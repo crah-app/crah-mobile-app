@@ -1,15 +1,15 @@
+import ThemedText from '@/components/ThemedText';
 import ThemedView from '@/components/ThemedView';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import ThemedText from '@/components/ThemedText';
 
 const Page = () => {
   const theme = useSystemTheme();
 
   return (
-    <ThemedView theme={theme} flex={1}>
-      <ThemedText theme={theme} value="search" />
+    <ThemedView flex={1} theme={theme}>
+      <ThemedText value="Stats" theme={theme} />
     </ThemedView>
   );
 };

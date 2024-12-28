@@ -21,6 +21,7 @@ const Page = () => {
       <Stack.Screen
         options={{
           title: 'Messages',
+          headerTintColor: Colors[theme].textPrimary,
           headerLeft: () => (
             <TouchableOpacity onPress={router.back}>
               <Ionicons
