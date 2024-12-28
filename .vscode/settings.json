@@ -1,0 +1,18 @@
+{
+    "editor.formatOnSave": true,               // Formatierte Dateien bei jedem Speichern
+    "editor.defaultFormatter": "esbenp.prettier-vscode", // Prettier als Standard-Formatter
+    "files.autoSave": "onWindowChange",        // Automatisches Speichern von Dateien
+    "javascript.format.enable": false,         // Deaktiviert die eingebaute JS-Formatierung
+    "typescript.format.enable": false,         // Deaktiviert die eingebaute TS-Formatierung
+    "prettier.singleQuote": true,              // Verwende einfache Anführungszeichen statt doppelte
+    "prettier.trailingComma": "all",           // Trailing Komma für Objekte, Arrays und Funktionsparameter
+    "prettier.semi": true,                     // Semikolon am Ende von Anweisungen
+    "prettier.tabWidth": 2,                    // Tab-Breite auf 2 Leerzeichen setzen
+    "prettier.useTabs": false,                 // Verwendet Leerzeichen statt Tabs
+    "prettier.bracketSpacing": true,           // Fügt Leerzeichen zwischen Klammern und dem Inhalt hinzu
+    "prettier.arrowParens": "always",          // Setzt Klammern um Arrow-Function-Parameter
+    "prettier.jsxBracketSameLine": false,      // Schließt das JSX-Schließzeichen in eine neue Zeile ein
+    "editor.formatOnPaste": true,              // Formatiere beim Einfügen von Code
+    "prettier.printWidth": 80                  // Maximale Zeilenlänge
+  }
+  
