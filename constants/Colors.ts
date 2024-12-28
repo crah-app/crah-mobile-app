@@ -1,6 +1,6 @@
 export default {
   light: {
-    primary: '#E63946',
+    primary: '#ff0000',
     background: '#E0E0E0',
     surface: '#FFFFFF',
     textPrimary: '#212121',
@@ -14,7 +14,7 @@ export default {
     borderColor: '#2A2A2A',
   },
   dark: {
-    primary: '#E63946',
+    primary: '#ff0000',
     background: '#121212',
     surface: '#1E1E1E',
     textPrimary: '#FFFFFF',
@@ -28,8 +28,11 @@ export default {
     borderColor: '#2A2A2A',
   },
   default: {
-    primary: '#E63946',
+    primary: '#ff0000',
     borderColor: '#E0E0E0',
     defaultTextPrimary: '#212121',
   },
 };
+
+// old primary color:
+// primary: '#E63946',

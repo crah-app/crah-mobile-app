@@ -1,13 +1,15 @@
 import Colors from '@/constants/Colors';
-import { defaultStyles } from '@/constants/Styles';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { Link, Stack } from 'expo-router';
+import { Link, router, Stack } from 'expo-router';
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 
 import ScooterBar from '../../../assets/images/vectors/bar.svg';
 import ScooterWheel from '../../../assets/images/vectors/wheel.svg';
+import TextLogo from '../../../assets/images/vectors/TextLogo.svg';
+import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Layout = () => {
   const theme = useSystemTheme();
@@ -27,23 +29,31 @@ const Layout = () => {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: '',
           headerTintColor: Colors[theme].textPrimary,
-          // headerLargeTitle: true,
           headerShadowVisible: false,
+          headerTitle: () => <View></View>,
+          headerLeft: () => (
+            <SafeAreaView>
+              <SvgXml
+                width={130}
+                height={130}
+                xml={TextLogo}
+                style={{
+                  bottom: Platform.OS === 'ios' ? -3 : -65,
+                  position: 'absolute',
+                  left: 0,
+                }}
+              />
+            </SafeAreaView>
+          ),
           headerRight: () => (
-            <Link
-              asChild
-              href={{
-                params: {},
-                pathname: '/homePages/messages',
-              }}
-            >
+            <View style={{ flexDirection: 'row', gap: 15 }}>
               <TouchableOpacity>
                 <SvgXml
                   width="25"
                   height="25"
-                  xml={ScooterBar}
+                  xml={ScooterWheel}
                   style={[
                     {
                       color: Colors[theme].textPrimary,
@@ -51,19 +61,42 @@ const Layout = () => {
                   ]}
                 />
               </TouchableOpacity>
-            </Link>
+
+              <Link
+                asChild
+                href={{
+                  params: {},
+                  pathname: '/homePages/messages',
+                }}
+              >
+                <TouchableOpacity>
+                  <SvgXml
+                    width="25"
+                    height="25"
+                    xml={ScooterBar}
+                    style={[
+                      {
+                        color: Colors[theme].textPrimary,
+                      },
+                    ]}
+                  />
+                </TouchableOpacity>
+              </Link>
+            </View>
           ),
+        }}
+      />
+      <Stack.Screen
+        name="messages"
+        options={{
+          title: 'Messages',
+          headerTintColor: Colors[theme].textPrimary,
           headerLeft: () => (
-            <TouchableOpacity>
-              <SvgXml
-                width="25"
-                height="25"
-                xml={ScooterWheel}
-                style={[
-                  {
-                    color: Colors[theme].textPrimary,
-                  },
-                ]}
+            <TouchableOpacity onPress={router.back}>
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={Colors[theme].textPrimary}
               />
             </TouchableOpacity>
           ),

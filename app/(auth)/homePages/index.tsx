@@ -11,7 +11,12 @@ const Page = () => {
 
   return (
     <ThemedView theme={theme} flex={1}>
-      <ThemedText value={'lol'} theme={theme} />
+      <ThemedText
+        value={
+          'lsdfsdwfwergguweighefuigzwegzhewugfhfuidkghjwsghfudkjghkjshdgjkhdfghjkdfgjghjksdghfjkdol'
+        }
+        theme={theme}
+      />
     </ThemedView>
   );
 };
