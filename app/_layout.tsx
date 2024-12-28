@@ -53,16 +53,8 @@ const Root = () => {
 
     const inAuthGroup = segments[0] === '(auth)';
 
-    console.log(
-      'check',
-      inAuthGroup,
-      isLoaded,
-      isSignedIn,
-      isSignedIn && !inAuthGroup,
-    );
-
     if (isSignedIn && !inAuthGroup) {
-      router.replace('/(auth)/profile');
+      router.replace('/(auth)/profilePages/');
     } else if (!isSignedIn) {
       router.replace('/');
     }

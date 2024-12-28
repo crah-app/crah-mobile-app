@@ -1,15 +1,17 @@
-import ThemedText from '@/components/ThemedText';
 import ThemedView from '@/components/ThemedView';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
+import ThemedText from '@/components/ThemedText';
+import { Stack } from 'expo-router';
+import Colors from '@/constants/Colors';
 
 const Page = () => {
   const theme = useSystemTheme();
 
   return (
-    <ThemedView flex={1} theme={theme}>
-      <ThemedText value="Stats" theme={theme} />
+    <ThemedView theme={theme} flex={1}>
+      <ThemedText theme={theme} value="search" />
     </ThemedView>
   );
 };

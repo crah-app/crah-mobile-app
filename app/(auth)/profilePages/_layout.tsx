@@ -19,8 +19,13 @@ const Layout = () => {
         headerShadowVisible: false,
       }}
     >
-      <Stack.Screen name="index" options={{ headerTitle: 'Profile' }} />
+      <Stack.Screen
+        name="index"
+        options={{ headerTitle: 'Profile', headerShown: false }}
+      />
       <Stack.Screen name="settings" options={{ headerTitle: 'Settings' }} />
+      <Stack.Screen name="inbox" options={{ headerTitle: 'Inbox' }} />
+      <Stack.Screen name="postView" options={{ headerTitle: 'PostView' }} />
     </Stack>
   );
 };

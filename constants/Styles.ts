@@ -20,7 +20,4 @@ export const defaultStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.light.primary,
   },
-  headerRightBtn: {
-    marginRight: 14,
-  },
 });

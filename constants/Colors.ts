@@ -1,7 +1,7 @@
 export default {
   light: {
     primary: '#E63946',
-    background: '#F5F5F5',
+    background: '#E0E0E0',
     surface: '#FFFFFF',
     textPrimary: '#212121',
     textPrimaryReverse: '#FFFFFF',
