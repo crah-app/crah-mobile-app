@@ -98,7 +98,7 @@ const Layout = () => {
                 height="25"
                 xml={Scooter}
                 fill={color}
-                style={[{ color }]}
+                style={[{ color: color }]}
               />
             ),
             tabBarShowLabel: false,
