@@ -25,7 +25,6 @@ const Layout = () => {
       />
       <Stack.Screen name="settings" options={{ headerTitle: 'Settings' }} />
       <Stack.Screen name="inbox" options={{ headerTitle: 'Inbox' }} />
-      <Stack.Screen name="postView" options={{ headerTitle: 'PostView' }} />
     </Stack>
   );
 };

@@ -18,22 +18,6 @@ const Page = () => {
 
   return (
     <ThemedView theme={theme} flex={1}>
-      <Stack.Screen
-        options={{
-          title: 'Messages',
-          headerTintColor: Colors[theme].textPrimary,
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color={Colors[theme].textPrimary}
-              />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-
       <ThemedText theme={theme} value="messages" />
     </ThemedView>
   );
