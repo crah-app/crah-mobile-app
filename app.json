@@ -28,7 +28,16 @@
       "output": "static",
       "favicon": "./assets/images/crah.png"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     },

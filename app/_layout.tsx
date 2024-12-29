@@ -54,7 +54,7 @@ const Root = () => {
     const inAuthGroup = segments[0] === '(auth)';
 
     if (isSignedIn && !inAuthGroup) {
-      router.replace('/(auth)/profilePages/');
+      router.replace('/(auth)/homePages');
     } else if (!isSignedIn) {
       router.replace('/');
     }
@@ -95,6 +95,10 @@ const Root = () => {
         }}
       />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="modals"
+        options={{ headerShown: false, presentation: 'modal' }}
+      />
     </Stack>
   );
 };
