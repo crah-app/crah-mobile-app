@@ -54,6 +54,22 @@ const Layout = () => {
           ),
         }}
       />
+      <Stack.Screen
+        name="FilterHomeContent"
+        options={{
+          headerShown: true,
+          title: 'Filter Content',
+          headerLeft: () => (
+            <TouchableOpacity onPress={router.back}>
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={Colors[theme].textPrimary}
+              />
+            </TouchableOpacity>
+          ),
+        }}
+      />
     </Stack>
   );
 };
