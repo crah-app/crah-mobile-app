@@ -1,48 +1,51 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
-import { useAuth } from '@clerk/clerk-expo';
+import {
+  View,
+  SectionList,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from 'react-native';
 import ThemedView from '@/components/ThemedView';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import ThemedText from '@/components/ThemedText';
-import { router } from 'expo-router';
 import Colors from '@/constants/Colors';
+import SettingsColumn from '@/components/SettingsColumn';
+import settingsData from '@/JSON/settings.json';
+import { router, Stack } from 'expo-router';
+import ThemedText from '@/components/ThemedText';
 
 const Page = () => {
-  const { signOut } = useAuth();
   const theme = useSystemTheme();
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      router.replace('/login');
-    } catch (err) {
-      console.error('Fehler beim Abmelden:', err);
-    }
-  };
-
   return (
-    <ThemedView flex={1} theme={theme}>
-      <TouchableOpacity onPress={handleSignOut} style={styles.button}>
-        <ThemedText
-          theme={theme}
-          value="sign out"
-          style={[styles.buttonText, { color: Colors['default'].primary }]}
+    <ThemedView theme={theme} flex={1}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <SectionList
+          sections={settingsData}
+          keyExtractor={(item, index) => item.text + index}
+          renderItem={({ item }) => <SettingsColumn {...item} />}
+          renderSectionHeader={({ section: { title } }) => (
+            <ThemedView style={styles.header} theme={theme}>
+              <ThemedText
+                theme={theme}
+                style={[styles.headerText]}
+                value={title}
+              />
+            </ThemedView>
+          )}
         />
-      </TouchableOpacity>
+      </SafeAreaView>
     </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
+  header: {
     padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    margin: 10,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

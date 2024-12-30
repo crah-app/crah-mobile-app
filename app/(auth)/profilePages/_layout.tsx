@@ -1,8 +1,9 @@
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { router, Stack } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const Layout = () => {
   const theme = useSystemTheme();
@@ -21,9 +22,26 @@ const Layout = () => {
     >
       <Stack.Screen
         name="index"
-        options={{ headerTitle: 'Profile', headerShown: false }}
+        options={{ headerTitle: 'Profile', headerShown: true }}
       />
-      <Stack.Screen name="settings" options={{ headerTitle: 'Settings' }} />
+      <Stack.Screen
+        name="settings"
+        options={{
+          title: 'Settings and Stats',
+          // headerLargeTitle: true,
+          headerTitleStyle: [{ fontSize: 20 }],
+          headerShown: true,
+          headerLeft: () => (
+            <TouchableOpacity onPress={router.back}>
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={Colors[theme].textPrimary}
+              />
+            </TouchableOpacity>
+          ),
+        }}
+      />
       <Stack.Screen name="inbox" options={{ headerTitle: 'Inbox' }} />
     </Stack>
   );

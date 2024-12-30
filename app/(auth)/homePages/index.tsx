@@ -17,7 +17,7 @@ import UserPost from '@/components/UserPost';
 import NoDataPlaceholder from '@/components/NoDataPlaceholder';
 
 // dummy data
-import posts from '../../../dummy/posts.json';
+import posts from '../../../JSON/posts.json';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Page = () => {
