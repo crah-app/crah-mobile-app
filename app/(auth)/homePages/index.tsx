@@ -123,7 +123,7 @@ const Page = () => {
 
       {UserPosts.length > 0 ? (
         <FlatList
-          data={UserPosts} // Geänderte Datenquelle
+          data={UserPosts}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <UserPost post={item} />}
           contentContainerStyle={[styles.flatListContainer]}
@@ -207,6 +207,11 @@ const Page = () => {
 };
 
 const styles = StyleSheet.create({
+  flatListContainer: {
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    paddingBottom: 100,
+  },
   popUpInnerWrapper: {
     position: 'absolute',
     shadowColor: '#000',

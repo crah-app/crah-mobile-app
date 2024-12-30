@@ -20,16 +20,16 @@ const Layout = () => {
         headerShadowVisible: false,
       }}
     >
-      <Stack.Screen
-        name="index"
-        options={{ headerTitle: 'Profile', headerShown: true }}
-      />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen
         name="settings"
         options={{
           title: 'Settings and Stats',
+          headerTitle: 'Settings and Stats',
           // headerLargeTitle: true,
-          headerTitleStyle: [{ fontSize: 20 }],
+          headerTitleStyle: [
+            { fontSize: 20, color: Colors[theme].textPrimary },
+          ],
           headerShown: true,
           headerLeft: () => (
             <TouchableOpacity onPress={router.back}>
