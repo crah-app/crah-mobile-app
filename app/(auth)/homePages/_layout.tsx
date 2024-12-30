@@ -1,15 +1,19 @@
+import React, { useRef, useState } from 'react';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Animated,
+  Easing,
+  Platform,
+} from 'react-native';
+import { SvgXml } from 'react-native-svg';
+import { Link, router, Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { Link, router, Stack } from 'expo-router';
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
-import { SvgXml } from 'react-native-svg';
-
-import ScooterBar from '../../../assets/images/vectors/bar.svg';
-import ScooterWheel from '../../../assets/images/vectors/wheel.svg';
-import TextLogo from '../../../assets/images/vectors/TextLogo.svg';
-import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import TextLogo from '../../../assets/images/vectors/TextLogo.svg';
 
 const Layout = () => {
   const theme = useSystemTheme();
@@ -32,7 +36,6 @@ const Layout = () => {
           title: '',
           headerTintColor: Colors[theme].textPrimary,
           headerShadowVisible: false,
-          headerTitle: () => <View></View>,
           headerLeft: () => (
             <SafeAreaView>
               <SvgXml
@@ -46,43 +49,6 @@ const Layout = () => {
                 }}
               />
             </SafeAreaView>
-          ),
-          headerRight: () => (
-            <View style={{ flexDirection: 'row', gap: 15 }}>
-              <TouchableOpacity>
-                <SvgXml
-                  width="25"
-                  height="25"
-                  xml={ScooterWheel}
-                  style={[
-                    {
-                      color: Colors[theme].textPrimary,
-                    },
-                  ]}
-                />
-              </TouchableOpacity>
-
-              <Link
-                asChild
-                href={{
-                  params: {},
-                  pathname: '/homePages/messages',
-                }}
-              >
-                <TouchableOpacity>
-                  <SvgXml
-                    width="25"
-                    height="25"
-                    xml={ScooterBar}
-                    style={[
-                      {
-                        color: Colors[theme].textPrimary,
-                      },
-                    ]}
-                  />
-                </TouchableOpacity>
-              </Link>
-            </View>
           ),
         }}
       />
