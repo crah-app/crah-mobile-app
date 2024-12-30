@@ -267,15 +267,29 @@ const Page = () => {
               <TextInput
                 value={resetCode}
                 placeholder="Code..."
-                style={styles.inputField}
                 onChangeText={setResetCode}
+                style={[
+                  styles.inputField,
+                  {
+                    backgroundColor: Colors[theme].surface,
+                    color: Colors[theme].textPrimary,
+                    borderColor: Colors[theme].borderColor,
+                  },
+                ]}
               />
               <TextInput
                 placeholder="New password"
                 value={newPassword}
                 onChangeText={setNewPassword}
                 secureTextEntry
-                style={styles.inputField}
+                style={[
+                  styles.inputField,
+                  {
+                    backgroundColor: Colors[theme].surface,
+                    color: Colors[theme].textPrimary,
+                    borderColor: Colors[theme].borderColor,
+                  },
+                ]}
               />
             </View>
           )}
