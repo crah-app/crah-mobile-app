@@ -26,7 +26,6 @@ const Page = () => {
 
   return (
     <ThemedView theme={theme} style={{ flex: 1 }}>
-      {/* <ScrollView style={[styles.ScrollViewContainer]}> */}
       {posts.length > 0 ? (
         <FlatList
           data={posts}
@@ -37,7 +36,6 @@ const Page = () => {
       ) : (
         <NoDataPlaceholder />
       )}
-      {/* </ScrollView> */}
     </ThemedView>
   );
 };
