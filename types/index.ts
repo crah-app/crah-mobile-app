@@ -12,3 +12,12 @@ export const PostTypes = {
 } as const;
 
 export type PostType = keyof typeof PostTypes;
+
+export const PostTypeIonicons = {
+  all: 'albums-outline',
+  videoLandscape: 'phone-landscape-outline',
+  videoPortrait: 'phone-portrait-outline',
+  text: 'chatbox-ellipses-outline',
+  article: 'book-outline',
+  image: 'images-outline',
+} as const;
