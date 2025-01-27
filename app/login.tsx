@@ -246,7 +246,7 @@ const Page = () => {
 
               {type === 'register' && (
                 <TextInput
-                  placeholder="set a username"
+                  placeholder="username"
                   value={username}
                   onChangeText={setUsername}
                   style={[
@@ -264,19 +264,42 @@ const Page = () => {
 
           {type === 'forgot' && successfulCreation && (
             <View>
-              <TextInput
+              <CodeField
+                ref={ref}
+                {...props}
                 value={resetCode}
-                placeholder="Code..."
                 onChangeText={setResetCode}
-                style={[
-                  styles.inputField,
-                  {
-                    backgroundColor: Colors[theme].surface,
-                    color: Colors[theme].textPrimary,
-                    borderColor: Colors[theme].borderColor,
-                  },
-                ]}
+                cellCount={CELL_COUNT}
+                rootStyle={styles.codeFieldRoot}
+                keyboardType="number-pad"
+                textContentType="oneTimeCode"
+                renderCell={({ index, symbol, isFocused }) => (
+                  <ThemedText
+                    theme={theme}
+                    key={index}
+                    style={[
+                      styles.cellRoot,
+                      {
+                        borderColor: Colors[theme].borderColor,
+                        textAlign: 'center',
+                        textAlignVertical: 'center',
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignContent: 'center',
+                        alignItems: 'center',
+                        alignSelf: 'center',
+                        padding: 12.5,
+                        marginBottom: 20,
+                      },
+                      styles.cellText,
+                      isFocused && { backgroundColor: Colors[theme].surface },
+                    ]}
+                    onLayout={getCellOnLayoutHandler(index)}
+                    value={symbol || (isFocused ? <Cursor /> : '')}
+                  />
+                )}
               />
+
               <TextInput
                 placeholder="New password"
                 value={newPassword}
