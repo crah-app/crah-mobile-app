@@ -69,7 +69,7 @@ const Page = () => {
   };
 
   return (
-    <ThemedView theme={theme} style={{ flex: 1 }}>
+    <ThemedView theme={theme} flex={1}>
       <Stack.Screen
         options={{
           headerTitle: () => <View></View>,

@@ -10,7 +10,7 @@ import { router } from 'expo-router';
 import Scooter from '../assets/images/vectors/scooter.svg';
 
 interface SettingsColumnProps {
-  type: string;
+  type: 'ordinary' | 'unordinary';
   text: string;
   icon: string;
   svg: boolean;

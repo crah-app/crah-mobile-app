@@ -27,6 +27,7 @@ import { PostTypeIonicons } from '@/types';
 // dummy data
 import tricks from '@/JSON/tricks.json';
 import posts from '../../../JSON/posts.json';
+import UserImageCircle from '@/components/UserImageCircle';
 
 const Page = () => {
   const theme = useSystemTheme();
@@ -119,11 +120,10 @@ const Page = () => {
                   }
                   style={[styles.UserName]}
                 />
-                <Image
-                  height={88}
+                <UserImageCircle
                   width={88}
-                  source={{ uri: user?.imageUrl }}
-                  style={[styles.UserProfile]}
+                  height={88}
+                  imageUri={JSON.stringify(user?.imageUrl)}
                 />
               </View>
 

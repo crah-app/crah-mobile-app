@@ -22,11 +22,11 @@ const Layout = () => {
       <Stack.Screen
         name="index"
         options={{
-          headerSearchBarOptions: { placeholder: 'Stats' },
           headerTintColor: Colors[theme].textPrimary,
-          headerLargeTitle: true,
+          // headerLargeTitle: true,
           headerShadowVisible: false,
-          title: 'Statsss',
+          title: 'Gallery',
+          // headerShown: true,
         }}
       />
     </Stack>
