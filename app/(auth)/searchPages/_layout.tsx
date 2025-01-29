@@ -44,7 +44,7 @@ const Layout = () => {
                 height={130}
                 xml={TextLogo}
                 style={{
-                  bottom: Platform.OS === 'ios' ? -61.5 : -15,
+                  bottom: Platform.OS === 'ios' ? -61.5 : -65,
                   position: 'absolute',
                   left: 0,
                 }}

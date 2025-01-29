@@ -5,7 +5,7 @@ import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedText from '@/components/ThemedText';
 import { Stack } from 'expo-router';
 import Colors from '@/constants/Colors';
-import { PostTypes } from '@/types';
+import { SearchTypes } from '@/types';
 import PostTypeButton from '@/components/PostTypeButton';
 import posts from '../../../JSON/posts.json'; // posts that are relevant for the search section
 import { filterPosts } from '@/utils/globalFuncs';
@@ -27,7 +27,7 @@ const Page = () => {
   return (
     <ThemedView theme={theme} style={styles.container}>
       <View style={styles.category_container}>
-        {Object.entries(PostTypes).map(([key, value]) => (
+        {Object.entries(SearchTypes).map(([key, value]) => (
           <PostTypeButton
             key={key}
             val={value}
@@ -43,6 +43,7 @@ const Page = () => {
               borderColor: Colors.default.primary,
               borderWidth: 1,
               width: 150,
+              shadowColor: 'transparent',
             }}
             fontStyle={{
               fontSize: 13,

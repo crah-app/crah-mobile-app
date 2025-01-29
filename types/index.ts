@@ -21,7 +21,7 @@ export const GeneralPostTypes = {
 } as const;
 
 // ALl types of stuff the user can search for includign non-post stuff like the "rider" type and the "tricks" type
-export const GeneralSearchTypes = {
+export const SearchTypes = {
   all: 'All posts',
   videos_and_images: 'Clips',
   articles: 'Articles',
