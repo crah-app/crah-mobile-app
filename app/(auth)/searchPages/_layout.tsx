@@ -31,7 +31,7 @@ const Layout = () => {
       <Stack.Screen
         name="index"
         options={{
-          // headerSearchBarOptions: { placeholder: 'Search for chat' },
+          headerSearchBarOptions: { placeholder: 'Search for...' },
           headerTintColor: Colors[theme].textPrimary,
           headerLargeTitle: false,
           headerShadowVisible: false,

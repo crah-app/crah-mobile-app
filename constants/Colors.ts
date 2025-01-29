@@ -1,11 +1,12 @@
 export default {
   light: {
     primary: '#ff0000',
-    background: '#E0E0E0',
+    background: '#EFEFEF',
     surface: '#FFFFFF',
+    container_surface: '#DCDCDC',
     textPrimary: '#212121',
     textPrimaryReverse: '#FFFFFF',
-    textSecondary: '#757575',
+    textSecondary: '#DCDCDC',
     accent: '#457B9D',
     buttonDefault: '#1E1E1E',
     buttonActive: '#C92A34',
@@ -17,6 +18,7 @@ export default {
     primary: '#ff0000',
     background: '#121212',
     surface: '#1E1E1E',
+    container_surface: '#1E1E1E',
     textPrimary: '#FFFFFF',
     textPrimaryReverse: '#212121',
     textSecondary: '#BDBDBD',

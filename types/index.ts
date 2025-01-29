@@ -40,4 +40,10 @@ export const PostTypeIonicons = {
   image: 'images-outline',
 } as const;
 
+// explore post order types
+export const ExplorePostOrder = {
+  toOldest: 'Latest to oldest',
+  toLatest: 'Oldest to latest',
+};
+
 export type PostType = keyof typeof PostTypes;

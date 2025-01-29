@@ -197,8 +197,8 @@ const Page = () => {
 
 const styles = StyleSheet.create({
   flatListContainer: {
-    paddingHorizontal: 15,
-    paddingTop: 10,
+    // paddingHorizontal: 15,
+    // paddingTop: 10,
     paddingBottom: 100,
   },
   popUpInnerWrapper: {
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 10,
+    gap: 15,
     height: '100%',
   },
   FilterButton: {
