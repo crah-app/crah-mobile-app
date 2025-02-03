@@ -31,6 +31,8 @@ import ScooterWheel from '../../../assets/images/vectors/wheel.svg';
 import ScooterWheelReflexes from '../../../assets/images/vectors/wheel_reflexes.svg';
 import { Ionicons } from '@expo/vector-icons';
 import { PostType, PostTypes } from '@/types';
+import PostTypeButton from '@/components/PostTypeButton';
+import { filterPosts } from '@/utils/globalFuncs';
 
 const Page = () => {
   const theme = useSystemTheme();
@@ -58,18 +60,14 @@ const Page = () => {
   });
 
   const FilterPosts = (type: string) => {
-    let filteredPosts = posts;
-
-    if (type != 'all') {
-      filteredPosts = posts.filter((post) => post.type === type);
-    }
+    let filteredPosts = filterPosts(posts, type);
 
     SetUserPosts(filteredPosts);
     setFilterVisibility(false);
   };
 
   return (
-    <ThemedView theme={theme} style={{ flex: 1 }}>
+    <ThemedView theme={theme} flex={1}>
       <Stack.Screen
         options={{
           headerTitle: () => <View></View>,
@@ -180,22 +178,13 @@ const Page = () => {
             <ThemedView theme={theme} style={[styles.main]} flex={1}>
               <View style={[styles.FilterGrid]}>
                 {Object.values(PostTypes).map((val, key) => (
-                  <TouchableOpacity
+                  <PostTypeButton
                     key={key}
-                    style={[
-                      styles.FilterButton,
-                      { backgroundColor: Colors[theme].primary },
-                    ]}
-                    onPress={() =>
+                    val={val}
+                    click_action={() =>
                       FilterPosts(`${Object.keys(PostTypes)[key]}`)
                     }
-                  >
-                    <ThemedText
-                      theme={theme}
-                      value={val}
-                      style={[styles.FilterButtonText]}
-                    />
-                  </TouchableOpacity>
+                  />
                 ))}
               </View>
             </ThemedView>
@@ -208,8 +197,8 @@ const Page = () => {
 
 const styles = StyleSheet.create({
   flatListContainer: {
-    paddingHorizontal: 15,
-    paddingTop: 10,
+    // paddingHorizontal: 15,
+    // paddingTop: 10,
     paddingBottom: 100,
   },
   popUpInnerWrapper: {
@@ -243,7 +232,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 10,
+    gap: 15,
     height: '100%',
   },
   FilterButton: {
