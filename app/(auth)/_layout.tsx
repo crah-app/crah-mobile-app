@@ -16,6 +16,7 @@ import { SvgXml } from 'react-native-svg';
 import Scooter from '../../assets/images/vectors/scooter.svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ThemedText from '@/components/ThemedText';
+import CreateModal from '@/components/CreateModal';
 
 const Layout = () => {
   const theme = useSystemTheme();
@@ -118,134 +119,11 @@ const Layout = () => {
         />
       </Tabs>
 
-      <Modal
-        transparent={true}
-        animationType="slide"
+      <CreateModal
+        theme={theme}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <TouchableOpacity
-            onPress={() => setModalVisible(false)}
-            style={{
-              position: 'absolute',
-              width: Dimensions.get('window').width,
-              height: Dimensions.get('window').height,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <View
-              style={[
-                styles.modalContent,
-                {
-                  backgroundColor: Colors[theme].container_surface,
-                  position: 'absolute',
-                  bottom: Platform.OS === 'ios' ? 70 + 20 : 70 + 30,
-                  borderWidth: StyleSheet.hairlineWidth,
-                  borderColor: 'rgba(0,0,0,1)',
-                },
-              ]}
-            >
-              <View
-                style={[
-                  {
-                    width: '100%',
-                    paddingBottom: 4,
-                    borderBottomColor: Colors[theme].textPrimary,
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  },
-                ]}
-              >
-                <View
-                  style={[
-                    {
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '90%',
-                      marginTop: 4,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.modalText,
-                      { color: Colors[theme].textPrimary, fontWeight: 700 },
-                    ]}
-                  >
-                    create
-                  </Text>
-                </View>
-              </View>
-
-              <View
-                style={{
-                  width: '100%',
-                }}
-              >
-                <Link
-                  onPress={() => setModalVisible(false)}
-                  href={{ pathname: '/(auth)/createPages/createVideo' }}
-                  style={[
-                    styles.modalCategory,
-                    {
-                      borderBottomColor: 'rgba(255,255,255,0.3)',
-                      textAlign: 'center',
-                    },
-                  ]}
-                >
-                  <ThemedText theme={theme} value={'Video'} />
-                </Link>
-
-                <Link
-                  onPress={() => setModalVisible(false)}
-                  href={{ pathname: '/(auth)/createPages/createTextPost' }}
-                  style={[
-                    styles.modalCategory,
-                    {
-                      borderBottomColor: 'rgba(255,255,255,0.3)',
-                      textAlign: 'center',
-                    },
-                  ]}
-                >
-                  <ThemedText theme={theme} value={'Text'} />
-                </Link>
-
-                <Link
-                  onPress={() => setModalVisible(false)}
-                  href={{ pathname: '/(auth)/createPages/createTextPost' }}
-                  style={[
-                    styles.modalCategory,
-                    {
-                      borderBottomColor: 'rgba(255,255,255,0.3)',
-                      textAlign: 'center',
-                    },
-                  ]}
-                >
-                  <ThemedText theme={theme} value={'Image'} />
-                </Link>
-
-                <Link
-                  onPress={() => setModalVisible(false)}
-                  href={{ pathname: '/(auth)/createPages/createArticle' }}
-                  style={[
-                    styles.modalCategory,
-                    {
-                      borderBottomColor: 'transparent',
-                      textAlign: 'center',
-                    },
-                  ]}
-                >
-                  <ThemedText theme={theme} value={'Article'} />
-                </Link>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+        setModalVisible={() => setModalVisible(false)}
+      />
     </View>
   );
 };
@@ -283,31 +161,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    borderRadius: 10,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-    width: 200,
-  },
-  modalText: {
-    fontSize: 18,
-  },
-
-  modalCategory: {
-    paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    width: '100%',
   },
 });
 

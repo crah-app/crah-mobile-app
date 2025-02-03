@@ -17,15 +17,36 @@ const Layout = () => {
           color: Colors[theme].textPrimary,
         },
         headerShadowVisible: false,
+        headerLeft: () => <></>,
+        headerLargeTitle: false,
+        animation: 'none',
       }}
     >
       <Stack.Screen
-        name="index"
+        name="createArticle"
         options={{
           headerTintColor: Colors[theme].textPrimary,
-          headerLargeTitle: true,
           headerShadowVisible: false,
-          title: 'Create',
+          headerShown: true,
+          title: 'Create Article',
+        }}
+      />
+      <Stack.Screen
+        name="createTextPost"
+        options={{
+          headerTintColor: Colors[theme].textPrimary,
+          headerShadowVisible: false,
+          headerShown: true,
+          title: 'Create Text/ Image',
+        }}
+      />
+      <Stack.Screen
+        name="createVideo"
+        options={{
+          headerTintColor: Colors[theme].textPrimary,
+          headerShadowVisible: false,
+          headerShown: true,
+          title: 'Create Video',
         }}
       />
     </Stack>
