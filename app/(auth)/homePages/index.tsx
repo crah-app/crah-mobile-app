@@ -30,15 +30,19 @@ import ScooterBar from '../../../assets/images/vectors/bar.svg';
 import ScooterWheel from '../../../assets/images/vectors/wheel.svg';
 import ScooterWheelReflexes from '../../../assets/images/vectors/wheel_reflexes.svg';
 import { Ionicons } from '@expo/vector-icons';
-import { PostType, PostTypes } from '@/types';
 import PostTypeButton from '@/components/PostTypeButton';
 import { filterPosts } from '@/utils/globalFuncs';
+import PostTypeFilterModal from '@/components/home/PostTypeFilterModal';
+import HomePageFilterButton from '@/components/home/HomePageFilterButton';
+import { ContentFilterTypes } from '@/types';
 
 const Page = () => {
   const theme = useSystemTheme();
   const [FilterIsVisible, setFilterVisibility] = useState(false);
-  const { width, height } = useWindowDimensions();
   const [UserPosts, SetUserPosts] = useState(posts);
+  const [ContentFilterSelected, setSelectedContentFilter] = useState(
+    ContentFilterTypes[0],
+  );
 
   const rotation = useRef(new Animated.Value(0)).current;
 
@@ -64,6 +68,10 @@ const Page = () => {
 
     SetUserPosts(filteredPosts);
     setFilterVisibility(false);
+  };
+
+  const HandleFilterContentType = (type: string) => {
+    setSelectedContentFilter(type);
   };
 
   return (
@@ -119,78 +127,44 @@ const Page = () => {
         }}
       />
 
-      {UserPosts.length > 0 ? (
-        <FlatList
-          data={UserPosts}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <UserPost post={item} />}
-          contentContainerStyle={[styles.flatListContainer]}
-        />
-      ) : (
-        <NoDataPlaceholder />
-      )}
-
-      <Modal
-        visible={FilterIsVisible}
-        presentationStyle="overFullScreen"
-        animationType="fade"
-        transparent
-        statusBarTranslucent
-      >
-        <View style={styles.PopUpBackground}>
-          <View
-            style={[
-              styles.popUpInnerWrapper,
-              {
-                top: height / 3.5,
-                left: width / 10,
-                width: (width / 10) * 8,
-                height: (height / 10) * 4.5,
-                borderRadius: 20,
-                overflow: 'hidden',
-                backgroundColor: Colors[theme].surface,
-              },
-            ]}
-          >
-            <ThemedView
-              theme={theme}
-              style={[
-                styles.header,
-                { backgroundColor: Colors[theme].surface },
-              ]}
-            >
-              <TouchableOpacity onPress={() => setFilterVisibility(false)}>
-                <Ionicons
-                  name="close"
-                  size={24}
-                  color={Colors[theme].textPrimary}
-                />
-              </TouchableOpacity>
-
-              <ThemedText
-                theme={theme}
-                value={'Filter Content'}
-                style={{ fontSize: 25, fontWeight: '600' }}
+      <ScrollView>
+        <View style={[styles.ContentFilterContainer]}>
+          {ContentFilterTypes.map((value: string, index: number) => {
+            return (
+              <HomePageFilterButton
+                key={value}
+                text={value}
+                onPress={() => HandleFilterContentType(value)}
+                style={[
+                  {
+                    borderColor:
+                      ContentFilterSelected === value
+                        ? Colors[theme].primary
+                        : Colors[theme].textPrimary,
+                  },
+                ]}
               />
-
-              <View></View>
-            </ThemedView>
-            <ThemedView theme={theme} style={[styles.main]} flex={1}>
-              <View style={[styles.FilterGrid]}>
-                {Object.values(PostTypes).map((val, key) => (
-                  <PostTypeButton
-                    key={key}
-                    val={val}
-                    click_action={() =>
-                      FilterPosts(`${Object.keys(PostTypes)[key]}`)
-                    }
-                  />
-                ))}
-              </View>
-            </ThemedView>
-          </View>
+            );
+          })}
         </View>
-      </Modal>
+
+        {UserPosts.length > 0 ? (
+          <FlatList
+            data={UserPosts}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <UserPost post={item} />}
+            contentContainerStyle={[styles.flatListContainer]}
+          />
+        ) : (
+          <NoDataPlaceholder />
+        )}
+      </ScrollView>
+
+      <PostTypeFilterModal
+        FilterIsVisible={FilterIsVisible}
+        FilterPosts={FilterPosts}
+        setFilterVisibility={setFilterVisibility}
+      />
     </ThemedView>
   );
 };
@@ -201,57 +175,10 @@ const styles = StyleSheet.create({
     // paddingTop: 10,
     paddingBottom: 100,
   },
-  popUpInnerWrapper: {
-    position: 'absolute',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  PopUpBackground: {
-    flex: 1,
-    backgroundColor: '#000000cc',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  header: {
-    width: '100%',
+  ContentFilterContainer: {
+    padding: 10,
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  main: {
-    width: '100%',
-    paddingHorizontal: 20,
-  },
-  FilterGrid: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 15,
-    height: '100%',
-  },
-  FilterButton: {
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
-    width: 200,
-  },
-  FilterButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    gap: 10,
   },
 });
 
