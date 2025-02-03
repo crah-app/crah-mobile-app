@@ -114,6 +114,7 @@ const Page = () => {
                     width="25"
                     height="25"
                     xml={ScooterBar}
+                    fill={Colors[theme].textPrimary}
                     style={[
                       {
                         color: Colors[theme].textPrimary,

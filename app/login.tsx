@@ -30,6 +30,8 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
+import { Ionicons } from '@expo/vector-icons';
+import SecuredPasswordInput from '@/components/SecuredPasswordInput';
 
 const CELL_COUNT = 6;
 
@@ -228,19 +230,10 @@ const Page = () => {
               />
 
               {type !== 'forgot' && !successfulCreation && (
-                <TextInput
+                <SecuredPasswordInput
+                  password={password}
+                  setPassword={setPassword}
                   placeholder={'password'}
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  style={[
-                    styles.inputField,
-                    {
-                      backgroundColor: Colors[theme].surface,
-                      color: Colors[theme].textPrimary,
-                      borderColor: Colors[theme].borderColor,
-                    },
-                  ]}
                 />
               )}
 
@@ -300,12 +293,11 @@ const Page = () => {
                 )}
               />
 
-              <TextInput
-                placeholder="New password"
-                value={newPassword}
-                onChangeText={setNewPassword}
-                secureTextEntry
-                style={[
+              <SecuredPasswordInput
+                password={newPassword}
+                setPassword={setNewPassword}
+                placeholder={'New Password'}
+                InputStyle={[
                   styles.inputField,
                   {
                     backgroundColor: Colors[theme].surface,
