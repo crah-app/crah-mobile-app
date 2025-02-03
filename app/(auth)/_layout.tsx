@@ -57,7 +57,8 @@ const Layout = () => {
             tabBarIcon: ({ color }) => (
               <Ionicons name="home-outline" size={24} color={color} />
             ),
-            tabBarShowLabel: false,
+            tabBarShowLabel: true,
+            tabBarLabel: 'Home',
             headerShown: false,
           }}
         />
@@ -67,7 +68,8 @@ const Layout = () => {
             tabBarIcon: ({ color }) => (
               <Ionicons name="search-outline" size={24} color={color} />
             ),
-            tabBarShowLabel: false,
+            tabBarShowLabel: true,
+            tabBarLabel: 'Search',
             headerShown: false,
           }}
         />
@@ -103,7 +105,8 @@ const Layout = () => {
                 style={{ color }}
               />
             ),
-            tabBarShowLabel: false,
+            tabBarShowLabel: true,
+            tabBarLabel: 'Ranks',
             headerShown: false,
           }}
         />
@@ -113,7 +116,8 @@ const Layout = () => {
             tabBarIcon: ({ color }) => (
               <Ionicons name="person-outline" size={24} color={color} />
             ),
-            tabBarShowLabel: false,
+            tabBarShowLabel: true,
+            tabBarLabel: 'Profile',
             headerShown: false,
           }}
         />
@@ -131,22 +135,30 @@ const Layout = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignContent: 'center',
   },
   tabBarStyle: {
     position: 'absolute',
-    borderRadius: 70,
+    borderRadius: 0,
     borderWidth: 10,
-    borderBottomWidth: 40,
-    paddingHorizontal: 10,
-    height: 70,
+    borderBottomWidth: 10,
+    paddingHorizontal: 15,
+    height: 90,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingBottom: 20,
-    borderTopWidth: 0,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderTopColor: 'white',
+    // borderLeftColor: 'white',
+    // borderRightColor: 'white',
   },
   plusButtonContainer: {
-    bottom: 5,
+    bottom: 0,
     alignItems: 'center',
   },
   plusButton: {

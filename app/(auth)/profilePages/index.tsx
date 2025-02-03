@@ -269,6 +269,7 @@ const Page = () => {
                     numColumns={3}
                     renderItem={({ item, index }) => (
                       <UserPostGridItem
+                        key={index}
                         post={item}
                         style={[
                           styles.GridItem,
