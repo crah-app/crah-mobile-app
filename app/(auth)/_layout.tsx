@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, Tabs } from 'expo-router';
 import {
   StyleSheet,
   View,
+  Modal,
   Text,
   TouchableOpacity,
+  Dimensions,
   Platform,
 } from 'react-native';
 import Colors from '@/constants/Colors';
@@ -13,10 +15,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import Scooter from '../../assets/images/vectors/scooter.svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ThemedText from '@/components/ThemedText';
+import CreateModal from '@/components/CreateModal';
 
 const Layout = () => {
   const theme = useSystemTheme();
   const { bottom } = useSafeAreaInsets();
+  const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -26,8 +31,8 @@ const Layout = () => {
             styles.tabBarStyle,
             {
               borderColor: Colors[theme].background,
-              backgroundColor: Colors[theme].surface,
-              bottom: bottom / 2.5,
+              backgroundColor: Colors[theme].background,
+              paddingBottom: bottom,
             },
           ],
           tabBarInactiveTintColor: Colors[theme].textPrimary,
@@ -66,6 +71,7 @@ const Layout = () => {
             headerShown: false,
           }}
         />
+
         <Tabs.Screen
           name="createPages"
           options={{
@@ -73,18 +79,14 @@ const Layout = () => {
             tabBarShowLabel: false,
             headerShown: false,
             tabBarButton: (props) => (
-              <Link
-                {...props}
+              <TouchableOpacity
+                onPress={() => setModalVisible(true)}
                 style={styles.plusButtonContainer}
-                href={{ pathname: '/createPages' }}
-                asChild
               >
-                <TouchableOpacity>
-                  <View style={[styles.plusButton]}>
-                    <Ionicons name="add" size={30} color="#FFF" />
-                  </View>
-                </TouchableOpacity>
-              </Link>
+                <View style={styles.plusButton}>
+                  <Ionicons name="add" size={30} color="#FFF" />
+                </View>
+              </TouchableOpacity>
             ),
           }}
         />
@@ -98,7 +100,7 @@ const Layout = () => {
                 height="25"
                 xml={Scooter}
                 fill={color}
-                style={[{ color: color }]}
+                style={{ color }}
               />
             ),
             tabBarShowLabel: false,
@@ -116,6 +118,12 @@ const Layout = () => {
           }}
         />
       </Tabs>
+
+      <CreateModal
+        theme={theme}
+        visible={modalVisible}
+        setModalVisible={() => setModalVisible(false)}
+      />
     </View>
   );
 };
@@ -123,28 +131,28 @@ const Layout = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.default.primary,
   },
   tabBarStyle: {
     position: 'absolute',
-    borderRadius: 50,
+    borderRadius: 70,
     borderWidth: 10,
-    paddingHorizontal: 15,
+    borderBottomWidth: 40,
+    paddingHorizontal: 10,
     height: 70,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 20,
+    borderTopWidth: 0,
   },
   plusButtonContainer: {
-    position: 'absolute',
-    top: 5,
-    left: '50%',
-    transform: [{ translateX: -25 }],
-    zIndex: 1,
+    bottom: 5,
+    alignItems: 'center',
   },
   plusButton: {
     width: 50,
     height: 50,
     borderRadius: 30,
-    borderWidth: 4,
-    borderColor: '#8B0000',
     backgroundColor: Colors.default.primary,
     justifyContent: 'center',
     alignItems: 'center',

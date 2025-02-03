@@ -46,4 +46,6 @@ export const ExplorePostOrder = {
   toLatest: 'Oldest to latest',
 };
 
+export const ContentFilterTypes = ['explore', 'friends', 'rank'];
+
 export type PostType = keyof typeof PostTypes;
