@@ -78,7 +78,6 @@ const Layout = () => {
           name="createPages"
           options={{
             tabBarIcon: () => null,
-            tabBarShowLabel: false,
             headerShown: false,
             tabBarButton: (props) => (
               <TouchableOpacity
