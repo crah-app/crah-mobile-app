@@ -1,0 +1,32 @@
+[
+  {
+    "_id": 1,
+    "text": "Hey, bist du morgen im Skatepark?",
+    "createdAt": "2024-02-04 12:00:00",
+    "user": {
+      "_id": 2,
+      "name": "Tom Rider",
+      "avatar": "https://randomuser.me/api/portraits/men/45.jpg"
+    }
+  },
+  {
+    "_id": 2,
+    "text": "Ja, bin da! Lass ein paar Tricks filmen.",
+    "createdAt": "2024-02-04 11:55:00",
+    "user": {
+      "_id": 1,
+      "name": "Max Mustermann",
+      "avatar": "https://randomuser.me/api/portraits/men/32.jpg"
+    }
+  },
+  {
+    "_id": 3,
+    "text": "Perfekt, bis morgen!",
+    "createdAt": "2024-02-04 11:50:00",
+    "user": {
+      "_id": 2,
+      "name": "Tom Rider",
+      "avatar": "https://randomuser.me/api/portraits/men/45.jpg"
+    }
+  }
+]

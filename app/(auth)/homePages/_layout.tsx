@@ -53,10 +53,12 @@ const Layout = () => {
         }}
       />
       <Stack.Screen
-        name="messages"
+        name="chats"
         options={{
           title: 'Messages',
           headerTintColor: Colors[theme].textPrimary,
+          headerSearchBarOptions: { placeholder: 'Search for a chat' },
+          headerLargeTitle: true,
           headerLeft: () => (
             <TouchableOpacity onPress={router.back}>
               <Ionicons
