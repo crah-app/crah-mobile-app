@@ -52,22 +52,8 @@ const Layout = () => {
           ),
         }}
       />
-      <Stack.Screen
-        name="messages"
-        options={{
-          title: 'Messages',
-          headerTintColor: Colors[theme].textPrimary,
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color={Colors[theme].textPrimary}
-              />
-            </TouchableOpacity>
-          ),
-        }}
-      />
+
+      <Stack.Screen name="chats" options={{ headerShown: false }} />
     </Stack>
   );
 };

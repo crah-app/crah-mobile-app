@@ -35,6 +35,7 @@ import { filterPosts } from '@/utils/globalFuncs';
 import PostTypeFilterModal from '@/components/home/PostTypeFilterModal';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
 import { ContentFilterTypes } from '@/types';
+import MessagesButton from '@/components/home/MessagesButton';
 
 const Page = () => {
   const theme = useSystemTheme();
@@ -102,27 +103,7 @@ const Page = () => {
                 </Animated.View>
               </TouchableOpacity>
 
-              <Link
-                asChild
-                href={{
-                  params: {},
-                  pathname: '/homePages/messages',
-                }}
-              >
-                <TouchableOpacity>
-                  <SvgXml
-                    width="25"
-                    height="25"
-                    xml={ScooterBar}
-                    fill={Colors[theme].textPrimary}
-                    style={[
-                      {
-                        color: Colors[theme].textPrimary,
-                      },
-                    ]}
-                  />
-                </TouchableOpacity>
-              </Link>
+              <MessagesButton />
             </View>
           ),
         }}
