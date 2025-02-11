@@ -8,7 +8,17 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 const Layout = () => {
   const theme = useSystemTheme();
   return (
-    <Stack screenOptions={{}}>
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: Colors[theme].surface,
+        },
+        headerTitleStyle: {
+          color: Colors[theme].textPrimary,
+        },
+        headerShadowVisible: false,
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{

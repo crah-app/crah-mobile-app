@@ -52,24 +52,8 @@ const Layout = () => {
           ),
         }}
       />
-      <Stack.Screen
-        name="chats"
-        options={{
-          title: 'Messages',
-          headerTintColor: Colors[theme].textPrimary,
-          headerSearchBarOptions: { placeholder: 'Search for a chat' },
-          headerLargeTitle: true,
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color={Colors[theme].textPrimary}
-              />
-            </TouchableOpacity>
-          ),
-        }}
-      />
+
+      <Stack.Screen name="chats" options={{ headerShown: false }} />
     </Stack>
   );
 };

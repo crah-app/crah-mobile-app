@@ -10,44 +10,50 @@ import React from 'react';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedText from './ThemedText';
+import { Link } from 'expo-router';
 
-const MessageColumn = () => {
+const MessageColumn: React.FC<{ id: number }> = ({ id }) => {
   const theme = useSystemTheme();
 
   const handleClick = () => {};
 
   return (
-    <TouchableOpacity
-      style={[
-        styles.container,
-        { backgroundColor: Colors[theme].textBubbleOther },
-      ]}
-      onPress={handleClick}
+    <Link
+      asChild
+      href={{ pathname: '/(auth)/homePages/chats/[id]', params: { id } }}
     >
-      <View style={[styles.user_container]}>
-        <Image
-          source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
-          width={32}
-          height={32}
-          style={[styles.user_profile]}
-        />
-
-        <View style={[styles.text_container]}>
-          <ThemedText
-            theme={theme}
-            value={'User123'}
-            style={[
-              styles.text,
-              {
-                color: Colors[theme].textPrimary,
-                fontWeight: 600,
-                textAlign: 'center',
-              },
-            ]}
+      <TouchableOpacity
+        style={[
+          styles.container,
+          { backgroundColor: Colors[theme].textBubbleOther },
+        ]}
+        onPress={handleClick}
+      >
+        <View style={[styles.user_container]}>
+          <Image
+            source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+            width={32}
+            height={32}
+            style={[styles.user_profile]}
           />
+
+          <View style={[styles.text_container]}>
+            <ThemedText
+              theme={theme}
+              value={'User123'}
+              style={[
+                styles.text,
+                {
+                  color: Colors[theme].textPrimary,
+                  fontWeight: 600,
+                  textAlign: 'center',
+                },
+              ]}
+            />
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Link>
   );
 };
 

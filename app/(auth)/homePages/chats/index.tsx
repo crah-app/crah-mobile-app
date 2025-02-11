@@ -19,23 +19,43 @@ import ThemedText from '@/components/ThemedText';
 import { useUser } from '@clerk/clerk-expo';
 import messages from '@/JSON/messages.json';
 import MessageColumn from '@/components/MessageColumn';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Page = () => {
   const theme = useSystemTheme();
   const { user } = useUser();
+  const { bottom } = useSafeAreaInsets();
 
   return (
     <ThemedView theme={theme} flex={1}>
-      <SafeAreaView>
-        <View style={[styles.messages_container]}>
-          <View style={{ padding: 10 }}>
-            <ThemedText theme={theme} value={'latest'} />
-          </View>
+      <Stack.Screen
+        options={{
+          title: 'Messages',
+          headerTintColor: Colors[theme].textPrimary,
+          headerLargeTitle: true,
+          headerShown: true,
+          headerSearchBarOptions: { placeholder: 'Search for a chat' },
+          headerLeft: () => (
+            <TouchableOpacity onPress={router.back}>
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={Colors[theme].textPrimary}
+              />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        contentContainerStyle={{ paddingBottom: 60 }}
+      >
+        <SafeAreaView>
+          <View style={[styles.messages_container]}>
+            <View style={{ padding: 10 }}>
+              <ThemedText theme={theme} value={'latest'} />
+            </View>
 
-          <ScrollView
-            contentInsetAdjustmentBehavior="automatic"
-            contentContainerStyle={{ paddingBottom: 40 }}
-          >
             <FlatList
               ItemSeparatorComponent={() => (
                 <View
@@ -49,15 +69,13 @@ const Page = () => {
               data={messages}
               keyExtractor={(item) => item._id.toString()}
               contentContainerStyle={[styles.message_list_container]}
-              renderItem={(item) => {
-                console.log(item);
-
-                return <MessageColumn />;
+              renderItem={(listItem) => {
+                return <MessageColumn id={listItem.item._id} />;
               }}
             />
-          </ScrollView>
-        </View>
-      </SafeAreaView>
+          </View>
+        </SafeAreaView>
+      </ScrollView>
     </ThemedView>
   );
 };

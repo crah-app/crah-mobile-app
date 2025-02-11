@@ -47,8 +47,6 @@ const Page = () => {
 
   return (
     <ThemedView theme={theme} flex={1}>
-      <StatusBar backgroundColor={'transparent'} />
-
       <SafeAreaView>
         <ScrollView
           contentContainerStyle={styles.scrollViewContainer}

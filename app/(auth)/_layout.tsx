@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, Tabs } from 'expo-router';
+import { Link, Tabs, useSegments } from 'expo-router';
 import {
   StyleSheet,
   View,
@@ -22,6 +22,7 @@ const Layout = () => {
   const theme = useSystemTheme();
   const { bottom } = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
+  const segments = useSegments();
 
   return (
     <View style={styles.container}>
@@ -60,8 +61,18 @@ const Layout = () => {
             tabBarShowLabel: true,
             tabBarLabel: 'Home',
             headerShown: false,
+            tabBarStyle: [
+              styles.tabBarStyle,
+              {
+                borderColor: Colors[theme].background,
+                backgroundColor: Colors[theme].background,
+                paddingBottom: bottom,
+                display: segments[3] === '[id]' ? 'none' : 'flex',
+              },
+            ],
           }}
         />
+
         <Tabs.Screen
           name="searchPages"
           options={{

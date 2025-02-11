@@ -28,5 +28,95 @@
       "name": "Tom Rider",
       "avatar": "https://randomuser.me/api/portraits/men/45.jpg"
     }
+  },
+  {
+    "_id": 4,
+    "text": "Hey, bist du morgen im Skatepark?",
+    "createdAt": "2024-02-04 12:00:00",
+    "user": {
+      "_id": 2,
+      "name": "Tom Rider",
+      "avatar": "https://randomuser.me/api/portraits/men/45.jpg"
+    }
+  },
+  {
+    "_id": 5,
+    "text": "Ja, bin da! Lass ein paar Tricks filmen.",
+    "createdAt": "2024-02-04 11:55:00",
+    "user": {
+      "_id": 1,
+      "name": "Max Mustermann",
+      "avatar": "https://randomuser.me/api/portraits/men/32.jpg"
+    }
+  },
+  {
+    "_id": 6,
+    "text": "Perfekt, bis morgen!",
+    "createdAt": "2024-02-04 11:50:00",
+    "user": {
+      "_id": 2,
+      "name": "Tom Rider",
+      "avatar": "https://randomuser.me/api/portraits/men/45.jpg"
+    }
+  },
+  {
+    "_id": 7,
+    "text": "Hey, bist du morgen im Skatepark?",
+    "createdAt": "2024-02-04 12:00:00",
+    "user": {
+      "_id": 2,
+      "name": "Tom Rider",
+      "avatar": "https://randomuser.me/api/portraits/men/45.jpg"
+    }
+  },
+  {
+    "_id": 8,
+    "text": "Ja, bin da! Lass ein paar Tricks filmen.",
+    "createdAt": "2024-02-04 11:55:00",
+    "user": {
+      "_id": 1,
+      "name": "Max Mustermann",
+      "avatar": "https://randomuser.me/api/portraits/men/32.jpg"
+    }
+  },
+  {
+    "_id": 9,
+    "text": "Perfekt, bis morgen!",
+    "createdAt": "2024-02-04 11:50:00",
+    "user": {
+      "_id": 2,
+      "name": "Tom Rider",
+      "avatar": "https://randomuser.me/api/portraits/men/45.jpg"
+    }
+  },
+  {
+    "_id": 10,
+    "text": "Hey, bist du morgen im Skatepark?",
+    "createdAt": "2024-02-04 12:00:00",
+    "user": {
+      "_id": 2,
+      "name": "Tom Rider",
+      "avatar": "https://randomuser.me/api/portraits/men/45.jpg"
+    }
+  },
+  {
+    "_id": 11,
+    "text": "Ja, bin da! Lass ein paar Tricks filmen.",
+    "createdAt": "2024-02-04 11:55:00",
+    "user": {
+      "_id": 1,
+      "name": "Max Mustermann",
+      "avatar": "https://randomuser.me/api/portraits/men/32.jpg"
+    }
+  },
+  {
+    "_id": 12,
+    "text": "Perfekt, bis morgen!",
+    "createdAt": "2024-02-04 11:50:00",
+    "user": {
+      "_id": 2,
+      "name": "Tom Rider",
+      "avatar": "https://randomuser.me/api/portraits/men/45.jpg"
+    }
   }
 ]

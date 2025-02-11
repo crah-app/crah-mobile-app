@@ -44,7 +44,7 @@ const MessagesButton = () => {
               value={notifications > 99 ? '99+' : notifications.toString()}
               style={[
                 styles.notification_text,
-                { fontSize: notifications <= 9 ? 12 : 8 },
+                { fontSize: notifications <= 9 ? 12 : 8, color: 'white' },
               ]}
             />
           </View>
