@@ -67,7 +67,7 @@ const Layout = () => {
                 borderColor: Colors[theme].background,
                 backgroundColor: Colors[theme].background,
                 paddingBottom: bottom,
-                display: segments[3] === '[id]' ? 'none' : 'flex',
+                display: segments[2] === 'chats' ? 'none' : 'flex',
               },
             ],
           }}

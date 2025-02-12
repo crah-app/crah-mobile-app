@@ -11,27 +11,48 @@ import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedText from './ThemedText';
 import { Link } from 'expo-router';
+import { UserStatus } from '@/types';
+import { formatDistanceToNow } from 'date-fns';
 
-const MessageColumn: React.FC<{ id: number }> = ({ id }) => {
+interface MessageColumnProps {
+  id: number;
+  name: string;
+  avatar: string;
+  status: UserStatus;
+  lastActive?: Date;
+}
+
+const MessageColumn: React.FC<MessageColumnProps> = ({
+  id,
+  name,
+  avatar,
+  status,
+  lastActive,
+}) => {
   const theme = useSystemTheme();
 
   const handleClick = () => {};
+
+  const chatTimeAgo = formatDistanceToNow(
+    new Date(lastActive?.toString() || new Date()),
+    {
+      addSuffix: true,
+    },
+  );
 
   return (
     <Link
       asChild
       href={{ pathname: '/(auth)/homePages/chats/[id]', params: { id } }}
+      style={[styles.container, { borderTopColor: 'gray' }]}
     >
       <TouchableOpacity
-        style={[
-          styles.container,
-          { backgroundColor: Colors[theme].textBubbleOther },
-        ]}
+        style={[{ backgroundColor: Colors[theme].textBubbleOther }]}
         onPress={handleClick}
       >
         <View style={[styles.user_container]}>
           <Image
-            source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+            source={{ uri: avatar }}
             width={32}
             height={32}
             style={[styles.user_profile]}
@@ -40,7 +61,7 @@ const MessageColumn: React.FC<{ id: number }> = ({ id }) => {
           <View style={[styles.text_container]}>
             <ThemedText
               theme={theme}
-              value={'User123'}
+              value={name}
               style={[
                 styles.text,
                 {
@@ -50,6 +71,19 @@ const MessageColumn: React.FC<{ id: number }> = ({ id }) => {
                 },
               ]}
             />
+
+            <Text
+              style={{
+                color:
+                  status === UserStatus.OFFLINE
+                    ? 'gray'
+                    : Colors[theme].primary,
+              }}
+            >
+              {status === UserStatus.OFFLINE
+                ? `last seen ${chatTimeAgo}`
+                : status}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -62,10 +96,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    backgroundColor: 'red',
     height: 62,
     width: Dimensions.get('window').width,
     padding: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   text: {
     fontSize: 16,
@@ -81,7 +115,9 @@ const styles = StyleSheet.create({
   user_profile: {
     borderRadius: 50,
   },
-  text_container: {},
+  text_container: {
+    alignItems: 'flex-start',
+  },
 });
 
 export default MessageColumn;
