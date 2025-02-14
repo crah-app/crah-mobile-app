@@ -47,12 +47,18 @@ export const ExplorePostOrder = {
 };
 
 export const ContentFilterTypes = ['explore', 'friends', 'rank'];
-
 export const ChatFilterTypes = ['all', 'unread', 'groups'];
 
 export enum UserStatus {
   ONLINE = 'online',
   OFFLINE = 'offline',
+}
+
+export enum UserGalleryTopics {
+  USER_RANK = 'Your Rank',
+  LEAGUES = 'Leagues',
+  TRICKS = 'Tricks',
+  TRICK_BUILDER = 'Trick Builder',
 }
 
 export type PostType = keyof typeof PostTypes;

@@ -38,18 +38,15 @@ const Layout = () => {
           title: '',
           headerTitle: () => <View></View>,
           headerLeft: () => (
-            <SafeAreaView>
-              <SvgXml
-                width={130}
-                height={130}
-                xml={TextLogo}
-                style={{
-                  bottom: Platform.OS === 'ios' ? -61.5 : -65,
-                  position: 'absolute',
-                  left: 0,
-                }}
-              />
-            </SafeAreaView>
+            <SvgXml
+              width={130}
+              height={130}
+              xml={TextLogo}
+              style={{
+                position: 'absolute',
+                left: 0,
+              }}
+            />
           ),
         }}
       />

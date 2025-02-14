@@ -37,18 +37,15 @@ const Layout = () => {
           headerTintColor: Colors[theme].textPrimary,
           headerShadowVisible: false,
           headerLeft: () => (
-            <SafeAreaView>
-              <SvgXml
-                width={130}
-                height={130}
-                xml={TextLogo}
-                style={{
-                  bottom: Platform.OS === 'ios' ? -3 : -65,
-                  position: 'absolute',
-                  left: 0,
-                }}
-              />
-            </SafeAreaView>
+            <SvgXml
+              width={130}
+              height={130}
+              xml={TextLogo}
+              style={{
+                position: 'absolute',
+                left: 0,
+              }}
+            />
           ),
         }}
       />
