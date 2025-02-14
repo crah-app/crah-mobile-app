@@ -36,7 +36,6 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
       presentationStyle="overFullScreen"
       animationType="fade"
       transparent
-      statusBarTranslucent
     >
       <View style={styles.PopUpBackground}>
         <View
