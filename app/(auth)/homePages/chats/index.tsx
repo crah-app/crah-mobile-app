@@ -6,12 +6,13 @@ import {
   StyleSheet,
   View,
   Text,
-  StatusBar,
   TouchableOpacity,
   Animated,
   FlatList,
   ScrollView,
   SafeAreaView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/ThemedView';

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  StatusBar,
 } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -26,6 +27,7 @@ const Layout = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle={'default'} />
       <Tabs
         screenOptions={{
           tabBarStyle: [
