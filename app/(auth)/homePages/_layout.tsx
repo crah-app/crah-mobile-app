@@ -6,6 +6,7 @@ import {
   Animated,
   Easing,
   Platform,
+  Text,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { Link, router, Stack } from 'expo-router';
@@ -13,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import TextLogo from '../../../assets/images/vectors/TextLogo.svg';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const Layout = () => {
   const theme = useSystemTheme();
@@ -36,20 +37,7 @@ const Layout = () => {
           title: '',
           headerTintColor: Colors[theme].textPrimary,
           headerShadowVisible: false,
-          headerLeft: () => (
-            <SafeAreaView>
-              <SvgXml
-                width={130}
-                height={130}
-                xml={TextLogo}
-                style={{
-                  bottom: Platform.OS === 'ios' ? -3 : -65,
-                  position: 'absolute',
-                  left: 0,
-                }}
-              />
-            </SafeAreaView>
-          ),
+          headerLeft: () => <HeaderLeftLogo />,
         }}
       />
 

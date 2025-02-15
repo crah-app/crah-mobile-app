@@ -21,6 +21,9 @@ import { useUser } from '@clerk/clerk-expo';
 import messages from '@/JSON/messages.json';
 import MessageColumn from '@/components/MessageColumn';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import HomePageFilterButton from '@/components/home/HomePageFilterButton';
+import { ChatFilterTypes, UserStatus } from '@/types';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const Page = () => {
   const theme = useSystemTheme();
@@ -44,6 +47,40 @@ const Page = () => {
                 color={Colors[theme].textPrimary}
               />
             </TouchableOpacity>
+          ),
+
+          headerTitle: () => (
+            <View style={{ flex: 1 }}>
+              <SvgXml
+                width={130}
+                height={130}
+                xml={TextLogo}
+                style={{
+                  bottom: Platform.OS === 'ios' ? -65 : -65,
+                  position: 'absolute',
+                  left: 0,
+                }}
+              />
+            </View>
+          ),
+
+          headerRight: () => (
+            <View style={{ flexDirection: 'row', gap: 14 }}>
+              <TouchableOpacity>
+                <Ionicons
+                  name="ellipsis-horizontal-outline"
+                  size={24}
+                  color={Colors[theme].textPrimary}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Ionicons
+                  name="create-outline"
+                  size={24}
+                  color={Colors[theme].textPrimary}
+                />
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />

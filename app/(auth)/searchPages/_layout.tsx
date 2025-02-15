@@ -10,8 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
-import TextLogo from '../../../assets/images/vectors/TextLogo.svg';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const Layout = () => {
   const theme = useSystemTheme();
@@ -37,20 +36,7 @@ const Layout = () => {
           headerShadowVisible: false,
           title: '',
           headerTitle: () => <View></View>,
-          headerLeft: () => (
-            <SafeAreaView>
-              <SvgXml
-                width={130}
-                height={130}
-                xml={TextLogo}
-                style={{
-                  bottom: Platform.OS === 'ios' ? -61.5 : -65,
-                  position: 'absolute',
-                  left: 0,
-                }}
-              />
-            </SafeAreaView>
-          ),
+          headerLeft: () => <HeaderLeftLogo />,
         }}
       />
     </Stack>
