@@ -69,7 +69,11 @@ const Page = () => {
 
           headerTitle: () => (
             <View style={{ flex: 1 }}>
-              <HeaderLeftLogo />
+              <HeaderLeftLogo
+                style={{
+                  bottom: -20,
+                }}
+              />
             </View>
           ),
 

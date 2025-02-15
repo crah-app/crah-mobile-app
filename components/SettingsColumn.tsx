@@ -47,7 +47,7 @@ const SettingsColumn: React.FC<SettingsColumnProps> = ({
       style={[
         styles.container,
         type === 'ordinary' && {
-          backgroundColor: Colors[theme].textBubbleOther,
+          backgroundColor: Colors[theme].textPrimaryReverse,
         },
       ]}
       onPress={handleClick}
