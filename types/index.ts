@@ -61,4 +61,18 @@ export enum UserGalleryTopics {
   TRICK_BUILDER = 'Trick Builder',
 }
 
+export enum TrickDifficulty {
+  NOVICE = 'novice',
+  BEGINNER = 'beginner',
+  NORMAL = 'normal',
+  INTERMEDIATE = 'intermediate',
+  ADVANCED = 'advanced',
+  HARD = 'hard',
+  VERY_HARD = 'very hard',
+  MONSTER = 'monster',
+  IMPOSSIBLE = 'impossible',
+  GOATED = 'goated',
+  POTENTIAL_WORLDS_FIRST = 'potential worlds first',
+}
+
 export type PostType = keyof typeof PostTypes;

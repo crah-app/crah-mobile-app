@@ -14,11 +14,25 @@ import LeaderBoardUserCircle from '@/components/LeaderBoardUserCircle';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
 import { UserGalleryTopics } from '@/types';
 import Colors from '@/constants/Colors';
+import LeaguesPage from '@/components/rankspage/Leagues';
+import YourRank from '@/components/rankspage/YourRank';
+import Tricks from '@/components/rankspage/Tricks';
+import TrickBuilder from '@/components/rankspage/TrickBuilder';
 
 const Page = () => {
   const theme = useSystemTheme();
   const { user } = useUser();
   const insets = useSafeAreaInsets();
+
+  const galleryComponents = {
+    [UserGalleryTopics.USER_RANK]: <YourRank user={JSON.stringify(user)} />,
+
+    [UserGalleryTopics.LEAGUES]: <LeaguesPage user={JSON.stringify(user)} />,
+
+    [UserGalleryTopics.TRICKS]: <Tricks />,
+
+    [UserGalleryTopics.TRICK_BUILDER]: <TrickBuilder />,
+  };
 
   const [CurrentGalleryTopic, setCurrentGalleryTopic] =
     useState<UserGalleryTopics>(UserGalleryTopics.USER_RANK);
@@ -57,62 +71,7 @@ const Page = () => {
           ))}
         </ScrollView>
 
-        <ScrollView
-          style={[styles.leagues_container, { bottom: insets.bottom }]}
-        >
-          <View style={styles.TopThreeUsers}>
-            <LeaderBoardUserCircle
-              width={100}
-              height={100}
-              imageUri={JSON.stringify(user?.imageUrl)}
-              rank={2}
-              style={{ top: 30 }}
-            />
-            <LeaderBoardUserCircle
-              width={120}
-              height={120}
-              imageUri={JSON.stringify(user?.imageUrl)}
-              rank={1}
-            />
-            <LeaderBoardUserCircle
-              width={100}
-              height={100}
-              imageUri={JSON.stringify(user?.imageUrl)}
-              rank={3}
-              style={{ top: 30 }}
-            />
-          </View>
-          <UserRankColumn
-            user={JSON.stringify(user)}
-            user_id={Number(user?.id)}
-            rank={17}
-            best_trick="Quad whip flat"
-          />
-          <UserRankColumn
-            user={JSON.stringify(user)}
-            user_id={Number(user?.id)}
-            rank={17}
-            best_trick="Quad whip flat"
-          />{' '}
-          <UserRankColumn
-            user={JSON.stringify(user)}
-            user_id={Number(user?.id)}
-            rank={17}
-            best_trick="Quad whip flat"
-          />{' '}
-          <UserRankColumn
-            user={JSON.stringify(user)}
-            user_id={Number(user?.id)}
-            rank={17}
-            best_trick="Quad whip flat"
-          />{' '}
-          <UserRankColumn
-            user={JSON.stringify(user)}
-            user_id={Number(user?.id)}
-            rank={17}
-            best_trick="Quad whip flat"
-          />{' '}
-        </ScrollView>
+        <View>{galleryComponents[CurrentGalleryTopic]}</View>
       </View>
     </ThemedView>
   );
@@ -120,15 +79,6 @@ const Page = () => {
 
 const styles = StyleSheet.create({
   content_container: {},
-  TopThreeUsers: {
-    paddingTop: 20,
-    paddingBottom: 40 + 20,
-    width: '100%',
-    alignContent: 'center',
-    justifyContent: 'space-around',
-    gap: 12,
-    flexDirection: 'row',
-  },
   header_container: {
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -136,7 +86,6 @@ const styles = StyleSheet.create({
     height: 85,
     flexDirection: 'row',
   },
-  leagues_container: {},
 });
 
 export default Page;
