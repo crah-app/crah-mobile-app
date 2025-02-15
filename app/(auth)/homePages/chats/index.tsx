@@ -6,11 +6,9 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  Animated,
   FlatList,
   ScrollView,
   SafeAreaView,
-  Platform,
 } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/ThemedView';
