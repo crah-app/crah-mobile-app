@@ -1,12 +1,10 @@
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import { Link, router, Stack } from 'expo-router';
-import React, { Key, useState } from 'react';
+import { router, Stack } from 'expo-router';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
-  Text,
-  StatusBar,
   TouchableOpacity,
   Animated,
   FlatList,
@@ -21,11 +19,9 @@ import { useUser } from '@clerk/clerk-expo';
 import messages from '@/JSON/messages.json';
 import MessageColumn from '@/components/MessageColumn';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { SvgXml } from 'react-native-svg';
-import TextLogo from '../../../../assets/images/vectors/TextLogo.svg';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
-import { ChatFilterTypes } from '@/types';
-import { UserStatus } from '@/types';
+import { ChatFilterTypes, UserStatus } from '@/types';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const Page = () => {
   const theme = useSystemTheme();
@@ -75,16 +71,7 @@ const Page = () => {
 
           headerTitle: () => (
             <View style={{ flex: 1 }}>
-              <SvgXml
-                width={130}
-                height={130}
-                xml={TextLogo}
-                style={{
-                  bottom: Platform.OS === 'ios' ? -65 : -65,
-                  position: 'absolute',
-                  left: 0,
-                }}
-              />
+              <HeaderLeftLogo />
             </View>
           ),
 

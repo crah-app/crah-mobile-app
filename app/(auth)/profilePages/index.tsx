@@ -7,7 +7,6 @@ import {
   ScrollView,
   SafeAreaView,
   Dimensions,
-  StatusBar,
   Text,
 } from 'react-native';
 import React, { useState } from 'react';
