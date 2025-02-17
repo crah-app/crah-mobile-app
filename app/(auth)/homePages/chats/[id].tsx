@@ -7,7 +7,6 @@ import {
   InputToolbar,
   SystemMessage,
 } from 'react-native-gifted-chat';
-import initialMessages from '@/JSON/messages.json';
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -27,56 +26,44 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router, Stack, useNavigation } from 'expo-router';
+import {
+  router,
+  Stack,
+  useLocalSearchParams,
+  useNavigation,
+} from 'expo-router';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { QuickReplies } from 'react-native-gifted-chat/lib/QuickReplies';
 
-const userProfile = {
-  _id: 2,
-  name: 'Max Mustermann',
-  avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-  online: true,
-};
+import initialMessages from '@/JSON/messages.json';
+import { useUser } from '@clerk/clerk-expo';
 
 const ChatScreen = () => {
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  const params = useLocalSearchParams();
+
+  const [messages, setMessages] = useState<IMessage[]>(() => {
+    return initialMessages
+      .filter((value) => value._id == Number(params['id'])) // filter selected chat from all messages
+      .map((msg: any) => ({
+        // change "createAt" date type
+        ...msg,
+        createdAt: new Date(msg.createdAt),
+      }));
+  });
   const [text, setText] = useState('');
 
   const theme = useSystemTheme();
   const { bottom, top } = useSafeAreaInsets();
   const navigation = useNavigation();
 
-  useEffect(() => {
-    // Tab-Leiste ausblenden
-    navigation.setOptions({
-      tabBarStyle: { display: 'none' },
-    });
-
-    return () => {
-      // Tab-Leiste wieder einblenden, wenn man den Screen verlässt
-      navigation.setOptions({
-        tabBarStyle: { display: 'flex' },
-      });
-    };
-  }, [navigation]);
-
-  useEffect(() => {
-    const formattedMessages = initialMessages.map((msg: any) => ({
-      ...msg,
-      createdAt: new Date(msg.createdAt),
-    }));
-
-    formattedMessages.sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-    );
-
-    setMessages(formattedMessages);
-  }, []);
+  const { user } = useUser();
 
   const onSend = useCallback((newMessages: IMessage[] = []) => {
     setMessages((previousMessages) =>
       GiftedChat.append(previousMessages, newMessages),
     );
+
+    console.log(messages, messages[0]);
   }, []);
 
   return (
@@ -133,7 +120,7 @@ const ChatScreen = () => {
             <View style={[styles.headerCenter, {}]}>
               {/* user info */}
               <Image
-                source={{ uri: userProfile.avatar }}
+                source={{ uri: messages[0].user.avatar }}
                 style={styles.profilePic}
               />
               <View style={styles.headerText}>
@@ -143,19 +130,19 @@ const ChatScreen = () => {
                     { color: Colors[theme].textPrimary },
                   ]}
                 >
-                  {userProfile.name}
+                  {messages[0].user.name}
                 </Text>
                 <Text
                   style={[
                     styles.userStatus,
                     {
-                      color: userProfile.online
+                      color: user?.lastSignInAt
                         ? Colors[theme].primary
                         : 'gray',
                     },
                   ]}
                 >
-                  {userProfile.online ? 'Online' : 'Offline'}
+                  {user?.lastSignInAt ? 'Online' : 'Offline'}
                 </Text>
               </View>
             </View>
@@ -171,7 +158,7 @@ const ChatScreen = () => {
           messages={messages}
           onSend={(messages) => onSend(messages)}
           user={{
-            _id: 1, // chat id
+            _id: Number(params['id']), // chat id
           }}
           onInputTextChanged={setText}
           // centered system messages

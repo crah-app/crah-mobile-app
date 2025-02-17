@@ -16,8 +16,6 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 
   return (
     <View style={[{ bottom: insets.bottom }, styles.container]}>
-      <Stack.Screen options={{ headerShown: true }} />
-
       <FlatList
         data={[
           {

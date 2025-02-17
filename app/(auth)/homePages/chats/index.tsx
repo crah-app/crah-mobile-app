@@ -143,8 +143,8 @@ const Page = () => {
               ItemSeparatorComponent={() => (
                 <View
                   style={{
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                    borderBottomColor: Colors[theme].textPrimary,
+                    // borderBottomWidth: StyleSheet.hairlineWidth,
+                    // borderBottomColor: Colors[theme].textPrimary,
                     marginHorizontal: 0,
                   }}
                 />
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    // borderBottomWidth: StyleSheet.hairlineWidth,
   },
   ContentFilterContainer: {
     padding: 10,

@@ -44,7 +44,7 @@ const MessageColumn: React.FC<MessageColumnProps> = ({
     <Link
       asChild
       href={{ pathname: '/(auth)/homePages/chats/[id]', params: { id } }}
-      style={[styles.container, { borderTopColor: 'gray' }]}
+      style={[styles.container, { borderTopColor: 'transparent' }]}
     >
       <TouchableOpacity
         style={[{ backgroundColor: Colors[theme].textBubbleOther }]}
@@ -53,8 +53,8 @@ const MessageColumn: React.FC<MessageColumnProps> = ({
         <View style={[styles.user_container]}>
           <Image
             source={{ uri: avatar }}
-            width={32}
-            height={32}
+            width={46}
+            height={46}
             style={[styles.user_profile]}
           />
 
@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
   },
   text_container: {
     alignItems: 'flex-start',
+    height: '100%',
   },
 });
 
