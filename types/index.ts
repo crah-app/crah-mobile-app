@@ -75,4 +75,20 @@ export enum TrickDifficulty {
   POTENTIAL_WORLDS_FIRST = 'potential worlds first',
 }
 
+export enum TextInputMaxCharacters {
+  UserName = 25,
+  Simple = 50,
+  SmallDescription = 250,
+  BigDescription = 5000,
+}
+
+export enum Tags {
+  News = 'News',
+  WorldsFirst = "World's First",
+  Banger = 'Banger',
+  Tutorial = 'Tutorial',
+  Story = 'Story',
+  Guide = 'Guide',
+}
+
 export type PostType = keyof typeof PostTypes;

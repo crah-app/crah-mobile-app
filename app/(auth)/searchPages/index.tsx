@@ -11,13 +11,14 @@ import {
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedText from '@/components/ThemedText';
 import Colors from '@/constants/Colors';
-import { SearchTypes, ExplorePostOrder } from '@/types';
+import { SearchTypes, ExplorePostOrder, Tags } from '@/types';
 import PostTypeButton from '@/components/PostTypeButton';
 import posts from '../../../JSON/posts.json'; // posts that are relevant for the search section
 import { filterPosts } from '@/utils/globalFuncs';
 import CheckBox from '@react-native-community/checkbox';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import UserPost from '@/components/UserPost';
+import Tag from '@/components/tag';
 
 const Page = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
@@ -95,50 +96,16 @@ const Page = () => {
                   </View>
 
                   <View style={[styles.tag_container]}>
-                    {[
-                      'News',
-                      "World's First",
-                      'Banger',
-                      'Tutorial',
-                      'Story',
-                      'Guide',
-                    ].map((tag) => {
+                    {Object.values(Tags).map((tag) => {
                       const isSelected = tag === selectedTag;
                       return (
-                        <TouchableOpacity
+                        <Tag
+                          handleTagPress={() => handleTagPress(tag)}
+                          isSelectedOnClick={isSelected}
+                          tag={tag}
+                          theme={theme}
                           key={tag}
-                          onPress={() => handleTagPress(tag)}
-                          style={[
-                            isSelected && {
-                              backgroundColor: 'rgba(255,0,0,0.4)',
-                            },
-                            { borderRadius: 10 },
-                          ]}
-                        >
-                          <ThemedText
-                            theme={theme}
-                            value={tag}
-                            style={[
-                              styles.text,
-                              {
-                                borderColor:
-                                  tag === "World's First"
-                                    ? Colors[theme].textPrimary
-                                    : Colors[theme].textPrimary,
-                                color:
-                                  tag === "World's First"
-                                    ? Colors[theme].textPrimary
-                                    : Colors[theme].textPrimary,
-                              },
-                              styles[
-                                tag
-                                  .toLowerCase()
-                                  .replace(' ', '')
-                                  .replace("'", '')
-                              ],
-                            ]}
-                          />
-                        </TouchableOpacity>
+                        />
                       );
                     })}
                   </View>
@@ -247,17 +214,6 @@ const styles = StyleSheet.create({
   tag_container_left: {
     width: '15%',
     height: '100%',
-  },
-  text: {
-    fontSize: 14,
-    padding: 5,
-    borderWidth: 1.25,
-    borderRadius: 10,
-    width: 100,
-    textAlign: 'center',
-    alignContent: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   text2: {
     borderWidth: 1.25,

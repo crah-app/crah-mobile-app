@@ -3,6 +3,7 @@ import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Stack } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const Layout = () => {
   const theme = useSystemTheme();
@@ -17,7 +18,7 @@ const Layout = () => {
           color: Colors[theme].textPrimary,
         },
         headerShadowVisible: false,
-        headerLeft: () => <></>,
+        headerLeft: () => <HeaderLeftLogo />,
         headerLargeTitle: false,
         animation: 'none',
       }}

@@ -9,6 +9,29 @@ export const defaultStyles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
   },
+  primaryBtn: {
+    backgroundColor: Colors.default.primary,
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontWeight: 'bold',
+    padding: 8,
+    borderRadius: 5,
+  },
+
+  outlinedBtn: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors.default.primary,
+    color: Colors.default.primary,
+    backgroundColor: 'transparent',
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontWeight: 'bold',
+    padding: 4,
+    borderRadius: 5,
+  },
+
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -19,5 +42,9 @@ export const defaultStyles = StyleSheet.create({
   pageContainer: {
     flex: 1,
     backgroundColor: Colors.light.primary,
+  },
+  textInput: {
+    padding: 8,
+    borderRadius: 8,
   },
 });
