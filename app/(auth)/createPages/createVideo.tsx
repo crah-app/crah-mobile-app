@@ -46,7 +46,7 @@ const CreateVideo = () => {
           <ThemedText
             theme={theme}
             value={'Create Video'}
-            style={styles.biggerText}
+            style={defaultStyles.biggerText}
           />
           <Ionicons
             size={24}
@@ -186,10 +186,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 0,
     height: Dimensions.get('window').height,
-  },
-  biggerText: {
-    fontSize: 22,
-    fontWeight: '700',
   },
   headerContainer: {
     flexDirection: 'row',

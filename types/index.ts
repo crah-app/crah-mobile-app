@@ -91,4 +91,12 @@ export enum Tags {
   Guide = 'Guide',
 }
 
+export type Rank =
+  | 'Iron'
+  | 'Bronze'
+  | 'Silver'
+  | 'Gold'
+  | 'Platinum'
+  | 'Diamond';
+
 export type PostType = keyof typeof PostTypes;

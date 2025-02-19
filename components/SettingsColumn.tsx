@@ -1,103 +1,91 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from 'react-native-vector-icons';
+import { Dimensions, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import ThemedText from './ThemedText';
 import { useAuth } from '@clerk/clerk-expo';
 import { router } from 'expo-router';
+import Column from '@/components/general/column';
 import Scooter from '../assets/images/vectors/scooter.svg';
 
 interface SettingsColumnProps {
   type: 'ordinary' | 'unordinary';
   text: string;
-  icon: string;
-  svg: boolean;
-  hasIcon: boolean;
+  icon?: string;
+  svg?: boolean;
+  hasIcon?: boolean;
 }
 
 const SettingsColumn: React.FC<SettingsColumnProps> = ({
   type,
   text,
   icon,
-  svg,
-  hasIcon,
+  svg = false,
+  hasIcon = false,
 }) => {
   const theme = useSystemTheme();
   const { signOut } = useAuth();
-
-  const handleClick = async () => {
-    if (text === 'Sign Out') {
-      await handleSignOut();
-    }
-  };
 
   const handleSignOut = async () => {
     try {
       await signOut();
       router.replace('/login');
     } catch (err) {
-      console.error('error signing out:', err);
+      console.error('Error signing out:', err);
     }
   };
 
-  return (
-    <TouchableOpacity
-      style={[
-        styles.container,
-        type === 'ordinary' && {
-          backgroundColor: Colors[theme].textPrimaryReverse,
-        },
-      ]}
-      onPress={handleClick}
-    >
-      {svg ? (
+  const handleClick = async () => {
+    if (text === 'Sign Out') await handleSignOut();
+  };
+
+  const renderLeftIcon = () => {
+    if (svg && type != 'unordinary') {
+      return (
         <SvgXml
           width="25"
           height="25"
           xml={Scooter}
           fill={Colors[theme].textPrimary}
-          style={[{ color: Colors[theme].textPrimary, marginRight: -2 }]}
+          style={{ marginRight: -2 }}
         />
-      ) : (
-        <View>
-          {hasIcon && (
-            <Ionicons name={icon} size={24} color={Colors[theme].textPrimary} />
-          )}
-        </View>
-      )}
+      );
+    }
 
-      <ThemedText
-        theme={theme}
-        value={text}
-        style={[
-          styles.text,
-          type === 'unordinary' && {
-            color: 'red',
-            textAlign: 'center',
-            width: '100%',
-            marginLeft: 0,
-          },
-        ]}
-      />
-    </TouchableOpacity>
+    if (hasIcon && icon && type != 'unordinary') {
+      return (
+        <Ionicons name={icon} size={24} color={Colors[theme].textPrimary} />
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <Column
+      title={text}
+      onPress={handleClick}
+      customLeftComponent={renderLeftIcon()}
+      leftContainerStyle={{
+        marginRight: 0,
+      }}
+      containerStyle={{
+        backgroundColor:
+          type === 'ordinary'
+            ? Colors[theme].textPrimaryReverse
+            : 'transparent',
+      }}
+      titleStyle={{
+        fontSize: 16,
+        marginLeft: type === 'unordinary' ? 0 : 12,
+        color: type === 'unordinary' ? 'red' : Colors[theme].textPrimary,
+        textAlign: type === 'unordinary' ? 'center' : 'left',
+        width: type === 'unordinary' ? '100%' : undefined,
+        fontWeight: 'normal',
+      }}
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    // borderRadius: 6,
-    // marginVertical: 6,
-    backgroundColor: 'transparent',
-  },
-  text: {
-    fontSize: 16,
-    marginLeft: 12,
-  },
-});
 
 export default SettingsColumn;

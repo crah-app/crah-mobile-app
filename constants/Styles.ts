@@ -47,4 +47,8 @@ export const defaultStyles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
   },
+  biggerText: {
+    fontSize: 22,
+    fontWeight: '700',
+  },
 });
