@@ -1,100 +1,91 @@
 import ThemedText from '@/components/ThemedText';
 import ThemedView from '@/components/ThemedView';
-import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
+import { Dimensions, ScrollView, StyleSheet, View, Text } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import UserRankColumn from '@/components/UserRankColumn';
 import SettingsColumn from '@/components/SettingsColumn';
 import { useUser } from '@clerk/clerk-expo';
 import LeaderBoardUserCircle from '@/components/LeaderBoardUserCircle';
+import HomePageFilterButton from '@/components/home/HomePageFilterButton';
+import { UserGalleryTopics } from '@/types';
+import Colors from '@/constants/Colors';
+import LeaguesPage from '@/components/rankspage/Leagues';
+import YourRank from '@/components/rankspage/YourRank';
+import Tricks from '@/components/rankspage/Tricks';
+import TrickBuilder from '@/components/rankspage/TrickBuilder';
 
 const Page = () => {
   const theme = useSystemTheme();
   const { user } = useUser();
+  const insets = useSafeAreaInsets();
+
+  const galleryComponents = {
+    [UserGalleryTopics.USER_RANK]: <YourRank user={JSON.stringify(user)} />,
+
+    [UserGalleryTopics.LEAGUES]: <LeaguesPage user={JSON.stringify(user)} />,
+
+    [UserGalleryTopics.TRICKS]: <Tricks />,
+
+    [UserGalleryTopics.TRICK_BUILDER]: <TrickBuilder />,
+  };
+
+  const [CurrentGalleryTopic, setCurrentGalleryTopic] =
+    useState<UserGalleryTopics>(UserGalleryTopics.USER_RANK);
+
+  const handleGalleryTopic = (newTopic: UserGalleryTopics) => {
+    setCurrentGalleryTopic(newTopic);
+  };
 
   return (
     <ThemedView flex={1} theme={theme}>
-      {/* <SafeAreaView> */}
-      {/* "Your Trick" Button */}
-      {/* <SettingsColumn
-          type="ordinary"
-          text="Trick List"
-          icon="list-outline"
-          hasIcon={true}
-          svg={false}
-        /> */}
+      <View style={styles.content_container}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.header_container}
+          style={{ width: 'auto' }}
+        >
+          {Object.values(UserGalleryTopics).map((val, i) => (
+            <HomePageFilterButton
+              text={val}
+              onPress={() => handleGalleryTopic(val)}
+              key={i}
+              style={{
+                minWidth: 90,
+                marginRight: 8,
+                justifyContent: 'center',
+                height: 35,
+                borderColor:
+                  CurrentGalleryTopic === val
+                    ? Colors[theme].primary
+                    : Colors[theme].textPrimary,
+                zIndex: 1000,
+              }}
+              textStyle={{ fontSize: 15 }}
+            />
+          ))}
+        </ScrollView>
 
-      <ScrollView style={[styles.scrollContainer]}>
-        <View style={styles.TopThreeUsers}>
-          <LeaderBoardUserCircle
-            width={100}
-            height={100}
-            imageUri={JSON.stringify(user?.imageUrl)}
-            rank={2}
-            style={{ top: 30 }}
-          />
-          <LeaderBoardUserCircle
-            width={120}
-            height={120}
-            imageUri={JSON.stringify(user?.imageUrl)}
-            rank={1}
-          />
-          <LeaderBoardUserCircle
-            width={100}
-            height={100}
-            imageUri={JSON.stringify(user?.imageUrl)}
-            rank={3}
-            style={{ top: 30 }}
-          />
-        </View>
-        <UserRankColumn
-          user={JSON.stringify(user)}
-          user_id={Number(user?.id)}
-          rank={17}
-          best_trick="Quad whip flat"
-        />
-        <UserRankColumn
-          user={JSON.stringify(user)}
-          user_id={Number(user?.id)}
-          rank={17}
-          best_trick="Quad whip flat"
-        />{' '}
-        <UserRankColumn
-          user={JSON.stringify(user)}
-          user_id={Number(user?.id)}
-          rank={17}
-          best_trick="Quad whip flat"
-        />{' '}
-        <UserRankColumn
-          user={JSON.stringify(user)}
-          user_id={Number(user?.id)}
-          rank={17}
-          best_trick="Quad whip flat"
-        />{' '}
-        <UserRankColumn
-          user={JSON.stringify(user)}
-          user_id={Number(user?.id)}
-          rank={17}
-          best_trick="Quad whip flat"
-        />{' '}
-      </ScrollView>
-      {/* </SafeAreaView> */}
+        <View>{galleryComponents[CurrentGalleryTopic]}</View>
+      </View>
     </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
-  TopThreeUsers: {
-    paddingTop: 40,
-    paddingBottom: 40 + 20,
-    width: '100%',
-    alignContent: 'center',
-    justifyContent: 'space-around',
-    gap: 12,
+  content_container: {},
+  header_container: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    backgroundColor: 'transparent',
+    height: 85,
     flexDirection: 'row',
   },
-  scrollContainer: {},
 });
 
 export default Page;

@@ -55,10 +55,13 @@ const Layout = () => {
         }}
       />
       <Stack.Screen
-        name="FilterHomeContent"
+        name="help_modal"
         options={{
           headerShown: true,
-          title: 'Filter Content',
+          title: 'Help',
+          headerStyle: {
+            backgroundColor: Colors[theme].background,
+          },
           headerLeft: () => (
             <TouchableOpacity onPress={router.back}>
               <Ionicons

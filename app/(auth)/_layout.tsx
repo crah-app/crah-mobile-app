@@ -69,7 +69,7 @@ const Layout = () => {
                 borderColor: Colors[theme].background,
                 backgroundColor: Colors[theme].background,
                 paddingBottom: bottom,
-                display: segments[3] === '[id]' ? 'none' : 'flex',
+                display: segments[2] === 'chats' ? 'none' : 'flex',
               },
             ],
           }}
@@ -131,6 +131,18 @@ const Layout = () => {
             tabBarShowLabel: true,
             tabBarLabel: 'Profile',
             headerShown: false,
+            tabBarStyle: [
+              styles.tabBarStyle,
+              {
+                borderColor: Colors[theme].background,
+                backgroundColor: Colors[theme].background,
+                paddingBottom: bottom,
+                display:
+                  segments[2] === 'inbox' || segments[2] === 'settings'
+                    ? 'none'
+                    : 'flex',
+              },
+            ],
           }}
         />
       </Tabs>

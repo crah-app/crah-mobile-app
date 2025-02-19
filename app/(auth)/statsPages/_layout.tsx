@@ -2,14 +2,7 @@ import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Stack } from 'expo-router';
 import React from 'react';
-import {
-  FlatListComponent,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
@@ -26,12 +19,12 @@ const Layout = () => {
           color: Colors[theme].textPrimary,
         },
         headerShadowVisible: false,
+        headerLargeTitle: false,
       }}
     >
       <Stack.Screen
         name="index"
         options={{
-          // headerSearchBarOptions: { placeholder: 'Search for...' },
           headerTintColor: Colors[theme].textPrimary,
           headerLargeTitle: false,
           headerShadowVisible: false,

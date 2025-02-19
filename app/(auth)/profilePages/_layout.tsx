@@ -1,9 +1,15 @@
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack } from 'expo-router';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  FlatListComponent,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 const Layout = () => {
   const theme = useSystemTheme();
@@ -42,7 +48,14 @@ const Layout = () => {
           ),
         }}
       />
-      <Stack.Screen name="inbox" options={{ headerTitle: 'Inbox' }} />
+      <Stack.Screen
+        name="inbox"
+        options={{
+          headerShown: false,
+          headerTitle: () => <></>,
+          headerLeft: () => <HeaderLeftLogo />,
+        }}
+      />
     </Stack>
   );
 };

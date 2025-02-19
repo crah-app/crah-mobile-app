@@ -1,19 +1,8 @@
-import React, { useRef, useState } from 'react';
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Animated,
-  Easing,
-  Platform,
-  Text,
-} from 'react-native';
-import { SvgXml } from 'react-native-svg';
-import { Link, router, Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { StyleSheet } from 'react-native';
+import { Stack } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const Layout = () => {
