@@ -5,10 +5,13 @@ import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
+  Text,
   TouchableOpacity,
   FlatList,
   ScrollView,
   SafeAreaView,
+  Platform,
+  StatusBar
 } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/ThemedView';
