@@ -47,12 +47,56 @@ export const ExplorePostOrder = {
 };
 
 export const ContentFilterTypes = ['explore', 'friends', 'rank'];
-
 export const ChatFilterTypes = ['all', 'unread', 'groups'];
 
 export enum UserStatus {
   ONLINE = 'online',
   OFFLINE = 'offline',
 }
+
+export enum UserGalleryTopics {
+  USER_RANK = 'Your Rank',
+  LEAGUES = 'Leagues',
+  TRICKS = 'Tricks',
+  TRICK_BUILDER = 'Trick Builder',
+}
+
+export enum TrickDifficulty {
+  NOVICE = 'novice',
+  BEGINNER = 'beginner',
+  NORMAL = 'normal',
+  INTERMEDIATE = 'intermediate',
+  ADVANCED = 'advanced',
+  HARD = 'hard',
+  VERY_HARD = 'very hard',
+  MONSTER = 'monster',
+  IMPOSSIBLE = 'impossible',
+  GOATED = 'goated',
+  POTENTIAL_WORLDS_FIRST = 'potential worlds first',
+}
+
+export enum TextInputMaxCharacters {
+  UserName = 25,
+  Simple = 50,
+  SmallDescription = 250,
+  BigDescription = 5000,
+}
+
+export enum Tags {
+  News = 'News',
+  WorldsFirst = "World's First",
+  Banger = 'Banger',
+  Tutorial = 'Tutorial',
+  Story = 'Story',
+  Guide = 'Guide',
+}
+
+export type Rank =
+  | 'Iron'
+  | 'Bronze'
+  | 'Silver'
+  | 'Gold'
+  | 'Platinum'
+  | 'Diamond';
 
 export type PostType = keyof typeof PostTypes;

@@ -1,0 +1,27 @@
+[
+  {
+    "type": "title",
+    "stack_title": "Help",
+    "header": "What's the purpose of the inbox?",
+    "showContent": true,
+    "content": "You get three types of inbox messages"
+  },
+  {
+    "type": "subtitle",
+    "header": "Friend Requests",
+    "showContent": true,
+    "content": "Your inbox allows you to manage all incoming friend requests. You can choose to accept or decline them directly from here. Accepting a request lets you connect and chat with other users, while declining removes the request without notifying the sender. Additionally, if you encounter inappropriate behavior, you have the option to block or report users to keep your experience safe and enjoyable."
+  },
+  {
+    "type": "subtitle",
+    "header": "Update Information",
+    "showContent": true,
+    "content": "Stay informed about the latest app improvements, feature releases, and important announcements through update notifications in your inbox. These updates ensure you're always aware of new functionalities, bug fixes, and community guidelines."
+  },
+  {
+    "type": "subtitle",
+    "header": "New User Ranks",
+    "showContent": true,
+    "content": "Your rank is determined by your top 5 stunt scooter tricks, placing you in one of the following tiers: Iron, Bronze, Silver, Gold, Platinum, or Diamond. As you improve or your performance changes, you’ll be notified if you move up or down the ranks. This system helps track progress and encourages healthy competition within the community."
+  }
+]

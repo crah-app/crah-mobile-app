@@ -2,9 +2,9 @@ import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Stack } from 'expo-router';
 import React from 'react';
-import { Platform, SafeAreaView, StyleSheet, View } from 'react-native';
-import { SvgXml } from 'react-native-svg';
-import TextLogo from '../../../assets/images/vectors/TextLogo.svg';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const Layout = () => {
   const theme = useSystemTheme();
@@ -19,30 +19,34 @@ const Layout = () => {
           color: Colors[theme].textPrimary,
         },
         headerShadowVisible: false,
+        headerLargeTitle: false,
       }}
     >
       <Stack.Screen
         name="index"
         options={{
-          // headerSearchBarOptions: { placeholder: 'Search for...' },
           headerTintColor: Colors[theme].textPrimary,
           headerLargeTitle: false,
           headerShadowVisible: false,
           title: '',
           headerTitle: () => <View></View>,
-          headerLeft: () => (
-            <SafeAreaView>
-              <SvgXml
-                width={130}
-                height={130}
-                xml={TextLogo}
-                style={{
-                  bottom: Platform.OS === 'ios' ? -61.5 : -65,
-                  position: 'absolute',
-                  left: 0,
-                }}
-              />
-            </SafeAreaView>
+          headerLeft: () => <HeaderLeftLogo />,
+          headerRight: () => (
+            <View
+              style={{
+                borderLeftWidth: StyleSheet.hairlineWidth,
+                borderColor: Colors[theme].textPrimary,
+                paddingLeft: 14,
+              }}
+            >
+              <TouchableOpacity>
+                <Ionicons
+                  name="help-circle-outline"
+                  size={28}
+                  color={Colors[theme].textPrimary}
+                />
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />

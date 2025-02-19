@@ -1,13 +1,12 @@
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import { Link, router, Stack } from 'expo-router';
-import React, { Key, useState } from 'react';
+import { router, Stack } from 'expo-router';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   TouchableOpacity,
-  Animated,
   FlatList,
   ScrollView,
   SafeAreaView,
@@ -21,11 +20,9 @@ import { useUser } from '@clerk/clerk-expo';
 import messages from '@/JSON/messages.json';
 import MessageColumn from '@/components/MessageColumn';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { SvgXml } from 'react-native-svg';
-import TextLogo from '../../../../assets/images/vectors/TextLogo.svg';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
-import { ChatFilterTypes } from '@/types';
-import { UserStatus } from '@/types';
+import { ChatFilterTypes, UserStatus } from '@/types';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const Page = () => {
   const theme = useSystemTheme();
@@ -75,14 +72,9 @@ const Page = () => {
 
           headerTitle: () => (
             <View style={{ flex: 1 }}>
-              <SvgXml
-                width={130}
-                height={130}
-                xml={TextLogo}
+              <HeaderLeftLogo
                 style={{
-                  bottom: Platform.OS === 'ios' ? -65 : -65,
-                  position: 'absolute',
-                  left: 0,
+                  bottom: -20,
                 }}
               />
             </View>
@@ -154,8 +146,8 @@ const Page = () => {
               ItemSeparatorComponent={() => (
                 <View
                   style={{
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                    borderBottomColor: Colors[theme].textPrimary,
+                    // borderBottomWidth: StyleSheet.hairlineWidth,
+                    // borderBottomColor: Colors[theme].textPrimary,
                     marginHorizontal: 0,
                   }}
                 />
@@ -197,7 +189,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    // borderBottomWidth: StyleSheet.hairlineWidth,
   },
   ContentFilterContainer: {
     padding: 10,

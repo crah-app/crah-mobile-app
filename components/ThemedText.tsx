@@ -6,11 +6,22 @@ interface ThemedTextProps {
   value: string | React.JSX.Element;
   theme: 'light' | 'dark';
   style?: TextStyle | TextStyle[];
+  lineNumber?: number;
 }
 
-const ThemedText: React.FC<ThemedTextProps> = ({ value, theme, style }) => {
+const ThemedText: React.FC<ThemedTextProps> = ({
+  value,
+  theme,
+  style,
+  lineNumber,
+}) => {
   return (
-    <Text style={[{ color: Colors[theme].textPrimary }, style]}>{value}</Text>
+    <Text
+      numberOfLines={lineNumber || undefined}
+      style={[{ color: Colors[theme].textPrimary }, style]}
+    >
+      {value}
+    </Text>
   );
 };
 
