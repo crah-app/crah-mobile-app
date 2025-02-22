@@ -1,3 +1,11 @@
+import Reactions from '@/constants/Reactions';
+import UserPostDummyStructure from '@/JSON/posts.json';
+
+export type UserPostType = (typeof UserPostDummyStructure)[number]; // the json structure itself
+export type PostKeys = keyof UserPostType; // a single key of the json structure
+
+export type ReactionType = (typeof Reactions)[number];
+
 export enum AuthStrategy {
   Google = 'oauth_google',
 }
