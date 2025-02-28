@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, View, Text } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import {
-  SafeAreaView,
-  useSafeAreaInsets,
+	SafeAreaView,
+	useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import UserRankColumn from '@/components/UserRankColumn';
 import SettingsColumn from '@/components/SettingsColumn';
@@ -20,72 +20,71 @@ import Tricks from '@/components/rankspage/Tricks';
 import TrickBuilder from '@/components/rankspage/TrickBuilder';
 
 const Page = () => {
-  const theme = useSystemTheme();
-  const { user } = useUser();
-  const insets = useSafeAreaInsets();
+	const theme = useSystemTheme();
+	const { user } = useUser();
+	const insets = useSafeAreaInsets();
 
-  const galleryComponents = {
-    [UserGalleryTopics.USER_RANK]: <YourRank user={JSON.stringify(user)} />,
+	const galleryComponents = {
+		[UserGalleryTopics.USER_RANK]: <YourRank user={JSON.stringify(user)} />,
 
-    [UserGalleryTopics.LEAGUES]: <LeaguesPage user={JSON.stringify(user)} />,
+		[UserGalleryTopics.LEAGUES]: <LeaguesPage user={JSON.stringify(user)} />,
 
-    [UserGalleryTopics.TRICKS]: <Tricks />,
+		[UserGalleryTopics.TRICKS]: <Tricks />,
 
-    [UserGalleryTopics.TRICK_BUILDER]: <TrickBuilder />,
-  };
+		[UserGalleryTopics.TRICK_BUILDER]: <TrickBuilder />,
+	};
 
-  const [CurrentGalleryTopic, setCurrentGalleryTopic] =
-    useState<UserGalleryTopics>(UserGalleryTopics.USER_RANK);
+	const [CurrentGalleryTopic, setCurrentGalleryTopic] =
+		useState<UserGalleryTopics>(UserGalleryTopics.USER_RANK);
 
-  const handleGalleryTopic = (newTopic: UserGalleryTopics) => {
-    setCurrentGalleryTopic(newTopic);
-  };
+	const handleGalleryTopic = (newTopic: UserGalleryTopics) => {
+		setCurrentGalleryTopic(newTopic);
+	};
 
-  return (
-    <ThemedView flex={1} theme={theme}>
-      <View style={styles.content_container}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.header_container}
-          style={{ width: 'auto' }}
-        >
-          {Object.values(UserGalleryTopics).map((val, i) => (
-            <HomePageFilterButton
-              text={val}
-              onPress={() => handleGalleryTopic(val)}
-              key={i}
-              style={{
-                minWidth: 90,
-                marginRight: 8,
-                justifyContent: 'center',
-                height: 35,
-                borderColor:
-                  CurrentGalleryTopic === val
-                    ? Colors[theme].primary
-                    : Colors[theme].textPrimary,
-                zIndex: 1000,
-              }}
-              textStyle={{ fontSize: 15 }}
-            />
-          ))}
-        </ScrollView>
+	return (
+		<ThemedView flex={1} theme={theme}>
+			<View style={styles.content_container}>
+				<ScrollView
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					contentContainerStyle={styles.header_container}
+					style={{ width: 'auto' }}>
+					{Object.values(UserGalleryTopics).map((val, i) => (
+						<HomePageFilterButton
+							text={val}
+							onPress={() => handleGalleryTopic(val)}
+							key={i}
+							style={{
+								minWidth: 90,
+								marginRight: 8,
+								justifyContent: 'center',
+								height: 35,
+								backgroundColor:
+									CurrentGalleryTopic === val
+										? Colors[theme].primary + 'rgba(255,0,0,0.3)'
+										: Colors[theme].surface,
+								zIndex: 1000,
+							}}
+							textStyle={{ fontSize: 15 }}
+						/>
+					))}
+				</ScrollView>
 
-        <View>{galleryComponents[CurrentGalleryTopic]}</View>
-      </View>
-    </ThemedView>
-  );
+				<View>{galleryComponents[CurrentGalleryTopic]}</View>
+			</View>
+		</ThemedView>
+	);
 };
 
 const styles = StyleSheet.create({
-  content_container: {},
-  header_container: {
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: 'transparent',
-    height: 85,
-    flexDirection: 'row',
-  },
+	content_container: {},
+	header_container: {
+		paddingHorizontal: 10,
+		paddingVertical: 10,
+		backgroundColor: 'transparent',
+		height: 85,
+		flexDirection: 'row',
+	},
 });
 
 export default Page;

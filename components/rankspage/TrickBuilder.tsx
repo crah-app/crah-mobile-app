@@ -26,7 +26,7 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'pink',
+    // backgroundColor: 'pink',
     flex: 0,
     height: Dimensions.get('window').height,
   },

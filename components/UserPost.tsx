@@ -6,6 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
+  TouchableWithoutFeedback,
+  Dimensions,
 } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -17,12 +19,18 @@ import Reactions from '@/constants/Reactions';
 import ThemedText from './ThemedText';
 import { formatDistanceToNow } from 'date-fns';
 import { Ionicons } from 'react-native-vector-icons';
+import { ReactionType, UserPostType } from '@/types';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const DUMMY_PROFILE_IMAGE = 'https://via.placeholder.com/150';
 const videoSource =
   'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
-const UserPost = ({ post }) => {
+interface UserPostComponentProps {
+  post: UserPostType;
+}
+
+const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
   const player = useVideoPlayer(post.videoUrl || videoSource, (player) => {
     player.loop = true;
   });
@@ -32,8 +40,9 @@ const UserPost = ({ post }) => {
   });
 
   const theme = useSystemTheme();
+
   const [showReactions, setShowReactions] = useState(false);
-  const [reactions, setReactions] = useState([]);
+  const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [likesCount, setLikesCount] = useState(post.likes || 0);
   const [commentsCount, setCommentsCount] = useState(post.comments.length || 0);
   const [shareCount, setshareCount] = useState(post.shares || 0);
@@ -96,7 +105,7 @@ const UserPost = ({ post }) => {
                   { color: Colors[theme].textPrimary },
                 ]}
                 theme={theme}
-                value={`${post.article.slice(0, 150)}...`}
+                value={`${post.article?.slice(0, 150)}...`}
               />
             </TouchableOpacity>
           </Link>
@@ -108,7 +117,13 @@ const UserPost = ({ post }) => {
           </Text>
         );
       default:
-        return <Image source={{ uri: post.imageUrl }} style={styles.image} />;
+        return (
+          <Image
+            source={{ uri: post.imageUrl }}
+            style={styles.image}
+            height={456}
+          />
+        );
     }
   };
 
@@ -116,14 +131,50 @@ const UserPost = ({ post }) => {
     addSuffix: true,
   });
 
+  // render post
   return (
     <View
       style={[
         styles.postContainer,
-        { backgroundColor: Colors[theme].textPrimaryReverse },
+        { backgroundColor: Colors[theme].background },
       ]}
     >
       {/* Header */}
+      <PostHeader post={post} postTimeAgo={postTimeAgo} />
+
+      {/* Main content */}
+      {renderPostContent()}
+
+      {/* Footer */}
+      <PostFooter
+        likesCount={likesCount}
+        commentsCount={commentsCount}
+        post={post}
+        shareCount={shareCount}
+        reactions={reactions}
+        setShowReactions={setShowReactions}
+        handleLike={handleLike}
+        handleShare={handleShare}
+      />
+
+      {/* Reactions Modal */}
+      <UserPostReactionsModal
+        showReactions={showReactions}
+        setShowReactions={setShowReactions}
+        handleReaction={handleReaction}
+      />
+    </View>
+  );
+};
+
+const PostHeader: React.FC<{ post: UserPostType; postTimeAgo: string }> = ({
+  post,
+  postTimeAgo,
+}) => {
+  const theme = useSystemTheme();
+
+  return (
+    <View>
       <View style={styles.header}>
         <Image
           source={{ uri: post.profileImage || DUMMY_PROFILE_IMAGE }}
@@ -133,15 +184,38 @@ const UserPost = ({ post }) => {
           {post.username}
         </Text>
       </View>
-      <Text style={[styles.postTime, { color: Colors[theme].textSecondary }]}>
-        {postTimeAgo}
-      </Text>
+      <Text style={[styles.postTime, { color: 'gray' }]}>{postTimeAgo}</Text>
+    </View>
+  );
+};
 
-      {/* Main content */}
-      {renderPostContent()}
+interface PostFooterProps {
+  likesCount: number;
+  handleLike: () => void;
+  handleShare: () => void;
+  commentsCount: number;
+  post: UserPostType;
+  shareCount: number;
+  reactions: string[];
+  setShowReactions: (boolean: boolean) => void;
+}
 
-      {/* Footer */}
-      <View style={styles.footer}>
+const PostFooter: React.FC<PostFooterProps> = ({
+  likesCount,
+  commentsCount,
+  handleLike,
+  handleShare,
+  post,
+  shareCount,
+  setShowReactions,
+  reactions,
+}) => {
+  const theme = useSystemTheme();
+
+  return (
+    <View style={styles.footer}>
+      <View style={styles.upper_footer}>
+        {/* <left side of the footer> */}
         <View style={styles.footerLeft}>
           {/* like button */}
           <TouchableOpacity style={styles.iconButton} onPress={handleLike}>
@@ -194,7 +268,7 @@ const UserPost = ({ post }) => {
           </TouchableOpacity>
         </View>
 
-        {/* reaction button */}
+        {/* reaction button <right side of the footer> */}
         <TouchableOpacity onPress={() => setShowReactions(true)}>
           <Ionicons
             name="happy-outline"
@@ -202,64 +276,170 @@ const UserPost = ({ post }) => {
             color={Colors[theme].textPrimary}
           />
         </TouchableOpacity>
-
-        {/* Reactions in a vertical bubble */}
-        <View style={styles.reactionsBubbleContainer}>
-          {reactions.length > 0 && (
-            <View style={styles.reactionsBubble}>
-              {reactions.map((reaction, index) => (
-                <Text key={index} style={styles.reactionText}>
-                  {reaction}
-                </Text>
-              ))}
-            </View>
-          )}
-        </View>
       </View>
 
-      {/* Reactions Modal */}
-      <Modal
-        visible={showReactions}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowReactions(false)}
+      <View
+        style={[
+          styles.lower_footer,
+          {
+            height:
+              post.type == 'videoPortrait' ||
+              post.type == 'videoLandscape' ||
+              post.type == 'image'
+                ? reactions.length > 0
+                  ? 100
+                  : 45
+                : reactions.length > 0
+                ? 45
+                : 0,
+          },
+        ]}
       >
-        <ThemedView theme={theme} flex={1} style={styles.modalOverlay}>
-          <View style={styles.modalOverlay}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowReactions(false)}
+        {/* Reactions in a vertical bubble */}
+        <View style={{ height: 'auto' }}>
+          {/* // reaction and counter container */}
+          <View
+            style={[
+              {
+                // padding: 10,
+                // borderRadius: 25,
+                // backgroundColor: 'rgba(100,100,100,0.3)',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
+                marginTop: 2,
+                gap: 10,
+              },
+            ]}
+          >
+            {/* write comment bar */}
+            {(post.type == 'videoPortrait' ||
+              post.type == 'videoLandscape' ||
+              post.type == 'image') && (
+              <View
+                style={[
+                  styles.writeCommentBar,
+                  {
+                    backgroundColor: Colors[theme].surface,
+                    padding: 10,
+                    borderRadius: 20,
+                    width: Dimensions.get('window').width - 20,
+                    height: 45,
+                    justifyContent: 'center',
+                  },
+                ]}
+              >
+                <Text style={{ color: 'gray' }}>Write a comment...</Text>
+              </View>
+            )}
+
+            {/* reaction container */}
+            {reactions.length > 0 && (
+              <ScrollView
+                showsHorizontalScrollIndicator={false}
+                horizontal
+                style={{
+                  maxWidth: '100%',
+                  flexDirection: 'row', 
+                  overflowX: 'hidden',
+                }}
+              >
+                <View style={{ flexDirection: 'row', gap: 10 }}>
+                  {reactions.map((reaction: string, index: number) => (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        gap: 6,
+                        backgroundColor: 'rgba(100,100,100,0.3)',
+                        padding: 10,
+                        borderRadius: 20,
+                        height: 40,
+                      }}
+                      key={index + 'Container'}
+                    >
+                      <Text key={index} style={{}}>
+                        {reaction}
+                      </Text>
+
+                      <Text
+                        key={index + 'Text'}
+                        style={[
+                          {
+                            color: Colors[theme].textPrimary,
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                          },
+                        ]}
+                      >
+                        {2322}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+interface UserPostReactionsModalProps {
+  showReactions: boolean;
+  setShowReactions: (boolean: boolean) => void;
+  handleReaction: (reaction: string) => void;
+}
+
+const UserPostReactionsModal: React.FC<UserPostReactionsModalProps> = ({
+  showReactions,
+  setShowReactions,
+  handleReaction,
+}) => {
+  const theme = useSystemTheme();
+
+  return (
+    <Modal
+      visible={showReactions}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={() => setShowReactions(false)}
+    >
+      <ThemedView theme={theme} flex={1} style={styles.modalOverlay}>
+        <TouchableWithoutFeedback onPress={() => setShowReactions(false)}>
+          <View
+            style={[styles.modalOverlay, { backgroundColor: 'transparent' }]}
+          >
+            <ThemedView
+              style={[
+                styles.reactionsGrid,
+                {
+                  width: Dimensions.get('window').width / 1.25,
+                },
+              ]}
+              theme={theme}
             >
-              <Text style={[styles.closeText, { color: 'white' }]}>X</Text>
-            </TouchableOpacity>
-            <ThemedView style={styles.reactionsGrid} theme={theme}>
               {Reactions.map((reaction) => (
                 <TouchableOpacity
                   key={reaction}
-                  style={styles.reactionItem}
                   onPress={() => handleReaction(reaction)}
                 >
-                  <Text style={styles.reactionText}>{reaction}</Text>
+                  <Text style={{ fontSize: 24 }}>{reaction}</Text>
                 </TouchableOpacity>
               ))}
             </ThemedView>
           </View>
-        </ThemedView>
-      </Modal>
-    </View>
+        </TouchableWithoutFeedback>
+      </ThemedView>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
   postContainer: {
-    // marginVertical: 10,
-    // borderRadius: 8,
     overflow: 'hidden',
     shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.1,
-    // shadowRadius: 4,
-    // elevation: 5,
   },
   header: {
     padding: 10,
@@ -284,7 +464,6 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
     resizeMode: 'cover',
   },
   video: {
@@ -300,8 +479,21 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 10,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  lower_footer: {
+    marginTop: 10,
+    height: 45,
+    width: '100%',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  writeCommentBar: {},
+  upper_footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    width: '100%',
   },
   footerLeft: {
     flexDirection: 'row',
@@ -316,28 +508,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
-  reactionsBubbleContainer: {
-    position: 'absolute',
-    bottom: -10,
-    left: 200,
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  reactionsBubble: {
-    backgroundColor: '#007bff',
-    padding: 8,
-    borderRadius: 20,
-    marginTop: 5,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    maxWidth: 100,
-    overflow: 'hidden',
-    gap: 10,
-  },
-  reactionText: {
-    fontSize: 18,
-    color: '#fff',
-    marginBottom: 5,
+  reactionCountContainer: {
+    fontWeight: 'bold',
+    borderRadius: '100%',
+    fontSize: 12,
   },
   modalOverlay: {
     flex: 1,
@@ -345,32 +519,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  closeButton: {
-    position: 'absolute',
-    top: 100,
-    left: 0,
-    zIndex: 1,
-    padding: 10,
-  },
-  closeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
   reactionsGrid: {
-    backgroundColor: '#fff',
     padding: 20,
     borderRadius: 8,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     zIndex: 1,
-  },
-  reactionItem: {
-    // margin: 10,
-    padding: 15,
-    borderRadius: 30,
-    backgroundColor: '#eee',
-    zIndex: 2,
+    gap: 20,
   },
   contentContainer: {
     flex: 1,
