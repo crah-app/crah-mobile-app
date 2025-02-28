@@ -1,35 +1,50 @@
 import { TrickDifficulty } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import ThemedText from './ThemedText';
+import Column from './general/column';
+
+import Bars from '../assets/images/vectors/bar.svg';
+import Colors from '@/constants/Colors';
 
 interface TrickColumnProps {
-  name: string;
-  points: number;
-  difficulty: TrickDifficulty;
+	name: string;
+	points?: number;
+	difficulty?: TrickDifficulty;
+	landed?: 'landed' | 'not landed';
+	onPress: () => void;
 }
 
 const TrickColumn: React.FC<TrickColumnProps> = ({
-  name,
-  points,
-  difficulty,
+	name,
+	points,
+	difficulty,
+	landed,
+	onPress,
 }) => {
-  const theme = useSystemTheme();
+	const theme = useSystemTheme();
 
-  return (
-    <View style={[styles.container]}>
-      <ThemedText value={name} theme={theme} />
-      <ThemedText value={points.toString()} theme={theme} />
-      <ThemedText value={difficulty} theme={theme} />
-    </View>
-  );
+	return (
+		<Column
+			title={name}
+			subtitle={landed}
+			subtitleStyle={{
+				color:
+					landed == 'landed' ? Colors['default'].green : Colors[theme].primary,
+			}}
+			avatarIsSVG={true}
+			showAvatar={true}
+			avatarUrl={Bars}
+			onPress={onPress}
+		/>
+	);
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: Dimensions.get('window').width,
-  },
+	container: {
+		width: Dimensions.get('window').width,
+	},
 });
 
 export default TrickColumn;

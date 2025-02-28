@@ -138,7 +138,7 @@ const Layout = () => {
                 backgroundColor: Colors[theme].background,
                 paddingBottom: bottom,
                 display:
-                  segments[2] === 'inbox' || segments[2] === 'settings'
+              (segments[2] === 'inbox' || segments[2] === 'settings')
                     ? 'none'
                     : 'flex',
               },

@@ -59,7 +59,8 @@ const Column: React.FC<ColumnProps> = ({
           <View>
             {avatarIsSVG ? (
               <SvgXml
-                xml={avatarUrl}
+                xml={avatarUrl
+                }
                 fill={Colors[theme].textPrimary}
                 style={[styles.avatar]}
                 width={46}

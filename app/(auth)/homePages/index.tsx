@@ -1,18 +1,18 @@
 import React, { useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Animated,
-  Platform,
-  Easing,
-  Modal,
-  useWindowDimensions,
+	View,
+	Text,
+	FlatList,
+	StyleSheet,
+	Image,
+	TouchableOpacity,
+	ScrollView,
+	SafeAreaView,
+	Animated,
+	Platform,
+	Easing,
+	Modal,
+	useWindowDimensions,
 } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/ThemedView';
@@ -38,130 +38,129 @@ import { ContentFilterTypes } from '@/types';
 import MessagesButton from '@/components/home/MessagesButton';
 
 const Page = () => {
-  const theme = useSystemTheme();
-  const [FilterIsVisible, setFilterVisibility] = useState(false);
-  const [UserPosts, SetUserPosts] = useState(posts);
-  const [ContentFilterSelected, setSelectedContentFilter] = useState(
-    ContentFilterTypes[0],
-  );
+	const theme = useSystemTheme();
+	const [FilterIsVisible, setFilterVisibility] = useState(false);
+	const [UserPosts, SetUserPosts] = useState(posts);
+	const [ContentFilterSelected, setSelectedContentFilter] = useState(
+		ContentFilterTypes[0],
+	);
 
-  const rotation = useRef(new Animated.Value(0)).current;
+	const rotation = useRef(new Animated.Value(0)).current;
 
-  const handleClickWheel = () => {
-    setFilterVisibility(!FilterIsVisible);
+	const handleClickWheel = () => {
+		setFilterVisibility(!FilterIsVisible);
 
-    rotation.setValue(0);
-    Animated.timing(rotation, {
-      toValue: 1,
-      duration: 1000,
-      easing: Easing.bounce,
-      useNativeDriver: true,
-    }).start();
-  };
+		rotation.setValue(0);
+		Animated.timing(rotation, {
+			toValue: 1,
+			duration: 1000,
+			easing: Easing.bounce,
+			useNativeDriver: true,
+		}).start();
+	};
 
-  const rotateInterpolate = rotation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
+	const rotateInterpolate = rotation.interpolate({
+		inputRange: [0, 1],
+		outputRange: ['0deg', '360deg'],
+	});
 
-  const FilterPosts = (type: string) => {
-    let filteredPosts = filterPosts(posts, type);
+	const FilterPosts = (type: string) => {
+		let filteredPosts = filterPosts(posts, type);
 
-    SetUserPosts(filteredPosts);
-    setFilterVisibility(false);
-  };
+		SetUserPosts(filteredPosts);
+		setFilterVisibility(false);
+	};
 
-  const HandleFilterContentType = (type: string) => {
-    setSelectedContentFilter(type);
-  };
+	const HandleFilterContentType = (type: string) => {
+		setSelectedContentFilter(type);
+	};
 
-  return (
-    <ThemedView theme={theme} flex={1}>
-      <Stack.Screen
-        options={{
-          headerTitle: () => <View></View>,
-          headerRight: () => (
-            <View style={{ flexDirection: 'row', gap: 15 }}>
-              <TouchableOpacity onPress={handleClickWheel}>
-                <Animated.View
-                  style={[
-                    {
-                      transform: [{ rotate: rotateInterpolate }],
-                    },
-                  ]}
-                >
-                  <SvgXml
-                    width="25"
-                    height="25"
-                    xml={ScooterWheelReflexes}
-                    style={[
-                      {
-                        color: Colors[theme].textPrimary,
-                      },
-                    ]}
-                  />
-                </Animated.View>
-              </TouchableOpacity>
+	return (
+		<ThemedView theme={theme} flex={1}>
+			<Stack.Screen
+				options={{
+					headerTitle: () => <View></View>,
+					headerRight: () => (
+						<View style={{ flexDirection: 'row', gap: 15 }}>
+							<TouchableOpacity onPress={handleClickWheel}>
+								<Animated.View
+									style={[
+										{
+											transform: [{ rotate: rotateInterpolate }],
+										},
+									]}>
+									<SvgXml
+										width="25"
+										height="25"
+										xml={ScooterWheelReflexes}
+										style={[
+											{
+												color: Colors[theme].textPrimary,
+											},
+										]}
+									/>
+								</Animated.View>
+							</TouchableOpacity>
 
-              <MessagesButton />
-            </View>
-          ),
-        }}
-      />
+							<MessagesButton />
+						</View>
+					),
+				}}
+			/>
 
-      <ScrollView>
-        <View style={[styles.ContentFilterContainer]}>
-          {ContentFilterTypes.map((value: string, index: number) => {
-            return (
-              <HomePageFilterButton
-                key={value}
-                text={value}
-                onPress={() => HandleFilterContentType(value)}
-                style={[
-                  {
-                    borderColor:
-                      ContentFilterSelected === value
-                        ? Colors[theme].primary
-                        : Colors[theme].textPrimary,
-                  },
-                ]}
-              />
-            );
-          })}
-        </View>
+			<ScrollView>
+				<View style={[styles.ContentFilterContainer]}>
+					{ContentFilterTypes.map((value: string, index: number) => {
+						return (
+							<HomePageFilterButton
+								key={value}
+								text={value}
+								onPress={() => HandleFilterContentType(value)}
+								style={[
+									{
+										backgroundColor:
+											ContentFilterSelected === value
+												? Colors[theme].primary + 'rgba(255,0,0,0.3)'
+												: Colors[theme].surface,
+									},
+								]}
+							/>
+						);
+					})}
+				</View>
 
-        {UserPosts.length > 0 ? (
-          <FlatList
-            data={UserPosts}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <UserPost post={item} />}
-            contentContainerStyle={[styles.flatListContainer]}
-          />
-        ) : (
-          <NoDataPlaceholder />
-        )}
-      </ScrollView>
+				{UserPosts.length > 0 ? (
+					<FlatList
+						data={UserPosts}
+						keyExtractor={(item) => item.id}
+						renderItem={({ item }) => <UserPost post={item} />}
+						contentContainerStyle={[styles.flatListContainer]}
+					/>
+				) : (
+					<NoDataPlaceholder />
+				)}
+			</ScrollView>
 
-      <PostTypeFilterModal
-        FilterIsVisible={FilterIsVisible}
-        FilterPosts={FilterPosts}
-        setFilterVisibility={setFilterVisibility}
-      />
-    </ThemedView>
-  );
+			<PostTypeFilterModal
+				FilterIsVisible={FilterIsVisible}
+				FilterPosts={FilterPosts}
+				setFilterVisibility={setFilterVisibility}
+			/>
+		</ThemedView>
+	);
 };
 
 const styles = StyleSheet.create({
-  flatListContainer: {
-    // paddingHorizontal: 15,
-    // paddingTop: 10,
-    paddingBottom: 100,
-  },
-  ContentFilterContainer: {
-    padding: 10,
-    flexDirection: 'row',
-    gap: 10,
-  },
+	flatListContainer: {
+		// paddingHorizontal: 15,
+		// paddingTop: 10,
+		paddingBottom: 100,
+	},
+	ContentFilterContainer: {
+		padding: 10,
+		flexDirection: 'row',
+		gap: 10,
+	},
 });
 
 export default Page;

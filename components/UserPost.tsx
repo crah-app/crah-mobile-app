@@ -341,7 +341,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 horizontal
                 style={{
                   maxWidth: '100%',
-                  flexDirection: 'row',
+                  flexDirection: 'row', 
                   overflowX: 'hidden',
                 }}
               >
