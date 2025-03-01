@@ -6,7 +6,7 @@ import {
 	View,
 	ViewStyle,
 } from 'react-native';
-import ThemedText from '../ThemedText';
+import ThemedText from '../general/ThemedText';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import Colors from '@/constants/Colors';
 import { TextStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';

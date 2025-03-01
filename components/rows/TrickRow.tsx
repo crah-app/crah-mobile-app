@@ -2,10 +2,9 @@ import { TrickDifficulty } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import React from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
-import ThemedText from './ThemedText';
-import Column from './general/column';
+import Column from '../general/Row';
 
-import Bars from '../assets/images/vectors/bar.svg';
+import Bars from '../../assets/images/vectors/bar.svg';
 import Colors from '@/constants/Colors';
 
 interface TrickColumnProps {

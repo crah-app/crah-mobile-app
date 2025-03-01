@@ -1,16 +1,8 @@
-import ThemedText from '@/components/ThemedText';
-import ThemedView from '@/components/ThemedView';
+import ThemedView from '@/components/general/ThemedView';
 import React, { useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import {
-	SafeAreaView,
-	useSafeAreaInsets,
-} from 'react-native-safe-area-context';
-import UserRankColumn from '@/components/UserRankColumn';
-import SettingsColumn from '@/components/SettingsColumn';
 import { useUser } from '@clerk/clerk-expo';
-import LeaderBoardUserCircle from '@/components/LeaderBoardUserCircle';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
 import { UserGalleryTopics } from '@/types';
 import Colors from '@/constants/Colors';
@@ -22,7 +14,6 @@ import TrickBuilder from '@/components/rankspage/TrickBuilder';
 const Page = () => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
-	const insets = useSafeAreaInsets();
 
 	const galleryComponents = {
 		[UserGalleryTopics.USER_RANK]: <YourRank user={JSON.stringify(user)} />,
@@ -84,6 +75,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'transparent',
 		height: 85,
 		flexDirection: 'row',
+		marginBottom: 10,
 	},
 });
 

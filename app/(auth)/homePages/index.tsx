@@ -15,11 +15,11 @@ import {
 	useWindowDimensions,
 } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import ThemedView from '@/components/ThemedView';
-import ThemedText from '@/components/ThemedText';
+import ThemedView from '@/components/general/ThemedView';
+import ThemedText from '@/components/general/ThemedText';
 import Colors from '@/constants/Colors';
-import UserPost from '@/components/UserPost';
-import NoDataPlaceholder from '@/components/NoDataPlaceholder';
+import UserPost from '@/components/home/UserPost';
+import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
 
 // dummy data
 import posts from '../../../JSON/posts.json';

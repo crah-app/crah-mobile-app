@@ -1,0 +1,12 @@
+for cane:
+
+1. create article page design
+2. trick builder page design
+3. create rank .svg symbols
+4. fix backend api requests
+5. complete common trick list (with better json structure)
+6. fix new wheel .svg
+7. create database scheme
+8. create .svg verification batch
+9. create user-post reactions (like our flatgod discord reactions)
+10. create .svg ramp 

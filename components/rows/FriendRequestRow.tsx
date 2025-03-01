@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'react-native';
-import { Button } from '@/components/ui/button';
-import Column from '@/components/general/column';
+import Column from '@/components/general/Row';
 
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import ThemedText from './ThemedText';
+import ThemedText from '../general/ThemedText';
 
 interface FriendRequestColumnProps {
 	id: string | number;

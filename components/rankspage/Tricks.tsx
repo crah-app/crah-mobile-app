@@ -3,34 +3,29 @@ import {
 	Dimensions,
 	Falsy,
 	FlatList,
-	NativeSyntheticEvent,
 	ScrollView,
 	StyleSheet,
 	TextInput,
-	TextInputFocusEventData,
 	TouchableOpacity,
 	View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ThemedText from '../ThemedText';
+import ThemedText from '../general/ThemedText';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { Link, Stack } from 'expo-router';
-import TrickColumn from '../TrickColumn';
+import { Link } from 'expo-router';
+import TrickColumn from '../rows/TrickRow';
 import { ActivityIndicator } from 'react-native-paper';
 
 import {
 	commonTricksDataStructure,
 	fetchAdresses,
 	TrickDifficulty,
+	TrickListGeneralSpotCategory,
 } from '@/types';
 
 import { getCachedData, setCachedData } from '@/hooks/cache';
 import Colors from '@/constants/Colors';
-import { defaultStyles } from '@/constants/Styles';
-import ThemedTextInput from '../ThemedTextInput';
 import { Ionicons } from '@expo/vector-icons';
-import Column from '../general/column';
-
 import modalDummyContents from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
 
 interface TricksProps {}
@@ -160,6 +155,9 @@ const TrickListHeader: React.FC<{
 }> = ({ text, setText }) => {
 	const theme = useSystemTheme();
 
+	const [selectedCategory, setSelectedCategory] =
+		useState<TrickListGeneralSpotCategory>(TrickListGeneralSpotCategory.ALL);
+
 	return (
 		<View
 			style={{
@@ -216,33 +214,24 @@ const TrickListHeader: React.FC<{
 				</View>
 
 				<View style={styles.headerContainerWrapper}>
-					<TouchableOpacity>
-						<View style={{ flexDirection: 'row' }}>
-							<ThemedText
-								theme={theme}
-								value={'All'}
-								style={{ color: Colors[theme].primary }}
-							/>
-						</View>
-					</TouchableOpacity>
-
-					<TouchableOpacity>
-						<View style={{ flexDirection: 'row' }}>
-							<ThemedText theme={theme} value={'Flat'} />
-						</View>
-					</TouchableOpacity>
-
-					<TouchableOpacity>
-						<View style={{ flexDirection: 'row' }}>
-							<ThemedText theme={theme} value={'Park'} />
-						</View>
-					</TouchableOpacity>
-
-					<TouchableOpacity>
-						<View style={{ flexDirection: 'row' }}>
-							<ThemedText theme={theme} value={'Street'} />
-						</View>
-					</TouchableOpacity>
+					{Object.values(TrickListGeneralSpotCategory).map((val, key) => (
+						<TouchableOpacity
+							key={key}
+							onPress={() => setSelectedCategory(val)}>
+							<View style={{ flexDirection: 'row' }}>
+								<ThemedText
+									theme={theme}
+									value={val}
+									style={{
+										color:
+											selectedCategory === val
+												? Colors[theme].primary
+												: Colors[theme].textPrimary,
+									}}
+								/>
+							</View>
+						</TouchableOpacity>
+					))}
 				</View>
 			</View>
 		</View>
@@ -253,7 +242,6 @@ const styles = StyleSheet.create({
 	container: {
 		height: Dimensions.get('window').height,
 		width: Dimensions.get('window').width,
-		marginTop: 10,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
