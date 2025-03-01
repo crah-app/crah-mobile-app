@@ -131,8 +131,13 @@ const TrickList: React.FC<{
 					<Link
 						asChild
 						href={{
-							pathname: '/modals/help_modal',
-							params: { contents: JSON.stringify(modalDummyContents) },
+							pathname: '/modals/TrickModal',
+							params: {
+								data: JSON.stringify({
+									trickName: `${item.words[0]} ${item.words[1]}`,
+									trickDescription: 'trick description',
+								}),
+							},
 						}}>
 						<TrickColumn
 							name={`${item.words[0]} ${item.words[1]}`}
