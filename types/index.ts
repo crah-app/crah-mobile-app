@@ -49,56 +49,54 @@ export type commonTricksDataStructure = { words: Array<string> };
 	User posts are categorized in these types
 */
 
-export const PostTypes = {
-	all: 'Show all posts',
-	videoLandscape: 'Landscape Videos',
-	videoPortrait: 'Portrait Videos',
-	text: 'Text',
-	article: 'Articles',
-	image: 'Images',
-} as const;
-
-export type PostType = keyof typeof PostTypes;
+export enum PostTypes {
+	all = 'Show all posts',
+	videoLandscape = 'Landscape Videos',
+	videoPortrait = 'Portrait Videos',
+	text = 'Text',
+	article = 'Articles',
+	image = 'Images',
+}
 
 // General user post types
-export const GeneralPostTypes = {
-	all: 'All posts',
-	videos_and_images: 'Clips',
-	articles: 'Articles',
-	text: 'Text',
-} as const;
+export enum GeneralPostTypes {
+	all = 'All posts',
+	videos_and_images = 'Clips',
+	articles = 'Articles',
+	text = 'Text',
+}
 
 // All icons for all post/search types
-export const PostTypeIonicons = {
-	all: 'albums-outline',
-	videoLandscape: 'phone-landscape-outline',
-	videoPortrait: 'phone-portrait-outline',
-	text: 'chatbox-ellipses-outline',
-	article: 'book-outline',
-	image: 'images-outline',
-} as const;
+export enum PostTypeIonicons {
+	all = 'albums-outline',
+	videoLandscape = 'phone-landscape-outline',
+	videoPortrait = 'phone-portrait-outline',
+	text = 'chatbox-ellipses-outline',
+	article = 'book-outline',
+	image = 'images-outline',
+}
 
 /* 
 	ALl types of content the user can search for on the search page
 	including non-post data like the people, stunt scooter riders
 	and tricks
 */
-export const SearchTypes = {
-	all: 'All posts',
-	videos_and_images: 'Clips',
-	articles: 'Articles',
-	text: 'Text',
-	riders: 'Riders',
-	tricks: 'Tricks',
-} as const;
+export enum SearchTypes {
+	all = 'All posts',
+	videos_and_images = 'Clips',
+	articles = 'Articles',
+	text = 'Text',
+	riders = 'Riders',
+	tricks = 'Tricks',
+}
 
 /*
 	Determines in which order the client displays user posts or other data search entries
 */
-export const ExplorePostOrder = {
-	toOldest: 'Latest to oldest',
-	toLatest: 'Oldest to latest',
-};
+export enum ExplorePostOrder {
+	toOldest = 'Latest to oldest',
+	toLatest = 'Oldest to latest',
+}
 
 /* 
 	General topics the user can watch content on
@@ -107,13 +105,21 @@ export const ExplorePostOrder = {
 	rank: the user only recieves data from people being in the same rank as the user itself 
 */
 
-export const ContentFilterTypes = ['explore', 'friends', 'rank'];
+export enum ContentFilterTypes {
+	explore = 'explore',
+	friends = 'friends',
+	rank = 'rank',
+}
 
 /* 
 	On the chat page the user can filter chats 
 */
 
-export const ChatFilterTypes = ['all', 'unread', 'groups'];
+export enum ChatFilterTypes {
+	all = 'all',
+	unread = 'unread',
+	groups = 'groups',
+}
 
 /* 
 	A user can either be offline or online

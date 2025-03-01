@@ -13,7 +13,7 @@ import PostTypeButton from '../PostTypeButton';
 import ThemedText from '../general/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import { PostType, PostTypes } from '@/types';
+import { PostTypes } from '@/types';
 
 interface PostTypeFilterModalProps {
 	FilterIsVisible: boolean;

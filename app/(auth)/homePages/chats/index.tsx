@@ -5,44 +5,33 @@ import React, { useState } from 'react';
 import {
 	StyleSheet,
 	View,
-	Text,
 	TouchableOpacity,
 	FlatList,
 	ScrollView,
 	SafeAreaView,
-	Platform,
-	StatusBar,
 } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/general/ThemedView';
 import ThemedText from '@/components/general/ThemedText';
-import { useUser } from '@clerk/clerk-expo';
 import messages from '@/JSON/messages.json';
 import MessageColumn from '@/components/rows/MessageRow';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
 import { ChatFilterTypes, UserStatus } from '@/types';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const Page = () => {
 	const theme = useSystemTheme();
-	const { user } = useUser();
-	const { bottom } = useSafeAreaInsets();
 
-	const [messagesFilterSelected, setMessagesFilter] = useState<
-		keyof typeof ChatFilterTypes | string
-	>(ChatFilterTypes[0]);
+	const [messagesFilterSelected, setMessagesFilter] = useState<ChatFilterTypes>(
+		ChatFilterTypes.all,
+	);
 
 	const [messagesDateFilter, setMessagesDateFilter] = useState<
 		'latest' | 'oldest'
 	>('latest');
 
-	const HandleFilterMessagesType = (
-		value: keyof typeof ChatFilterTypes | string,
-	) => {
-		setMessagesFilter((prev) => {
-			return value;
-		});
+	const HandleFilterMessagesType = (value: ChatFilterTypes) => {
+		setMessagesFilter(value);
 	};
 
 	const HandleMessagesDateFilter = () => {
@@ -106,12 +95,14 @@ const Page = () => {
 				<SafeAreaView>
 					<View style={{ gap: 0, marginTop: 0 }}>
 						<View style={[styles.ContentFilterContainer]}>
-							{ChatFilterTypes.map((value: string, index: number) => {
+							{Object.values(ChatFilterTypes).map((value, index) => {
 								return (
 									<HomePageFilterButton
 										key={value}
-										text={value}
-										onPress={() => HandleFilterMessagesType(value)}
+										text={value as string}
+										onPress={() =>
+											HandleFilterMessagesType(value as ChatFilterTypes)
+										}
 										style={[
 											{
 												borderColor:

@@ -25,9 +25,11 @@ const Page = () => {
 		'all',
 	);
 	const [selectedTag, setSelectedTag] = useState<string | undefined>(undefined);
-	const [selectedOrder, setSelectedOrder] = useState<string | undefined>(
-		ExplorePostOrder['toOldest'],
-	);
+
+	const [selectedOrder, setSelectedOrder] = useState<
+		ExplorePostOrder | undefined
+	>(ExplorePostOrder.toOldest);
+
 	const [friendsOnly, setFriendsOnly] = useState(false);
 
 	const theme = useSystemTheme();
@@ -116,22 +118,20 @@ const Page = () => {
 									</View>
 
 									<View style={{ gap: 10, flexDirection: 'row' }}>
-										{Object.keys(ExplorePostOrder).map((val) => {
+										{Object.values(ExplorePostOrder).map((val, i) => {
 											return (
 												<TouchableOpacity
 													key={val}
-													onPress={() =>
-														setSelectedOrder(ExplorePostOrder[val])
-													}>
+													onPress={() => setSelectedOrder(val)}>
 													<ThemedText
 														theme={theme}
-														value={ExplorePostOrder[val]}
+														value={val}
 														style={[
 															styles.text2,
 															{ borderColor: Colors[theme].textPrimary },
 															{
 																backgroundColor:
-																	selectedOrder === ExplorePostOrder[val]
+																	selectedOrder === val
 																		? 'rgba(255,0,0,0.4)'
 																		: 'transparent',
 															},

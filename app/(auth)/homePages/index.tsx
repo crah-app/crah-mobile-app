@@ -41,9 +41,8 @@ const Page = () => {
 	const theme = useSystemTheme();
 	const [FilterIsVisible, setFilterVisibility] = useState(false);
 	const [UserPosts, SetUserPosts] = useState(posts);
-	const [ContentFilterSelected, setSelectedContentFilter] = useState(
-		ContentFilterTypes[0],
-	);
+	const [ContentFilterSelected, setSelectedContentFilter] =
+		useState<ContentFilterTypes>(ContentFilterTypes.explore);
 
 	const rotation = useRef(new Animated.Value(0)).current;
 
@@ -71,7 +70,7 @@ const Page = () => {
 		setFilterVisibility(false);
 	};
 
-	const HandleFilterContentType = (type: string) => {
+	const HandleFilterContentType = (type: ContentFilterTypes) => {
 		setSelectedContentFilter(type);
 	};
 
@@ -110,23 +109,23 @@ const Page = () => {
 
 			<ScrollView>
 				<View style={[styles.ContentFilterContainer]}>
-					{ContentFilterTypes.map((value: string, index: number) => {
-						return (
-							<HomePageFilterButton
-								key={value}
-								text={value}
-								onPress={() => HandleFilterContentType(value)}
-								style={[
-									{
-										backgroundColor:
-											ContentFilterSelected === value
-												? Colors[theme].primary + 'rgba(255,0,0,0.3)'
-												: Colors[theme].surface,
-									},
-								]}
-							/>
-						);
-					})}
+					{Object.values(ContentFilterTypes).map((value) => (
+						<HomePageFilterButton
+							key={value}
+							text={value as string}
+							onPress={() =>
+								HandleFilterContentType(value as ContentFilterTypes)
+							}
+							style={[
+								{
+									backgroundColor:
+										ContentFilterSelected === value
+											? Colors[theme].primary + 'rgba(255,0,0,0.3)'
+											: Colors[theme].surface,
+								},
+							]}
+						/>
+					))}
 				</View>
 
 				{UserPosts.length > 0 ? (
