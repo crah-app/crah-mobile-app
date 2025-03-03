@@ -3,7 +3,9 @@ import React from 'react';
 import {
 	Modal,
 	StyleSheet,
+	TouchableHighlight,
 	TouchableOpacity,
+	TouchableWithoutFeedbackBase,
 	useWindowDimensions,
 	View,
 	ViewStyle,
@@ -14,6 +16,8 @@ import ThemedText from '../general/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { PostTypes } from '@/types';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { Button } from 'react-native-paper';
 
 interface PostTypeFilterModalProps {
 	FilterIsVisible: boolean;
@@ -36,7 +40,10 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
 			presentationStyle="overFullScreen"
 			animationType="fade"
 			transparent>
-			<View style={styles.PopUpBackground}>
+			<TouchableOpacity
+				activeOpacity={1}
+				style={styles.PopUpBackground}
+				onPress={() => setFilterVisibility(false)}>
 				<View
 					style={[
 						styles.popUpInnerWrapper,
@@ -50,9 +57,7 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
 							backgroundColor: Colors[theme].surface,
 						},
 					]}>
-					<ThemedView
-						theme={theme}
-						style={[styles.header, { backgroundColor: Colors[theme].surface }]}>
+					<ThemedView theme={theme} style={[styles.header]}>
 						<TouchableOpacity onPress={() => setFilterVisibility(false)}>
 							<Ionicons
 								name="close"
@@ -60,13 +65,11 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
 								color={Colors[theme].textPrimary}
 							/>
 						</TouchableOpacity>
-
 						<ThemedText
 							theme={theme}
 							value={'Filter Content'}
 							style={{ fontSize: 25, fontWeight: '600' }}
 						/>
-
 						<View></View>
 					</ThemedView>
 					<ThemedView theme={theme} style={[styles.main]} flex={1}>
@@ -83,7 +86,7 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
 						</View>
 					</ThemedView>
 				</View>
-			</View>
+			</TouchableOpacity>
 		</Modal>
 	);
 };

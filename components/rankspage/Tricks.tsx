@@ -96,7 +96,7 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 			{/* load trick list */}
 			{!commonTricksLoaded ? (
 				<ActivityIndicator
-					style={{ top: insets.top }}
+					style={{ bottom: insets.bottom * 2 }}
 					size={'large'}
 					color={Colors[theme].primary}
 				/>

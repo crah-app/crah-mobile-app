@@ -91,6 +91,12 @@ const Layout = () => {
 					),
 				}}
 			/>
+			<Stack.Screen
+				name="uploadVideoModal"
+				options={{
+					headerShown: false,
+				}}
+			/>
 		</Stack>
 	);
 };

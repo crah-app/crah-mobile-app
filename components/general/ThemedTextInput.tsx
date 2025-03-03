@@ -21,7 +21,8 @@ interface ThemedTextInputProps {
 	showLength?: boolean;
 	children?: React.ReactNode;
 	childrenContainerStyle?: ViewStyle | ViewStyle[];
-	value?: string;
+	value: string;
+	setValue: (text: string) => void;
 	clearButton?:
 		| 'always'
 		| 'never'
@@ -41,10 +42,9 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 	children,
 	childrenContainerStyle,
 	value,
+	setValue,
 	clearButton,
 }) => {
-	const [text, setText] = useState<string | undefined>(value);
-
 	return (
 		<View
 			style={{
@@ -63,8 +63,8 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 				<TextInput
 					clearButtonMode={clearButton}
 					autoCapitalize={'none'}
-					onChangeText={(newText) => setText(newText)}
-					value={text}
+					onChangeText={(newText) => setValue(newText)}
+					value={value}
 					maxLength={maxLength || 50}
 					multiline={multiline || true}
 					numberOfLines={lines || 3}
@@ -82,7 +82,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 
 				{showLength && (
 					<ThemedText
-						value={`${text?.length}/${maxLength}`}
+						value={`${value?.length}/${maxLength}`}
 						theme={theme}
 						style={{
 							alignSelf: 'flex-end',
