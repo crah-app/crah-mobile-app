@@ -172,7 +172,8 @@ export enum TextInputMaxCharacters {
 	UserName = 25,
 	Simple = 50,
 	SmallDescription = 250,
-	BigDescription = 5000,
+	BigDescription = 2000,
+	Article = 10000,
 }
 
 /* 
@@ -232,7 +233,7 @@ export enum TrickListGeneralSpotCategory {
 }
 
 /*
-	In what order a trick list should be displayed
+	In what order a trick list should be displayed in a trick list
 */
 
 export enum TrickListOrderTypes {
@@ -242,7 +243,7 @@ export enum TrickListOrderTypes {
 }
 
 /*
-	What kind of tricks should be displayed
+	What kind of tricks should be displayed in a trick list
  */
 
 export enum TrickListFilterOptions {
@@ -254,3 +255,13 @@ export enum TrickListFilterOptions {
 	TWISTS = 'twists',
 	BALANCE = 'balance',
 }
+
+/*
+	In the create-video page the user has to upload a source from type video and a cover from type image
+	see ImagePicker.types.ts from module expo-image-picker
+	for the upload a modal is competent where the user has to choose between gallery and camera.
+	The modal is being used for both the cover (image) and the source (video).
+	The modal has to be given a parameter so it knows for what purpose an image shall be uploaded 
+*/
+
+export type modal_mode = 'Source' | 'Cover';

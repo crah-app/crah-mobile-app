@@ -2,17 +2,16 @@ import ThemedText from '@/components/general/ThemedText';
 import ThemedView from '@/components/general/ThemedView';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
-import { ionicon } from '@/types';
+import { ionicon, modal_mode } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React from 'react';
 import {
 	StyleSheet,
 	TouchableOpacity,
 	View,
 	Modal,
 	Dimensions,
-	Alert,
 } from 'react-native';
 import * as imagePicker from 'expo-image-picker';
 
@@ -36,35 +35,35 @@ interface UploadVideoModalProps {
 	isVisible: boolean;
 	setVisibility: (visible: boolean) => void;
 	setUploadedImage: (assets: imagePicker.ImagePickerAsset[]) => void;
-	uploadedImage: imagePicker.ImagePickerAsset[] | undefined;
-	removeImage?: () => void;
+	setUploadedCover: (assets: imagePicker.ImagePickerAsset[]) => void;
+	uploadMode: modal_mode | undefined;
 }
 
 const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 	isVisible,
 	setVisibility,
 	setUploadedImage,
-	uploadedImage,
-	removeImage,
+	setUploadedCover,
+	uploadMode,
 }) => {
 	const theme = useSystemTheme();
 
-	const uploadFromGallery = async () => {
+	const uploadFromGallery = async (mediatype: imagePicker.MediaType) => {
 		await imagePicker.requestMediaLibraryPermissionsAsync();
 		let result = await imagePicker.launchImageLibraryAsync({
-			mediaTypes: ['images'],
+			mediaTypes: [mediatype],
 			allowsEditing: true,
-			aspect: [1, 1],
+			aspect: [9, 16],
 			quality: 1,
 		});
 
 		return result;
 	};
 
-	const uploadFromCamera = async () => {
+	const uploadFromCamera = async (mediatype: imagePicker.MediaType) => {
 		await imagePicker.requestCameraPermissionsAsync();
 		let result = await imagePicker.launchCameraAsync({
-			mediaTypes: ['images'],
+			mediaTypes: [mediatype],
 			cameraType: imagePicker.CameraType.back,
 			allowsEditing: true,
 			aspect: [1, 1],
@@ -74,15 +73,19 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 		return result;
 	};
 
-	const uploadSource = async (mode: upload_mode) => {
+	const uploadSource = async (
+		mode: upload_mode,
+		setStateFunction: (assets: imagePicker.ImagePickerAsset[]) => void,
+		mediatype: imagePicker.MediaType,
+	) => {
 		try {
 			let result =
 				mode == upload_mode.Camera
-					? await uploadFromCamera()
-					: await uploadFromGallery();
+					? await uploadFromCamera(mediatype)
+					: await uploadFromGallery(mediatype);
 
 			if (!result?.canceled) {
-				await saveSource(result?.assets);
+				await saveSource(result?.assets, setStateFunction);
 			}
 		} catch (error: any) {
 			console.warn(error);
@@ -91,10 +94,11 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 
 	const saveSource = async (
 		image: imagePicker.ImagePickerAsset[] | undefined,
+		setStateFunction: (assets: imagePicker.ImagePickerAsset[]) => void,
 	) => {
 		try {
 			if (image) {
-				setUploadedImage(image);
+				setStateFunction(image);
 				setVisibility(false);
 			} else {
 				console.log('object');
@@ -126,7 +130,7 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 					{/* header */}
 					<View style={[styles.header]}>
 						<ThemedText
-							value={'Upload Video'}
+							value={`Upload ${uploadMode == 'Cover' ? 'Cover' : 'Video'}`}
 							theme={theme}
 							style={[defaultStyles.biggerText]}
 						/>
@@ -141,6 +145,12 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 										val.text === upload_mode.Gallery
 											? upload_mode.Gallery
 											: upload_mode.Camera,
+
+										uploadMode === 'Source'
+											? setUploadedImage
+											: setUploadedCover,
+
+										uploadMode === 'Source' ? 'videos' : 'images',
 									)
 								}
 								key={key}

@@ -47,7 +47,8 @@
     "react-native-svg": "^15.11.1",
     "react-native-svg-transformer": "^1.5.0",
     "react-native-web": "~0.19.13",
-    "uuid": "^11.0.5"
+    "uuid": "^11.0.5",
+    "expo-video-thumbnails": "~9.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
