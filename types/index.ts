@@ -171,8 +171,8 @@ export enum TrickDifficulty {
 export enum TextInputMaxCharacters {
 	UserName = 25,
 	Simple = 50,
-	SmallDescription = 250,
-	BigDescription = 2000,
+	SmallDescription = 150,
+	BigDescription = 800,
 	Article = 10000,
 }
 

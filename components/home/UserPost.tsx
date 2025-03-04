@@ -31,7 +31,7 @@ interface UserPostComponentProps {
 }
 
 const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
-	const player = useVideoPlayer(post.videoUrl || videoSource, (player) => {
+	const player = useVideoPlayer(post.videoUrl, (player) => {
 		player.loop = true;
 	});
 
@@ -72,21 +72,32 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				return (
 					<View style={styles.contentContainer}>
 						<VideoView
-							style={styles.video}
+							nativeControls={true}
+							contentFit="fill"
 							player={player}
-							allowsFullscreen
-							allowsPictureInPicture
+							style={[
+								{
+									width: Dimensions.get('window').width,
+									height: Dimensions.get('window').width,
+								},
+							]}
 						/>
 					</View>
 				);
 			case 'videoPortrait':
 				return (
-					<VideoView
-						style={styles.video}
-						player={player}
-						allowsFullscreen
-						allowsPictureInPicture
-					/>
+					<View style={styles.contentContainer}>
+						<VideoView
+							nativeControls={true}
+							player={player}
+							style={[
+								{
+									width: Dimensions.get('window').width,
+									height: Dimensions.get('window').width,
+								},
+							]}
+						/>
+					</View>
 				);
 			case 'article':
 				return (
@@ -119,8 +130,13 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				return (
 					<Image
 						source={{ uri: post.imageUrl }}
-						style={styles.image}
-						height={456}
+						style={[
+							styles.image,
+							{
+								width: Dimensions.get('window').width,
+								height: Dimensions.get('window').width,
+							},
+						]}
 					/>
 				);
 		}
@@ -453,10 +469,6 @@ const styles = StyleSheet.create({
 		width: '100%',
 		resizeMode: 'cover',
 	},
-	video: {
-		width: 350,
-		height: 275,
-	},
 	articlePreview: {
 		fontSize: 14,
 	},
@@ -517,10 +529,10 @@ const styles = StyleSheet.create({
 	},
 	contentContainer: {
 		flex: 1,
-		padding: 10,
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingHorizontal: 50,
+		paddingVertical: 10,
+		// alignItems: 'center',
+		// justifyContent: 'center',
+		// paddingHorizontal: 50,
 	},
 });
 

@@ -134,6 +134,7 @@ const Page = () => {
 						keyExtractor={(item) => item.id}
 						renderItem={({ item }) => <UserPost post={item} />}
 						contentContainerStyle={[styles.flatListContainer]}
+						scrollEnabled={false}
 					/>
 				) : (
 					<NoDataPlaceholder />

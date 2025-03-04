@@ -24,7 +24,8 @@
 				"foregroundImage": "./assets/images/crah.png",
 				"backgroundColor": "#ff0000"
 			},
-			"package": "com.anonymous.crahapp"
+			"package": "com.anonymous.crahapp",
+			"softwareKeyboardLayoutMode": "pan"
 		},
 		"web": {
 			"bundler": "metro",

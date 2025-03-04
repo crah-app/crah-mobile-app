@@ -182,6 +182,7 @@ const TrickListHeader: React.FC<{
 						cursor: Colors[theme].textPrimary,
 					},
 				]}
+				placeholderTextColor={'grey'}
 				placeholder="Search a trick..."
 				value={text}
 				onChangeText={(text) => setText(text)}

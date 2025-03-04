@@ -2,6 +2,7 @@ import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import React, { Children, useState } from 'react';
 import {
+	KeyboardAvoidingView,
 	StyleSheet,
 	TextInput,
 	TextStyle,
@@ -65,15 +66,16 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 					autoCapitalize={'none'}
 					onChangeText={(newText) => setValue(newText)}
 					value={value}
-					maxLength={maxLength || 50}
-					multiline={multiline || true}
-					numberOfLines={lines || 3}
+					maxLength={maxLength ?? 50}
+					multiline={multiline ?? false}
+					numberOfLines={lines ?? 1}
 					placeholder={placeholder}
 					style={[
 						{
 							backgroundColor: Colors[theme].container_surface,
 							color: Colors[theme].textPrimary,
 							textAlignVertical: 'top',
+							maxHeight: 200,
 						},
 						defaultStyles.textInput,
 						style,
