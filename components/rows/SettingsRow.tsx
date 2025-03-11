@@ -11,9 +11,9 @@ import Scooter from '../../assets/images/vectors/scooter.svg';
 import { ionicon } from '@/types';
 
 interface SettingsColumnProps {
-	type: 'ordinary' | 'unordinary';
+	type: 'ordinary' | 'unordinary' | string;
 	text: string;
-	icon?: ionicon;
+	icon?: ionicon | string;
 	svg?: boolean;
 	hasIcon?: boolean;
 }

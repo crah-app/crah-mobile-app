@@ -59,7 +59,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 			<View
 				style={{
 					justifyContent: 'space-between',
-					height: multiline ? 75 * (lines || 1) : 'auto',
+					height: multiline ? 10 * (lines || 1) : 'auto',
 				}}>
 				<TextInput
 					clearButtonMode={clearButton}

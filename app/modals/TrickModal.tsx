@@ -1,3 +1,4 @@
+import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
 import ThemedText from '@/components/general/ThemedText';
 import ThemedView from '@/components/general/ThemedView';
 import Colors from '@/constants/Colors';
@@ -5,11 +6,11 @@ import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface TrickStructure {
 	trickName: string;
+	trickDescription: string;
 }
 
 const TrickModal = () => {
@@ -45,11 +46,7 @@ const TrickModal = () => {
 					/>
 				</View>
 			) : (
-				<ActivityIndicator
-					style={{ top: insets.top }}
-					size={'large'}
-					color={Colors[theme].primary}
-				/>
+				<CrahActivityIndicator size={'large'} color={Colors[theme].primary} />
 			)}
 		</ThemedView>
 	);

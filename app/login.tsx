@@ -3,7 +3,6 @@ import {
 	StyleSheet,
 	TextInput,
 	Alert,
-	ActivityIndicator,
 	TouchableOpacity,
 	KeyboardAvoidingView,
 	Platform,
@@ -32,6 +31,7 @@ import {
 } from 'react-native-confirmation-code-field';
 import { Ionicons } from '@expo/vector-icons';
 import SecuredPasswordInput from '@/components/general/SecuredPasswordInput';
+import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
 
 const CELL_COUNT = 6;
 
@@ -92,7 +92,7 @@ const Page = () => {
 
 			if (signUpAttempt.status === 'complete') {
 				await setActive({ session: signUpAttempt.createdSessionId });
-				router.replace('/(auth)/profile');
+				router.replace('/(auth)/profilePages');
 			} else {
 				console.error(JSON.stringify(signUpAttempt, null, 2));
 			}
@@ -174,7 +174,7 @@ const Page = () => {
 		<ThemedView flex={1} theme={theme}>
 			{loading && (
 				<View style={defaultStyles.loadingOverlay}>
-					<ActivityIndicator
+					<CrahActivityIndicator
 						size="large"
 						color={theme == 'dark' ? '#fff' : '000'}
 					/>
@@ -284,10 +284,14 @@ const Page = () => {
 												marginBottom: 20,
 											},
 											styles.cellText,
-											isFocused && { backgroundColor: Colors[theme].surface },
+											{
+												backgroundColor: isFocused
+													? Colors[theme].surface
+													: 'transparent',
+											},
 										]}
-										onLayout={getCellOnLayoutHandler(index)}
 										value={symbol || (isFocused ? <Cursor /> : '')}
+										onLayout={getCellOnLayoutHandler(index)}
 									/>
 								)}
 							/>
@@ -383,7 +387,11 @@ const Page = () => {
 												padding: 12.5,
 											},
 											styles.cellText,
-											isFocused && { backgroundColor: Colors[theme].surface },
+											{
+												backgroundColor: isFocused
+													? Colors[theme].surface
+													: 'transparent',
+											},
 										]}
 										onLayout={getCellOnLayoutHandler(index)}
 										value={symbol || (isFocused ? <Cursor /> : '')}

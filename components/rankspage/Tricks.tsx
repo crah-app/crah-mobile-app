@@ -14,7 +14,6 @@ import ThemedText from '../general/ThemedText';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Link } from 'expo-router';
 import TrickColumn from '../rows/TrickRow';
-import { ActivityIndicator } from 'react-native-paper';
 
 import {
 	commonTricksDataStructure,
@@ -27,6 +26,7 @@ import { getCachedData, setCachedData } from '@/hooks/cache';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import modalDummyContents from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
+import CrahActivityIndicator from '../general/CrahActivityIndicator';
 
 interface TricksProps {}
 
@@ -95,10 +95,10 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 			]}>
 			{/* load trick list */}
 			{!commonTricksLoaded ? (
-				<ActivityIndicator
-					style={{ bottom: insets.bottom * 2 }}
+				<CrahActivityIndicator
 					size={'large'}
 					color={Colors[theme].primary}
+					style={{ bottom: insets.bottom * 2 }}
 				/>
 			) : (
 				<TrickList commonTricks={commonTricks!} />

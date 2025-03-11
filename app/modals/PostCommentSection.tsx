@@ -1,33 +1,55 @@
 import ThemedText from '@/components/general/ThemedText';
 import ThemedView from '@/components/general/ThemedView';
+import CommentRow from '@/components/rows/CommentRow';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { useLocalSearchParams } from 'expo-router';
-import React from 'react';
-import { FlatList, Text, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Text, StyleSheet, View, ListRenderItem } from 'react-native';
+import { CommentPurpose, userCommentType, userPostType } from '@/types';
+import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
+import Colors from '@/constants/Colors';
 
 const PostPage = () => {
 	const { data } = useLocalSearchParams();
 	const theme = useSystemTheme();
-	const comments = JSON.parse(data) || [];
+	const comments: userCommentType = JSON.parse(data as string).comments || [];
 
-	const renderComment = ({ item }) => (
-		<View style={styles.commentContainer}>
-			<ThemedText theme={theme} style={styles.commentText} value={item.text} />
-			<ThemedText
-				theme={theme}
-				style={styles.commentAuthor}
-				value={item.username}
-			/>
-		</View>
-	);
+	const [commentsLoaded, setCommentsLoaded] = useState(false);
+
+	useEffect(() => {
+		setCommentsLoaded(false);
+
+		if (!comments) return;
+
+		setCommentsLoaded(true);
+		console.log(comments);
+	}, [comments]);
 
 	return (
 		<ThemedView theme={theme} flex={1} style={styles.container}>
-			<FlatList
-				data={comments}
-				renderItem={renderComment}
-				keyExtractor={(item, index) => index.toString()}
-			/>
+			{commentsLoaded ? (
+				<FlatList
+					scrollEnabled={false}
+					data={[comments]}
+					renderItem={({ item: _, index }) => (
+						<CommentRow
+							key={index}
+							userId={_.userId}
+							avatar={_.avatar}
+							text={_.text}
+							responses={_.responses}
+							likes={_.likes}
+							date={new Date(_.date)}
+							username={_.username}
+							purpuse={_.type as CommentPurpose}
+							commentId={_.commentId}
+						/>
+					)}
+					keyExtractor={(item, index) => index.toString()}
+				/>
+			) : (
+				<CrahActivityIndicator size={'large'} color={Colors[theme].primary} />
+			)}
 		</ThemedView>
 	);
 };

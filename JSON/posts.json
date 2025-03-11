@@ -6,8 +6,39 @@
 		"imageUrl": "https://dummyimage.com/1080x1920",
 		"likes": 120,
 		"comments": [
-			{ "username": "jane_smith", "text": "Amazing!" },
-			{ "username": "mark_tom", "text": "Love it!" }
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
 		],
 		"caption": "Had a great time at the beach!",
 		"type": "image",
@@ -20,7 +51,7 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"imageUrl": "https://dummyimage.com/1080x1920",
 		"likes": 200,
-		"comments": [{ "username": "john_doe", "text": "This is awesome!" }],
+		"comments": [],
 		"caption": "Feeling blessed 🙏",
 		"type": "image",
 		"timestamp": "2024-12-27T15:00:00Z",
@@ -32,7 +63,7 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"imageUrl": "https://dummyimage.com/1080x1920",
 		"likes": 340,
-		"comments": [{ "username": "sarah_connor", "text": "This is inspiring!" }],
+		"comments": [],
 		"caption": "Just finished my first marathon 🏃‍♂️",
 		"type": "image",
 		"timestamp": "2024-12-26T10:30:00Z",
@@ -56,7 +87,41 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"text": "Who else is excited for the new year? 🎉🎆",
 		"likes": 45,
-		"comments": [{ "username": "julia_k", "text": "Can’t wait!" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "",
 		"type": "text",
 		"timestamp": "2024-12-25T20:45:00Z",
@@ -68,7 +133,41 @@
 		"profileImage": "",
 		"videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
 		"likes": 410,
-		"comments": [{ "username": "emma_watson", "text": "Such a cute video!" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "Nature is beautiful 🌿🐇",
 		"type": "videoLandscape",
 		"timestamp": "2024-12-24T11:15:00Z",
@@ -81,8 +180,39 @@
 		"imageUrl": "https://dummyimage.com/1080x1920",
 		"likes": 512,
 		"comments": [
-			{ "username": "mary_jane", "text": "Love this view!" },
-			{ "username": "harry_osborn", "text": "Looks amazing!" }
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
 		],
 		"caption": "City lights 🌃✨",
 		"type": "image",
@@ -95,7 +225,41 @@
 		"profileImage": "",
 		"article": "Traveling to new places has always been a passion of mine. Here are my top tips for budget-friendly adventures around the world.",
 		"likes": 250,
-		"comments": [{ "username": "alex_brown", "text": "Thanks for the tips!" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "Exploring the world 🌍",
 		"type": "article",
 		"timestamp": "2024-12-22T14:00:00Z",
@@ -107,7 +271,41 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"imageUrl": "https://dummyimage.com/1080x1920",
 		"likes": 300,
-		"comments": [{ "username": "john_doe", "text": "This is stunning!" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "Sunsets are proof that there’s beauty at the end of the day 🌅",
 		"type": "image",
 		"timestamp": "2024-12-29T17:00:00Z",
@@ -133,7 +331,41 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"imageUrl": "https://dummyimage.com/1080x1920",
 		"likes": 180,
-		"comments": [{ "username": "emma_watson", "text": "Great shot!" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "Exploring the unknown 🏞️",
 		"type": "image",
 		"timestamp": "2024-12-28T16:00:00Z",
@@ -145,7 +377,41 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"article": "Embrace the small moments in life. Sometimes, it's the little things that make the biggest impact.",
 		"likes": 65,
-		"comments": [{ "username": "mark_tom", "text": "True words!" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "Life’s small joys ❤️",
 		"type": "article",
 		"timestamp": "2024-12-27T19:30:00Z",
@@ -157,7 +423,41 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"videoUrl": "../assets/IMG_7380.MOV",
 		"likes": 210,
-		"comments": [{ "username": "peter_parker", "text": "Great video!" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "Adventure awaits 🚗💨",
 		"type": "videoLandscape",
 		"timestamp": "2024-12-26T13:45:00Z",
@@ -169,7 +469,41 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"imageUrl": "https://dummyimage.com/1080x1920",
 		"likes": 600,
-		"comments": [{ "username": "john_doe", "text": "Wow, this is beautiful!" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "Autumn leaves 🍂🍁",
 		"type": "image",
 		"timestamp": "2024-12-25T21:30:00Z",
@@ -181,7 +515,41 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"imageUrl": "https://dummyimage.com/1080x1920",
 		"likes": 75,
-		"comments": [{ "username": "mike_wills", "text": "Awesome place!" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "Exploring hidden gems 🌍",
 		"type": "image",
 		"timestamp": "2024-12-24T18:00:00Z",
@@ -193,7 +561,41 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"imageUrl": "https://placehold.co/1080x1080",
 		"likes": 125,
-		"comments": [{ "username": "sophia_lee", "text": "What a view!" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "The best way to end the day 🌇",
 		"type": "image",
 		"timestamp": "2024-12-23T17:20:00Z",
@@ -205,7 +607,41 @@
 		"profileImage": "https://via.placeholder.com/150",
 		"article": "Just finished reading a great book! Highly recommend to all book lovers out there.",
 		"likes": 180,
-		"comments": [{ "username": "john_doe", "text": "What book is it?" }],
+		"comments": [
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
+		],
 		"caption": "Book recommendations 📚",
 		"type": "article",
 		"timestamp": "2024-12-22T16:10:00Z",
@@ -218,7 +654,39 @@
 		"text": "Wishing everyone a Merry Christmas 🎄🎁",
 		"likes": 150,
 		"comments": [
-			{ "username": "linda_l", "text": "Merry Christmas to you too!" }
+			{
+				"username": "JohnDoe",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Das ist ein großartiger Kommentar!",
+				"userId": 1,
+				"commentId": 101,
+				"likes": 12,
+				"responses": 3,
+				"date": "2024-03-04T12:00:00Z",
+				"type": "comment"
+			},
+			{
+				"username": "JaneSmith",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Ich stimme voll und ganz zu!",
+				"userId": 2,
+				"commentId": 102,
+				"likes": 8,
+				"responses": 1,
+				"date": "2024-03-04T13:30:00Z",
+				"type": "reply"
+			},
+			{
+				"username": "User123",
+				"avatar": "https://via.placeholder.com/150",
+				"text": "Interessante Diskussion hier.",
+				"userId": 3,
+				"commentId": 103,
+				"likes": 25,
+				"responses": 5,
+				"date": "2024-03-04T14:15:00Z",
+				"type": "comment"
+			}
 		],
 		"caption": "",
 		"type": "text",

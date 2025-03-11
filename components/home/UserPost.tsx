@@ -18,7 +18,7 @@ import ThemedView from '../general/ThemedView';
 import Reactions from '@/constants/Reactions';
 import ThemedText from '../general/ThemedText';
 import { formatDistanceToNow } from 'date-fns';
-import { ReactionType, UserPostType } from '@/types';
+import { ReactionType, userPostType } from '@/types';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -27,11 +27,11 @@ const videoSource =
 	'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
 interface UserPostComponentProps {
-	post: UserPostType;
+	post: userPostType;
 }
 
 const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
-	const player = useVideoPlayer(post.videoUrl, (player) => {
+	const player = useVideoPlayer(post.videoUrl!, (player) => {
 		player.loop = true;
 	});
 
@@ -47,9 +47,9 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	const [commentsCount, setCommentsCount] = useState(post.comments.length || 0);
 	const [shareCount, setshareCount] = useState(post.shares || 0);
 
-	const handleReaction = (reaction: string) => {
+	const handleReaction = (reaction: ReactionType) => {
 		if (reaction) {
-			setReactions((prev: string[]) => [...prev, reaction]);
+			setReactions((prev: ReactionType[]) => [...prev, reaction]);
 		}
 		setShowReactions(false);
 	};
@@ -104,7 +104,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 					<Link
 						asChild
 						href={{
-							pathname: '/../modals/postView',
+							pathname: '/modals/postView',
 							params: { data: JSON.stringify(post), type: post.type },
 						}}
 						style={[styles.textPost]}>
@@ -181,7 +181,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	);
 };
 
-const PostHeader: React.FC<{ post: UserPostType; postTimeAgo: string }> = ({
+const PostHeader: React.FC<{ post: userPostType; postTimeAgo: string }> = ({
 	post,
 	postTimeAgo,
 }) => {
@@ -208,7 +208,7 @@ interface PostFooterProps {
 	handleLike: () => void;
 	handleShare: () => void;
 	commentsCount: number;
-	post: UserPostType;
+	post: userPostType;
 	shareCount: number;
 	reactions: string[];
 	setShowReactions: (boolean: boolean) => void;
@@ -396,7 +396,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
 interface UserPostReactionsModalProps {
 	showReactions: boolean;
 	setShowReactions: (boolean: boolean) => void;
-	handleReaction: (reaction: string) => void;
+	handleReaction: (reaction: ReactionType) => void;
 }
 
 const UserPostReactionsModal: React.FC<UserPostReactionsModalProps> = ({

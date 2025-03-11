@@ -2,15 +2,29 @@ import Reactions from '@/constants/Reactions';
 import UserPostDummyStructure from '@/JSON/posts.json';
 import { Ionicons } from '@expo/vector-icons';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
+import UserPost from '@/JSON/posts.json';
 
 // Ionicons icon type
 export type ionicon = keyof typeof Ionicons.glyphMap;
 
-export type UserPostType = (typeof UserPostDummyStructure)[number]; // the json structure itself
-export type PostKeys = keyof UserPostType; // a single key of the json structure
+export type userPostType = (typeof UserPostDummyStructure)[number]; // the json structure itself
+export type postKeys = keyof userPostType; // a single key of the json structure
 
 // reaction type based on reactions array
 export type ReactionType = (typeof Reactions)[number];
+
+// JSOn structure of a comment
+export type userCommentType = {
+	username: string;
+	avatar: string;
+	text: string;
+	userId: number;
+	commentId: number;
+	likes: number;
+	responses: number;
+	date: string;
+	type: string;
+};
 
 /*
 	Third-party websites the user can log in through.
@@ -265,3 +279,21 @@ export enum TrickListFilterOptions {
 */
 
 export type modal_mode = 'Source' | 'Cover';
+
+/*
+	Users can let their comments rate from other users
+	the most voted type for a comment is the displayed comment type on the comment row
+*/
+
+export enum CommentType {
+	default = 'Default Comment',
+	top = 'Top Comment',
+	funny = 'Funny Comment',
+	real = 'Real Comment',
+}
+
+/*
+	Wether a comment is to the post or to another comment
+*/
+
+export type CommentPurpose = 'comment' | 'reply';

@@ -42,6 +42,9 @@ const Layout = () => {
 				options={{
 					presentation: 'modal',
 					title: 'Comments',
+					headerStyle: {
+						backgroundColor: Colors[theme].background,
+					},
 					headerLeft: () => (
 						<TouchableOpacity onPress={router.back}>
 							<Ionicons

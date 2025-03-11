@@ -25,6 +25,7 @@ import {
 	View,
 	Image,
 	Alert,
+	TextInput,
 } from 'react-native';
 import * as imagePicker from 'expo-image-picker';
 
@@ -37,6 +38,23 @@ import {
 	SafeAreaView,
 	useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import CostumKeyboardAvoidingView from '@/components/general/KeyboardAnimationView';
+import {
+	KeyboardAwareScrollView,
+	KeyboardToolbar,
+} from 'react-native-keyboard-controller';
+
+const CreateVideo = () => {
+	const theme = useSystemTheme();
+	const { bottom } = useSafeAreaInsets();
+
+	return (
+		<ThemedView theme={theme} flex={1} style={{ bottom: bottom * 3 }}>
+			<CreateVideoHeader />
+			<CreateVideoMainContent />
+		</ThemedView>
+	);
+};
 
 const CreateVideoHeader = () => {
 	const theme = useSystemTheme();
@@ -128,95 +146,105 @@ const CreateVideoMainContent = () => {
 	const RemoveTag = () => {};
 
 	return (
-		<View style={{ paddingBottom: 0 }}>
-			<UploadVideoModal
-				isVisible={modalVisible}
-				setVisibility={setModalVisible}
-				setUploadedImage={setUploadedSource}
-				setUploadedCover={setCover}
-				uploadMode={modalMode}
-			/>
-
-			<View
-				style={[styles.Container1, styles.InputContainer, { paddingTop: 10 }]}>
-				<ThemedTextInput
-					value={title}
-					placeholder="Enter the video title here"
-					theme={theme}
-					setValue={setTitle}
+		<>
+			<KeyboardAwareScrollView
+				bottomOffset={100}
+				contentContainerStyle={{ gap: 0, paddingBottom: 100 }}
+				style={{ flex: 1 }}>
+				<UploadVideoModal
+					isVisible={modalVisible}
+					setVisibility={setModalVisible}
+					setUploadedImage={setUploadedSource}
+					setUploadedCover={setCover}
+					uploadMode={modalMode}
 				/>
-			</View>
 
-			<View style={[styles.Container2, styles.InputContainer]}>
-				<View style={{ gap: 12 }}>
-					{uploadedSource ? (
-						<UploadedSourceContainer
-							removeSource={removeSource}
-							uploadedSource={uploadedSource}
-							SourceMode="Source"
-							ref={videoPlayerRef}
-						/>
-					) : (
-						<TouchableOpacity onPress={() => handleModal('Source')}>
-							<ThemedText
-								value="Upload video"
-								theme={theme}
-								style={[
-									defaultStyles.primaryBtn,
-									{
-										padding: 14,
-										color: Colors[theme].textPrimaryReverse,
-									},
-								]}
+				<View
+					style={[
+						styles.Container1,
+						styles.InputContainer,
+						{ paddingTop: 10 },
+					]}>
+					<ThemedTextInput
+						value={title}
+						placeholder="Enter the video title here"
+						theme={theme}
+						setValue={setTitle}
+					/>
+				</View>
+
+				<View style={[styles.Container2, styles.InputContainer]}>
+					<View style={{ gap: 12 }}>
+						{uploadedSource ? (
+							<UploadedSourceContainer
+								removeSource={removeSource}
+								uploadedSource={uploadedSource}
+								SourceMode="Source"
+								ref={videoPlayerRef}
 							/>
-						</TouchableOpacity>
-					)}
-
-					{cover ? (
-						<UploadedSourceContainer
-							removeSource={removeCover}
-							uploadedSource={cover as imagePicker.ImagePickerAsset[]}
-							SourceMode="Cover"
-						/>
-					) : (
-						<View
-							style={{
-								flexDirection: 'row',
-								width: '100%',
-								justifyContent: 'space-between',
-								gap: 8,
-							}}>
-							<TouchableOpacity
-								style={{ flex: 1 }}
-								onPress={() => handleModal('Cover')}>
+						) : (
+							<TouchableOpacity onPress={() => handleModal('Source')}>
 								<ThemedText
-									value="Upload cover"
+									value="Upload video"
 									theme={theme}
-									style={[defaultStyles.outlinedBtn, { padding: 8 }]}
+									style={[
+										defaultStyles.primaryBtn,
+										{
+											padding: 14,
+											color: Colors[theme].textPrimaryReverse,
+										},
+									]}
 								/>
 							</TouchableOpacity>
+						)}
 
-							{uploadedSource && (
-								<TouchableOpacity onPress={() => grabCoverFromCurrentFrame()}>
+						{cover ? (
+							<UploadedSourceContainer
+								removeSource={removeCover}
+								uploadedSource={cover as imagePicker.ImagePickerAsset[]}
+								SourceMode="Cover"
+							/>
+						) : (
+							<View
+								style={{
+									flexDirection: 'row',
+									width: '100%',
+									justifyContent: 'space-between',
+									gap: 8,
+								}}>
+								<TouchableOpacity
+									style={{ flex: 1 }}
+									onPress={() => handleModal('Cover')}>
 									<ThemedText
-										value="Grab cover from current frame"
+										value="Upload cover"
 										theme={theme}
 										style={[defaultStyles.outlinedBtn, { padding: 8 }]}
 									/>
 								</TouchableOpacity>
-							)}
-						</View>
-					)}
-				</View>
-			</View>
 
-			<CreateVideoTextInputs
-				setTags={() => setTags}
-				setDescription={setDescription}
-				description={description}
-				RemoveTag={RemoveTag}
-			/>
-		</View>
+								{uploadedSource && (
+									<TouchableOpacity onPress={() => grabCoverFromCurrentFrame()}>
+										<ThemedText
+											value="Grab cover from current frame"
+											theme={theme}
+											style={[defaultStyles.outlinedBtn, { padding: 8 }]}
+										/>
+									</TouchableOpacity>
+								)}
+							</View>
+						)}
+					</View>
+				</View>
+
+				<CreateVideoTextInputs
+					setTags={() => setTags}
+					setDescription={setDescription}
+					description={description}
+					RemoveTag={RemoveTag}
+				/>
+			</KeyboardAwareScrollView>
+			<KeyboardToolbar />
+		</>
 	);
 };
 
@@ -243,7 +271,7 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 						'Enter description, insights, hashtags, your thoughts...'
 					}
 					theme={theme}
-					lines={3}
+					lines={30}
 					multiline={true}
 					maxLength={TextInputMaxCharacters.BigDescription}
 					showLength={true}
@@ -274,35 +302,6 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 				</ThemedTextInput>
 			</View>
 		</View>
-	);
-};
-
-const CreateVideo = () => {
-	const theme = useSystemTheme();
-
-	const { bottom, top } = useSafeAreaInsets();
-
-	return (
-		<ThemedView flex={1} theme={theme} style={{}}>
-			<ThemedView theme={theme} flex={1} style={[styles.container]}>
-				<CreateVideoHeader />
-
-				<KeyboardAvoidingView
-					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-					keyboardVerticalOffset={top * 2.5}
-					style={{ flex: 1 }}>
-					<ScrollView
-						contentInsetAdjustmentBehavior="always"
-						keyboardDismissMode="on-drag"
-						contentContainerStyle={{
-							flexGrow: 1,
-							paddingBottom: 110 /* the tab nav bar height + its bottom padding */,
-						}}>
-						<CreateVideoMainContent />
-					</ScrollView>
-				</KeyboardAvoidingView>
-			</ThemedView>
-		</ThemedView>
 	);
 };
 
@@ -354,6 +353,9 @@ const UploadedSourceContainer = forwardRef<
 	// console.log('Is Landscape:', isLandscape);
 	// console.log('Is Portrait:', isPortrait);
 
+	const fileName = uploadedSource[0].fileName?.toString();
+	const fileNameLength = fileName?.length || 0;
+
 	return (
 		<View
 			style={[styles.videoWrapper, { backgroundColor: Colors[theme].surface }]}>
@@ -367,7 +369,8 @@ const UploadedSourceContainer = forwardRef<
 				<ThemedText
 					style={[{ fontSize: 16 }]}
 					value={
-						uploadedSource[0].fileName?.toString() ||
+						// prettier-ignore
+						fileNameLength <= 20 ? fileName! : 
 						`Your uploaded ${SourceMode === 'Cover' ? 'cover (1:1)' : 'video'}`
 					}
 					theme={theme}
@@ -445,7 +448,9 @@ const UploadedSourceContainer = forwardRef<
 				<View
 					style={{
 						width: Dimensions.get('window').width,
-						height: Dimensions.get('window').width,
+						height: isLandscape
+							? Dimensions.get('window').width / (16 / 9)
+							: Dimensions.get('window').width,
 						justifyContent: 'center',
 						alignItems: 'center',
 					}}>
@@ -454,7 +459,7 @@ const UploadedSourceContainer = forwardRef<
 						style={{
 							width: '94%',
 							height: isLandscape
-								? Dimensions.get('window').width
+								? Dimensions.get('window').width / (16 / 9)
 								: Dimensions.get('window').width,
 						}}
 						source={{
