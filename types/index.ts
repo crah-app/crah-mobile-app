@@ -39,7 +39,18 @@ export enum AuthStrategy {
 */
 
 export enum fetchAdresses {
-	commonTricks = 'http://192.168.0.136:3000/public/tricks/commonTricks.json',
+	commonTricks = 'http://192.168.0.136:4000/public/tricks/commonTricks.json',
+}
+
+/* 
+	The generic drop down component follows a strict item structure
+*/
+
+export interface dropDownMenuInputData {
+	key: number;
+	text: string;
+	iconIOS?: string;
+	iconAndroid?: string;
 }
 
 /*
@@ -58,6 +69,16 @@ export type TricksDataStructure = {
 */
 
 export type commonTricksDataStructure = { words: Array<string> };
+
+/* 
+	Types of posts a user can directly create
+*/
+
+export enum CreatePostType {
+	video = 'Video',
+	image = 'Image',
+	article = 'Article',
+}
 
 /*
 	User posts are categorized in these types

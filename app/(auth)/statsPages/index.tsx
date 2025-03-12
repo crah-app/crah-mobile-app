@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 		paddingVertical: 10,
 		backgroundColor: 'transparent',
-		height: 85,
+		height: 55,
 		flexDirection: 'row',
 		marginBottom: 10,
 	},
