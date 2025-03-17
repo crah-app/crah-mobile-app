@@ -318,3 +318,26 @@ export enum CommentType {
 */
 
 export type CommentPurpose = 'comment' | 'reply';
+
+/*
+	image-aspects the user can choose from to upload his video in
+*/
+
+export enum upload_source_ratio {
+	SQUARE = '1:1',
+	LANDSCAPE = '16:9',
+	PORTRAIT = '9:16',
+}
+
+/*
+	image-aspect as array type
+*/
+
+export const mediaTypeSourceRatio: Record<
+	upload_source_ratio,
+	[number, number]
+> = {
+	[upload_source_ratio.SQUARE]: [1, 1],
+	[upload_source_ratio.LANDSCAPE]: [16, 9],
+	[upload_source_ratio.PORTRAIT]: [9, 16],
+} as const;

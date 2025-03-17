@@ -2,10 +2,15 @@ import ThemedText from '@/components/general/ThemedText';
 import ThemedView from '@/components/general/ThemedView';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
-import { ionicon, modal_mode } from '@/types';
+import {
+	ionicon,
+	mediaTypeSourceRatio,
+	modal_mode,
+	upload_source_ratio,
+} from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	StyleSheet,
 	TouchableOpacity,
@@ -37,6 +42,9 @@ interface UploadVideoModalProps {
 	setUploadedImage: (assets: imagePicker.ImagePickerAsset[]) => void;
 	setUploadedCover: (assets: imagePicker.ImagePickerAsset[]) => void;
 	uploadMode: modal_mode | undefined;
+	setSourceRatio: (ratio: upload_source_ratio) => void;
+	uploadedSource: imagePicker.ImagePickerAsset[] | undefined;
+	cover: imagePicker.ImagePickerAsset[] | undefined | string;
 }
 
 const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
@@ -45,15 +53,44 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 	setUploadedImage,
 	setUploadedCover,
 	uploadMode,
+	setSourceRatio,
+	uploadedSource,
+	cover,
 }) => {
 	const theme = useSystemTheme();
+
+	const [selectedRatio, setSelectedRatio] = useState<upload_source_ratio>(
+		upload_source_ratio.SQUARE,
+	);
+
+	// prettier-ignore
+	const [ratioInputOptions, setRatioInputOptions] = useState<
+	upload_source_ratio[]
+>(Object.values(upload_source_ratio));
+
+	useEffect(() => {
+		// console.log(uploadedSource, cover, 'lol');
+		if (uploadedSource == undefined && cover == undefined) {
+			setRatioInputOptions(Object.values(upload_source_ratio));
+		} else {
+			setRatioInputOptions([selectedRatio]);
+		}
+	}, [uploadedSource, cover]);
+
+	useEffect(() => {
+		if (!selectedRatio) return;
+
+		setSourceRatio(selectedRatio);
+		console.log(selectedRatio);
+	}, [selectedRatio]);
 
 	const uploadFromGallery = async (mediatype: imagePicker.MediaType) => {
 		await imagePicker.requestMediaLibraryPermissionsAsync();
 		let result = await imagePicker.launchImageLibraryAsync({
 			mediaTypes: [mediatype],
 			allowsEditing: true,
-			aspect: [9, 16],
+			aspect: mediaTypeSourceRatio[selectedRatio],
+			allowsMultipleSelection: false,
 			quality: 1,
 		});
 
@@ -66,7 +103,8 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 			mediaTypes: [mediatype],
 			cameraType: imagePicker.CameraType.back,
 			allowsEditing: true,
-			aspect: [1, 1],
+			aspect: mediaTypeSourceRatio[selectedRatio],
+			allowsMultipleSelection: false,
 			quality: 1,
 		});
 
@@ -167,6 +205,32 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 							</TouchableOpacity>
 						))}
 					</View>
+
+					{/* footer */}
+					<View style={styles.footer}>
+						{ratioInputOptions.map(
+							(value: upload_source_ratio, key: number) => {
+								return (
+									<TouchableOpacity
+										key={key}
+										onPress={() => setSelectedRatio(value)}
+										style={[
+											styles.btn,
+											{ backgroundColor: Colors[theme].background },
+											{ padding: 12, width: 64, height: 48, borderWidth: 1 },
+											{
+												borderColor:
+													selectedRatio === value
+														? Colors[theme].primary
+														: 'transparent',
+											},
+										]}>
+										<ThemedText value={value} theme={theme} />
+									</TouchableOpacity>
+								);
+							},
+						)}
+					</View>
 					{/*  */}
 				</ThemedView>
 			</TouchableOpacity>
@@ -182,24 +246,28 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	background: {
-		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
+		flex: 1,
 	},
 	container: {
 		width: Dimensions.get('window').width * 0.8,
-		height: Dimensions.get('window').height * 0.2,
+		height: Dimensions.get('window').height * 0.3,
+		flexDirection: 'column',
 		borderRadius: 12,
+		justifyContent: 'center',
+		alignItems: 'center',
+		gap: 32,
 	},
 	header: {
 		justifyContent: 'center',
 		alignItems: 'center',
 		width: '100%',
-		height: '35%',
+		height: 'auto',
 	},
 	main: {
 		flexDirection: 'row',
-		height: '65%',
+		height: 'auto',
 		width: '100%',
 		justifyContent: 'center',
 		alignItems: 'flex-start',
@@ -212,6 +280,13 @@ const styles = StyleSheet.create({
 		padding: 20,
 		borderRadius: 12,
 		gap: 5,
+	},
+	footer: {
+		padding: 0,
+		flexDirection: 'row',
+		gap: 18,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 });
 

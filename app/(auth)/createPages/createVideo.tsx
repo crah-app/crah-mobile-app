@@ -4,11 +4,18 @@ import ThemedTextInput from '@/components/general/ThemedTextInput';
 import ThemedView from '@/components/general/ThemedView';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
-import { modal_mode, Tags, TextInputMaxCharacters } from '@/types';
+import {
+	modal_mode,
+	Tags,
+	TextInputMaxCharacters,
+	mediaTypeSourceRatio,
+	upload_source_ratio,
+} from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import React, {
 	forwardRef,
+	useEffect,
 	useImperativeHandle,
 	useRef,
 	useState,
@@ -108,6 +115,10 @@ const CreateVideoMainContent = () => {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [modalMode, setModalMode] = useState<modal_mode | undefined>();
 
+	const [sourceRatio, setSourceRatio] = useState<upload_source_ratio>(
+		upload_source_ratio.SQUARE,
+	);
+
 	const videoPlayerRef = useRef<{
 		getCurrentTime: () => number;
 		getPlayer: () => any;
@@ -157,6 +168,9 @@ const CreateVideoMainContent = () => {
 					setUploadedImage={setUploadedSource}
 					setUploadedCover={setCover}
 					uploadMode={modalMode}
+					setSourceRatio={setSourceRatio}
+					uploadedSource={uploadedSource}
+					cover={cover}
 				/>
 
 				<View
@@ -181,6 +195,9 @@ const CreateVideoMainContent = () => {
 								uploadedSource={uploadedSource}
 								SourceMode="Source"
 								ref={videoPlayerRef}
+								sourceRatio={sourceRatio}
+								video={uploadedSource}
+								cover={cover}
 							/>
 						) : (
 							<TouchableOpacity onPress={() => handleModal('Source')}>
@@ -203,6 +220,9 @@ const CreateVideoMainContent = () => {
 								removeSource={removeCover}
 								uploadedSource={cover as imagePicker.ImagePickerAsset[]}
 								SourceMode="Cover"
+								sourceRatio={sourceRatio}
+								video={uploadedSource}
+								cover={cover}
 							/>
 						) : (
 							<View
@@ -309,6 +329,9 @@ interface UploadedSourceContainerProps {
 	uploadedSource: imagePicker.ImagePickerAsset[];
 	removeSource: () => void;
 	SourceMode: modal_mode;
+	sourceRatio: upload_source_ratio;
+	video: undefined | imagePicker.ImagePickerAsset[];
+	cover: string | undefined | imagePicker.ImagePickerAsset[];
 }
 
 interface UploadedSourceContainerRef {
@@ -316,11 +339,30 @@ interface UploadedSourceContainerRef {
 	getPlayer: () => any;
 }
 
+let GlobalIsLandscapeSource: boolean;
+let GlobalsourceRatio: number;
+
+let GlobalUserInputSourceRatio: upload_source_ratio;
+
+let GlobalIsLandscapeSource_Cover: boolean;
+let GlobalsourceRatio_Cover: number;
+
+let GlobalUserInputSourceRatio_Cover: upload_source_ratio;
+
+let GlobalFinalSourceRatio: number | undefined;
+
 const UploadedSourceContainer = forwardRef<
 	UploadedSourceContainerRef,
 	UploadedSourceContainerProps
 >((props, ref) => {
-	const { uploadedSource, removeSource, SourceMode } = props;
+	const {
+		uploadedSource,
+		removeSource,
+		SourceMode,
+		sourceRatio: source_ratio,
+		video,
+		cover,
+	} = props;
 	const theme = useSystemTheme();
 	const player = useVideoPlayer(uploadedSource[0].uri, (player) => {
 		player.playbackRate = 1;
@@ -346,15 +388,66 @@ const UploadedSourceContainer = forwardRef<
 
 	const sourceRatio = uploadedSource[0].width / uploadedSource[0].height;
 
-	const isLandscape = sourceRatio >= 16 / 9;
-	const isPortrait = sourceRatio < 1; // Falls du auch quadratische Videos als "nicht Portrait" sehen möchtest, ändere das zu sourceRatio < 1 && sourceRatio !== 1;
+	const isLandscape = sourceRatio >= 14 / 9; // normal landscape ratio is 16 / 9 but in cropping the fractional digits can fluctuate so a fluctuating-margin is set here
+	const isPortrait = sourceRatio < 1 && sourceRatio !== 1;
 
-	// console.log('Aspect Ratio:', sourceRatio);
-	// console.log('Is Landscape:', isLandscape);
-	// console.log('Is Portrait:', isPortrait);
+	console.log('Aspect Ratio:', sourceRatio);
+	console.log('Is Landscape:', isLandscape);
+	console.log('Is Portrait:', isPortrait);
+	console.log('official:', source_ratio);
 
 	const fileName = uploadedSource[0].fileName?.toString();
 	const fileNameLength = fileName?.length || 0;
+
+	if (SourceMode === 'Source') {
+		GlobalIsLandscapeSource = isLandscape;
+		GlobalsourceRatio = sourceRatio;
+		GlobalUserInputSourceRatio = source_ratio;
+	} else {
+		GlobalIsLandscapeSource_Cover = isLandscape;
+		GlobalsourceRatio_Cover = sourceRatio;
+		GlobalUserInputSourceRatio_Cover = source_ratio;
+	}
+
+	useEffect(() => {
+		console.log(video, cover, 'edioj');
+		if (GlobalFinalSourceRatio == undefined) {
+			GlobalFinalSourceRatio = sourceRatio;
+		}
+
+		if (cover == undefined && video == undefined) {
+			GlobalFinalSourceRatio = undefined;
+		}
+	}, [video, cover]);
+
+	const VideoPlayBtn = () => {
+		return (
+			<TouchableOpacity
+				onPress={handleVideoPlayer}
+				style={styles.playBtn}
+				activeOpacity={0.8}>
+				{!isPlaying && (
+					<View
+						style={{
+							padding: 12,
+							backgroundColor:
+								'gray' +
+								`rgba(${playBtnColor},${playBtnColor},${playBtnColor},0.5)`,
+							borderRadius: '100%',
+							justifyContent: 'center',
+							alignItems: 'center',
+						}}>
+						<Ionicons
+							name={isPlaying ? 'pause' : 'play'}
+							size={24}
+							color={'gray' + `rgba(${255},${255},${255},0.8)`}
+							style={{ textAlign: 'center', marginLeft: 2 }}
+						/>
+					</View>
+				)}
+			</TouchableOpacity>
+		);
+	};
 
 	return (
 		<View
@@ -370,8 +463,8 @@ const UploadedSourceContainer = forwardRef<
 					style={[{ fontSize: 16 }]}
 					value={
 						// prettier-ignore
-						fileNameLength <= 20 ? fileName! : 
-						`Your uploaded ${SourceMode === 'Cover' ? 'cover (1:1)' : 'video'}`
+						(fileNameLength <= 20 && fileName) ? fileName! : 
+						`Your uploaded ${SourceMode === 'Cover' ? `cover (${source_ratio})` : `video (${source_ratio})`}`
 					}
 					theme={theme}
 				/>
@@ -390,77 +483,50 @@ const UploadedSourceContainer = forwardRef<
 			{SourceMode === 'Source' ? (
 				<View
 					style={{
-						width: Dimensions.get('window').width,
-						height: isLandscape
-							? Dimensions.get('window').width / sourceRatio
+						// prettier-ignore
+						width: Dimensions.get('window').width * 0.94,
+						height: GlobalIsLandscapeSource
+							? Dimensions.get('window').width / GlobalsourceRatio
 							: Dimensions.get('window').width,
 						justifyContent: 'center',
 						alignItems: 'center',
 					}}>
-					{isLandscape ? (
-						<VideoView
-							style={{
-								width: '94%',
-								height: Dimensions.get('window').width / sourceRatio,
-							}}
-							player={player}
-							contentFit={'fill'}
-							nativeControls={false}
-						/>
-					) : (
-						<VideoView
-							style={{
-								width: Dimensions.get('window').width * sourceRatio * 0.94,
-								height: '100%',
-							}}
-							player={player}
-							contentFit={'fill'}
-							nativeControls={false}
-						/>
-					)}
+					<VideoView
+						style={{
+							width: '100%',
+							height: '100%',
+						}}
+						player={player}
+						contentFit={
+							source_ratio !== upload_source_ratio.PORTRAIT
+								? 'cover'
+								: 'contain'
+						}
+						nativeControls={false}
+					/>
 
-					<TouchableOpacity
-						onPress={handleVideoPlayer}
-						style={styles.playBtn}
-						activeOpacity={0.8}>
-						{!isPlaying && (
-							<View
-								style={{
-									padding: 12,
-									backgroundColor:
-										'gray' +
-										`rgba(${playBtnColor},${playBtnColor},${playBtnColor},0.5)`,
-									borderRadius: '100%',
-									justifyContent: 'center',
-									alignItems: 'center',
-								}}>
-								<Ionicons
-									name={isPlaying ? 'pause' : 'play'}
-									size={24}
-									color={'gray' + `rgba(${255},${255},${255},0.8)`}
-									style={{ textAlign: 'center', marginLeft: 2 }}
-								/>
-							</View>
-						)}
-					</TouchableOpacity>
+					<VideoPlayBtn />
 				</View>
 			) : (
 				<View
 					style={{
-						width: Dimensions.get('window').width,
-						height: isLandscape
-							? Dimensions.get('window').width / (16 / 9)
-							: Dimensions.get('window').width,
+						width: Dimensions.get('window').width * 0.94,
+						height: GlobalIsLandscapeSource
+							? Dimensions.get('window').width / GlobalsourceRatio
+							: Dimensions.get('window').width * 0.94,
 						justifyContent: 'center',
 						alignItems: 'center',
+						// maxHeight: Dimensions.get('window').width / GlobalsourceRatio,
 					}}>
 					<Image
-						resizeMode="cover"
+						resizeMode={
+							source_ratio !== upload_source_ratio.PORTRAIT
+								? 'cover'
+								: 'contain'
+						}
 						style={{
-							width: '94%',
-							height: isLandscape
-								? Dimensions.get('window').width / (16 / 9)
-								: Dimensions.get('window').width,
+							width: '100%',
+							height: '100%',
 						}}
 						source={{
 							uri:
