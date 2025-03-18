@@ -200,8 +200,6 @@ const CreateVideoMainContent = () => {
 								SourceMode="Source"
 								ref={videoPlayerRef}
 								sourceRatio={sourceRatio}
-								video={uploadedSource}
-								cover={cover}
 							/>
 						) : (
 							<TouchableOpacity onPress={() => handleModal('Source')}>
@@ -225,8 +223,6 @@ const CreateVideoMainContent = () => {
 								uploadedSource={cover as imagePicker.ImagePickerAsset[]}
 								SourceMode="Cover"
 								sourceRatio={sourceRatio}
-								video={uploadedSource}
-								cover={cover}
 							/>
 						) : (
 							<View
@@ -274,7 +270,7 @@ const CreateVideoMainContent = () => {
 
 interface CreateVideoTextInputsProps {
 	description: string;
-	setDescription: (s: string) => void;
+	setDescription: (text: string) => void;
 	setTags: () => void;
 	RemoveTag: () => void;
 }
@@ -334,26 +330,12 @@ interface UploadedSourceContainerProps {
 	removeSource: () => void;
 	SourceMode: modal_mode;
 	sourceRatio: upload_source_ratio;
-	video: undefined | imagePicker.ImagePickerAsset[];
-	cover: string | undefined | imagePicker.ImagePickerAsset[];
 }
 
 interface UploadedSourceContainerRef {
 	getCurrentTime: () => number;
 	getPlayer: () => any;
 }
-
-let GlobalIsLandscapeSource: boolean;
-let GlobalsourceRatio: number;
-
-let GlobalUserInputSourceRatio: upload_source_ratio;
-
-let GlobalIsLandscapeSource_Cover: boolean;
-let GlobalsourceRatio_Cover: number;
-
-let GlobalUserInputSourceRatio_Cover: upload_source_ratio;
-
-let GlobalFinalSourceRatio: number | undefined;
 
 let GlobalFinalUserInputSourceRatio: upload_source_ratio | undefined;
 
@@ -366,8 +348,6 @@ const UploadedSourceContainer = forwardRef<
 		removeSource,
 		SourceMode,
 		sourceRatio: source_ratio,
-		video,
-		cover,
 	} = props;
 	const theme = useSystemTheme();
 	const player = useVideoPlayer(uploadedSource[0].uri, (player) => {
@@ -392,45 +372,26 @@ const UploadedSourceContainer = forwardRef<
 		getPlayer: () => player,
 	}));
 
-	const sourceRatio = uploadedSource[0].width / uploadedSource[0].height;
-
-	const isLandscape = sourceRatio >= 14 / 9; // normal landscape ratio is 16 / 9 but in cropping the fractional digits can fluctuate so a fluctuating-margin is set here
-	const isPortrait = sourceRatio < 1 && sourceRatio !== 1;
-
-	// console.log('Aspect Ratio:', sourceRatio);
-	// console.log('Is Landscape:', isLandscape);
-	// console.log('Is Portrait:', isPortrait);
-	// console.log('official:', source_ratio);
-
 	const fileName = uploadedSource[0].fileName?.toString();
 	const fileNameLength = fileName?.length || 0;
 
-	if (SourceMode === 'Source') {
-		GlobalIsLandscapeSource = isLandscape;
-		GlobalsourceRatio = sourceRatio;
-		GlobalUserInputSourceRatio = source_ratio;
-	} else {
-		GlobalIsLandscapeSource_Cover = isLandscape;
-		GlobalsourceRatio_Cover = sourceRatio;
-		GlobalUserInputSourceRatio_Cover = source_ratio;
-	}
-
-	useEffect(() => {
-		// console.log(video, cover, 'edioj');
-		if (GlobalFinalSourceRatio == undefined) {
-			GlobalFinalSourceRatio = sourceRatio;
-			GlobalFinalUserInputSourceRatio = source_ratio;
-		}
-
-		if (cover == undefined && video == undefined) {
-			GlobalFinalSourceRatio = undefined;
-			GlobalFinalUserInputSourceRatio = undefined;
-		}
-	}, [video, cover]);
-
-	useEffect(() => {
-		console.log(GlobalFinalUserInputSourceRatio, 'global final lol');
-	}, [GlobalFinalUserInputSourceRatio]);
+	const [dynamicDimensions, setDynamicDimensions] = useState<{
+		width: number | string;
+		height: number;
+	}>({
+		width:
+			GlobalFinalUserInputSourceRatio == upload_source_ratio.PORTRAIT
+				? Dimensions.get('window').width * 0.94 * (9 / 16)
+				: '100%',
+		height:
+			GlobalFinalUserInputSourceRatio != upload_source_ratio.SQUARE
+				? GlobalFinalUserInputSourceRatio == upload_source_ratio.PORTRAIT
+					? Dimensions.get('window').height *
+					  (Dimensions.get('window').width / Dimensions.get('window').height) *
+					  0.94
+					: (Dimensions.get('window').width / (16 / 9)) * 0.94
+				: Dimensions.get('window').width * 0.94,
+	});
 
 	const VideoPlayBtn = () => {
 		return (
@@ -499,39 +460,15 @@ const UploadedSourceContainer = forwardRef<
 				<View
 					style={{
 						// prettier-ignore
-						width:
-								GlobalFinalUserInputSourceRatio == upload_source_ratio.PORTRAIT
-									? Dimensions.get('window').width * 0.94 * (9 / 16)
-									: '100%',
-						height:
-							GlobalFinalUserInputSourceRatio != upload_source_ratio.SQUARE
-								? GlobalFinalUserInputSourceRatio ==
-								  upload_source_ratio.PORTRAIT
-									? Dimensions.get('window').height *
-									  (Dimensions.get('window').width /
-											Dimensions.get('window').height) *
-									  0.94
-									: (Dimensions.get('window').width / (16 / 9)) * 0.94
-								: Dimensions.get('window').width * 0.94,
+						width: dynamicDimensions.width as number,
+						height: dynamicDimensions.height,
 						justifyContent: 'center',
 						alignItems: 'center',
 					}}>
 					<VideoView
 						style={{
-							width:
-								GlobalFinalUserInputSourceRatio == upload_source_ratio.PORTRAIT
-									? Dimensions.get('window').width * 0.94 * (9 / 16)
-									: '100%',
-							height:
-								GlobalFinalUserInputSourceRatio != upload_source_ratio.SQUARE
-									? GlobalFinalUserInputSourceRatio ==
-									  upload_source_ratio.PORTRAIT
-										? Dimensions.get('window').height *
-										  (Dimensions.get('window').width /
-												Dimensions.get('window').height) *
-										  0.94
-										: (Dimensions.get('window').width / (16 / 9)) * 0.94
-									: Dimensions.get('window').width * 0.94,
+							width: dynamicDimensions.width as number,
+							height: dynamicDimensions.height,
 						}}
 						player={player}
 						contentFit={'cover'}
@@ -543,43 +480,16 @@ const UploadedSourceContainer = forwardRef<
 			) : (
 				<View
 					style={{
-						width:
-							GlobalFinalUserInputSourceRatio == upload_source_ratio.PORTRAIT
-								? Dimensions.get('window').width * 0.94 * (9 / 16)
-								: '100%',
-						height:
-							GlobalFinalUserInputSourceRatio != upload_source_ratio.SQUARE
-								? GlobalFinalUserInputSourceRatio ==
-								  upload_source_ratio.PORTRAIT
-									? Dimensions.get('window').height *
-									  (Dimensions.get('window').width /
-											Dimensions.get('window').height) *
-									  0.94
-									: (Dimensions.get('window').width / (16 / 9)) * 0.94
-								: Dimensions.get('window').width * 0.94,
+						width: dynamicDimensions.width as number,
+						height: dynamicDimensions.height,
 						justifyContent: 'center',
 						alignItems: 'center',
-						// maxHeight: Dimensions.get('window').width / GlobalsourceRatio,
 					}}>
 					<Image
-						resizeMode={
-							source_ratio !== upload_source_ratio.PORTRAIT ? 'cover' : 'cover'
-						}
+						resizeMode={'cover'}
 						style={{
-							width:
-								GlobalFinalUserInputSourceRatio == upload_source_ratio.PORTRAIT
-									? Dimensions.get('window').width * 0.94 * (9 / 16)
-									: '100%',
-							height:
-								GlobalFinalUserInputSourceRatio != upload_source_ratio.SQUARE
-									? GlobalFinalUserInputSourceRatio ==
-									  upload_source_ratio.PORTRAIT
-										? Dimensions.get('window').height *
-										  (Dimensions.get('window').width /
-												Dimensions.get('window').height) *
-										  0.94
-										: (Dimensions.get('window').width / (16 / 9)) * 0.94
-									: Dimensions.get('window').width * 0.94,
+							width: dynamicDimensions.width as number,
+							height: dynamicDimensions.height,
 						}}
 						source={{
 							uri:
