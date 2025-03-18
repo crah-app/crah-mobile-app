@@ -1,19 +1,23 @@
 {
-  "extends": "expo/tsconfig.base",
-  "compilerOptions": {
-    "jsx": "react",
-    "target": "ESNext",
-    "module": "CommonJS",
-    "strict": true,
-    "paths": {
-      "@/*": ["./*"]
-    }
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "index.js"
-  ]
+	"extends": "expo/tsconfig.base",
+	"compilerOptions": {
+		"jsx": "react",
+		"target": "ESNext",
+		"module": "CommonJS",
+		"strict": true,
+		"paths": {
+			"@/*": ["./*"]
+		}
+	},
+	"include": [
+		"**/*.ts",
+		"**/*.tsx",
+		".expo/types/**/*.ts",
+		"expo-env.d.ts",
+		"index.js",
+		"app/**/*",
+		"types/**/*",
+		"../crah-mobile-app/types/react-native-image-crop-picker.d.ts"
+	],
+	"exclude": ["node_modules"]
 }

@@ -391,10 +391,10 @@ const UploadedSourceContainer = forwardRef<
 	const isLandscape = sourceRatio >= 14 / 9; // normal landscape ratio is 16 / 9 but in cropping the fractional digits can fluctuate so a fluctuating-margin is set here
 	const isPortrait = sourceRatio < 1 && sourceRatio !== 1;
 
-	console.log('Aspect Ratio:', sourceRatio);
-	console.log('Is Landscape:', isLandscape);
-	console.log('Is Portrait:', isPortrait);
-	console.log('official:', source_ratio);
+	// console.log('Aspect Ratio:', sourceRatio);
+	// console.log('Is Landscape:', isLandscape);
+	// console.log('Is Portrait:', isPortrait);
+	// console.log('official:', source_ratio);
 
 	const fileName = uploadedSource[0].fileName?.toString();
 	const fileNameLength = fileName?.length || 0;
@@ -410,7 +410,7 @@ const UploadedSourceContainer = forwardRef<
 	}
 
 	useEffect(() => {
-		console.log(video, cover, 'edioj');
+		// console.log(video, cover, 'edioj');
 		if (GlobalFinalSourceRatio == undefined) {
 			GlobalFinalSourceRatio = sourceRatio;
 		}
