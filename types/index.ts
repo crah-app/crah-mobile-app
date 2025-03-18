@@ -222,6 +222,19 @@ export enum Tags {
 	Tutorial = 'Tutorial',
 	Story = 'Story',
 	Guide = 'Guide',
+	Documentation = 'Documenation',
+	Review = 'Review',
+	Challenge = 'Challenge',
+	Question = 'Question',
+	Answer = 'Answer',
+	Opinion = 'Opinion',
+	Thought = 'Thought',
+	Experience = 'Experience',
+	Information = 'Information',
+	Advertisement = 'Advertisement',
+	Warning = 'Warning',
+	Reminder = 'Reminder',
+	Announcement = 'Announcement',
 }
 
 /* 

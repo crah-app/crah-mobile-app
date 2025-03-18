@@ -23,7 +23,6 @@ import CreatePostDropDownMenu from '@/components/CreatePostDropDownMenu';
 const Layout = () => {
 	const theme = useSystemTheme();
 	const { bottom } = useSafeAreaInsets();
-	const [modalVisible, setModalVisible] = useState(false);
 	const segments = useSegments();
 
 	return (

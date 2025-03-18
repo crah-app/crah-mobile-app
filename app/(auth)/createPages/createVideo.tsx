@@ -15,8 +15,10 @@ import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import React, {
 	forwardRef,
+	useCallback,
 	useEffect,
 	useImperativeHandle,
+	useMemo,
 	useRef,
 	useState,
 } from 'react';
@@ -41,11 +43,12 @@ import UploadVideoModal from '@/app/modals/uploadVideoModal';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import * as VideoThumbnails from 'expo-video-thumbnails';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-	SafeAreaView,
-	useSafeAreaInsets,
-} from 'react-native-safe-area-context';
-import CostumKeyboardAvoidingView from '@/components/general/KeyboardAnimationView';
+	BottomSheetModal,
+	BottomSheetView,
+	BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
 import {
 	KeyboardAwareScrollView,
 	KeyboardToolbar,
@@ -105,7 +108,6 @@ const CreateVideoMainContent = () => {
 
 	const [title, setTitle] = useState<string>('');
 	const [description, setDescription] = useState<string>('');
-	const [tags, setTags] = useState<{}>();
 	const [uploadedSource, setUploadedSource] = useState<
 		imagePicker.ImagePickerAsset[] | undefined
 	>();
@@ -155,10 +157,6 @@ const CreateVideoMainContent = () => {
 			setCover(uri);
 		}
 	};
-
-	const AddTag = () => {};
-
-	const RemoveTag = () => {};
 
 	return (
 		<>
@@ -257,12 +255,11 @@ const CreateVideoMainContent = () => {
 				</View>
 
 				<CreateVideoTextInputs
-					setTags={() => setTags}
 					setDescription={setDescription}
 					description={description}
-					RemoveTag={RemoveTag}
 				/>
 			</KeyboardAwareScrollView>
+
 			<KeyboardToolbar />
 		</>
 	);
@@ -271,56 +268,148 @@ const CreateVideoMainContent = () => {
 interface CreateVideoTextInputsProps {
 	description: string;
 	setDescription: (text: string) => void;
-	setTags: () => void;
-	RemoveTag: () => void;
 }
 
 const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 	description,
 	setDescription,
-	setTags,
-	RemoveTag,
 }) => {
 	const theme = useSystemTheme();
 
+	const [tags, setTags] = useState<Tags[]>();
+
+	const AddTag = (tag: Tags) => {
+		console.log('AddTag function called');
+		setTags((prev: Tags[] | undefined) => (prev ? [...prev, tag] : [tag]));
+
+		handlCloseModalPress();
+	};
+
+	const RemoveTag = (tag: Tags) => {
+		console.log('RemoveTag function called');
+		setTags((prev: Tags[] | undefined) => {
+			const updatedTags = prev?.filter((t) => t !== tag);
+			return updatedTags;
+		});
+	};
+
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
+	const snapPoints = useMemo(() => ['90%'], []);
+
+	const handlePresentModalPress = useCallback(() => {
+		bottomSheetRef.current?.present();
+	}, []);
+
+	const handlCloseModalPress = useCallback(() => {
+		bottomSheetRef.current?.close();
+	}, []);
+
 	return (
 		<View>
-			<View style={[styles.Container3, styles.InputContainer]}>
-				<ThemedTextInput
-					placeholder={
-						'Enter description, insights, hashtags, your thoughts...'
-					}
-					theme={theme}
-					lines={30}
-					multiline={true}
-					maxLength={TextInputMaxCharacters.BigDescription}
-					showLength={true}
-					children={null}
-					value={description}
-					setValue={setDescription}
-				/>
-			</View>
-			<View style={[styles.Container4, styles.InputContainer]}>
-				<ThemedTextInput
-					value={''}
-					setValue={setTags}
-					placeholder={'Add tag'}
-					theme={theme}
-					lines={1}
-					multiline={false}
-					childrenContainerStyle={{
-						flexDirection: 'row',
-						gap: 10,
-						flexWrap: 'wrap',
-					}}>
-					<Tag
-						DisplayRemoveBtn={true}
+			<BottomSheetModalProvider>
+				<View style={[styles.Container3, styles.InputContainer]}>
+					<ThemedTextInput
+						placeholder={
+							'Enter description, insights, hashtags, your thoughts...'
+						}
 						theme={theme}
-						tag={Tags.Banger}
-						ActionOnRemoveBtnClick={RemoveTag()}
+						lines={30}
+						multiline={true}
+						maxLength={TextInputMaxCharacters.BigDescription}
+						showLength={true}
+						children={null}
+						value={description}
+						setValue={setDescription}
 					/>
-				</ThemedTextInput>
-			</View>
+				</View>
+				<View style={[styles.Container4, styles.InputContainer]}>
+					<View
+						style={{
+							backgroundColor: Colors[theme].container_surface,
+							borderRadius: 8,
+							paddingRight: 8,
+							paddingBottom: 8,
+							flexDirection: 'column',
+							gap: 8,
+							padding: 12,
+						}}>
+						<TouchableOpacity onPress={handlePresentModalPress}>
+							<ThemedText
+								value={'Add tags'}
+								theme={theme}
+								style={{ color: 'gray' }}
+							/>
+						</TouchableOpacity>
+
+						<View
+							style={{
+								paddingBottom: 8,
+								gap: 12,
+								flexWrap: 'wrap',
+								width: '100%',
+								flexDirection: 'row',
+							}}>
+							{tags?.map((tag) => (
+								<Tag
+									touchOpacity={1}
+									DisplayRemoveBtn={true}
+									theme={theme}
+									tag={tag}
+									ActionOnRemoveBtnClick={() => RemoveTag(tag)}
+								/>
+							))}
+						</View>
+
+						{!tags && <View style={{ height: 12 }} />}
+					</View>
+				</View>
+
+				<BottomSheetModal
+					snapPoints={snapPoints}
+					handleIndicatorStyle={{ backgroundColor: 'gray' }}
+					backgroundStyle={{
+						backgroundColor: Colors[theme].background,
+					}}
+					ref={bottomSheetRef}>
+					<BottomSheetView>
+						<View
+							style={{
+								flexDirection: 'column',
+								gap: 12,
+								paddingHorizontal: 18,
+								paddingVertical: 18,
+							}}>
+							<ThemedText
+								value={'Add a tag'}
+								theme={theme}
+								style={defaultStyles.biggerText}
+							/>
+
+							<ScrollView>
+								<View
+									style={{
+										width: '100%',
+										flexDirection: 'row',
+										gap: 8,
+										flexWrap: 'wrap',
+									}}>
+									{Object.values(Tags)
+										.filter((tag) => !tags?.includes(tag))
+										.map((tag) => (
+											<Tag
+												touchOpacity={0.2}
+												DisplayRemoveBtn={false}
+												theme={theme}
+												tag={tag}
+												handleTagPress={() => AddTag(tag)}
+											/>
+										))}
+								</View>
+							</ScrollView>
+						</View>
+					</BottomSheetView>
+				</BottomSheetModal>
+			</BottomSheetModalProvider>
 		</View>
 	);
 };
@@ -426,7 +515,7 @@ const UploadedSourceContainer = forwardRef<
 		<View
 			style={[
 				styles.videoWrapper,
-				{ backgroundColor: Colors[theme].textSecondary },
+				{ backgroundColor: Colors[theme].container_surface },
 			]}>
 			<View
 				style={{
@@ -515,7 +604,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 12,
 		paddingTop: 12,
 		paddingBottom: 12,
-		zIndex: 1,
+		// zIndex: 1,
 	},
 	Container1: {},
 	Container2: {},
@@ -538,7 +627,7 @@ const styles = StyleSheet.create({
 		height: '100%',
 		justifyContent: 'center',
 		alignItems: 'center',
-		zIndex: 1,
+		// zIndex: 1,
 		flex: 1,
 	},
 });

@@ -11,7 +11,8 @@ interface TagProps {
 	handleTagPress?: () => void;
 	isSelectedOnClick?: boolean;
 	DisplayRemoveBtn?: boolean;
-	ActionOnRemoveBtnClick?: void;
+	ActionOnRemoveBtnClick?: () => void;
+	touchOpacity?: number;
 }
 
 const Tag: React.FC<TagProps> = ({
@@ -21,9 +22,11 @@ const Tag: React.FC<TagProps> = ({
 	theme,
 	DisplayRemoveBtn,
 	ActionOnRemoveBtnClick,
+	touchOpacity,
 }) => {
 	return (
 		<TouchableOpacity
+			activeOpacity={touchOpacity}
 			key={tag}
 			onPress={handleTagPress}
 			style={[
@@ -35,8 +38,10 @@ const Tag: React.FC<TagProps> = ({
 					flexDirection: 'row',
 					justifyContent: 'space-between',
 					gap: 10,
+					width: '100%',
 				},
 				styles.text,
+				{ width: DisplayRemoveBtn ? 140 : 110 },
 				{
 					borderColor:
 						tag === "World's First"
@@ -53,12 +58,13 @@ const Tag: React.FC<TagProps> = ({
 							tag === "World's First"
 								? Colors[theme].textPrimary
 								: Colors[theme].textPrimary,
+						flex: 1,
 					},
 				]}
 			/>
 
 			{DisplayRemoveBtn && (
-				<TouchableOpacity onPress={() => ActionOnRemoveBtnClick}>
+				<TouchableOpacity onPress={ActionOnRemoveBtnClick}>
 					<Ionicons
 						name="close-outline"
 						size={16}
@@ -76,7 +82,6 @@ const styles = StyleSheet.create({
 		padding: 5,
 		borderWidth: 1.25,
 		borderRadius: 10,
-		width: 100,
 		textAlign: 'center',
 		alignContent: 'center',
 		justifyContent: 'center',

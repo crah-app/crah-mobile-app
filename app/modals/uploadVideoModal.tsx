@@ -5,6 +5,8 @@ import {
 	View,
 	Modal,
 	Dimensions,
+	Pressable,
+	useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as imagePicker from 'expo-image-picker';
@@ -52,6 +54,8 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 	cover,
 }) => {
 	const theme = useSystemTheme();
+	const { width, height } = useWindowDimensions();
+
 	const [selectedRatio, setSelectedRatio] = useState<upload_source_ratio>(
 		upload_source_ratio.SQUARE,
 	);
@@ -130,17 +134,23 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 			presentationStyle="overFullScreen"
 			animationType="fade"
 			visible={isVisible}
-			transparent
-			style={styles.modal}>
+			transparent>
 			<TouchableOpacity
 				activeOpacity={1}
 				onPress={() => setVisibility(false)}
-				style={styles.background}>
+				style={[
+					styles.background,
+					{ justifyContent: 'center', alignItems: 'center' },
+				]}>
 				<ThemedView
 					theme={theme}
 					style={[
 						styles.container,
 						{ backgroundColor: Colors[theme].surface },
+						{
+							width: Dimensions.get('window').width * 0.8,
+							height: Dimensions.get('window').height * 0.3,
+						},
 					]}>
 					<View style={styles.header}>
 						<ThemedText
@@ -186,7 +196,7 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 								onPress={() => setSelectedRatio(value)}
 								style={[
 									styles.btn,
-									{ backgroundColor: Colors[theme].background },
+									{ backgroundColor: Colors[theme].background, zIndex: 103 },
 									styles.ratioBtn,
 									{
 										borderColor:
@@ -207,23 +217,20 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 
 const styles = StyleSheet.create({
 	modal: {
-		width: Dimensions.get('window').width,
-		height: Dimensions.get('window').height,
 		flex: 1,
+		zIndex: 100,
 	},
 	background: {
-		justifyContent: 'center',
-		alignItems: 'center',
 		flex: 1,
 		backgroundColor: '#000000cc',
+		zIndex: 101,
 	},
 	container: {
-		width: Dimensions.get('window').width * 0.8,
-		height: Dimensions.get('window').height * 0.3,
 		borderRadius: 12,
 		justifyContent: 'center',
 		alignItems: 'center',
 		gap: 32,
+		zIndex: 102,
 	},
 	header: {
 		justifyContent: 'center',

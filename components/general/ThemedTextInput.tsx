@@ -30,6 +30,8 @@ interface ThemedTextInputProps {
 		| 'while-editing'
 		| 'unless-editing'
 		| undefined;
+	disabled?: boolean; // Add this line
+	onPress?: () => void; // Add this line
 }
 
 const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
@@ -45,6 +47,8 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 	value,
 	setValue,
 	clearButton,
+	disabled, // Add this line
+	onPress, // Add this line
 }) => {
 	return (
 		<View
@@ -62,6 +66,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 					height: multiline ? 10 * (lines || 1) : 'auto',
 				}}>
 				<TextInput
+					placeholderTextColor={'gray'}
 					clearButtonMode={clearButton}
 					autoCapitalize={'none'}
 					onChangeText={(newText) => setValue(newText)}
@@ -80,6 +85,11 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 						defaultStyles.textInput,
 						style,
 					]}
+					editable={!disabled}
+					onTouchStart={disabled ? onPress : undefined}
+					onTouchEnd={disabled ? onPress : undefined}
+					onTouchCancel={disabled ? onPress : undefined}
+					onTouchEndCapture={disabled ? onPress : undefined}
 				/>
 
 				{showLength && (
