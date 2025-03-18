@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 
 import * as imagePicker from 'expo-image-picker';
-import * as imageCropper from 'react-native-image-crop-picker';
+// import * as imageCropper from 'react-native-image-crop-picker';
 
 enum upload_mode {
 	Camera = 'camera',
@@ -88,15 +88,6 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 
 	const uploadFromGallery = async (mediatype: imagePicker.MediaType) => {
 		await imagePicker.requestMediaLibraryPermissionsAsync();
-
-		// const result = await imageCropper.openPicker({
-		// 	width: 300,
-		// 	height: 400,
-		// 	cropping: true,
-		// 	videos: true,
-		// 	multiple: false,
-		// });
-
 		let result = await imagePicker.launchImageLibraryAsync({
 			mediaTypes: [mediatype],
 			allowsEditing: true,
@@ -125,7 +116,7 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 	const uploadSource = async (
 		mode: upload_mode,
 		setStateFunction: (assets: imagePicker.ImagePickerAsset[]) => void,
-		mediatype: imagePicker.MediaType,
+		mediatype: any,
 	) => {
 		try {
 			let result =
