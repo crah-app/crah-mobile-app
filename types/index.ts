@@ -218,6 +218,7 @@ export enum TextInputMaxCharacters {
 export enum Tags {
 	News = 'News',
 	WorldsFirst = "World's First",
+	WorldsSecond = "World's Second",
 	Banger = 'Banger',
 	Tutorial = 'Tutorial',
 	Story = 'Story',
