@@ -3,10 +3,9 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	View,
-	Modal,
 	Dimensions,
-	Pressable,
-	useWindowDimensions,
+	KeyboardAvoidingView,
+	Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as imagePicker from 'expo-image-picker';
@@ -21,6 +20,7 @@ import {
 	upload_source_ratio,
 } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
+import Modal from 'react-native-modal';
 
 enum upload_mode {
 	Camera = 'camera',
@@ -54,7 +54,6 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 	cover,
 }) => {
 	const theme = useSystemTheme();
-	const { width, height } = useWindowDimensions();
 
 	const [selectedRatio, setSelectedRatio] = useState<upload_source_ratio>(
 		upload_source_ratio.SQUARE,
@@ -131,86 +130,84 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 
 	return (
 		<Modal
-			presentationStyle="overFullScreen"
-			animationType="fade"
-			visible={isVisible}
-			transparent>
-			<TouchableOpacity
-				activeOpacity={1}
-				onPress={() => setVisibility(false)}
+			isVisible={isVisible}
+			backdropOpacity={0.5}
+			onBackdropPress={() => setVisibility(false)}
+			statusBarTranslucent={false} // Entferne translucent, kann Probleme machen
+			useNativeDriver={true}
+			useNativeDriverForBackdrop={true}
+			hideModalContentWhileAnimating={true}
+			style={{
+				alignItems: 'center',
+				justifyContent: 'center',
+				flex: 1,
+			}}>
+			<ThemedView
+				theme={theme}
 				style={[
-					styles.background,
-					{ justifyContent: 'center', alignItems: 'center' },
+					styles.container,
+					{
+						backgroundColor: Colors[theme].surface,
+						width: '80%',
+						height: '30%',
+					},
 				]}>
-				<ThemedView
-					theme={theme}
-					style={[
-						styles.container,
-						{ backgroundColor: Colors[theme].surface },
-						{
-							width: Dimensions.get('window').width * 0.8,
-							height: Dimensions.get('window').height * 0.3,
-						},
-					]}>
-					<View style={styles.header}>
-						<ThemedText
-							value={`Upload ${uploadMode === 'Cover' ? 'Cover' : 'Video'}`}
-							theme={theme}
-							style={defaultStyles.biggerText}
-						/>
-					</View>
+				<View style={styles.header}>
+					<ThemedText
+						value={`Upload ${uploadMode === 'Cover' ? 'Cover' : 'Video'}`}
+						theme={theme}
+						style={defaultStyles.biggerText}
+					/>
+				</View>
 
-					<View style={styles.main}>
-						{options.map((val, key) => (
-							<TouchableOpacity
-								key={key}
-								onPress={() =>
-									uploadSource(
-										val.text === upload_mode.Gallery
-											? upload_mode.Gallery
-											: upload_mode.Camera,
-										uploadMode === 'Source'
-											? setUploadedImage
-											: setUploadedCover,
-										uploadMode === 'Source' ? 'videos' : 'images',
-									)
-								}
-								style={[
-									styles.btn,
-									{ backgroundColor: Colors[theme].background },
-								]}>
-								<Ionicons
-									name={val.icon}
-									size={24}
-									color={Colors[theme].primary}
-								/>
-								<ThemedText value={val.text} theme={theme} />
-							</TouchableOpacity>
-						))}
-					</View>
+				<View style={styles.main}>
+					{options.map((val, key) => (
+						<TouchableOpacity
+							key={key}
+							onPress={() =>
+								uploadSource(
+									val.text === upload_mode.Gallery
+										? upload_mode.Gallery
+										: upload_mode.Camera,
+									uploadMode === 'Source' ? setUploadedImage : setUploadedCover,
+									uploadMode === 'Source' ? 'videos' : 'images',
+								)
+							}
+							style={[
+								styles.btn,
+								{ backgroundColor: Colors[theme].background },
+							]}>
+							<Ionicons
+								name={val.icon}
+								size={24}
+								color={Colors[theme].primary}
+							/>
+							<ThemedText value={val.text} theme={theme} />
+						</TouchableOpacity>
+					))}
+				</View>
 
-					<View style={styles.footer}>
-						{ratioInputOptions.map((value, key) => (
-							<TouchableOpacity
-								key={key}
-								onPress={() => setSelectedRatio(value)}
-								style={[
-									styles.btn,
-									{ backgroundColor: Colors[theme].background, zIndex: 103 },
-									styles.ratioBtn,
-									{
-										borderColor:
-											selectedRatio === value
-												? Colors[theme].primary
-												: 'transparent',
-									},
-								]}>
-								<ThemedText value={value} theme={theme} />
-							</TouchableOpacity>
-						))}
-					</View>
-				</ThemedView>
-			</TouchableOpacity>
+				<View style={styles.footer}>
+					{ratioInputOptions.map((value, key) => (
+						<TouchableOpacity
+							key={key}
+							onPress={() => setSelectedRatio(value)}
+							style={[
+								styles.btn,
+								styles.ratioBtn,
+								{
+									backgroundColor: Colors[theme].background,
+									borderColor:
+										selectedRatio === value
+											? Colors[theme].primary
+											: 'transparent',
+								},
+							]}>
+							<ThemedText value={value} theme={theme} />
+						</TouchableOpacity>
+					))}
+				</View>
+			</ThemedView>
 		</Modal>
 	);
 };

@@ -8,7 +8,6 @@ import {
 	modal_mode,
 	Tags,
 	TextInputMaxCharacters,
-	mediaTypeSourceRatio,
 	upload_source_ratio,
 } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -24,19 +23,14 @@ import React, {
 } from 'react';
 import {
 	Dimensions,
-	Keyboard,
-	KeyboardAvoidingView,
-	Platform,
 	ScrollView,
 	StyleSheet,
 	TouchableOpacity,
-	TouchableWithoutFeedback,
 	View,
 	Image,
 	Alert,
-	TextInput,
-	Pressable,
-	Modal,
+	KeyboardAvoidingView,
+	Platform,
 } from 'react-native';
 import * as imagePicker from 'expo-image-picker';
 
@@ -56,17 +50,52 @@ import {
 	KeyboardToolbar,
 } from 'react-native-keyboard-controller';
 import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
+import { router } from 'expo-router';
+import Modal from 'react-native-modal';
+
+interface videoDataInterface {
+	cover: string; // cover image
+	title: string; // video title
+	description: string; // video description
+	tags: Tags[] | undefined; // video tags
+}
 
 const CreateVideo = () => {
 	const theme = useSystemTheme();
 	const { bottom } = useSafeAreaInsets();
 
-	const [uploadFinished, setUploadFinished] = useState<boolean>(false);
-	const [uploadIsLoading, setUploadIsLoading] = useState<boolean>(false);
-	const [uploadProgress, setUploadProgress] = useState<number>(0);
+	const [cover, setCover] = useState<
+		imagePicker.ImagePickerAsset[] | undefined | string
+	>(); // Lifted state
+	const [title, setTitle] = useState<string>('');
+	const [description, setDescription] = useState<string>('');
+	const [tags, setTags] = useState<Tags[] | undefined>();
+	const [uploadedSource, setUploadedSource] = useState<
+		imagePicker.ImagePickerAsset[] | undefined
+	>();
+
+	const checkUserInputs = () => {
+		if (!cover) {
+			Alert.alert('Error', 'Please upload a cover image');
+			return false;
+		}
+		if (!uploadedSource) {
+			Alert.alert('Error', 'Please upload a video');
+			return false;
+		}
+		if (!title) {
+			Alert.alert('Error', 'Please enter a title');
+			return false;
+		}
+		if (!description) {
+			Alert.alert('Error', 'Please enter a description');
+			return false;
+		}
+		return true;
+	};
 
 	const handleVideoUploadClickEvent = () => {
-		setUploadIsLoading(false);
+		if (!checkUserInputs()) return;
 
 		Alert.alert(
 			'Confirm Upload',
@@ -85,44 +114,51 @@ const CreateVideo = () => {
 		);
 	};
 
+	const [videoData, setVideoData] = useState<videoDataInterface>({
+		title,
+		description,
+		tags,
+		cover: cover as string,
+	});
+
 	const handleVideoUpload = async () => {
-		setUploadIsLoading(true);
+		setVideoData({
+			cover: cover as string, // Use cover state
+			title, // Use title state
+			description, // Use description state
+			tags, // Use tags state
+		});
 
-		// Upload the video here
-
-		// setUploadFinished(true);
-		// setUploadIsLoading(false);
+		router.push(
+			{
+				pathname: '/(auth)/homePages',
+				params: {
+					video_upload: 'true',
+					video_cover: JSON.stringify(cover),
+					video_data: JSON.stringify(videoData),
+				},
+			}, // Use cover state
+		);
 	};
 
 	return (
 		<View style={{ flex: 1 }}>
-			{uploadIsLoading && (
-				<View
-					style={{
-						position: 'absolute',
-						top: 0,
-						left: 0,
-						right: 0,
-						bottom: 0,
-						backgroundColor: 'rgba(0,0,0,0.5)',
-						zIndex: 1,
-						justifyContent: 'center',
-						alignItems: 'center',
-						gap: 12,
-					}}>
-					<CrahActivityIndicator color={Colors[theme].primary} size={32} />
-					<ThemedText
-						theme={theme}
-						style={{ color: Colors[theme].primary, fontSize: 18 }}
-						value={`${uploadProgress}% complete`}
-					/>
-				</View>
-			)}
 			<ThemedView theme={theme} flex={1} style={{ bottom: bottom * 3 }}>
 				<CreateVideoHeader
 					handleVideoUploadClickEvent={handleVideoUploadClickEvent}
 				/>
-				<CreateVideoMainContent />
+				<CreateVideoMainContent
+					cover={cover}
+					setCover={setCover}
+					uploadedSource={uploadedSource}
+					setUploadedSource={setUploadedSource}
+					title={title}
+					setTitle={setTitle}
+					description={description}
+					setDescription={setDescription}
+					tags={tags}
+					setTags={setTags}
+				/>
 			</ThemedView>
 		</View>
 	);
@@ -182,18 +218,36 @@ const CreateVideoHeader: React.FC<CreateVideoHeaderProps> = ({
 	);
 };
 
-const CreateVideoMainContent = () => {
+const CreateVideoMainContent = ({
+	cover,
+	setCover,
+	uploadedSource,
+	setUploadedSource,
+	title,
+	setTitle,
+	description,
+	setDescription,
+	tags,
+	setTags,
+}: {
+	cover: imagePicker.ImagePickerAsset[] | undefined | string;
+	setCover: React.Dispatch<
+		React.SetStateAction<imagePicker.ImagePickerAsset[] | undefined | string>
+	>;
+	uploadedSource: imagePicker.ImagePickerAsset[] | undefined;
+	setUploadedSource: React.Dispatch<
+		React.SetStateAction<imagePicker.ImagePickerAsset[] | undefined>
+	>;
+	title: string;
+	setTitle: React.Dispatch<React.SetStateAction<string>>;
+	description: string;
+	setDescription: React.Dispatch<React.SetStateAction<string>>;
+	tags: Tags[] | undefined;
+	setTags: React.Dispatch<React.SetStateAction<Tags[] | undefined>>;
+}) => {
 	const theme = useSystemTheme();
 	const scrollViewRef = useRef<ScrollView>(null);
 
-	const [title, setTitle] = useState<string>('');
-	const [description, setDescription] = useState<string>('');
-	const [uploadedSource, setUploadedSource] = useState<
-		imagePicker.ImagePickerAsset[] | undefined
-	>();
-	const [cover, setCover] = useState<
-		imagePicker.ImagePickerAsset[] | undefined | string
-	>();
 	const [modalVisible, setModalVisible] = useState(false);
 	const [modalMode, setModalMode] = useState<modal_mode | undefined>();
 
@@ -240,112 +294,121 @@ const CreateVideoMainContent = () => {
 
 	return (
 		<>
-			<ScrollView ref={scrollViewRef} style={{ flex: 1 }} scrollEnabled={true}>
-				<KeyboardAwareScrollView
-					scrollEnabled={false}
-					bottomOffset={100}
-					contentContainerStyle={{ gap: 0, paddingBottom: 100 }}
-					style={{ flex: 1 }}>
-					<UploadVideoModal
-						isVisible={modalVisible}
-						setVisibility={setModalVisible}
-						setUploadedImage={setUploadedSource}
-						setUploadedCover={setCover}
-						uploadMode={modalMode}
-						setSourceRatio={setSourceRatio}
-						uploadedSource={uploadedSource}
-						cover={cover}
-					/>
+			<KeyboardAvoidingView
+				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+				style={{ flex: 1 }}>
+				<UploadVideoModal
+					isVisible={modalVisible}
+					setVisibility={setModalVisible}
+					setUploadedImage={setUploadedSource}
+					setUploadedCover={setCover}
+					uploadMode={modalMode}
+					setSourceRatio={setSourceRatio}
+					uploadedSource={uploadedSource}
+					cover={cover}
+				/>
+				<ScrollView
+					ref={scrollViewRef}
+					contentContainerStyle={{ flexGrow: 1 }}
+					scrollEnabled={true}>
+					<KeyboardAwareScrollView
+						accessibilityViewIsModal={true}
+						scrollEnabled={false}
+						bottomOffset={100}
+						contentContainerStyle={{ gap: 0, paddingBottom: 100 }}
+						style={{ flex: 1 }}>
+						<View
+							style={[
+								styles.Container1,
+								styles.InputContainer,
+								{ paddingTop: 10 },
+							]}>
+							<ThemedTextInput
+								value={title}
+								placeholder="Enter the video title here"
+								theme={theme}
+								setValue={setTitle}
+							/>
+						</View>
 
-					<View
-						style={[
-							styles.Container1,
-							styles.InputContainer,
-							{ paddingTop: 10 },
-						]}>
-						<ThemedTextInput
-							value={title}
-							placeholder="Enter the video title here"
-							theme={theme}
-							setValue={setTitle}
-						/>
-					</View>
-
-					<View style={[styles.Container2, styles.InputContainer]}>
-						<View style={{ gap: 12 }}>
-							{uploadedSource ? (
-								<UploadedSourceContainer
-									removeSource={removeSource}
-									uploadedSource={uploadedSource}
-									SourceMode="Source"
-									ref={videoPlayerRef}
-									sourceRatio={sourceRatio}
-								/>
-							) : (
-								<TouchableOpacity onPress={() => handleModal('Source')}>
-									<ThemedText
-										value="Upload video"
-										theme={theme}
-										style={[
-											defaultStyles.primaryBtn,
-											{
-												padding: 14,
-												color: Colors[theme].textPrimaryReverse,
-											},
-										]}
+						<View style={[styles.Container2, styles.InputContainer]}>
+							<View style={{ gap: 12 }}>
+								{uploadedSource ? (
+									<UploadedSourceContainer
+										removeSource={removeSource}
+										uploadedSource={uploadedSource}
+										SourceMode="Source"
+										ref={videoPlayerRef}
+										sourceRatio={sourceRatio}
 									/>
-								</TouchableOpacity>
-							)}
-
-							{cover ? (
-								<UploadedSourceContainer
-									removeSource={removeCover}
-									uploadedSource={cover as imagePicker.ImagePickerAsset[]}
-									SourceMode="Cover"
-									sourceRatio={sourceRatio}
-								/>
-							) : (
-								<View
-									style={{
-										flexDirection: 'row',
-										width: '100%',
-										justifyContent: 'space-between',
-										gap: 8,
-									}}>
-									<TouchableOpacity
-										style={{ flex: 1 }}
-										onPress={() => handleModal('Cover')}>
+								) : (
+									<TouchableOpacity onPress={() => handleModal('Source')}>
 										<ThemedText
-											value="Upload cover"
+											value="Upload video"
 											theme={theme}
-											style={[defaultStyles.outlinedBtn, { padding: 8 }]}
+											style={[
+												defaultStyles.primaryBtn,
+												{
+													padding: 14,
+													color: Colors[theme].textPrimaryReverse,
+												},
+											]}
 										/>
 									</TouchableOpacity>
+								)}
 
-									{uploadedSource && (
+								{cover ? (
+									<UploadedSourceContainer
+										removeSource={removeCover}
+										uploadedSource={cover as imagePicker.ImagePickerAsset[]}
+										SourceMode="Cover"
+										sourceRatio={sourceRatio}
+									/>
+								) : (
+									<View
+										style={{
+											flexDirection: 'row',
+											width: '100%',
+											justifyContent: 'space-between',
+											gap: 8,
+										}}>
 										<TouchableOpacity
-											onPress={() => grabCoverFromCurrentFrame()}>
+											style={{ flex: 1 }}
+											onPress={() => handleModal('Cover')}>
 											<ThemedText
-												value="Grab cover from current frame"
+												value="Upload cover"
 												theme={theme}
 												style={[defaultStyles.outlinedBtn, { padding: 8 }]}
 											/>
 										</TouchableOpacity>
-									)}
-								</View>
-							)}
+
+										{uploadedSource && (
+											<TouchableOpacity
+												onPress={() => grabCoverFromCurrentFrame()}>
+												<ThemedText
+													value="Grab cover from current frame"
+													theme={theme}
+													style={[defaultStyles.outlinedBtn, { padding: 8 }]}
+												/>
+											</TouchableOpacity>
+										)}
+									</View>
+								)}
+							</View>
 						</View>
-					</View>
 
-					<CreateVideoTextInputs
-						setDescription={setDescription}
-						description={description}
-						scrollViewRef={scrollViewRef}
-					/>
-				</KeyboardAwareScrollView>
-			</ScrollView>
+						<CreateVideoTextInputs
+							setDescription={setDescription}
+							description={description}
+							scrollViewRef={scrollViewRef}
+							tags={tags}
+							setTags={setTags}
+						/>
+					</KeyboardAwareScrollView>
+				</ScrollView>
 
-			<KeyboardToolbar />
+				<KeyboardToolbar />
+			</KeyboardAvoidingView>
 		</>
 	);
 };
@@ -354,16 +417,19 @@ interface CreateVideoTextInputsProps {
 	description: string;
 	setDescription: (text: string) => void;
 	scrollViewRef: React.RefObject<ScrollView>;
+	tags: Tags[] | undefined;
+	setTags: React.Dispatch<React.SetStateAction<Tags[] | undefined>>;
 }
 
 const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 	description,
 	setDescription,
 	scrollViewRef,
+	tags,
+	setTags,
 }) => {
 	const theme = useSystemTheme();
 
-	const [tags, setTags] = useState<Tags[]>();
 	const [tagsLeft, setTagsLeft] = useState<Tags[]>(Object.values(Tags));
 
 	const AddTag = (tag: Tags) => {
