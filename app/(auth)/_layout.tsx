@@ -33,9 +33,8 @@ const Layout = () => {
 					tabBarStyle: [
 						styles.tabBarStyle,
 						{
-							borderColor: Colors[theme].background,
-							backgroundColor: Colors[theme].background,
-							paddingBottom: bottom,
+							borderTopColor: Colors[theme].textPrimary, // top border color
+							backgroundColor: Colors[theme].background, // tab bar background color
 						},
 					],
 					tabBarInactiveTintColor: Colors[theme].textPrimary,
@@ -49,7 +48,7 @@ const Layout = () => {
 					headerShadowVisible: false,
 					tabBarItemStyle: [
 						{
-							paddingVertical: 10,
+							paddingVertical: 15,
 						},
 					],
 				}}>
@@ -65,9 +64,10 @@ const Layout = () => {
 						tabBarStyle: [
 							styles.tabBarStyle,
 							{
-								borderColor: Colors[theme].background,
-								backgroundColor: Colors[theme].background,
-								paddingBottom: bottom,
+								borderTopColor: Colors[theme].textPrimary, // top border color
+								backgroundColor: Colors[theme].background, // tab bar background color
+							},
+							{
 								display: segments[2] === 'chats' ? 'none' : 'flex',
 							},
 						],
@@ -116,11 +116,7 @@ const Layout = () => {
 						tabBarLabel: 'Profile',
 						headerShown: false,
 						tabBarStyle: [
-							styles.tabBarStyle,
 							{
-								borderColor: Colors[theme].background,
-								backgroundColor: Colors[theme].background,
-								paddingBottom: bottom,
 								display:
 									// prettier-ignore
 									(segments[2] !== 'inbox' && segments[2] !== 'settings')
@@ -143,22 +139,9 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 	},
 	tabBarStyle: {
-		position: 'absolute',
-		borderRadius: 0,
-		borderWidth: 10,
-		borderBottomWidth: 10,
-		paddingHorizontal: 15,
-		height: 90,
-		width: '100%',
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingBottom: 20,
-		borderTopWidth: 1,
-		borderLeftWidth: 1,
-		borderRightWidth: 1,
-		borderTopColor: 'white',
-		// borderLeftColor: 'white',
-		// borderRightColor: 'white',
+		height: 80, // tab bar is fully in the screen
+		borderTopWidth: StyleSheet.hairlineWidth * 2, // top border height
+		paddingHorizontal: 15, // gap between tab bar icon is narrow
 	},
 });
 

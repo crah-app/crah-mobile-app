@@ -3,6 +3,7 @@ import UserPostDummyStructure from '@/JSON/posts.json';
 import { Ionicons } from '@expo/vector-icons';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 import UserPost from '@/JSON/posts.json';
+import { User } from 'react-native-gifted-chat';
 
 // Ionicons icon type
 export type ionicon = keyof typeof Ionicons.glyphMap;
@@ -15,15 +16,15 @@ export type ReactionType = (typeof Reactions)[number];
 
 // JSOn structure of a comment
 export type userCommentType = {
-	username: string;
+	user: User;
 	avatar: string;
 	text: string;
-	userId: number;
-	commentId: number;
-	likes: number;
-	responses: number;
-	date: string;
-	type: string;
+	// userId: number;
+	_id: number;
+	// likes: number;
+	// responses: number;
+	createdAt: number | Date;
+	// type: string;
 };
 
 /*

@@ -1,5 +1,5 @@
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Row from '../general/Row';
 import { CommentPurpose, CommentType } from '@/types';
@@ -31,9 +31,19 @@ const CommentRow: React.FC<CommentRowProps> = ({
 }) => {
 	const theme = useSystemTheme();
 
+	useEffect(() => {
+		console.log(avatar, 'avatar');
+	}, [avatar]);
+
 	return (
 		<View>
-			<Row title={username} subtitle={'lol'} avatarUrl={avatar} />
+			<Row
+				title={username}
+				subtitle={text}
+				avatarUrl={avatar}
+				showAvatar={true}
+				avatarIsSVG={true}
+			/>
 		</View>
 	);
 };

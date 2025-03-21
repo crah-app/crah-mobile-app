@@ -1,7 +1,6 @@
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import React from 'react';
 import {
-	Modal,
 	StyleSheet,
 	TouchableHighlight,
 	TouchableOpacity,
@@ -18,6 +17,7 @@ import Colors from '@/constants/Colors';
 import { PostTypes } from '@/types';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Button } from 'react-native-paper';
+import Modal from 'react-native-modal';
 
 interface PostTypeFilterModalProps {
 	FilterIsVisible: boolean;
@@ -36,20 +36,17 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
 
 	return (
 		<Modal
-			visible={FilterIsVisible}
-			presentationStyle="overFullScreen"
-			animationType="fade"
-			transparent>
-			<TouchableOpacity
-				activeOpacity={1}
-				style={styles.PopUpBackground}
-				onPress={() => setFilterVisibility(false)}>
+			useNativeDriver={true}
+			useNativeDriverForBackdrop={true}
+			isVisible={FilterIsVisible}
+			animationIn={'fadeIn'}
+			animationOut={'fadeOut'}
+			onBackdropPress={() => setFilterVisibility(false)}>
+			<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 				<View
 					style={[
 						styles.popUpInnerWrapper,
 						{
-							top: height / 3.5,
-							left: width / 10,
 							width: (width / 10) * 8,
 							height: (height / 10) * 4.5,
 							borderRadius: 20,
@@ -86,21 +83,19 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
 						</View>
 					</ThemedView>
 				</View>
-			</TouchableOpacity>
+			</View>
 		</Modal>
 	);
 };
 
 const styles = StyleSheet.create({
 	popUpInnerWrapper: {
-		position: 'absolute',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 10,
 		elevation: 5,
 		borderRadius: 20,
-		overflow: 'hidden',
 	},
 	PopUpBackground: {
 		flex: 1,

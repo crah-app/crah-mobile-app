@@ -19,6 +19,7 @@ import {
 	StyleSheet,
 	ImageBackground,
 	Platform,
+	ImageSourcePropType,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -114,7 +115,9 @@ const ChatScreen = () => {
 						<View style={[styles.headerCenter, {}]}>
 							{/* user info */}
 							<Image
-								source={{ uri: messages[0].user.avatar }}
+								source={{
+									uri: messages[0].user.avatar as ImageSourcePropType,
+								}}
 								style={styles.profilePic}
 							/>
 							<View style={styles.headerText}>
