@@ -1,48 +1,65 @@
 {
-  "expo": {
-    "name": "crah-app",
-    "slug": "crah-app",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/crah.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/crah.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ff0000"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/crah.png",
-        "backgroundColor": "#ff0000"
-      },
-      "package": "com.anonymous.crahapp"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/crah.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-video",
-        {
-          "supportsBackgroundPlayback": true,
-          "supportsPictureInPicture": true
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "extra": {
-      "expoRouterAppRoot": "/"
-    }
-  }
+	"expo": {
+		"name": "Crah",
+		"slug": "Crah",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/images/crah.png",
+		"scheme": "crah",
+		"userInterfaceStyle": "automatic",
+		"newArchEnabled": true,
+		"splash": {
+			"image": "./assets/images/crah.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ff0000"
+		},
+		"ios": {
+			"supportsTablet": true,
+			"infoPlist": {
+				"NSPhotoLibraryUsageDescription": "We need access to your photos for the upload."
+			},
+			"scheme": "crah",
+			"bundleIdentifier": "com.anonymous.crahapp"
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/images/crah.png",
+				"backgroundColor": "#ff0000"
+			},
+			"package": "com.anonymous.crahapp",
+			"softwareKeyboardLayoutMode": "pan",
+			"scheme": "crah"
+		},
+		"web": {
+			"bundler": "metro",
+			"output": "static",
+			"favicon": "./assets/images/crah.png"
+		},
+		"plugins": [
+			[
+				"expo-image-picker",
+				{
+					"photosPermission": "Crah needs permission to access your photos.",
+					"cameraPermission": "Crah needs permission to access your camera.",
+					"microphonePermission": "Crah needs permission to access your microphone."
+				}
+			],
+
+			"expo-router",
+			[
+				"expo-video",
+				{
+					"supportsBackgroundPlayback": true,
+					"supportsPictureInPicture": true
+				}
+			],
+			"expo-build-properties"
+		],
+		"experiments": {
+			"typedRoutes": true
+		},
+		"extra": {
+			"expoRouterAppRoot": "/"
+		}
+	}
 }

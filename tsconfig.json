@@ -6,14 +6,23 @@
     "module": "CommonJS",
     "strict": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "index.js"
+    "types/expo-env.d.ts",
+    "index.js",
+    "app/**/*",
+    "types/**/*",
+    "../crah-mobile-app/types/react-native-image-crop-picker.d.ts",
+    "expo-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

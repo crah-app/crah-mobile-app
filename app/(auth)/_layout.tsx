@@ -17,12 +17,12 @@ import { SvgXml } from 'react-native-svg';
 import Scooter from '../../assets/images/vectors/scooter.svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ThemedText from '@/components/general/ThemedText';
-import CreateModal from '@/components/CreateModal';
+import CreateModal from '@/components/CreatePostDropDownMenu';
+import CreatePostDropDownMenu from '@/components/CreatePostDropDownMenu';
 
 const Layout = () => {
 	const theme = useSystemTheme();
 	const { bottom } = useSafeAreaInsets();
-	const [modalVisible, setModalVisible] = useState(false);
 	const segments = useSegments();
 
 	return (
@@ -91,15 +91,7 @@ const Layout = () => {
 					options={{
 						tabBarIcon: () => null,
 						headerShown: false,
-						tabBarButton: (props) => (
-							<TouchableOpacity
-								onPress={() => setModalVisible(true)}
-								style={styles.plusButtonContainer}>
-								<View style={styles.plusButton}>
-									<Ionicons name="add" size={30} color="#FFF" />
-								</View>
-							</TouchableOpacity>
-						),
+						tabBarButton: (props) => <CreatePostDropDownMenu />,
 					}}
 				/>
 
@@ -107,13 +99,7 @@ const Layout = () => {
 					name="statsPages"
 					options={{
 						tabBarIcon: ({ color }) => (
-							<SvgXml
-								width="25"
-								height="25"
-								xml={Scooter}
-								fill={color}
-								style={{ color }}
-							/>
+							<SvgXml width="25" height="25" xml={Scooter} fill={color} />
 						),
 						tabBarShowLabel: true,
 						tabBarLabel: 'Ranks',
@@ -136,20 +122,15 @@ const Layout = () => {
 								backgroundColor: Colors[theme].background,
 								paddingBottom: bottom,
 								display:
-									(segments[2] === 'inbox' || segments[2] === 'settings')
-										? 'none'
-										: 'flex',
+									// prettier-ignore
+									(segments[2] !== 'inbox' && segments[2] !== 'settings')
+										? 'flex'
+										: 'none',
 							},
 						],
 					}}
 				/>
 			</Tabs>
-
-			<CreateModal
-				theme={theme}
-				visible={modalVisible}
-				setModalVisible={() => setModalVisible(false)}
-			/>
 		</View>
 	);
 };
@@ -178,23 +159,6 @@ const styles = StyleSheet.create({
 		borderTopColor: 'white',
 		// borderLeftColor: 'white',
 		// borderRightColor: 'white',
-	},
-	plusButtonContainer: {
-		bottom: 0,
-		alignItems: 'center',
-	},
-	plusButton: {
-		width: 50,
-		height: 50,
-		borderRadius: 30,
-		backgroundColor: Colors.default.primary,
-		justifyContent: 'center',
-		alignItems: 'center',
-		elevation: 5,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.1,
-		shadowRadius: 8,
 	},
 });
 

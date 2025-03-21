@@ -18,7 +18,7 @@ import ThemedView from '../general/ThemedView';
 import Reactions from '@/constants/Reactions';
 import ThemedText from '../general/ThemedText';
 import { formatDistanceToNow } from 'date-fns';
-import { ReactionType, UserPostType } from '@/types';
+import { ReactionType, userPostType } from '@/types';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -27,11 +27,11 @@ const videoSource =
 	'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
 interface UserPostComponentProps {
-	post: UserPostType;
+	post: userPostType;
 }
 
 const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
-	const player = useVideoPlayer(post.videoUrl || videoSource, (player) => {
+	const player = useVideoPlayer(post.videoUrl!, (player) => {
 		player.loop = true;
 	});
 
@@ -47,9 +47,9 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	const [commentsCount, setCommentsCount] = useState(post.comments.length || 0);
 	const [shareCount, setshareCount] = useState(post.shares || 0);
 
-	const handleReaction = (reaction: string) => {
+	const handleReaction = (reaction: ReactionType) => {
 		if (reaction) {
-			setReactions((prev: string[]) => [...prev, reaction]);
+			setReactions((prev: ReactionType[]) => [...prev, reaction]);
 		}
 		setShowReactions(false);
 	};
@@ -72,28 +72,39 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				return (
 					<View style={styles.contentContainer}>
 						<VideoView
-							style={styles.video}
+							nativeControls={true}
+							contentFit="fill"
 							player={player}
-							allowsFullscreen
-							allowsPictureInPicture
+							style={[
+								{
+									width: Dimensions.get('window').width,
+									height: Dimensions.get('window').width,
+								},
+							]}
 						/>
 					</View>
 				);
 			case 'videoPortrait':
 				return (
-					<VideoView
-						style={styles.video}
-						player={player}
-						allowsFullscreen
-						allowsPictureInPicture
-					/>
+					<View style={styles.contentContainer}>
+						<VideoView
+							nativeControls={true}
+							player={player}
+							style={[
+								{
+									width: Dimensions.get('window').width,
+									height: Dimensions.get('window').width,
+								},
+							]}
+						/>
+					</View>
 				);
 			case 'article':
 				return (
 					<Link
 						asChild
 						href={{
-							pathname: '/../modals/postView',
+							pathname: '/modals/postView',
 							params: { data: JSON.stringify(post), type: post.type },
 						}}
 						style={[styles.textPost]}>
@@ -119,8 +130,13 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				return (
 					<Image
 						source={{ uri: post.imageUrl }}
-						style={styles.image}
-						height={456}
+						style={[
+							styles.image,
+							{
+								width: Dimensions.get('window').width,
+								height: Dimensions.get('window').width,
+							},
+						]}
 					/>
 				);
 		}
@@ -165,7 +181,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	);
 };
 
-const PostHeader: React.FC<{ post: UserPostType; postTimeAgo: string }> = ({
+const PostHeader: React.FC<{ post: userPostType; postTimeAgo: string }> = ({
 	post,
 	postTimeAgo,
 }) => {
@@ -192,7 +208,7 @@ interface PostFooterProps {
 	handleLike: () => void;
 	handleShare: () => void;
 	commentsCount: number;
-	post: UserPostType;
+	post: userPostType;
 	shareCount: number;
 	reactions: string[];
 	setShowReactions: (boolean: boolean) => void;
@@ -380,7 +396,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
 interface UserPostReactionsModalProps {
 	showReactions: boolean;
 	setShowReactions: (boolean: boolean) => void;
-	handleReaction: (reaction: string) => void;
+	handleReaction: (reaction: ReactionType) => void;
 }
 
 const UserPostReactionsModal: React.FC<UserPostReactionsModalProps> = ({
@@ -453,10 +469,6 @@ const styles = StyleSheet.create({
 		width: '100%',
 		resizeMode: 'cover',
 	},
-	video: {
-		width: 350,
-		height: 275,
-	},
 	articlePreview: {
 		fontSize: 14,
 	},
@@ -517,10 +529,10 @@ const styles = StyleSheet.create({
 	},
 	contentContainer: {
 		flex: 1,
-		padding: 10,
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingHorizontal: 50,
+		paddingVertical: 10,
+		// alignItems: 'center',
+		// justifyContent: 'center',
+		// paddingHorizontal: 50,
 	},
 });
 

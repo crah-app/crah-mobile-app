@@ -2,15 +2,29 @@ import Reactions from '@/constants/Reactions';
 import UserPostDummyStructure from '@/JSON/posts.json';
 import { Ionicons } from '@expo/vector-icons';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
+import UserPost from '@/JSON/posts.json';
 
 // Ionicons icon type
 export type ionicon = keyof typeof Ionicons.glyphMap;
 
-export type UserPostType = (typeof UserPostDummyStructure)[number]; // the json structure itself
-export type PostKeys = keyof UserPostType; // a single key of the json structure
+export type userPostType = (typeof UserPostDummyStructure)[number]; // the json structure itself
+export type postKeys = keyof userPostType; // a single key of the json structure
 
 // reaction type based on reactions array
 export type ReactionType = (typeof Reactions)[number];
+
+// JSOn structure of a comment
+export type userCommentType = {
+	username: string;
+	avatar: string;
+	text: string;
+	userId: number;
+	commentId: number;
+	likes: number;
+	responses: number;
+	date: string;
+	type: string;
+};
 
 /*
 	Third-party websites the user can log in through.
@@ -25,7 +39,18 @@ export enum AuthStrategy {
 */
 
 export enum fetchAdresses {
-	commonTricks = 'http://192.168.0.136:3000/public/tricks/commonTricks.json',
+	commonTricks = 'http://192.168.0.136:4000/public/tricks/commonTricks.json',
+}
+
+/* 
+	The generic drop down component follows a strict item structure
+*/
+
+export interface dropDownMenuInputData {
+	key: number;
+	text: string;
+	iconIOS?: string;
+	iconAndroid?: string;
 }
 
 /*
@@ -44,6 +69,16 @@ export type TricksDataStructure = {
 */
 
 export type commonTricksDataStructure = { words: Array<string> };
+
+/* 
+	Types of posts a user can directly create
+*/
+
+export enum CreatePostType {
+	video = 'Video',
+	image = 'Image',
+	article = 'Article',
+}
 
 /*
 	User posts are categorized in these types
@@ -171,8 +206,9 @@ export enum TrickDifficulty {
 export enum TextInputMaxCharacters {
 	UserName = 25,
 	Simple = 50,
-	SmallDescription = 250,
-	BigDescription = 5000,
+	SmallDescription = 150,
+	BigDescription = 800,
+	Article = 10000,
 }
 
 /* 
@@ -182,10 +218,24 @@ export enum TextInputMaxCharacters {
 export enum Tags {
 	News = 'News',
 	WorldsFirst = "World's First",
+	WorldsSecond = "World's Second",
 	Banger = 'Banger',
 	Tutorial = 'Tutorial',
 	Story = 'Story',
 	Guide = 'Guide',
+	Documentation = 'Documenation',
+	Review = 'Review',
+	Challenge = 'Challenge',
+	Question = 'Question',
+	Answer = 'Answer',
+	Opinion = 'Opinion',
+	Thought = 'Thought',
+	Experience = 'Experience',
+	Information = 'Information',
+	Advertisement = 'Advertisement',
+	Warning = 'Warning',
+	Reminder = 'Reminder',
+	Announcement = 'Announcement',
 }
 
 /* 
@@ -232,7 +282,7 @@ export enum TrickListGeneralSpotCategory {
 }
 
 /*
-	In what order a trick list should be displayed
+	In what order a trick list should be displayed in a trick list
 */
 
 export enum TrickListOrderTypes {
@@ -242,7 +292,7 @@ export enum TrickListOrderTypes {
 }
 
 /*
-	What kind of tricks should be displayed
+	What kind of tricks should be displayed in a trick list
  */
 
 export enum TrickListFilterOptions {
@@ -254,3 +304,54 @@ export enum TrickListFilterOptions {
 	TWISTS = 'twists',
 	BALANCE = 'balance',
 }
+
+/*
+	In the create-video page the user has to upload a source from type video and a cover from type image
+	see ImagePicker.types.ts from module expo-image-picker
+	for the upload a modal is competent where the user has to choose between gallery and camera.
+	The modal is being used for both the cover (image) and the source (video).
+	The modal has to be given a parameter so it knows for what purpose an image shall be uploaded 
+*/
+
+export type modal_mode = 'Source' | 'Cover';
+
+/*
+	Users can let their comments rate from other users
+	the most voted type for a comment is the displayed comment type on the comment row
+*/
+
+export enum CommentType {
+	default = 'Default Comment',
+	top = 'Top Comment',
+	funny = 'Funny Comment',
+	real = 'Real Comment',
+}
+
+/*
+	Wether a comment is to the post or to another comment
+*/
+
+export type CommentPurpose = 'comment' | 'reply';
+
+/*
+	image-aspects the user can choose from to upload his video in
+*/
+
+export enum upload_source_ratio {
+	SQUARE = '1:1',
+	LANDSCAPE = '16:9',
+	PORTRAIT = '9:16',
+}
+
+/*
+	image-aspect as array type
+*/
+
+export const mediaTypeSourceRatio: Record<
+	upload_source_ratio,
+	[number, number]
+> = {
+	[upload_source_ratio.SQUARE]: [1, 1],
+	[upload_source_ratio.LANDSCAPE]: [16, 9],
+	[upload_source_ratio.PORTRAIT]: [9, 16],
+} as const;

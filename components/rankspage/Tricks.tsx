@@ -14,19 +14,23 @@ import ThemedText from '../general/ThemedText';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Link } from 'expo-router';
 import TrickColumn from '../rows/TrickRow';
-import { ActivityIndicator } from 'react-native-paper';
 
 import {
 	commonTricksDataStructure,
+	dropDownMenuInputData,
 	fetchAdresses,
 	TrickDifficulty,
+	TrickListFilterOptions,
 	TrickListGeneralSpotCategory,
+	TrickListOrderTypes,
 } from '@/types';
 
 import { getCachedData, setCachedData } from '@/hooks/cache';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import modalDummyContents from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
+import CrahActivityIndicator from '../general/CrahActivityIndicator';
+import DropDownMenu from '../general/DropDownMenu';
 
 interface TricksProps {}
 
@@ -59,7 +63,9 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 
 		console.log('fetch common tricks');
 
-		fetch(fetchAdresses.commonTricks)
+		fetch('http://192.168.0.136:4000/public/tricks/commonTricks.json', {
+			headers: { 'Cache-Control': 'no-cache' },
+		})
 			.then((res) => res.json())
 			.then(async (res) => {
 				setCommonTricks(res.commonTricks);
@@ -86,19 +92,16 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 	}, [errWhileLoadingCommonTricks]);
 
 	return (
-		<View
-			style={[
-				{
-					bottom: insets.bottom,
-				},
-				styles.container,
-			]}>
+		<View style={[styles.container]}>
 			{/* load trick list */}
 			{!commonTricksLoaded ? (
-				<ActivityIndicator
-					style={{ top: insets.top }}
+				<CrahActivityIndicator
 					size={'large'}
 					color={Colors[theme].primary}
+					style={{
+						position: 'absolute',
+						bottom: Dimensions.get('screen').height * 0.7,
+					}}
 				/>
 			) : (
 				<TrickList commonTricks={commonTricks!} />
@@ -113,6 +116,10 @@ const TrickList: React.FC<{
 	const [searchQuery, setSearchQuery] = useState<string>('');
 
 	const HandleTrickPress = () => {};
+
+	useEffect(() => {
+		console.log(commonTricks);
+	}, [commonTricks]);
 
 	return (
 		<ScrollView
@@ -131,8 +138,13 @@ const TrickList: React.FC<{
 					<Link
 						asChild
 						href={{
-							pathname: '/modals/help_modal',
-							params: { contents: JSON.stringify(modalDummyContents) },
+							pathname: '/modals/TrickModal',
+							params: {
+								data: JSON.stringify({
+									trickName: `${item.words[0]} ${item.words[1]}`,
+									trickDescription: 'trick description',
+								}),
+							},
 						}}>
 						<TrickColumn
 							name={`${item.words[0]} ${item.words[1]}`}
@@ -143,7 +155,7 @@ const TrickList: React.FC<{
 						/>
 					</Link>
 				)}
-				contentContainerStyle={{ height: 'auto', paddingBottom: 210 }}
+				contentContainerStyle={{ height: 'auto', paddingBottom: 270 }}
 			/>
 		</ScrollView>
 	);
@@ -155,8 +167,37 @@ const TrickListHeader: React.FC<{
 }> = ({ text, setText }) => {
 	const theme = useSystemTheme();
 
+	const OrderOptions = [
+		{
+			key: 0,
+			text: TrickListOrderTypes.DIFFICULTY,
+		},
+		{
+			key: 1,
+			text: TrickListOrderTypes.LANDEDFIRST,
+		},
+		{
+			key: 2,
+			text: TrickListOrderTypes.LANDEDLAST,
+		},
+	];
+
+	const [FilterOptions, setFilterOptions] = useState<dropDownMenuInputData[]>(
+		[],
+	);
+
 	const [selectedCategory, setSelectedCategory] =
 		useState<TrickListGeneralSpotCategory>(TrickListGeneralSpotCategory.ALL);
+
+	useEffect(() => {
+		const options = Object.values(TrickListFilterOptions).map((val, key) => ({
+			key,
+			text: val,
+		}));
+		setFilterOptions(options);
+	}, []);
+
+	const handleFilterBtnEvent = (key: number) => {};
 
 	return (
 		<View
@@ -177,6 +218,7 @@ const TrickListHeader: React.FC<{
 						cursor: Colors[theme].textPrimary,
 					},
 				]}
+				placeholderTextColor={'grey'}
 				placeholder="Search a trick..."
 				value={text}
 				onChangeText={(text) => setText(text)}
@@ -190,27 +232,39 @@ const TrickListHeader: React.FC<{
 					{ borderBottomColor: Colors[theme].textPrimary },
 				]}>
 				<View style={styles.headerContainerWrapper}>
-					<TouchableOpacity>
-						<View style={{ flexDirection: 'row' }}>
-							<ThemedText theme={theme} value={'Order'} />
-							<Ionicons
-								name="chevron-expand"
-								color={Colors[theme].textPrimary}
-								size={16}
-							/>
-						</View>
-					</TouchableOpacity>
+					<DropDownMenu
+						items={OrderOptions}
+						onSelect={handleFilterBtnEvent}
+						triggerComponent={
+							<TouchableOpacity>
+								<View style={{ flexDirection: 'row' }}>
+									<ThemedText theme={theme} value={'Order'} />
+									<Ionicons
+										name="chevron-expand"
+										color={Colors[theme].textPrimary}
+										size={16}
+									/>
+								</View>
+							</TouchableOpacity>
+						}
+					/>
 
-					<TouchableOpacity>
-						<View style={{ flexDirection: 'row' }}>
-							<ThemedText theme={theme} value={'Filter'} />
-							<Ionicons
-								name="chevron-expand"
-								color={Colors[theme].textPrimary}
-								size={16}
-							/>
-						</View>
-					</TouchableOpacity>
+					<DropDownMenu
+						items={FilterOptions}
+						onSelect={handleFilterBtnEvent}
+						triggerComponent={
+							<TouchableOpacity>
+								<View style={{ flexDirection: 'row' }}>
+									<ThemedText theme={theme} value={'Filter'} />
+									<Ionicons
+										name="chevron-expand"
+										color={Colors[theme].textPrimary}
+										size={16}
+									/>
+								</View>
+							</TouchableOpacity>
+						}
+					/>
 				</View>
 
 				<View style={styles.headerContainerWrapper}>

@@ -2,6 +2,7 @@ import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import React, { Children, useState } from 'react';
 import {
+	KeyboardAvoidingView,
 	StyleSheet,
 	TextInput,
 	TextStyle,
@@ -21,13 +22,16 @@ interface ThemedTextInputProps {
 	showLength?: boolean;
 	children?: React.ReactNode;
 	childrenContainerStyle?: ViewStyle | ViewStyle[];
-	value?: string;
+	value: string;
+	setValue: (text: string) => void;
 	clearButton?:
 		| 'always'
 		| 'never'
 		| 'while-editing'
 		| 'unless-editing'
 		| undefined;
+	disabled?: boolean; // Add this line
+	onPress?: () => void; // Add this line
 }
 
 const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
@@ -41,10 +45,11 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 	children,
 	childrenContainerStyle,
 	value,
+	setValue,
 	clearButton,
+	disabled, // Add this line
+	onPress, // Add this line
 }) => {
-	const [text, setText] = useState<string | undefined>(value);
-
 	return (
 		<View
 			style={{
@@ -58,31 +63,38 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 			<View
 				style={{
 					justifyContent: 'space-between',
-					height: multiline ? 75 * (lines || 1) : 'auto',
+					height: multiline ? 10 * (lines || 1) : 'auto',
 				}}>
 				<TextInput
+					placeholderTextColor={'gray'}
 					clearButtonMode={clearButton}
 					autoCapitalize={'none'}
-					onChangeText={(newText) => setText(newText)}
-					value={text}
-					maxLength={maxLength || 50}
-					multiline={multiline || true}
-					numberOfLines={lines || 3}
+					onChangeText={(newText) => setValue(newText)}
+					value={value}
+					maxLength={maxLength ?? 50}
+					multiline={multiline ?? false}
+					numberOfLines={lines ?? 1}
 					placeholder={placeholder}
 					style={[
 						{
 							backgroundColor: Colors[theme].container_surface,
 							color: Colors[theme].textPrimary,
 							textAlignVertical: 'top',
+							maxHeight: 200,
 						},
 						defaultStyles.textInput,
 						style,
 					]}
+					editable={!disabled}
+					onTouchStart={disabled ? onPress : undefined}
+					onTouchEnd={disabled ? onPress : undefined}
+					onTouchCancel={disabled ? onPress : undefined}
+					onTouchEndCapture={disabled ? onPress : undefined}
 				/>
 
 				{showLength && (
 					<ThemedText
-						value={`${text?.length}/${maxLength}`}
+						value={`${value?.length}/${maxLength}`}
 						theme={theme}
 						style={{
 							alignSelf: 'flex-end',

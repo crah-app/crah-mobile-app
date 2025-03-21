@@ -2,12 +2,10 @@ import {
 	View,
 	TouchableOpacity,
 	StyleSheet,
-	Image,
 	FlatList,
 	ScrollView,
 	SafeAreaView,
 	Dimensions,
-	Text,
 } from 'react-native';
 import React, { useState } from 'react';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -180,6 +178,7 @@ const Page = () => {
 
 									{tricks.length > 0 ? (
 										<FlatList
+											scrollEnabled={false}
 											data={tricks}
 											keyExtractor={(item) => item.id}
 											renderItem={({ item, index }) => (
@@ -224,6 +223,7 @@ const Page = () => {
 									]}>
 									{Object.values(PostTypeIonicons).map((icon, index) => (
 										<TouchableOpacity
+											key={index}
 											onPress={() =>
 												setActivePostFilterIcon(
 													Object.keys(PostTypeIonicons)[index],
@@ -254,6 +254,7 @@ const Page = () => {
 							<View style={{ flex: 1, bottom }}>
 								{posts.length > 0 ? (
 									<FlatList
+										scrollEnabled={false}
 										style={styles.PostsGridContainer}
 										data={posts}
 										keyExtractor={(item) => item.id}

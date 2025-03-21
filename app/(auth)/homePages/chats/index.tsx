@@ -132,6 +132,7 @@ const Page = () => {
 
 					<View style={[styles.messages_container]}>
 						<FlatList
+							scrollEnabled={false}
 							ItemSeparatorComponent={() => (
 								<View
 									style={{

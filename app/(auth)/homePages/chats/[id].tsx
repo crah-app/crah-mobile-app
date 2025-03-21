@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
 	Bubble,
 	Composer,
@@ -7,10 +7,7 @@ import {
 	InputToolbar,
 	SystemMessage,
 } from 'react-native-gifted-chat';
-import {
-	SafeAreaView,
-	useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ThemedView from '@/components/general/ThemedView';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import Colors from '@/constants/Colors';
@@ -21,8 +18,6 @@ import {
 	Text,
 	StyleSheet,
 	ImageBackground,
-	KeyboardAvoidingView,
-	Keyboard,
 	Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,7 +27,6 @@ import {
 	useLocalSearchParams,
 	useNavigation,
 } from 'expo-router';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { QuickReplies } from 'react-native-gifted-chat/lib/QuickReplies';
 
 import initialMessages from '@/JSON/messages.json';
@@ -151,7 +145,7 @@ const ChatScreen = () => {
 			{/* GiftedChat */}
 			<ImageBackground style={{ flex: 1, paddingBottom: bottom }}>
 				<GiftedChat
-					keyboardShouldPersistTaps="never"
+					isKeyboardInternallyHandled={true}
 					renderAvatar={null}
 					messages={messages}
 					onSend={(messages) => onSend(messages)}
@@ -217,6 +211,7 @@ const ChatScreen = () => {
 							textInputStyle={{ color: Colors[theme].textPrimary }}
 						/>
 					)}
+					focusOnInputWhenOpeningKeyboard={true}
 				/>
 			</ImageBackground>
 		</ThemedView>

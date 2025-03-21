@@ -56,3 +56,5 @@ export const defaultStyles = StyleSheet.create({
 		backgroundColor: 'gray',
 	},
 });
+
+export const defaultHeaderBtnSize = 32;

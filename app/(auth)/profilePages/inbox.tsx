@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/general/ThemedView';
 import ThemedText from '@/components/general/ThemedText';
-import { defaultStyles } from '@/constants/Styles';
+import { defaultHeaderBtnSize, defaultStyles } from '@/constants/Styles';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { Link, router } from 'expo-router';
@@ -107,7 +107,7 @@ const Header = () => {
 			<TouchableOpacity onPress={router.back}>
 				<Ionicons
 					name="chevron-back-outline"
-					size={24}
+					size={defaultHeaderBtnSize - 6}
 					color={Colors[theme].textPrimary}
 				/>
 			</TouchableOpacity>
@@ -124,8 +124,8 @@ const Header = () => {
 				}}>
 				<TouchableOpacity>
 					<Ionicons
-						name="help-outline"
-						size={24}
+						name="help-circle-outline"
+						size={defaultHeaderBtnSize - 4}
 						color={Colors[theme].textPrimary}
 					/>
 				</TouchableOpacity>

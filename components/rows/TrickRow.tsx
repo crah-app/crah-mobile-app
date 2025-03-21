@@ -29,8 +29,7 @@ const TrickColumn: React.FC<TrickColumnProps> = ({
 			title={name}
 			subtitle={landed}
 			subtitleStyle={{
-				color:
-					landed == 'landed' ? Colors['default'].green : Colors[theme].primary,
+				color: landed == 'landed' ? Colors['default'].primary : 'grey',
 			}}
 			avatarIsSVG={true}
 			showAvatar={true}
