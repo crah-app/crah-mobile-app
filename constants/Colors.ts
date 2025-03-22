@@ -18,7 +18,7 @@ export default {
 	dark: {
 		primary: 'rgb(255, 0, 0)',
 		green: 'forestgreen',
-		background: 'rgb(14, 14, 14)',
+		background: 'rgb(22, 22, 22)',
 		surface: 'rgb(37, 41, 46)',
 		container_surface: 'rgb(30, 30, 30)',
 		textPrimary: 'rgb(255, 255, 255)',

@@ -42,8 +42,10 @@ import {
 } from '@/types';
 import BottomSheet, {
 	BottomSheetBackdrop,
+	BottomSheetFlatList,
 	BottomSheetModal,
 	BottomSheetModalProvider,
+	BottomSheetTextInput,
 	BottomSheetView,
 	useBottomSheetModal,
 } from '@gorhom/bottom-sheet';
@@ -61,6 +63,8 @@ import Modal from 'react-native-modal';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSharedValue } from 'react-native-reanimated';
+import { defaultStyles } from '@/constants/Styles';
+import CommentRow from '../rows/CommentRow';
 
 const DUMMY_PROFILE_IMAGE = '../../assets/images/vectors/src/person(1).png';
 const videoSource =
@@ -234,7 +238,11 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				handleReaction={handleReaction}
 			/>
 			{/* Post Comment Section */}
-			<PostCommentSection ref={bottomSheetModalRef} comments={userComments} />
+			<PostCommentSection
+				ref={bottomSheetModalRef}
+				comments={userComments}
+				username={post.username}
+			/>
 			{/* </BottomSheetModalProvider> */}
 		</View>
 	);
@@ -471,7 +479,8 @@ const UserPostReactionsModal: React.FC<UserPostReactionsModalProps> = ({
 };
 
 interface PostCommentSectionProps {
-	comments: IMessage[]; // userCommentType[]
+	comments: userCommentType[];
+	username: string;
 }
 
 const PostCommentSection = forwardRef<
@@ -479,20 +488,37 @@ const PostCommentSection = forwardRef<
 	PostCommentSectionProps
 >((props, ref) => {
 	const theme = useSystemTheme();
+	const insets = useSafeAreaInsets();
 
-	const { comments: commentsAsProps } = props;
+	const { comments: commentsAsProps, username } = props;
 
 	const snapPoints = useMemo(() => ['75%'], []);
 
 	const [commentsLoaded, setCommentsLoaded] = useState(false);
 
-	const [comments, setComments] = useState<IMessage[]>(commentsAsProps);
+	const [comments, setComments] = useState<userCommentType[]>(commentsAsProps);
 	const [text, setText] = useState('');
 
-	const onSend = (comments: IMessage[]) => {
-		setComments((previousMessages) =>
-			GiftedChat.append(previousMessages, comments),
-		);
+	const onSend = () => {
+		if (!text) return;
+
+		// dummy data
+		const newComment: userCommentType = {
+			avatar: 'https://randomuser.me/api/portraits/men/32.jp',
+			text: 'Das ist ein großartiger Kommentar!',
+			user: {
+				_id: 1,
+				name: 'Felix Schmidt',
+				avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+			},
+			_id: 101,
+			createdAt: new Date('2024-03-04T12:00:00Z'),
+			likes: 567,
+			purpose: 'comment',
+			type: CommentType.default,
+		};
+
+		setComments((prev) => [...prev, newComment]);
 	};
 
 	useEffect(() => {
@@ -501,7 +527,7 @@ const PostCommentSection = forwardRef<
 		if (!comments) return;
 
 		setCommentsLoaded(true);
-		console.log('comments:', comments);
+		console.log('commentgdssggfs:', comments);
 	}, [comments]);
 
 	const renderBackdrop = useCallback((props: any) => {
@@ -512,87 +538,138 @@ const PostCommentSection = forwardRef<
 			<BottomSheetBackdrop
 				animatedIndex={animatedIndex}
 				animatedPosition={animatedPosition}
-				disappearsOnIndex={0}
-				appearsOnIndex={1}
+				disappearsOnIndex={-1}
+				appearsOnIndex={0}
 			/>
 		);
 	}, []);
 
 	return (
 		<BottomSheetModal
+			containerStyle={{}}
 			backdropComponent={renderBackdrop}
 			handleIndicatorStyle={{ backgroundColor: 'gray' }}
 			backgroundStyle={{
-				backgroundColor: Colors[theme].background,
+				backgroundColor: Colors[theme].surface,
 			}}
 			ref={ref}
-			index={-1}
+			index={1}
 			snapPoints={snapPoints}>
 			{/* main content */}
-			<BottomSheetView style={{ flex: 1 }}>
+			<BottomSheetView style={{}}>
 				{commentsLoaded ? (
-					<GiftedChat
-						isKeyboardInternallyHandled={true}
-						renderAvatar={null}
-						messages={comments}
-						onSend={(comments) => onSend(comments)}
-						user={{
-							_id: 101, // post id
-						}}
-						onInputTextChanged={setText}
-						// left action: add btn
-						renderActions={(props) => (
-							<View
-								style={{
-									alignItems: 'center',
-									justifyContent: 'center',
-									height: 44,
-								}}>
-								<RenderRightInputButton props={props} />
-							</View>
-						)}
-						renderSend={(props) => (
-							<View
-								style={{
-									alignItems: 'center',
-									justifyContent: 'center',
-									height: 44,
-								}}>
-								{text.length > 0 ? (
-									<RenderSendText props={props} />
-								) : (
-									<RenderSendEmptyText props={props} />
-								)}
-							</View>
-						)}
-						textInputProps={[styles.composer]}
-						renderBubble={(props) => <RenderBubble props={props} />}
-						listViewProps={{
-							keyboardShouldPersistTaps: 'handled',
-							keyboardDismissMode:
-								Platform.OS === 'ios' ? 'interactive' : 'on-drag',
-						}}
-						renderInputToolbar={(props) => (
-							<InputToolbar
-								{...props}
-								containerStyle={{
-									backgroundColor: Colors[theme].surface,
-								}}
+					<View
+						style={{
+							flexDirection: 'column',
+							justifyContent: 'space-between',
+							height: '100%',
+						}}>
+						<View
+							style={{
+								width: '100%',
+								justifyContent: 'center',
+								alignItems: 'center',
+								marginBottom: 20,
+							}}>
+							<ThemedText
+								theme={theme}
+								value={'Comments'}
+								style={[defaultStyles.biggerText]}
 							/>
-						)}
-						renderQuickReplies={(props) => (
-							<QuickReplies color={Colors[theme].primary} {...props} />
-						)}
-						renderComposer={(props) => (
-							<Composer
-								{...props}
-								textInputStyle={{ color: Colors[theme].textPrimary }}
+						</View>
+
+						<ScrollView
+							scrollEnabled={true}
+							keyboardDismissMode="on-drag"
+							contentInsetAdjustmentBehavior="always"
+							style={{ alignSelf: 'flex-start', flex: 1 }}>
+							{comments.length > 0 ? (
+								<BottomSheetFlatList
+									scrollEnabled={false}
+									data={comments}
+									renderItem={({ item: comment, index }) => {
+										const replies = comments.filter(
+											(val) => val.replyTo === comment._id,
+										);
+
+										return (
+											<View>
+												{!comment.replyTo && (
+													<CommentRow
+														key={index}
+														style={{ backgroundColor: Colors[theme].surface }}
+														userId={comment.user._id}
+														avatar={comment.avatar}
+														text={comment.text}
+														responses={replies.length}
+														likes={comment.likes}
+														date={new Date(comment.createdAt)}
+														username={comment.user.name}
+														purpose={comment.purpose}
+														type={comment.type}
+														commentId={comment._id}
+														replies={replies}
+													/>
+												)}
+											</View>
+										);
+									}}
+									keyExtractor={(item, index) => index.toString()}
+								/>
+							) : (
+								<View
+									style={{
+										flex: 1,
+										width: Dimensions.get('window').width,
+										height: 500,
+										alignItems: 'center',
+										justifyContent: 'center',
+									}}>
+									<ThemedText
+										style={{ color: 'gray' }}
+										theme={theme}
+										value={`Be the first comment under ${username}'s post!`}
+									/>
+								</View>
+							)}
+						</ScrollView>
+
+						<View
+							style={{
+								width: '100%',
+								height: 'auto',
+								flexDirection: 'row',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								backgroundColor: Colors[theme].surface,
+								borderTopWidth: StyleSheet.hairlineWidth,
+								borderTopColor: Colors[theme].textPrimary,
+							}}>
+							<BottomSheetTextInput
+								onChangeText={setText}
+								value={text}
+								style={[
+									styles.composer,
+									{
+										color: Colors[theme].textPrimary,
+									},
+								]}
+								placeholderTextColor={'gray'}
+								placeholder={`A comment for ${username}`}
 							/>
-						)}
-						focusOnInputWhenOpeningKeyboard={true}
-					/>
+							<TouchableOpacity
+								onPress={onSend}
+								style={{ paddingHorizontal: 14 }}>
+								<Ionicons
+									name="send-outline"
+									size={20}
+									color={Colors[theme].textPrimary}
+								/>
+							</TouchableOpacity>
+						</View>
+					</View>
 				) : (
-					<CrahActivityIndicator size={'large'} color={Colors[theme].primary} />
+					<CrahActivityIndicator size={'large'} color={'gray'} />
 				)}
 			</BottomSheetView>
 			{/*  */}
@@ -609,27 +686,6 @@ const RenderRightInputButton: React.FC<{ props: any }> = ({ props }) => {
 			style={{ paddingHorizontal: 10 }}>
 			<Ionicons
 				name="add-outline"
-				size={24}
-				color={Colors[theme].textPrimary}
-			/>
-		</TouchableOpacity>
-	);
-};
-
-const RenderSendText: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-
-	return (
-		<TouchableOpacity
-			onPress={() => {
-				if (props.text && props.text.trim()) {
-					props.onSend({ text: props.text.trim() }, true);
-					console.log('send pressed');
-				}
-			}}
-			style={{ paddingHorizontal: 14 }}>
-			<Ionicons
-				name="send-outline"
 				size={24}
 				color={Colors[theme].textPrimary}
 			/>
@@ -764,10 +820,8 @@ const styles = StyleSheet.create({
 		// paddingHorizontal: 50,
 	},
 	composer: {
-		paddingHorizontal: 10,
-		paddingTop: 8,
+		padding: 20,
 		fontSize: 16,
-		marginVertical: 4,
 	},
 });
 

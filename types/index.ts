@@ -3,7 +3,6 @@ import UserPostDummyStructure from '@/JSON/posts.json';
 import { Ionicons } from '@expo/vector-icons';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 import UserPost from '@/JSON/posts.json';
-import { User } from 'react-native-gifted-chat';
 
 // Ionicons icon type
 export type ionicon = keyof typeof Ionicons.glyphMap;
@@ -14,17 +13,44 @@ export type postKeys = keyof userPostType; // a single key of the json structure
 // reaction type based on reactions array
 export type ReactionType = (typeof Reactions)[number];
 
+// simple user interface
+export interface CrahUser {
+	name: string;
+	avatar: string;
+	_id: number;
+	level?: number;
+	rank?: number;
+}
+
+/*
+	Users can let their comments rate from other users
+	the most voted type for a comment is the displayed comment type on the comment row
+*/
+
+export enum CommentType {
+	default = 'Default Comment',
+	top = 'Top Comment',
+	funny = 'Funny Comment',
+	real = 'Real Comment',
+}
+
+/*
+	Wether a comment is to the post or to another comment
+*/
+
+export type CommentPurpose = 'comment' | 'reply';
+
 // JSOn structure of a comment
 export type userCommentType = {
-	user: User;
+	user: CrahUser;
 	avatar: string;
 	text: string;
-	// userId: number;
 	_id: number;
-	// likes: number;
-	// responses: number;
+	likes: number;
 	createdAt: number | Date;
-	// type: string;
+	type: CommentType;
+	purpose: CommentPurpose;
+	replyTo?: number; // if comment is from purpose "reply"
 };
 
 /*
@@ -315,24 +341,6 @@ export enum TrickListFilterOptions {
 */
 
 export type modal_mode = 'Source' | 'Cover';
-
-/*
-	Users can let their comments rate from other users
-	the most voted type for a comment is the displayed comment type on the comment row
-*/
-
-export enum CommentType {
-	default = 'Default Comment',
-	top = 'Top Comment',
-	funny = 'Funny Comment',
-	real = 'Real Comment',
-}
-
-/*
-	Wether a comment is to the post or to another comment
-*/
-
-export type CommentPurpose = 'comment' | 'reply';
 
 /*
 	image-aspects the user can choose from to upload his video in
