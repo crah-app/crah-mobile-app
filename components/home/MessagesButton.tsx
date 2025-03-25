@@ -9,7 +9,7 @@ import ThemedText from '../general/ThemedText';
 
 const MessagesButton = () => {
 	const theme = useSystemTheme();
-	const notifications = 1;
+	const notifications = 0;
 
 	return (
 		<View>

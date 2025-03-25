@@ -39,6 +39,7 @@ import {
 	userPostType,
 	ReactionType,
 	CommentType,
+	TextInputMaxCharacters,
 } from '@/types';
 import BottomSheet, {
 	BottomSheetBackdrop,
@@ -258,7 +259,7 @@ const PostHeader: React.FC<{ post: userPostType; postTimeAgo: string }> = ({
 		<View>
 			<View style={styles.header}>
 				<Image
-					source={{ uri: '../../assets/images/vectors/src/person(1).png' }}
+					source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
 					style={styles.profileImage}
 				/>
 
@@ -646,6 +647,7 @@ const PostCommentSection = forwardRef<
 								borderTopColor: Colors[theme].textPrimary,
 							}}>
 							<BottomSheetTextInput
+								maxLength={TextInputMaxCharacters.SmallDescription}
 								onChangeText={setText}
 								value={text}
 								style={[
