@@ -1,4 +1,4 @@
-import { View, Text, ViewStyle, StyleSheet } from 'react-native';
+import { View, Text, ViewStyle, StyleSheet, Image } from 'react-native';
 import React from 'react';
 import ThemedView from './general/ThemedView';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -13,8 +13,11 @@ const UserPostGridItem: React.FC<UserPostGridItemProps> = ({ post, style }) => {
 	const theme = useSystemTheme();
 
 	return (
-		<ThemedView theme={theme} style={[style]}>
-			<ThemedText theme={theme} value="LOL" />
+		<ThemedView theme={theme} style={style}>
+			<Image
+				style={{ width: '100%', height: '100%' }}
+				source={{ uri: 'https://picsum.photos/200' }}
+			/>
 		</ThemedView>
 	);
 };

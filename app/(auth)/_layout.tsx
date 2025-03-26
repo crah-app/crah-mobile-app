@@ -115,15 +115,15 @@ const Layout = () => {
 						tabBarShowLabel: true,
 						tabBarLabel: 'Profile',
 						headerShown: false,
-						tabBarStyle: [
-							{
-								display:
-									// prettier-ignore
-									(segments[2] !== 'inbox' && segments[2] !== 'settings')
-										? 'flex'
-										: 'none',
-							},
-						],
+						// tabBarStyle: [
+						// {
+						// display:
+						// prettier-ignore
+						// (segments[2] !== 'inbox' && segments[2] !== 'settings')
+						// 	? 'flex'
+						// 	: 'none',
+						// },
+						// ],
 					}}
 				/>
 			</Tabs>

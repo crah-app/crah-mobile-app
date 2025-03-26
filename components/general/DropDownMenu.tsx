@@ -12,7 +12,7 @@ import { dropDownMenuInputData } from '@/types';
 
 interface DropDownMenuProps {
 	items: Array<dropDownMenuInputData>;
-	onSelect: (numb: number) => void;
+	onSelect: (numb: number, val: any) => void;
 	triggerComponent: React.ReactNode;
 }
 
@@ -27,7 +27,9 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({
 
 			<DropdownMenuContent>
 				{items.map((val, key) => (
-					<DropdownMenuItem onSelect={() => onSelect(key)} key={key.toString()}>
+					<DropdownMenuItem
+						onSelect={() => onSelect(key, val)}
+						key={key.toString()}>
 						<DropdownMenuItemTitle>{val.text}</DropdownMenuItemTitle>
 
 						{(val.iconIOS || val.iconAndroid) && (

@@ -120,14 +120,6 @@ export enum PostTypes {
 	image = 'Images',
 }
 
-// General user post types
-export enum GeneralPostTypes {
-	all = 'All posts',
-	videos_and_images = 'Clips',
-	articles = 'Articles',
-	text = 'Text',
-}
-
 // All icons for all post/search types
 export enum PostTypeIonicons {
 	all = 'albums-outline',
@@ -136,6 +128,22 @@ export enum PostTypeIonicons {
 	text = 'chatbox-ellipses-outline',
 	article = 'book-outline',
 	image = 'images-outline',
+}
+
+// General user post types
+export enum GeneralPostTypes {
+	all = 'All posts',
+	videos = 'Clips',
+	articles = 'Articles',
+	text_images = 'Text',
+}
+
+// General icons for user post types
+export enum GeneralPostTypesIonicons {
+	all = 'albums-outline',
+	videos = 'videocam-outline',
+	articles = 'book-outline',
+	text_images = 'camera-outline',
 }
 
 /* 
@@ -278,6 +286,26 @@ export type Rank =
 	| 'Diamond';
 
 /* 
+	A user can get multiple roles at once. A user role determines the user responsibilities.
+	A user with no rank has no additonal responsibilities
+*/
+
+export enum UserRank {
+	staff = 'Staff',
+	verified = 'Verified',
+	contributor = 'Contributor',
+	OG = 'OG',
+	sponsor = 'Sponsor',
+}
+
+export const UserRankColor = {
+	[UserRank.staff]: '#E63946', // Kräftiges Rot für Autorität
+	[UserRank.verified]: '#1D3557', // Edles Dunkelblau für Vertrauenswürdigkeit
+	[UserRank.contributor]: '#F4A261', // Warmes Orange für Engagement
+	[UserRank.OG]: '#2A9D8F', // Smaragdgrün für Veteranen
+	[UserRank.sponsor]: '#FFD700', // Gold für Exklusivität
+} as const;
+/* 
 	With a spot, a trick can be specifically categorized which is crucial for point calculation.
 	for example, a Flair is much harder on flatground than on a 3 foot quarter 
 */
@@ -303,6 +331,12 @@ export enum TrickListSpot {
 */
 export enum TrickListGeneralSpotCategory {
 	ALL = 'All',
+	FLAT = 'Flat',
+	PARK = 'Park',
+	STREET = 'Street',
+}
+
+export enum BestTrickType {
 	FLAT = 'Flat',
 	PARK = 'Park',
 	STREET = 'Street',

@@ -19,12 +19,26 @@ import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
 import UserPostGridItem from '@/components/UserPostGridItem';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
-import { PostTypeIonicons } from '@/types';
+import {
+	BestTrickType,
+	dropDownMenuInputData,
+	GeneralPostTypes,
+	GeneralPostTypesIonicons,
+	PostTypeIonicons,
+} from '@/types';
 
 // dummy data
 import tricks from '@/JSON/tricks.json';
 import posts from '../../../JSON/posts.json';
 import UserImageCircle from '@/components/general/UserImageCircle';
+import { defaultStyles } from '@/constants/Styles';
+import DropDownMenu from '@/components/general/DropDownMenu';
+
+interface trickInterface {
+	id: string;
+	name: string;
+	hardness: number;
+}
 
 const Page = () => {
 	const theme = useSystemTheme();
@@ -32,336 +46,550 @@ const Page = () => {
 	const { bottom } = useSafeAreaInsets();
 	const windowWidth = Dimensions.get('window').width;
 
-	const [activePostFilterIcon, setActivePostFilterIcon] = useState(`all`);
+	const self = false;
 
-	const pathData = `M0,100 A${windowWidth},${windowWidth / 3} 0 0,0 ${
-		windowWidth / 2
-	},100`;
+	const [activePostFilterIcon, setActivePostFilterIcon] =
+		useState<GeneralPostTypesIonicons>(GeneralPostTypesIonicons.all);
 
-	const pathData2 = `M0,100 A${windowWidth},${windowWidth / 3} 0 0,0 ${
-		windowWidth / 2
-	},100`;
+	const handleBestTricksType = (type: { key: number; text: BestTrickType }) => {
+		console.log(type, 'sdfjoig');
+		setCurrentSelectedBestTrickType(type.text);
+	};
+
+	// dropdownmenu categories for best tricks
+	const BestTricks: Array<dropDownMenuInputData> = [
+		{ key: 0, text: BestTrickType.PARK },
+		{ key: 1, text: BestTrickType.FLAT },
+		{ key: 2, text: BestTrickType.STREET },
+	];
+
+	// best tricks states
+	const [bestParkTricks, setBestParkTricks] = useState<trickInterface[]>(
+		tricks[0].Park,
+	);
+	const [bestFlatTricks, setBestFlatTricks] = useState<trickInterface[]>(
+		tricks[0].Flat,
+	);
+	const [bestStreetTricks, setBestStreetTricks] = useState<trickInterface[]>(
+		tricks[0].Street,
+	);
+
+	const [currentSelectedBestTrickType, setCurrentSelectedBestTrickType] =
+		useState<BestTrickType>(BestTrickType.PARK);
+
+	const BestTricksToType = {
+		[BestTrickType.PARK]: bestParkTricks,
+		[BestTrickType.FLAT]: bestFlatTricks,
+		[BestTrickType.STREET]: bestStreetTricks,
+	};
+
+	// States for user data
+	const [fans, setFans] = useState<number>(81000);
+	const [friends, setFriends] = useState<number>(287);
+	const [level, setLevel] = useState<number>(23);
+	const [rank, setRank] = useState<number>(257);
+	const [postsCount, setPostsCount] = useState<number>(50);
+	const [riderType, setRiderType] = useState<string>('Flat Rider');
+	const [bestTrick, setBestTrick] = useState<string>('Buttercup Flat');
+
+	const HeaderContainer = () => {
+		return (
+			<View
+				style={[
+					styles.header,
+					defaultStyles.surface_container,
+					{
+						backgroundColor: Colors[theme].container_surface,
+						flexDirection: 'row',
+						gap: 12,
+					},
+				]}>
+				{self ? (
+					<View
+						style={{
+							position: 'absolute',
+							width: Dimensions.get('window').width - 24,
+							padding: 12,
+							alignItems: 'flex-end',
+							gap: 8,
+						}}>
+						<Link asChild href={{ pathname: '/profilePages/inbox' }}>
+							<TouchableOpacity style={{}}>
+								<Ionicons
+									size={24}
+									color={Colors[theme].textPrimary}
+									name="mail-outline"
+								/>
+							</TouchableOpacity>
+						</Link>
+
+						<Link href="/profilePages/settings" asChild>
+							<TouchableOpacity style={{}}>
+								<Ionicons
+									size={24}
+									color={Colors[theme].textPrimary}
+									name="settings-outline"
+								/>
+							</TouchableOpacity>
+						</Link>
+					</View>
+				) : (
+					<View
+						style={{
+							position: 'absolute',
+							width: Dimensions.get('window').width - 24,
+							padding: 12,
+							alignItems: 'flex-end',
+							gap: 8,
+						}}>
+						<Link asChild href={{ pathname: '/profilePages/inbox' }}>
+							<TouchableOpacity style={{}}>
+								<Ionicons
+									size={24}
+									color={Colors[theme].textPrimary}
+									name="person-add-outline"
+								/>
+							</TouchableOpacity>
+						</Link>
+
+						<Link href="/profilePages/settings" asChild>
+							<TouchableOpacity style={{}}>
+								<Ionicons
+									size={24}
+									color={Colors[theme].textPrimary}
+									name="chatbubbles-outline"
+								/>
+							</TouchableOpacity>
+						</Link>
+
+						<TouchableOpacity style={{}}>
+							<Ionicons
+								size={24}
+								color={Colors[theme].textPrimary}
+								name="ellipsis-horizontal-circle-outline"
+							/>
+						</TouchableOpacity>
+					</View>
+				)}
+
+				{/* Left container */}
+				<View style={{ height: '100%' }}>
+					<UserImageCircle
+						width={88}
+						height={88}
+						imageUri={JSON.stringify(user?.imageUrl)}
+					/>
+				</View>
+
+				{/* Right container */}
+				<View
+					style={{
+						flexDirection: 'column',
+					}}>
+					<View
+						style={{
+							justifyContent: 'flex-start',
+							alignItems: 'flex-start',
+						}}>
+						<ThemedText
+							theme={theme}
+							value={user?.username! == '' ? user?.fullName! : user?.username!}
+							style={[styles.UserName]}
+						/>
+					</View>
+
+					<View
+						style={{
+							alignItems: 'center',
+							flexDirection: 'row',
+							gap: 4,
+						}}>
+						{/* user rank */}
+						<ThemedText
+							theme={theme}
+							value="Rank"
+							style={[
+								styles.UserDataText,
+								{
+									color: 'red',
+								},
+							]}
+						/>
+						<ThemedText
+							theme={theme}
+							value={`#${rank}`}
+							style={styles.UserDataText}
+						/>
+
+						{/* space */}
+						<ThemedText
+							theme={theme}
+							value={'·'}
+							style={{ fontWeight: 900, fontSize: 22, paddingHorizontal: 2 }}
+						/>
+
+						{/* user level */}
+						<ThemedText
+							theme={theme}
+							value="Level"
+							style={[
+								styles.UserDataText,
+								{
+									color: 'red',
+								},
+							]}
+						/>
+						<ThemedText
+							theme={theme}
+							value={level.toString()}
+							style={styles.UserDataText}
+						/>
+					</View>
+
+					<View
+						style={{
+							alignItems: 'center',
+							flexDirection: 'row',
+							gap: 4,
+						}}>
+						{/* user post amount */}
+						<ThemedText
+							theme={theme}
+							value={postsCount.toString()}
+							style={[
+								styles.UserDataText,
+								{
+									color: 'red',
+								},
+							]}
+						/>
+						<ThemedText
+							theme={theme}
+							value="Posts"
+							style={styles.UserDataText}
+						/>
+					</View>
+				</View>
+			</View>
+		);
+	};
+
+	const UserProfileContainer = () => {
+		return (
+			<View
+				style={[
+					defaultStyles.surface_container,
+					{
+						backgroundColor: Colors[theme].container_surface,
+						width: Dimensions.get('window').width - 24,
+					},
+				]}>
+				{/* user fans (followers) and friends (user follows back) count */}
+				<View
+					style={{
+						flexDirection: 'row',
+						gap: 4,
+						justifyContent: 'flex-start',
+						alignItems: 'center',
+					}}>
+					{/* fans */}
+					<ThemedText
+						theme={theme}
+						value="Fans"
+						style={[
+							styles.UserDataText,
+							{
+								color: 'red',
+							},
+						]}
+					/>
+					<ThemedText
+						theme={theme}
+						value={fans.toLocaleString()}
+						style={styles.UserDataText}
+					/>
+
+					{/* space */}
+					<ThemedText
+						theme={theme}
+						value={'·'}
+						style={{ fontWeight: 900, fontSize: 22, paddingHorizontal: 2 }}
+					/>
+
+					{/* friends */}
+					<ThemedText
+						theme={theme}
+						value="Friends"
+						style={[
+							styles.UserDataText,
+							{
+								color: 'red',
+							},
+						]}
+					/>
+					<ThemedText
+						theme={theme}
+						value={friends.toString()}
+						style={styles.UserDataText}
+					/>
+				</View>
+
+				{/* User Description */}
+				<View style={{ marginBottom: 12 }}>
+					<ThemedText
+						theme={theme}
+						value={
+							'I am a 27 years old flat rider, living in Bjearnum, Sweden. Never stop fighting. Take what is yours.'
+						}
+					/>
+				</View>
+
+				{/* best trick */}
+				<View style={{ flexDirection: 'row', gap: 8 }}>
+					<ThemedText
+						theme={theme}
+						value="Best Trick"
+						style={[{ color: 'red' }]}
+					/>
+					<ThemedText theme={theme} value={bestTrick} />
+				</View>
+
+				{/* type of rider */}
+				<View style={{ flexDirection: 'row', gap: 8 }}>
+					<ThemedText
+						theme={theme}
+						value="Rider Type"
+						style={[{ color: 'red' }]}
+					/>
+					<ThemedText theme={theme} value={riderType} />
+				</View>
+			</View>
+		);
+	};
+
+	const BestTricksContainer = () => {
+		return (
+			<View
+				style={[
+					defaultStyles.surface_container,
+					{
+						backgroundColor: Colors[theme].container_surface,
+						width: Dimensions.get('window').width - 24,
+					},
+				]}>
+				<View
+					style={{
+						flexDirection: 'row',
+						alignItems: 'center',
+						justifyContent: 'space-between',
+					}}>
+					<View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+						<ThemedText
+							theme={theme}
+							value={`Top 5 Best ${currentSelectedBestTrickType} Tricks`}
+							style={[styles.UserDataText]}
+						/>
+
+						<DropDownMenu
+							items={BestTricks}
+							onSelect={(numb, val) => handleBestTricksType(val)}
+							triggerComponent={
+								<TouchableOpacity>
+									<Ionicons
+										color={Colors[theme].textPrimary}
+										size={16}
+										name="chevron-expand-outline"
+									/>
+								</TouchableOpacity>
+							}
+						/>
+					</View>
+
+					<TouchableOpacity>
+						<ThemedText
+							theme={theme}
+							value={'compare yourself'}
+							style={[
+								styles.UserDataText,
+								{ color: Colors[theme].primary, fontSize: 15, top: -2 },
+							]}
+						/>
+					</TouchableOpacity>
+				</View>
+
+				{BestTricksToType[currentSelectedBestTrickType].length > 0 ? (
+					<FlatList
+						scrollEnabled={false}
+						data={BestTricksToType[currentSelectedBestTrickType]}
+						keyExtractor={(item) => item.id}
+						renderItem={({ item, index }) => (
+							<ThemedText
+								key={index}
+								theme={theme}
+								value={
+									item.name.length > 22
+										? item.name.substring(0, 20) + '...'
+										: item.name
+								}
+								style={{
+									backgroundColor: 'rgba(255, 0, 0, 0.33)',
+									padding: 10,
+									// borderRadius: 8,
+								}}
+							/>
+						)}
+						contentContainerStyle={[styles.bestTricksContainer, {}]}
+					/>
+				) : (
+					<ThemedText
+						theme={theme}
+						value={'No Data available'}
+						style={{
+							paddingTop: 10,
+							fontWeight: 'bold',
+							color: 'gray',
+						}}
+					/>
+				)}
+			</View>
+		);
+	};
+
+	const UserPostContainer = () => {
+		return (
+			<View
+				style={[
+					defaultStyles.surface_container,
+					{
+						backgroundColor: Colors[theme].container_surface,
+						width: Dimensions.get('window').width - 24,
+					},
+				]}>
+				<View
+					style={[
+						styles.UserPostFilterContainer,
+						{
+							borderColor: Colors[theme].background,
+						},
+					]}>
+					{Object.values(GeneralPostTypesIonicons).map((icon, index) => (
+						<TouchableOpacity
+							key={index}
+							onPress={() => setActivePostFilterIcon(icon)}>
+							<Ionicons
+								name={icon}
+								size={activePostFilterIcon == icon ? 25 : 25}
+								color={
+									activePostFilterIcon == icon
+										? Colors['default'].primary
+										: Colors[theme].textPrimary
+								}
+							/>
+						</TouchableOpacity>
+					))}
+				</View>
+
+				<View>
+					<View style={{ bottom }}>
+						{posts.length > 0 ? (
+							<FlatList
+								scrollEnabled={false}
+								data={posts}
+								keyExtractor={(item) => item.id}
+								numColumns={3}
+								renderItem={({ item, index }) => (
+									<UserPostGridItem
+										key={index}
+										post={item}
+										style={[
+											styles.GridItem,
+											{ borderColor: Colors[theme].container_surface },
+										]}
+									/>
+								)}
+							/>
+						) : (
+							<View style={{ width: '100%', height: 200 }}>
+								<NoDataPlaceholder
+									subTextValue=""
+									firstTextValue="No posts here..."
+									arrowStyle={{ display: 'none' }}
+									containerStyle={{ paddingTop: 40 }}
+								/>
+							</View>
+						)}
+					</View>
+				</View>
+			</View>
+		);
+	};
 
 	return (
 		<ThemedView theme={theme} flex={1}>
-			<SafeAreaView>
-				<ScrollView
-					contentContainerStyle={styles.scrollViewContainer}
-					showsVerticalScrollIndicator={false}>
-					<View style={{ flex: 1 }}>
-						<View style={styles.upperHeader}>
-							<Link asChild href={{ pathname: '/profilePages/inbox' }}>
-								<TouchableOpacity style={{ position: 'absolute', left: 10 }}>
-									<Ionicons
-										size={24}
-										color={Colors[theme].textPrimary}
-										name="mail-outline"
-									/>
-								</TouchableOpacity>
-							</Link>
-
-							<Link href="/profilePages/settings" asChild>
-								<TouchableOpacity style={{ position: 'absolute', right: 10 }}>
-									<Ionicons
-										size={24}
-										color={Colors[theme].textPrimary}
-										name="settings-outline"
-									/>
-								</TouchableOpacity>
-							</Link>
-						</View>
-
-						<Svg
-							width={windowWidth}
-							height={200}
-							style={{
-								position: 'absolute',
-								top: 30,
-								left: -32,
-							}}>
-							<Path
-								d={pathData}
-								fill="transparent"
-								stroke={Colors[theme].primary}
-								strokeWidth={2}
-							/>
-						</Svg>
-
-						<Svg
-							width={windowWidth}
-							height={200}
-							style={{
-								position: 'absolute',
-								top: 30,
-								right: windowWidth / -2 - 32,
-							}}>
-							<Path
-								d={pathData2}
-								fill="transparent"
-								stroke={Colors[theme].primary}
-								strokeWidth={2}
-							/>
-						</Svg>
-
-						<View style={[styles.header]}>
-							<View style={{ flexDirection: 'column', alignItems: 'center' }}>
-								<ThemedText
-									theme={theme}
-									value={
-										user?.username! == '' ? user?.fullName! : user?.username!
-									}
-									style={[styles.UserName]}
-								/>
-								<UserImageCircle
-									width={88}
-									height={88}
-									imageUri={JSON.stringify(user?.imageUrl)}
-								/>
-							</View>
-
-							<View style={[styles.UserRankDataContainer]}>
-								<View style={{ alignItems: 'center' }}>
-									<ThemedText
-										theme={theme}
-										value="Best Trick"
-										style={[styles.UserDataText, { color: 'red' }]}
-									/>
-									<ThemedText
-										theme={theme}
-										value="Buttercup Flat"
-										style={styles.UserDataText}
-									/>
-								</View>
-
-								<View style={{ alignItems: 'center' }}>
-									<ThemedText
-										theme={theme}
-										value="User Rank"
-										style={[styles.UserDataText, { color: 'red' }]}
-									/>
-									<ThemedText
-										theme={theme}
-										value="#257"
-										style={styles.UserDataText}
-									/>
-								</View>
-							</View>
-
-							<View style={[styles.UserDataContainer]}>
-								<View style={{ alignItems: 'center' }}>
-									<ThemedText
-										theme={theme}
-										value="Flat Rider"
-										style={[styles.UserDataText, { color: 'red' }]}
-									/>
-
-									<ThemedText
-										theme={theme}
-										value="26 years old - asparagus enjoyer"
-										style={[styles.UserDataText]}
-									/>
-								</View>
-
-								<View
-									style={{
-										alignItems: 'center',
-										borderTopWidth: StyleSheet.hairlineWidth,
-										borderColor: Colors[theme].textPrimary,
-										paddingTop: 10,
-										minHeight: 296,
-									}}>
-									<ThemedText
-										theme={theme}
-										value="Top 5 Best Flat Tricks"
-										style={[styles.UserDataText]}
-									/>
-
-									{tricks.length > 0 ? (
-										<FlatList
-											scrollEnabled={false}
-											data={tricks}
-											keyExtractor={(item) => item.id}
-											renderItem={({ item, index }) => (
-												<ThemedText
-													key={index}
-													theme={theme}
-													value={
-														item.name.length > 22
-															? item.name.substring(0, 20) + '...'
-															: item.name
-													}
-													style={{
-														backgroundColor: 'rgba(255, 0, 0, 0.33)',
-														padding: 10,
-														borderRadius: 15,
-													}}
-												/>
-											)}
-											contentContainerStyle={[styles.bestTricksContainer, {}]}
-										/>
-									) : (
-										<ThemedText
-											theme={theme}
-											value={'No Data'}
-											style={{
-												paddingTop: 10,
-												fontWeight: 'bold',
-												color: 'gray',
-											}}
-										/>
-									)}
-								</View>
-
-								<View
-									style={[
-										styles.UserPostFilterContainer,
-										{
-											borderColor: Colors[theme].textPrimary,
-											borderTopWidth: StyleSheet.hairlineWidth,
-											paddingTop: 10,
-										},
-									]}>
-									{Object.values(PostTypeIonicons).map((icon, index) => (
-										<TouchableOpacity
-											key={index}
-											onPress={() =>
-												setActivePostFilterIcon(
-													Object.keys(PostTypeIonicons)[index],
-												)
-											}>
-											<Ionicons
-												name={icon}
-												size={
-													activePostFilterIcon ==
-													Object.keys(PostTypeIonicons)[index]
-														? 26
-														: 25
-												}
-												color={
-													activePostFilterIcon ==
-													Object.keys(PostTypeIonicons)[index]
-														? Colors['default'].primary
-														: Colors[theme].textPrimary
-												}
-											/>
-										</TouchableOpacity>
-									))}
-								</View>
-							</View>
-						</View>
-
-						<View style={[styles.main]}>
-							<View style={{ flex: 1, bottom }}>
-								{posts.length > 0 ? (
-									<FlatList
-										scrollEnabled={false}
-										style={styles.PostsGridContainer}
-										data={posts}
-										keyExtractor={(item) => item.id}
-										numColumns={3}
-										renderItem={({ item, index }) => (
-											<UserPostGridItem
-												key={index}
-												post={item}
-												style={[
-													styles.GridItem,
-													{ borderColor: Colors[theme].textPrimary },
-												]}
-											/>
-										)}
-										contentContainerStyle={[styles.flatListContainer, {}]}
-									/>
-								) : (
-									<NoDataPlaceholder />
-								)}
-							</View>
-						</View>
-					</View>
-				</ScrollView>
-			</SafeAreaView>
+			<ScrollView
+				contentContainerStyle={{}}
+				showsVerticalScrollIndicator={true}
+				scrollEnabled={true}>
+				<View style={styles.scrollViewContainer}>
+					<HeaderContainer />
+					<UserProfileContainer />
+					<BestTricksContainer />
+					<UserPostContainer />
+				</View>
+			</ScrollView>
 		</ThemedView>
 	);
 };
 
 const styles = StyleSheet.create({
 	scrollViewContainer: {
-		flexGrow: 1,
-		paddingBottom: 20,
-	},
-	upperHeader: {
-		width: '100%',
-		height: 35,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
+		flex: 1,
+		justifyContent: 'flex-start',
 		alignItems: 'center',
+		padding: 12,
+		gap: 12,
+		height: 'auto',
+		width: Dimensions.get('window').width,
 	},
-	flatListContainer: {},
 	bestTricksContainer: {
-		width: Dimensions.get('window').width / 1.1,
+		width: '100%',
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		top: 10,
 		gap: 10,
-		justifyContent: 'center',
+		paddingBottom: 10,
+		justifyContent: 'flex-start',
 	},
 	header: {
-		width: '100%',
-		height: 500,
-		alignItems: 'center',
+		width: Dimensions.get('window').width - 24,
+		alignItems: 'flex-start',
 		justifyContent: 'flex-start',
-		borderBottomWidth: 36,
-		borderBottomColor: 'gray',
-		paddingBottom: 15,
+		padding: 0,
 	},
 	UserName: {
-		fontSize: 35,
+		fontSize: 28,
 		fontWeight: '700',
 		textAlign: 'center',
 	},
 	UserProfile: {
-		borderRadius: 50,
-		marginTop: 10,
 		borderWidth: 2,
 		borderColor: 'red',
-	},
-	UserRankDataContainer: {
-		width: '85%',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		position: 'absolute',
-		top: Dimensions.get('window').height / 7,
-	},
-	UserDataContainer: {
-		flexDirection: 'column',
-		alignItems: 'center',
-		justifyContent: 'center',
-		top: 90,
-		gap: 30,
-		flex: 1,
 	},
 	UserDataText: {
 		fontSize: 16,
 		fontWeight: '600',
-		alignItems: 'center',
 	},
 	UserPostFilterContainer: {
-		width: Dimensions.get('window').width,
 		justifyContent: 'space-evenly',
-		bottom: 140,
 		zIndex: 10,
 		flexDirection: 'row',
 		borderBottomWidth: 2,
 		paddingBottom: 10,
 	},
-	main: {
-		width: '100%',
-		flex: 1,
-	},
-	PostsGridContainer: {},
 	GridItem: {
 		width: '33.33%',
 		aspectRatio: 1,
-		borderWidth: 1,
+		borderWidth: StyleSheet.hairlineWidth,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},

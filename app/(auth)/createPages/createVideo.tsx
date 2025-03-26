@@ -783,7 +783,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: 8,
 		paddingTop: 8,
-		borderRadius: 5,
+		borderRadius: 8,
 	},
 	playBtn: {
 		position: 'absolute',
