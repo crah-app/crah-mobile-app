@@ -4,7 +4,8 @@
 <svg
    width="48.174377mm"
    height="48.215034mm"
-   viewBox="0 0 48.174376 48.215034"
+   viewBox="0 0 35.4999989 35.499999"
+   style="color:currentColor;"
    version="1.1"
    id="svg1"
    xml:space="preserve"
@@ -12,7 +13,7 @@
    xmlns:svg="http://www.w3.org/2000/svg"><defs
      id="defs1" /><g
      id="layer1"
-     transform="translate(-61.196682,-382.57731)"><path
+     transform="translate(-67.286682,-388.6731)"><path
        d="m 85.283867,388.68487 c -9.89972,0 -17.999935,8.10021 -17.999935,17.99993 0,9.89973 8.100215,17.99994 17.999935,17.99994 9.89973,0 17.999933,-8.10021 17.999933,-17.99994 0,-9.89972 -8.100203,-17.99993 -17.999933,-17.99993 z m 0,3.50004 c 8.008222,-1.7e-4 14.500291,6.49167 14.500407,14.49989 1.69e-4,8.00843 -6.491983,14.50058 -14.500407,14.50041 -8.008222,-1.2e-4 -14.500059,-6.49219 -14.49989,-14.50041 1.17e-4,-8.00802 6.49187,-14.49977 14.49989,-14.49989 z"
        style="stroke-linecap:round;stroke-linejoin:round;paint-order:markers stroke fill"
        id="path57" /><path
@@ -32,5 +33,5 @@
        style="stroke-linecap:round;paint-order:markers stroke fill"
        id="path31" /><path
        d="m 90.161606,397.42852 4.379061,4.37906 z"
-       style="fill:#ffffff;stroke-linecap:round;paint-order:markers stroke fill"
+       style="fill:#ffffff;stroke-linecap:round;paint-order:markers stroke fill;justify-content:center;align-items:center;display:flex"
        id="path26" /></g></svg>

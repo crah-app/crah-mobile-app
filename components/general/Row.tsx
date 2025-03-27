@@ -13,7 +13,7 @@ import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { SvgFromXml, SvgXml } from 'react-native-svg';
 
-interface ColumnProps {
+interface RowProps {
 	title: string;
 	subtitle?: string;
 	showAvatar?: boolean;
@@ -22,13 +22,20 @@ interface ColumnProps {
 	customRightComponent?: React.ReactNode;
 	leftContainerStyle?: ViewStyle | ViewStyle[];
 	onPress?: () => void;
-	containerStyle?: ViewStyle;
+	containerStyle?: ViewStyle | ViewStyle[];
 	titleStyle?: TextStyle;
 	subtitleStyle?: TextStyle;
 	avatarIsSVG?: boolean;
+	subtitleIsMultiline?: boolean;
+	textInTitleComponent?: React.ReactNode;
+	bottomContainer?: React.ReactNode;
+	textContainerStyle?: ViewStyle | ViewStyle[];
+	highlightWords?: Array<string>;
+	costumAvatarWidth?: number;
+	costumAvatarHeight?: number;
 }
 
-const Row: React.FC<ColumnProps> = ({
+const Row: React.FC<RowProps> = ({
 	title,
 	subtitle,
 	showAvatar = true,
@@ -41,8 +48,40 @@ const Row: React.FC<ColumnProps> = ({
 	subtitleStyle,
 	avatarIsSVG,
 	leftContainerStyle,
+	subtitleIsMultiline,
+	textInTitleComponent,
+	bottomContainer,
+	textContainerStyle,
+	highlightWords,
+	costumAvatarWidth,
+	costumAvatarHeight,
 }) => {
 	const theme = useSystemTheme();
+
+	const highlightText = (text: string, words: Array<string> | undefined) => {
+		if (!words || words.length === 0) return text;
+
+		// Erstelle einen regulären Ausdruck für die Highlight-Wörter
+		const regex = new RegExp(
+			`(${words
+				.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+				.join('|')})`,
+			'gi',
+		);
+
+		// Zerlege den Text in hervorgehobene und normale Teile
+		const parts = text.split(regex);
+
+		return parts.map((part, index) =>
+			words.some((word) => word.toLowerCase() === part.toLowerCase()) ? (
+				<Text key={index} style={{ color: 'red', fontWeight: 'bold' }}>
+					{part}
+				</Text>
+			) : (
+				<Text key={index}>{part}</Text>
+			),
+		);
+	};
 
 	return (
 		<TouchableOpacity
@@ -65,7 +104,14 @@ const Row: React.FC<ColumnProps> = ({
 								height={42}
 							/>
 						) : (
-							<Image source={{ uri: avatarUrl }} style={styles.avatar} />
+							<Image
+								source={{
+									uri: 'https://randomuser.me/api/portraits/men/32.jpg',
+								}}
+								style={styles.avatar}
+								width={costumAvatarWidth || 46}
+								height={costumAvatarHeight || 46}
+							/>
 						)}
 					</View>
 				) : (
@@ -73,23 +119,29 @@ const Row: React.FC<ColumnProps> = ({
 				)}
 			</View>
 
-			<View style={styles.textContainer}>
-				<Text
-					style={[
-						styles.title,
-						{ color: Colors[theme].textPrimary },
-						titleStyle,
-					]}
-					numberOfLines={1}>
-					{title}
-				</Text>
+			<View style={[styles.textContainer, textContainerStyle]}>
+				<View style={{ flexDirection: 'row', gap: 8 }}>
+					<Text
+						style={[
+							styles.title,
+							{ color: Colors[theme].textPrimary },
+							titleStyle,
+						]}
+						numberOfLines={1}>
+						{title}
+					</Text>
+
+					{textInTitleComponent}
+				</View>
 				{subtitle && (
 					<Text
 						style={[styles.subtitle, { color: 'gray' }, subtitleStyle]}
-						numberOfLines={1}>
-						{subtitle}
+						numberOfLines={subtitleIsMultiline ? 5 : 1}>
+						{highlightText(subtitle, highlightWords)}
 					</Text>
 				)}
+
+				{bottomContainer}
 			</View>
 
 			{customRightComponent && (
@@ -117,13 +169,12 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	avatar: {
-		width: 46,
-		height: 46,
 		borderRadius: 23,
 	},
 	textContainer: {
 		flex: 1,
 		justifyContent: 'center',
+		height: 'auto',
 	},
 	title: {
 		fontSize: 16,
@@ -132,6 +183,7 @@ const styles = StyleSheet.create({
 	subtitle: {
 		fontSize: 13,
 		marginTop: 2,
+		height: 'auto',
 	},
 });
 

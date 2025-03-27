@@ -26,7 +26,6 @@ import posts from '../../../JSON/posts.json';
 import { Filter, SvgXml } from 'react-native-svg';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 
-import ScooterBar from '../../../assets/images/vectors/bar.svg';
 import ScooterWheel from '../../../assets/images/vectors/wheel.svg';
 import ScooterWheelReflexes from '../../../assets/images/vectors/wheel_reflexes.svg';
 import { Ionicons } from '@expo/vector-icons';
@@ -131,7 +130,7 @@ const Page = () => {
 									<SvgXml
 										width="25"
 										height="25"
-										xml={ScooterWheelReflexes}
+										xml={ScooterWheel}
 										fill={Colors[theme].textPrimary}
 										style={[
 											{

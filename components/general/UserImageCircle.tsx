@@ -28,8 +28,7 @@ const UserImageCircle: React.FC<UserImageCircleProps> = ({
 
 const styles = StyleSheet.create({
 	wrapper: {
-		borderRadius: '100%',
-		marginTop: 10,
+		borderRadius: 1000,
 		borderWidth: 2,
 		borderColor: 'red',
 	},

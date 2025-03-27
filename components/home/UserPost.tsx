@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, {
+	ForwardedRef,
+	forwardRef,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import {
 	View,
 	Text,
 	Image,
 	StyleSheet,
 	TouchableOpacity,
-	Modal,
 	TouchableWithoutFeedback,
 	Dimensions,
+	Platform,
+	SafeAreaView,
 } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -18,11 +27,47 @@ import ThemedView from '../general/ThemedView';
 import Reactions from '@/constants/Reactions';
 import ThemedText from '../general/ThemedText';
 import { formatDistanceToNow } from 'date-fns';
-import { ReactionType, userPostType } from '@/types';
-import { ScrollView } from 'react-native-gesture-handler';
+import {
+	GestureHandlerRootView,
+	ScrollView,
+} from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
+import { SvgXml } from 'react-native-svg';
+import {
+	CommentPurpose,
+	userCommentType,
+	userPostType,
+	ReactionType,
+	CommentType,
+	TextInputMaxCharacters,
+} from '@/types';
+import BottomSheet, {
+	BottomSheetBackdrop,
+	BottomSheetFlatList,
+	BottomSheetModal,
+	BottomSheetModalProvider,
+	BottomSheetTextInput,
+	BottomSheetView,
+	useBottomSheetModal,
+} from '@gorhom/bottom-sheet';
+import {
+	Bubble,
+	Composer,
+	GiftedChat,
+	IMessage,
+	InputToolbar,
+} from 'react-native-gifted-chat';
+import CrahActivityIndicator from '../general/CrahActivityIndicator';
+import { QuickReplies } from 'react-native-gifted-chat/lib/QuickReplies';
+import { BottomSheetModalRef } from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetModalProvider/types';
+import Modal from 'react-native-modal';
+import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSharedValue } from 'react-native-reanimated';
+import { defaultStyles } from '@/constants/Styles';
+import CommentRow from '../rows/CommentRow';
 
-const DUMMY_PROFILE_IMAGE = 'https://via.placeholder.com/150';
+const DUMMY_PROFILE_IMAGE = '../../assets/images/vectors/src/person(1).png';
 const videoSource =
 	'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
@@ -31,16 +76,23 @@ interface UserPostComponentProps {
 }
 
 const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
-	const player = useVideoPlayer(post.videoUrl!, (player) => {
-		player.loop = true;
-	});
+	// const player = useVideoPlayer(post.videoUrl!, (player) => {
+	// 	player.loop = true;
+	// });
 
-	const { isPlaying } = useEvent(player, 'playingChange', {
-		isPlaying: player.playing,
-	});
+	// const { isPlaying } = useEvent(player, 'playingChange', {
+	// 	isPlaying: player.playing,
+	// });
 
 	const theme = useSystemTheme();
 
+	const [userComments, setUserComments] = useState<userCommentType[]>(() => {
+		return post.comments.map((msg: any) => ({
+			// change "createAt" date type
+			...msg,
+			createdAt: new Date(msg.createdAt),
+		}));
+	});
 	const [showReactions, setShowReactions] = useState(false);
 	const [reactions, setReactions] = useState<ReactionType[]>([]);
 	const [likesCount, setLikesCount] = useState(post.likes || 0);
@@ -68,64 +120,64 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 
 	const renderPostContent = () => {
 		switch (post.type) {
-			case 'videoLandscape':
-				return (
-					<View style={styles.contentContainer}>
-						<VideoView
-							nativeControls={true}
-							contentFit="fill"
-							player={player}
-							style={[
-								{
-									width: Dimensions.get('window').width,
-									height: Dimensions.get('window').width,
-								},
-							]}
-						/>
-					</View>
-				);
-			case 'videoPortrait':
-				return (
-					<View style={styles.contentContainer}>
-						<VideoView
-							nativeControls={true}
-							player={player}
-							style={[
-								{
-									width: Dimensions.get('window').width,
-									height: Dimensions.get('window').width,
-								},
-							]}
-						/>
-					</View>
-				);
-			case 'article':
-				return (
-					<Link
-						asChild
-						href={{
-							pathname: '/modals/postView',
-							params: { data: JSON.stringify(post), type: post.type },
-						}}
-						style={[styles.textPost]}>
-						<TouchableOpacity>
-							<ThemedText
-								style={[
-									styles.articlePreview,
-									{ color: Colors[theme].textPrimary },
-								]}
-								theme={theme}
-								value={`${post.article?.slice(0, 150)}...`}
-							/>
-						</TouchableOpacity>
-					</Link>
-				);
-			case 'text':
-				return (
-					<Text style={[styles.textPost, { color: Colors[theme].textPrimary }]}>
-						{post.text}
-					</Text>
-				);
+			// case 'videoLandscape':
+			// 	return (
+			// 		<View style={styles.contentContainer}>
+			// 			<VideoView
+			// 				nativeControls={true}
+			// 				contentFit="fill"
+			// 				player={player}
+			// 				style={[
+			// 					{
+			// 						width: Dimensions.get('window').width,
+			// 						height: Dimensions.get('window').width,
+			// 					},
+			// 				]}
+			// 			/>
+			// 		</View>
+			// 	);
+			// case 'videoPortrait':
+			// 	return (
+			// 		<View style={styles.contentContainer}>
+			// 			<VideoView
+			// 				nativeControls={true}
+			// 				player={player}
+			// 				style={[
+			// 					{
+			// 						width: Dimensions.get('window').width,
+			// 						height: Dimensions.get('window').width,
+			// 					},
+			// 				]}
+			// 			/>
+			// 		</View>
+			// 	);
+			// case 'article':
+			// 	return (
+			// 		<Link
+			// 			asChild
+			// 			href={{
+			// 				pathname: '/modals/postView',
+			// 				params: { data: JSON.stringify(post), type: post.type },
+			// 			}}
+			// 			style={[styles.textPost]}>
+			// 			<TouchableOpacity>
+			// 				<ThemedText
+			// 					style={[
+			// 						styles.articlePreview,
+			// 						{ color: Colors[theme].textPrimary },
+			// 					]}
+			// 					theme={theme}
+			// 					value={`${post.article?.slice(0, 150)}...`}
+			// 				/>
+			// 			</TouchableOpacity>
+			// 		</Link>
+			// 	);
+			// case 'text':
+			// 	return (
+			// 		<Text style={[styles.textPost, { color: Colors[theme].textPrimary }]}>
+			// 			{post.text}
+			// 		</Text>
+			// 	);
 			default:
 				return (
 					<Image
@@ -146,6 +198,16 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 		addSuffix: true,
 	});
 
+	const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+	const handlePresentModalPress = useCallback(() => {
+		bottomSheetModalRef.current?.present();
+	}, []);
+
+	const handlCloseModalPress = useCallback(() => {
+		bottomSheetModalRef.current?.close();
+	}, []);
+
 	// render post
 	return (
 		<View
@@ -153,12 +215,11 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				styles.postContainer,
 				{ backgroundColor: Colors[theme].background },
 			]}>
+			{/* <BottomSheetModalProvider> */}
 			{/* Header */}
 			<PostHeader post={post} postTimeAgo={postTimeAgo} />
-
 			{/* Main content */}
 			{renderPostContent()}
-
 			{/* Footer */}
 			<PostFooter
 				likesCount={likesCount}
@@ -169,14 +230,21 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				setShowReactions={setShowReactions}
 				handleLike={handleLike}
 				handleShare={handleShare}
+				onCommentsBtnPress={handlePresentModalPress}
 			/>
-
 			{/* Reactions Modal */}
 			<UserPostReactionsModal
 				showReactions={showReactions}
 				setShowReactions={setShowReactions}
 				handleReaction={handleReaction}
 			/>
+			{/* Post Comment Section */}
+			<PostCommentSection
+				ref={bottomSheetModalRef}
+				comments={userComments}
+				username={post.username}
+			/>
+			{/* </BottomSheetModalProvider> */}
 		</View>
 	);
 };
@@ -191,9 +259,10 @@ const PostHeader: React.FC<{ post: userPostType; postTimeAgo: string }> = ({
 		<View>
 			<View style={styles.header}>
 				<Image
-					source={{ uri: post.profileImage || DUMMY_PROFILE_IMAGE }}
+					source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
 					style={styles.profileImage}
 				/>
+
 				<Text style={[styles.username, { color: Colors[theme].textPrimary }]}>
 					{post.username}
 				</Text>
@@ -212,6 +281,7 @@ interface PostFooterProps {
 	shareCount: number;
 	reactions: string[];
 	setShowReactions: (boolean: boolean) => void;
+	onCommentsBtnPress: () => void;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
@@ -223,6 +293,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
 	shareCount,
 	setShowReactions,
 	reactions,
+	onCommentsBtnPress,
 }) => {
 	const theme = useSystemTheme();
 
@@ -245,27 +316,19 @@ const PostFooter: React.FC<PostFooterProps> = ({
 					</TouchableOpacity>
 
 					{/* comment button */}
-					<Link
-						asChild
-						href={{
-							pathname: '/modals/PostCommentSection',
-							params: { data: JSON.stringify(post.comments) },
-						}}>
-						<TouchableOpacity style={styles.iconButton}>
-							<Ionicons
-								name="chatbubble-outline"
-								size={24}
-								color={Colors[theme].textPrimary}
-							/>
-							<Text
-								style={[
-									styles.iconCount,
-									{ color: Colors[theme].textPrimary },
-								]}>
-								{commentsCount}
-							</Text>
-						</TouchableOpacity>
-					</Link>
+					<TouchableOpacity
+						onPress={onCommentsBtnPress}
+						style={styles.iconButton}>
+						<Ionicons
+							name="chatbubble-outline"
+							size={24}
+							color={Colors[theme].textPrimary}
+						/>
+						<Text
+							style={[styles.iconCount, { color: Colors[theme].textPrimary }]}>
+							{commentsCount}
+						</Text>
+					</TouchableOpacity>
 
 					{/* share button */}
 					<TouchableOpacity style={styles.iconButton} onPress={handleShare}>
@@ -300,8 +363,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
 							post.type == 'videoLandscape' ||
 							post.type == 'image'
 								? reactions.length > 0
-									? 100
-									: 45
+									? 45
+									: 0
 								: reactions.length > 0
 								? 45
 								: 0,
@@ -324,26 +387,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
 								gap: 10,
 							},
 						]}>
-						{/* write comment bar */}
-						{(post.type == 'videoPortrait' ||
-							post.type == 'videoLandscape' ||
-							post.type == 'image') && (
-							<View
-								style={[
-									styles.writeCommentBar,
-									{
-										backgroundColor: Colors[theme].surface,
-										padding: 10,
-										borderRadius: 20,
-										width: Dimensions.get('window').width - 20,
-										height: 45,
-										justifyContent: 'center',
-									},
-								]}>
-								<Text style={{ color: 'gray' }}>Write a comment...</Text>
-							</View>
-						)}
-
 						{/* reaction container */}
 						{reactions.length > 0 && (
 							<ScrollView
@@ -408,34 +451,277 @@ const UserPostReactionsModal: React.FC<UserPostReactionsModalProps> = ({
 
 	return (
 		<Modal
-			visible={showReactions}
-			transparent={true}
-			animationType="fade"
-			onRequestClose={() => setShowReactions(false)}>
-			<ThemedView theme={theme} flex={1} style={styles.modalOverlay}>
-				<TouchableWithoutFeedback onPress={() => setShowReactions(false)}>
-					<View
-						style={[styles.modalOverlay, { backgroundColor: 'transparent' }]}>
-						<ThemedView
-							style={[
-								styles.reactionsGrid,
-								{
-									width: Dimensions.get('window').width / 1.25,
-								},
-							]}
-							theme={theme}>
-							{Reactions.map((reaction) => (
-								<TouchableOpacity
-									key={reaction}
-									onPress={() => handleReaction(reaction)}>
-									<Text style={{ fontSize: 24 }}>{reaction}</Text>
-								</TouchableOpacity>
-							))}
-						</ThemedView>
-					</View>
-				</TouchableWithoutFeedback>
-			</ThemedView>
+			isVisible={showReactions}
+			useNativeDriver={true}
+			useNativeDriverForBackdrop={true}
+			animationIn={'fadeIn'}
+			animationOut={'fadeOut'}
+			onBackdropPress={() => setShowReactions(false)}>
+			<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+				<ThemedView
+					style={[
+						styles.reactionsGrid,
+						{
+							width: Dimensions.get('window').width / 1.25,
+						},
+					]}
+					theme={theme}>
+					{Reactions.map((reaction) => (
+						<TouchableOpacity
+							key={reaction}
+							onPress={() => handleReaction(reaction)}>
+							<Text style={{ fontSize: 24 }}>{reaction}</Text>
+						</TouchableOpacity>
+					))}
+				</ThemedView>
+			</View>
 		</Modal>
+	);
+};
+
+interface PostCommentSectionProps {
+	comments: userCommentType[];
+	username: string;
+}
+
+const PostCommentSection = forwardRef<
+	BottomSheetModal,
+	PostCommentSectionProps
+>((props, ref) => {
+	const theme = useSystemTheme();
+	const insets = useSafeAreaInsets();
+
+	const { comments: commentsAsProps, username } = props;
+
+	const snapPoints = useMemo(() => ['75%'], []);
+
+	const [commentsLoaded, setCommentsLoaded] = useState(false);
+
+	const [comments, setComments] = useState<userCommentType[]>(commentsAsProps);
+	const [text, setText] = useState('');
+
+	const onSend = () => {
+		if (!text) return;
+
+		// dummy data
+		const newComment: userCommentType = {
+			avatar: 'https://randomuser.me/api/portraits/men/32.jp',
+			text: 'Das ist ein großartiger Kommentar!',
+			user: {
+				_id: 1,
+				name: 'Felix Schmidt',
+				avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+			},
+			_id: 101,
+			createdAt: new Date('2024-03-04T12:00:00Z'),
+			likes: 567,
+			purpose: 'comment',
+			type: CommentType.default,
+		};
+
+		setComments((prev) => [...prev, newComment]);
+	};
+
+	useEffect(() => {
+		setCommentsLoaded(false);
+
+		if (!comments) return;
+
+		setCommentsLoaded(true);
+		console.log('commentgdssggfs:', comments);
+	}, [comments]);
+
+	const renderBackdrop = useCallback((props: any) => {
+		const animatedIndex = useSharedValue(0);
+		const animatedPosition = useSharedValue(1);
+
+		return (
+			<BottomSheetBackdrop
+				animatedIndex={animatedIndex}
+				animatedPosition={animatedPosition}
+				disappearsOnIndex={-1}
+				appearsOnIndex={0}
+			/>
+		);
+	}, []);
+
+	return (
+		<BottomSheetModal
+			containerStyle={{}}
+			backdropComponent={renderBackdrop}
+			handleIndicatorStyle={{ backgroundColor: 'gray' }}
+			backgroundStyle={{
+				backgroundColor: Colors[theme].surface,
+			}}
+			ref={ref}
+			index={1}
+			snapPoints={snapPoints}>
+			{/* main content */}
+			<BottomSheetView style={{}}>
+				{commentsLoaded ? (
+					<View
+						style={{
+							flexDirection: 'column',
+							justifyContent: 'space-between',
+							height: '100%',
+						}}>
+						<View
+							style={{
+								width: '100%',
+								justifyContent: 'center',
+								alignItems: 'center',
+								marginBottom: 20,
+							}}>
+							<ThemedText
+								theme={theme}
+								value={'Comments'}
+								style={[defaultStyles.biggerText]}
+							/>
+						</View>
+
+						<ScrollView
+							scrollEnabled={true}
+							keyboardDismissMode="on-drag"
+							contentInsetAdjustmentBehavior="always"
+							style={{ alignSelf: 'flex-start', flex: 1 }}>
+							{comments.length > 0 ? (
+								<BottomSheetFlatList
+									scrollEnabled={false}
+									data={comments}
+									renderItem={({ item: comment, index }) => {
+										const replies = comments.filter(
+											(val) => val.replyTo === comment._id,
+										);
+
+										return (
+											<View>
+												{!comment.replyTo && (
+													<CommentRow
+														key={index}
+														style={{ backgroundColor: Colors[theme].surface }}
+														userId={comment.user._id}
+														avatar={comment.avatar}
+														text={comment.text}
+														responses={replies.length}
+														likes={comment.likes}
+														date={new Date(comment.createdAt)}
+														username={comment.user.name}
+														purpose={comment.purpose}
+														type={comment.type}
+														commentId={comment._id}
+														replies={replies}
+													/>
+												)}
+											</View>
+										);
+									}}
+									keyExtractor={(item, index) => index.toString()}
+								/>
+							) : (
+								<View
+									style={{
+										flex: 1,
+										width: Dimensions.get('window').width,
+										height: 500,
+										alignItems: 'center',
+										justifyContent: 'center',
+									}}>
+									<ThemedText
+										style={{ color: 'gray' }}
+										theme={theme}
+										value={`Be the first comment under ${username}'s post!`}
+									/>
+								</View>
+							)}
+						</ScrollView>
+
+						<View
+							style={{
+								width: '100%',
+								height: 'auto',
+								flexDirection: 'row',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								backgroundColor: Colors[theme].surface,
+								borderTopWidth: StyleSheet.hairlineWidth,
+								borderTopColor: Colors[theme].textPrimary,
+							}}>
+							<BottomSheetTextInput
+								maxLength={TextInputMaxCharacters.SmallDescription}
+								onChangeText={setText}
+								value={text}
+								style={[
+									styles.composer,
+									{
+										color: Colors[theme].textPrimary,
+									},
+								]}
+								placeholderTextColor={'gray'}
+								placeholder={`A comment for ${username}`}
+							/>
+							<TouchableOpacity
+								onPress={onSend}
+								style={{ paddingHorizontal: 14 }}>
+								<Ionicons
+									name="send-outline"
+									size={20}
+									color={Colors[theme].textPrimary}
+								/>
+							</TouchableOpacity>
+						</View>
+					</View>
+				) : (
+					<CrahActivityIndicator size={'large'} color={'gray'} />
+				)}
+			</BottomSheetView>
+			{/*  */}
+		</BottomSheetModal>
+	);
+});
+
+const RenderRightInputButton: React.FC<{ props: any }> = ({ props }) => {
+	const theme = useSystemTheme();
+
+	return (
+		<TouchableOpacity
+			onPress={() => console.log('Plus pressed')}
+			style={{ paddingHorizontal: 10 }}>
+			<Ionicons
+				name="add-outline"
+				size={24}
+				color={Colors[theme].textPrimary}
+			/>
+		</TouchableOpacity>
+	);
+};
+
+const RenderBubble: React.FC<{ props: any }> = ({ props }) => {
+	const theme = useSystemTheme();
+
+	return (
+		<Bubble
+			{...props}
+			containerStyle={{
+				width: Dimensions.get('window').width,
+			}}
+			wrapperStyle={{
+				right: { backgroundColor: Colors[theme].textBubbleOwn },
+				left: { backgroundColor: Colors[theme].textBubbleOther },
+			}}
+			textStyle={{
+				right: { color: 'white' },
+				left: { color: 'white' },
+			}}
+		/>
+	);
+};
+
+const RenderSendEmptyText: React.FC<{ props: any }> = ({ props }) => {
+	const theme = useSystemTheme();
+
+	return (
+		<View
+			style={{ flexDirection: 'row', gap: 14, paddingHorizontal: 14 }}></View>
 	);
 };
 
@@ -443,6 +729,7 @@ const styles = StyleSheet.create({
 	postContainer: {
 		overflow: 'hidden',
 		shadowColor: '#000',
+		flex: 1,
 	},
 	header: {
 		padding: 10,
@@ -533,6 +820,10 @@ const styles = StyleSheet.create({
 		// alignItems: 'center',
 		// justifyContent: 'center',
 		// paddingHorizontal: 50,
+	},
+	composer: {
+		padding: 20,
+		fontSize: 16,
 	},
 });
 

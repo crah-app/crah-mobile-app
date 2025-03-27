@@ -20,6 +20,7 @@
     "app/**/*",
     "types/**/*",
     "../crah-mobile-app/types/react-native-image-crop-picker.d.ts",
+    "types/expo-env.d.ts",
     "expo-env.d.ts"
   ],
   "exclude": [

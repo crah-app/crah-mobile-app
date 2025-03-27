@@ -41,12 +41,13 @@ const Layout = () => {
 				name="PostCommentSection"
 				options={{
 					presentation: 'modal',
+					animation: 'slide_from_bottom',
 					title: 'Comments',
 					headerStyle: {
 						backgroundColor: Colors[theme].background,
 					},
 					headerLeft: () => (
-						<TouchableOpacity onPress={router.back}>
+						<TouchableOpacity onPress={() => router.push('/(auth)/homePages')}>
 							<Ionicons
 								name="arrow-back"
 								size={24}

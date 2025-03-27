@@ -13,17 +13,44 @@ export type postKeys = keyof userPostType; // a single key of the json structure
 // reaction type based on reactions array
 export type ReactionType = (typeof Reactions)[number];
 
+// simple user interface
+export interface CrahUser {
+	name: string;
+	avatar: string;
+	_id: number;
+	level?: number;
+	rank?: number;
+}
+
+/*
+	Users can let their comments rate from other users
+	the most voted type for a comment is the displayed comment type on the comment row
+*/
+
+export enum CommentType {
+	default = 'Default Comment',
+	top = 'Top Comment',
+	funny = 'Funny Comment',
+	real = 'Real Comment',
+}
+
+/*
+	Wether a comment is to the post or to another comment
+*/
+
+export type CommentPurpose = 'comment' | 'reply';
+
 // JSOn structure of a comment
 export type userCommentType = {
-	username: string;
+	user: CrahUser;
 	avatar: string;
 	text: string;
-	userId: number;
-	commentId: number;
+	_id: number;
 	likes: number;
-	responses: number;
-	date: string;
-	type: string;
+	createdAt: number | Date;
+	type: CommentType;
+	purpose: CommentPurpose;
+	replyTo?: number; // if comment is from purpose "reply"
 };
 
 /*
@@ -93,14 +120,6 @@ export enum PostTypes {
 	image = 'Images',
 }
 
-// General user post types
-export enum GeneralPostTypes {
-	all = 'All posts',
-	videos_and_images = 'Clips',
-	articles = 'Articles',
-	text = 'Text',
-}
-
 // All icons for all post/search types
 export enum PostTypeIonicons {
 	all = 'albums-outline',
@@ -109,6 +128,22 @@ export enum PostTypeIonicons {
 	text = 'chatbox-ellipses-outline',
 	article = 'book-outline',
 	image = 'images-outline',
+}
+
+// General user post types
+export enum GeneralPostTypes {
+	all = 'All posts',
+	videos = 'Clips',
+	articles = 'Articles',
+	text_images = 'Text',
+}
+
+// General icons for user post types
+export enum GeneralPostTypesIonicons {
+	all = 'albums-outline',
+	videos = 'videocam-outline',
+	articles = 'book-outline',
+	text_images = 'camera-outline',
 }
 
 /* 
@@ -251,6 +286,26 @@ export type Rank =
 	| 'Diamond';
 
 /* 
+	A user can get multiple roles at once. A user role determines the user responsibilities.
+	A user with no rank has no additonal responsibilities
+*/
+
+export enum UserRank {
+	staff = 'Staff',
+	verified = 'Verified',
+	contributor = 'Contributor',
+	OG = 'OG',
+	sponsor = 'Sponsor',
+}
+
+export const UserRankColor = {
+	[UserRank.staff]: '#E63946', // Kräftiges Rot für Autorität
+	[UserRank.verified]: '#1D3557', // Edles Dunkelblau für Vertrauenswürdigkeit
+	[UserRank.contributor]: '#F4A261', // Warmes Orange für Engagement
+	[UserRank.OG]: '#2A9D8F', // Smaragdgrün für Veteranen
+	[UserRank.sponsor]: '#FFD700', // Gold für Exklusivität
+} as const;
+/* 
 	With a spot, a trick can be specifically categorized which is crucial for point calculation.
 	for example, a Flair is much harder on flatground than on a 3 foot quarter 
 */
@@ -276,6 +331,12 @@ export enum TrickListSpot {
 */
 export enum TrickListGeneralSpotCategory {
 	ALL = 'All',
+	FLAT = 'Flat',
+	PARK = 'Park',
+	STREET = 'Street',
+}
+
+export enum BestTrickType {
 	FLAT = 'Flat',
 	PARK = 'Park',
 	STREET = 'Street',
@@ -314,24 +375,6 @@ export enum TrickListFilterOptions {
 */
 
 export type modal_mode = 'Source' | 'Cover';
-
-/*
-	Users can let their comments rate from other users
-	the most voted type for a comment is the displayed comment type on the comment row
-*/
-
-export enum CommentType {
-	default = 'Default Comment',
-	top = 'Top Comment',
-	funny = 'Funny Comment',
-	real = 'Real Comment',
-}
-
-/*
-	Wether a comment is to the post or to another comment
-*/
-
-export type CommentPurpose = 'comment' | 'reply';
 
 /*
 	image-aspects the user can choose from to upload his video in

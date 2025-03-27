@@ -55,6 +55,13 @@ export const defaultStyles = StyleSheet.create({
 		height: StyleSheet.hairlineWidth,
 		backgroundColor: 'gray',
 	},
+
+	surface_container: {
+		borderRadius: 8,
+		flexDirection: 'column',
+		paddingVertical: 12,
+		paddingHorizontal: 12,
+	},
 });
 
 export const defaultHeaderBtnSize = 32;

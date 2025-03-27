@@ -448,11 +448,10 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 	};
 
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const snapPoints = useMemo(() => ['90%'], []);
+	const snapPoints = useMemo(() => ['50%'], []);
 
 	const handlePresentModalPress = useCallback(() => {
 		bottomSheetRef.current?.present();
-		scrollViewRef.current?.scrollToEnd({ animated: true });
 
 		setTagsLeft((prev) => prev.filter((tag) => !tags?.includes(tag)));
 		console.log('tagsLeft: ', tagsLeft);
@@ -464,119 +463,117 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 
 	return (
 		<View>
-			<BottomSheetModalProvider>
-				<View style={[styles.Container3, styles.InputContainer]}>
-					<ThemedTextInput
-						placeholder={
-							'Enter description, insights, hashtags, your thoughts...'
-						}
-						theme={theme}
-						lines={30}
-						multiline={true}
-						maxLength={TextInputMaxCharacters.BigDescription}
-						showLength={true}
-						children={null}
-						value={description}
-						setValue={setDescription}
-					/>
-				</View>
-				<View style={[styles.Container4, styles.InputContainer]}>
+			<View style={[styles.Container3, styles.InputContainer]}>
+				<ThemedTextInput
+					placeholder={
+						'Enter description, insights, hashtags, your thoughts...'
+					}
+					theme={theme}
+					lines={30}
+					multiline={true}
+					maxLength={TextInputMaxCharacters.BigDescription}
+					showLength={true}
+					children={null}
+					value={description}
+					setValue={setDescription}
+				/>
+			</View>
+			<View style={[styles.Container4, styles.InputContainer]}>
+				<View
+					style={{
+						backgroundColor: Colors[theme].container_surface,
+						borderRadius: 8,
+						paddingRight: 8,
+						paddingBottom: 8,
+						flexDirection: 'column',
+						gap: 8,
+						padding: 12,
+					}}>
+					<TouchableOpacity onPress={handlePresentModalPress}>
+						<ThemedText
+							value={'Add tags'}
+							theme={theme}
+							style={{ color: 'gray' }}
+						/>
+					</TouchableOpacity>
+
 					<View
 						style={{
-							backgroundColor: Colors[theme].container_surface,
-							borderRadius: 8,
-							paddingRight: 8,
 							paddingBottom: 8,
-							flexDirection: 'column',
-							gap: 8,
-							padding: 12,
+							gap: 12,
+							flexWrap: 'wrap',
+							width: '100%',
+							flexDirection: 'row',
 						}}>
-						<TouchableOpacity onPress={handlePresentModalPress}>
-							<ThemedText
-								value={'Add tags'}
+						{tags?.map((tag) => (
+							<Tag
+								key={tag}
+								touchOpacity={1}
+								DisplayRemoveBtn={true}
 								theme={theme}
-								style={{ color: 'gray' }}
+								tag={tag}
+								ActionOnRemoveBtnClick={() => RemoveTag(tag)}
 							/>
-						</TouchableOpacity>
-
-						<View
-							style={{
-								paddingBottom: 8,
-								gap: 12,
-								flexWrap: 'wrap',
-								width: '100%',
-								flexDirection: 'row',
-							}}>
-							{tags?.map((tag) => (
-								<Tag
-									key={tag}
-									touchOpacity={1}
-									DisplayRemoveBtn={true}
-									theme={theme}
-									tag={tag}
-									ActionOnRemoveBtnClick={() => RemoveTag(tag)}
-								/>
-							))}
-						</View>
-
-						{!tags && <View style={{ height: 12 }} />}
+						))}
 					</View>
+
+					{!tags && <View style={{ height: 12 }} />}
 				</View>
+			</View>
 
-				<BottomSheetModal
-					snapPoints={snapPoints}
-					handleIndicatorStyle={{ backgroundColor: 'gray' }}
-					backgroundStyle={{
-						backgroundColor: Colors[theme].background,
-					}}
-					ref={bottomSheetRef}>
-					<BottomSheetView>
-						<View
-							style={{
-								flexDirection: 'column',
-								gap: 12,
-								paddingHorizontal: 18,
-								paddingVertical: 18,
-							}}>
-							<ThemedText
-								value={'Add a tag'}
-								theme={theme}
-								style={defaultStyles.biggerText}
-							/>
+			<BottomSheetModal
+				snapPoints={snapPoints}
+				handleIndicatorStyle={{ backgroundColor: 'gray' }}
+				backgroundStyle={{
+					backgroundColor: Colors[theme].background,
+				}}
+				ref={bottomSheetRef}>
+				<BottomSheetView style={{ flex: 1 }}>
+					<View
+						style={{
+							flexDirection: 'column',
+							gap: 12,
+							paddingHorizontal: 18,
+							paddingVertical: 18,
+						}}>
+						<ThemedText
+							value={'Add a tag'}
+							theme={theme}
+							style={defaultStyles.biggerText}
+						/>
 
-							<ScrollView>
-								<View>
-									{tagsLeft.length > 0 ? (
-										<View
-											style={{
-												width: '100%',
-												flexDirection: 'row',
-												gap: 8,
-												flexWrap: 'wrap',
-											}}>
-											{tagsLeft.map((tag) => (
-												<Tag
-													touchOpacity={0.2}
-													DisplayRemoveBtn={false}
-													theme={theme}
-													tag={tag}
-													handleTagPress={() => AddTag(tag)}
-												/>
-											))}
-										</View>
-									) : (
-										<ThemedText
-											value={'No tags left'}
-											theme={theme}
-											style={{ color: 'gray' }}
-										/>
-									)}
-								</View>
-							</ScrollView>
-						</View>
-					</BottomSheetView>
-				</BottomSheetModal>
-			</BottomSheetModalProvider>
+						<ScrollView>
+							<View>
+								{tagsLeft.length > 0 ? (
+									<View
+										style={{
+											width: '100%',
+											flexDirection: 'row',
+											gap: 8,
+											flexWrap: 'wrap',
+										}}>
+										{tagsLeft.map((tag) => (
+											<Tag
+												touchOpacity={0.2}
+												DisplayRemoveBtn={false}
+												theme={theme}
+												tag={tag}
+												handleTagPress={() => AddTag(tag)}
+											/>
+										))}
+									</View>
+								) : (
+									<ThemedText
+										value={'No tags left'}
+										theme={theme}
+										style={{ color: 'gray' }}
+									/>
+								)}
+							</View>
+						</ScrollView>
+					</View>
+				</BottomSheetView>
+			</BottomSheetModal>
 		</View>
 	);
 };
@@ -786,7 +783,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: 8,
 		paddingTop: 8,
-		borderRadius: 5,
+		borderRadius: 8,
 	},
 	playBtn: {
 		position: 'absolute',
