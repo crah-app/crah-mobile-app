@@ -38,12 +38,29 @@ const Layout = () => {
 					}}
 				/>
 				<Stack.Screen
-					name="createTextPost"
+					name="createPost"
 					options={{
 						headerTintColor: Colors[theme].textPrimary,
 						headerShadowVisible: false,
 						headerShown: true,
 						title: 'Create Text/ Image',
+						headerTitle: () => <View></View>,
+						headerRight: () => (
+							<Link
+								asChild
+								href={{
+									params: { contents: JSON.stringify(helpModalContent) },
+									pathname: '/modals/help_modal',
+								}}>
+								<TouchableOpacity>
+									<Ionicons
+										name="help-circle-outline"
+										size={defaultHeaderBtnSize}
+										color={Colors[theme].textPrimary}
+									/>
+								</TouchableOpacity>
+							</Link>
+						),
 					}}
 				/>
 				<Stack.Screen

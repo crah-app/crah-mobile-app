@@ -530,7 +530,11 @@ const Page = () => {
 				contentContainerStyle={{}}
 				showsVerticalScrollIndicator={true}
 				scrollEnabled={true}>
-				<View style={styles.scrollViewContainer}>
+				<View
+					style={[
+						styles.scrollViewContainer,
+						{ backgroundColor: Colors[theme].background },
+					]}>
 					<HeaderContainer />
 					<UserProfileContainer />
 					<BestTricksContainer />

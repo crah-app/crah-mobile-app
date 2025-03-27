@@ -60,7 +60,8 @@
     "react-native-svg-transformer": "^1.5.0",
     "react-native-web": "~0.19.13",
     "uuid": "^11.0.5",
-    "zeego": "^3.0.3"
+    "zeego": "^3.0.3",
+    "react-native-pager-view": "6.5.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

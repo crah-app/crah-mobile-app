@@ -23,9 +23,9 @@ const dropMenuData: Record<CreatePostType, dropMenuDataInterface> = {
 		type: CreatePostType.video,
 		path: '/(auth)/createPages/createVideo',
 	},
-	[CreatePostType.image]: {
-		type: CreatePostType.image,
-		path: '/(auth)/createPages/createTextPost',
+	[CreatePostType.post]: {
+		type: CreatePostType.post,
+		path: '/(auth)/createPages/createPost',
 	},
 	[CreatePostType.article]: {
 		type: CreatePostType.article,
@@ -40,7 +40,7 @@ const dropDownMenuItemsData: dropDownMenuInputData[] = [
 	},
 	{
 		key: 1,
-		text: CreatePostType.image,
+		text: CreatePostType.post,
 	},
 	{
 		key: 2,
