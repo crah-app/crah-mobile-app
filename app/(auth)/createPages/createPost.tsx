@@ -17,8 +17,9 @@ import {
 	Image,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import PagerView from 'react-native-pager-view';
 import UploadVideoModal from '@/app/modals/uploadVideoModal';
+import { Ionicons } from '@expo/vector-icons';
+// import { SliderBox } from 'react-native-image-slider-box';
 
 const CreateTextPost = () => {
 	const theme = useSystemTheme();
@@ -57,10 +58,10 @@ const CreateTextPost = () => {
 		},
 	]);
 	const [sourceRatio, setSourceRatio] = useState<upload_source_ratio>(
-		upload_source_ratio.SQUARE,
+		upload_source_ratio.LANDSCAPE,
 	);
 
-	const multiplicator = 1;
+	const [multiplicator, setMultiplicator] = useState<number>(1);
 	const [dynamicDimensions, setDynamicDimensions] = useState<{
 		width: number | string;
 		height: number;
@@ -148,36 +149,47 @@ const CreateTextPost = () => {
 						{/*  */}
 
 						{uploadedImages && (
-							<View style={{ gap: 8, flexDirection: 'column', marginTop: 8 }}>
+							<View
+								style={{
+									gap: 8,
+									flexDirection: 'column',
+									marginTop: 8,
+									width: Dimensions.get('window').width,
+								}}>
 								<ThemedText
 									theme={theme}
-									value={'Your uploaded images:'}
+									value={`Your uploaded images (${sourceRatio}):`}
 									style={[defaultStyles.biggerText, { fontSize: 18 }]}
 								/>
-								<PagerView initialPage={0}>
-									{/* {uploadedImages.map((value, index) => ( */}
-									<View
-										key={`${1}`}
-										style={[
-											{
-												alignItems: 'center',
-												justifyContent: 'center',
-												backgroundColor: Colors[theme].textPrimary,
-												width: dynamicDimensions.width as number,
-												height: dynamicDimensions.height,
-											},
-										]}>
-										<Image
-											resizeMode={'cover'}
-											style={{
-												width: dynamicDimensions.width as number,
-												height: dynamicDimensions.height,
-											}}
-											source={{ uri: uploadedImages[0].uri }}
-										/>
-									</View>
-									{/* ))} */}
-								</PagerView>
+								<View
+									key={`${1}`}
+									style={[
+										{
+											alignItems: 'center',
+											justifyContent: 'flex-start',
+											flexDirection: 'column',
+											backgroundColor: Colors[theme].background,
+											width: Dimensions.get('window').width * 0.95,
+											height: dynamicDimensions.height + 100,
+										},
+									]}>
+									<Image
+										resizeMode={'cover'}
+										style={{
+											width: dynamicDimensions.width as number,
+											height: dynamicDimensions.height,
+										}}
+										source={{ uri: uploadedImages[0].uri }}
+									/>
+								</View>
+
+								<View style={{ flexDirection: 'row', gap: 8, paddingTop: 8 }}>
+									<Ionicons
+										size={18}
+										color={Colors[theme].surface}
+										name={'ellipse-outline'}
+									/>
+								</View>
 							</View>
 						)}
 					</ThemedView>
