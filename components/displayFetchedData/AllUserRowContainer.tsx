@@ -7,10 +7,16 @@ import Row from '../general/Row';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
 import Colors from '@/constants/Colors';
 import { fetchAdresses } from '@/types';
+import ThemedText from '../general/ThemedText';
+import { defaultStyles } from '@/constants/Styles';
 
-interface AllUserRowContainerProps {}
+interface AllUserRowContainerProps {
+	contentTitle?: string;
+}
 
-const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({}) => {
+const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
+	contentTitle,
+}) => {
 	const theme = useSystemTheme();
 
 	const [usersLoaded, setUsersLoaded] = useState<boolean>(false);
@@ -50,6 +56,12 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({}) => {
 				</View>
 			) : (
 				<ScrollView contentContainerStyle={{ flex: 1 }}>
+					<ThemedText
+						theme={theme}
+						value={contentTitle ?? 'Riders'}
+						style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
+					/>
+
 					<FlatList
 						scrollEnabled={false}
 						contentContainerStyle={{ flex: 1 }}
@@ -64,6 +76,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({}) => {
 									user.firstName + user.lastName ??
 									'no name user'
 								}
+								subtitle={'Rank Silver #51'}
 							/>
 						)}
 					/>

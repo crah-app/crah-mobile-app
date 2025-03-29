@@ -101,6 +101,26 @@ const Layout = () => {
 					headerShown: false,
 				}}
 			/>
+			<Stack.Screen
+				name="compareRider"
+				options={{
+					presentation: 'modal',
+					headerShown: true,
+					title: 'compare',
+					headerStyle: {
+						backgroundColor: Colors[theme].background,
+					},
+					headerLeft: () => (
+						<TouchableOpacity onPress={router.back}>
+							<Ionicons
+								name="arrow-back"
+								size={24}
+								color={Colors[theme].textPrimary}
+							/>
+						</TouchableOpacity>
+					),
+				}}
+			/>
 		</Stack>
 	);
 };

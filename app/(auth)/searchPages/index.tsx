@@ -26,6 +26,8 @@ import ArticlesRowContainer from '@/components/displayFetchedData/ArticlesRowCon
 import VideosRowContainer from '@/components/displayFetchedData/VideosRowContainer';
 import TextPostRowContainer from '@/components/displayFetchedData/TextPostRowContainer';
 import TricksRowContainer from '@/components/displayFetchedData/TricksRowContainer';
+import { Stack } from 'expo-router';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const Page = () => {
 	const theme = useSystemTheme();
@@ -46,7 +48,7 @@ const Page = () => {
 		[SearchCategories.allPosts]: <AllPostsRowContainer />,
 		[SearchCategories.articles]: <ArticlesRowContainer />,
 		[SearchCategories.clips]: <VideosRowContainer />,
-		[SearchCategories.riders]: <AllUserRowContainer />,
+		[SearchCategories.riders]: <AllUserRowContainer contentTitle="Riders" />,
 		[SearchCategories.text]: <TextPostRowContainer />,
 		[SearchCategories.tricks]: <TricksRowContainer />,
 	};

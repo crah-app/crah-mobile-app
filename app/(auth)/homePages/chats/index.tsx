@@ -48,7 +48,10 @@ const Page = () => {
 					headerTintColor: Colors[theme].textPrimary,
 					headerLargeTitle: false,
 					headerShown: true,
-					headerSearchBarOptions: { placeholder: 'Search' },
+					headerSearchBarOptions: {
+						placeholder: 'Search',
+						headerIconColor: Colors[theme].textPrimary,
+					},
 					headerLeft: () => (
 						<TouchableOpacity onPress={router.back}>
 							<Ionicons

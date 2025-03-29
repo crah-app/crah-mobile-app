@@ -62,7 +62,7 @@ export enum AuthStrategy {
 }
 
 /*
-	In this enumaration all addresses the app fetches from the crah-api are listed.
+	This enumeration lists all static endpoints without search parameters that the app fetches from the CRAH API.
 */
 
 export enum fetchAdresses {

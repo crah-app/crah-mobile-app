@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/general/ThemedView';
 import { useUser } from '@clerk/clerk-expo';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import ThemedText from '@/components/general/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -91,6 +91,16 @@ const Page = () => {
 	const [postsCount, setPostsCount] = useState<number>(50);
 	const [riderType, setRiderType] = useState<string>('Flat Rider');
 	const [bestTrick, setBestTrick] = useState<string>('Buttercup Flat');
+
+	const handleCompareYourself = () => {
+		router.push({
+			pathname: '/modals/compareRiders',
+			params: {
+				rider1Id: 'user_2sWdxSqHBDfFtIEpFhjqmDB1ybL',
+				rider2Id: user?.id,
+			},
+		});
+	};
 
 	const HeaderContainer = () => {
 		return (
@@ -405,7 +415,7 @@ const Page = () => {
 						/>
 					</View>
 
-					<TouchableOpacity>
+					<TouchableOpacity onPress={handleCompareYourself}>
 						<ThemedText
 							theme={theme}
 							value={'compare yourself'}
