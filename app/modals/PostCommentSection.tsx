@@ -41,7 +41,7 @@ const PostPage = () => {
 		if (!comments) return;
 
 		setCommentsLoaded(true);
-		console.log('comments:', comments);
+		// console.log('comments:', comments);
 	}, [comments]);
 
 	const onSend = (comments: IMessage[]) => {

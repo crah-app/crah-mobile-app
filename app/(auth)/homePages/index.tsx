@@ -33,7 +33,7 @@ import PostTypeButton from '@/components/PostTypeButton';
 import { filterPosts } from '@/utils/globalFuncs';
 import PostTypeFilterModal from '@/components/home/PostTypeFilterModal';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
-import { ContentFilterTypes } from '@/types';
+import { ContentFilterTypes, SearchCategories } from '@/types';
 import MessagesButton from '@/components/home/MessagesButton';
 import UserUploadsPost from '@/components/home/UserUploadsPost';
 import { set } from 'date-fns';
@@ -85,7 +85,7 @@ const Page = () => {
 	const { video_upload, video_cover, video_data } = useLocalSearchParams();
 
 	useEffect(() => {
-		console.log(video_upload, video_cover);
+		// console.log(video_upload, video_cover);
 		if (video_upload && video_cover && video_data) {
 			setVideoData(video_data as string);
 			setUserUploadsVideo(true);

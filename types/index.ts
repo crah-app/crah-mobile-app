@@ -67,6 +67,7 @@ export enum AuthStrategy {
 
 export enum fetchAdresses {
 	commonTricks = 'http://192.168.0.136:4000/public/tricks/commonTricks.json',
+	allUsers = 'http://192.168.0.136:4000/api/users/all',
 }
 
 /* 
@@ -146,26 +147,26 @@ export enum GeneralPostTypesIonicons {
 	text_images = 'camera-outline',
 }
 
-/* 
-	ALl types of content the user can search for on the search page
-	including non-post data like the people, stunt scooter riders
-	and tricks
-*/
-export enum SearchTypes {
-	all = 'All posts',
-	videos_and_images = 'Clips',
-	articles = 'Articles',
-	text = 'Text',
-	riders = 'Riders',
-	tricks = 'Tricks',
-}
-
 /*
 	Determines in which order the client displays user posts or other data search entries
 */
 export enum ExplorePostOrder {
 	toOldest = 'Latest to oldest',
 	toLatest = 'Oldest to latest',
+}
+
+/* 
+	ALl types of content the user can search for on the search page
+	including non-post data like the people, stunt scooter riders
+	and tricks
+*/
+export enum SearchCategories {
+	allPosts = 'All posts',
+	clips = 'Clips',
+	articles = 'Articles',
+	text = 'Text',
+	riders = 'Riders',
+	tricks = 'Tricks',
 }
 
 /* 
@@ -251,26 +252,26 @@ export enum TextInputMaxCharacters {
 */
 
 export enum Tags {
-	News = 'News',
-	WorldsFirst = "World's First",
-	WorldsSecond = "World's Second",
-	Banger = 'Banger',
-	Tutorial = 'Tutorial',
-	Story = 'Story',
-	Guide = 'Guide',
-	Documentation = 'Documenation',
-	Review = 'Review',
-	Challenge = 'Challenge',
-	Question = 'Question',
-	Answer = 'Answer',
-	Opinion = 'Opinion',
-	Thought = 'Thought',
-	Experience = 'Experience',
-	Information = 'Information',
-	Advertisement = 'Advertisement',
-	Warning = 'Warning',
-	Reminder = 'Reminder',
-	Announcement = 'Announcement',
+	Banger = 'Banger', // Highly engaging and attention-grabbing
+	WorldsFirst = "World's First", // Unique and exclusive content
+	WorldsSecond = "World's Second", // Still unique but slightly less exclusive
+	News = 'News', // Timely and relevant information
+	Challenge = 'Challenge', // Interactive and engaging
+	Review = 'Review', // Informative and opinion-based
+	Tutorial = 'Tutorial', // Educational and helpful
+	Guide = 'Guide', // Step-by-step instructions
+	Story = 'Story', // Personal and relatable content
+	Opinion = 'Opinion', // Thought-provoking and discussion-worthy
+	Thought = 'Thought', // Intellectual and reflective
+	Experience = 'Experience', // Personal and relatable insights
+	Information = 'Information', // General knowledge sharing
+	Announcement = 'Announcement', // Important updates
+	Reminder = 'Reminder', // Useful and actionable
+	Warning = 'Warning', // Urgent and critical
+	Advertisement = 'Advertisement', // Promotional content
+	Documentation = 'Documentation', // Technical and detailed
+	Question = 'Question', // Encourages interaction
+	Answer = 'Answer', // Provides solutions
 }
 
 /* 

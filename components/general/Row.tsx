@@ -106,7 +106,9 @@ const Row: React.FC<RowProps> = ({
 						) : (
 							<Image
 								source={{
-									uri: 'https://randomuser.me/api/portraits/men/32.jpg',
+									uri:
+										avatarUrl ??
+										'https://randomuser.me/api/portraits/men/32.jpg',
 								}}
 								style={styles.avatar}
 								width={costumAvatarWidth || 46}

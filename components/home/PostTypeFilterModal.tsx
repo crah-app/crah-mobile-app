@@ -14,7 +14,7 @@ import PostTypeButton from '../PostTypeButton';
 import ThemedText from '../general/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import { PostTypes } from '@/types';
+import { PostTypes, SearchCategories } from '@/types';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Button } from 'react-native-paper';
 import Modal from 'react-native-modal';

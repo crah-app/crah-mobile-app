@@ -528,7 +528,7 @@ const PostCommentSection = forwardRef<
 		if (!comments) return;
 
 		setCommentsLoaded(true);
-		console.log('commentgdssggfs:', comments);
+		// console.log('commentgdssggfs:', comments);
 	}, [comments]);
 
 	const renderBackdrop = useCallback((props: any) => {
