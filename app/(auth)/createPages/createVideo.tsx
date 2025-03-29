@@ -52,6 +52,7 @@ import {
 import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
 import { router } from 'expo-router';
 import Modal from 'react-native-modal';
+import CreatePageHeader from '@/components/create/CreatePageHeader';
 
 interface videoDataInterface {
 	cover: string; // cover image
@@ -141,11 +142,16 @@ const CreateVideo = () => {
 		);
 	};
 
+	const previewClickEventHandler = () => {};
+
 	return (
 		<View style={{ flex: 1 }}>
 			<ThemedView theme={theme} flex={1} style={{ bottom: bottom * 3 }}>
-				<CreateVideoHeader
-					handleVideoUploadClickEvent={handleVideoUploadClickEvent}
+				<CreatePageHeader
+					title={'Create Video'}
+					handleUploadClickEvent={handleVideoUploadClickEvent}
+					previewClickEventHandler={previewClickEventHandler}
+					style={{ paddingHorizontal: 12, paddingTop: 12 }}
 				/>
 				<CreateVideoMainContent
 					cover={cover}
@@ -160,60 +166,6 @@ const CreateVideo = () => {
 					setTags={setTags}
 				/>
 			</ThemedView>
-		</View>
-	);
-};
-
-interface CreateVideoHeaderProps {
-	handleVideoUploadClickEvent: () => void;
-}
-
-const CreateVideoHeader: React.FC<CreateVideoHeaderProps> = ({
-	handleVideoUploadClickEvent,
-}) => {
-	const theme = useSystemTheme();
-
-	return (
-		<View style={[styles.headerContainer]}>
-			<View
-				style={{
-					justifyContent: 'space-between',
-					flexDirection: 'row',
-				}}>
-				<ThemedText
-					theme={theme}
-					value={'Create Video'}
-					style={defaultStyles.biggerText}
-				/>
-				<TouchableOpacity
-					style={{
-						position: 'absolute',
-						right: 0,
-						padding: 24,
-						paddingHorizontal: -24,
-					}}
-					onPress={handleVideoUploadClickEvent}>
-					<Ionicons
-						size={24}
-						color={Colors[theme].textPrimary}
-						name="send-outline"
-					/>
-				</TouchableOpacity>
-			</View>
-
-			<View style={{ marginVertical: 4, width: 150 }}>
-				<TouchableOpacity>
-					<ThemedText
-						style={{
-							flex: -1,
-							borderRadius: 8,
-							color: Colors[theme].primary,
-						}}
-						theme={theme}
-						value={'click here for preview'}
-					/>
-				</TouchableOpacity>
-			</View>
 		</View>
 	);
 };
@@ -761,14 +713,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 0,
 		height: Dimensions.get('window').height,
-	},
-	headerContainer: {
-		flexDirection: 'column',
-		justifyContent: 'space-between',
-		paddingHorizontal: 12,
-		paddingTop: 12,
-		paddingBottom: 12,
-		// zIndex: 1,
 	},
 	Container1: {},
 	Container2: {},

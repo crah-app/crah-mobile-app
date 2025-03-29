@@ -103,7 +103,7 @@ export type commonTricksDataStructure = { words: Array<string> };
 
 export enum CreatePostType {
 	video = 'Video',
-	image = 'Image',
+	post = 'Post',
 	article = 'Article',
 }
 

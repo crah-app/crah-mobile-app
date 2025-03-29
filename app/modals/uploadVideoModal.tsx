@@ -39,7 +39,7 @@ interface UploadVideoModalProps {
 	setUploadedCover: (assets: imagePicker.ImagePickerAsset[]) => void;
 	uploadMode: modal_mode | undefined;
 	setSourceRatio: (ratio: upload_source_ratio) => void;
-	uploadedSource: imagePicker.ImagePickerAsset[] | undefined;
+	uploadedSource?: imagePicker.ImagePickerAsset[] | undefined;
 	cover: imagePicker.ImagePickerAsset[] | undefined | string;
 }
 
