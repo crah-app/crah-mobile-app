@@ -9,6 +9,7 @@ import Colors from '@/constants/Colors';
 import { fetchAdresses } from '@/types';
 import ThemedText from '../general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
+import { router } from 'expo-router';
 
 interface AllUserRowContainerProps {
 	contentTitle?: string;
@@ -47,6 +48,13 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 		if (!usersLoaded || !allUsers) return;
 	}, [usersLoaded, allUsers]);
 
+	const handleUserPress = (userId: string) => {
+		router.push({
+			pathname: '/(auth)/profilePages',
+			params: { self: 'false', userId },
+		});
+	};
+
 	return (
 		<ThemedView theme={theme} style={[styles.container]} flex={1}>
 			{!usersLoaded || !allUsers ? (
@@ -69,6 +77,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 						keyExtractor={(item) => item.id}
 						renderItem={({ item: user }) => (
 							<Row
+								onPress={() => handleUserPress(user.id)}
 								showAvatar={true}
 								avatarUrl={user.imageUrl}
 								title={
