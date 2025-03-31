@@ -13,7 +13,7 @@ import ThemedText from '@/components/general/ThemedText';
 import Colors from '@/constants/Colors';
 import { ExplorePostOrder, Tags, SearchCategories } from '@/types';
 import PostTypeButton from '@/components/PostTypeButton';
-import posts from '../../../JSON/posts.json'; // posts that are relevant for the search section
+import posts from '../../../../JSON/posts.json'; // posts that are relevant for the search section
 import { filterPosts } from '@/utils/globalFuncs';
 import CheckBox from '@react-native-community/checkbox';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';

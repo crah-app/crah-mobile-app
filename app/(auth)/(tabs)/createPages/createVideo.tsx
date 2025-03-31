@@ -34,7 +34,7 @@ import {
 } from 'react-native';
 import * as imagePicker from 'expo-image-picker';
 
-import UploadVideoModal from '@/app/modals/uploadVideoModal';
+import UploadVideoModal from '@/app/(auth)/modals/uploadVideoModal';
 
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
@@ -506,6 +506,7 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 										}}>
 										{tagsLeft.map((tag) => (
 											<Tag
+												key={tag}
 												touchOpacity={0.2}
 												DisplayRemoveBtn={false}
 												theme={theme}

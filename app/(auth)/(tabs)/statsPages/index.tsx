@@ -1,6 +1,6 @@
 import ThemedView from '@/components/general/ThemedView';
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { useUser } from '@clerk/clerk-expo';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
@@ -10,10 +10,14 @@ import LeaguesPage from '@/components/rankspage/Leagues';
 import YourRank from '@/components/rankspage/YourRank';
 import Tricks from '@/components/rankspage/Tricks';
 import TrickBuilder from '@/components/rankspage/TrickBuilder';
+import { useLocalSearchParams } from 'expo-router';
+import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
 
 const Page = () => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
+
+	const { pageType } = useLocalSearchParams();
 
 	const galleryComponents = {
 		[UserGalleryTopics.USER_RANK]: <YourRank user={JSON.stringify(user)} />,
@@ -31,6 +35,12 @@ const Page = () => {
 	const handleGalleryTopic = (newTopic: UserGalleryTopics) => {
 		setCurrentGalleryTopic(newTopic);
 	};
+
+	useEffect(() => {
+		if (!pageType) return;
+
+		handleGalleryTopic(pageType as UserGalleryTopics);
+	}, [pageType]);
 
 	return (
 		<ThemedView flex={1} theme={theme}>
@@ -61,7 +71,23 @@ const Page = () => {
 					))}
 				</ScrollView>
 
-				<View>{galleryComponents[CurrentGalleryTopic]}</View>
+				<View>
+					{galleryComponents[CurrentGalleryTopic] || (
+						<ThemedView theme={theme} flex={1}>
+							<NoDataPlaceholder
+								containerStyle={{
+									flex: 1,
+									justifyContent: 'center',
+									alignItems: 'center',
+									height: Dimensions.get('window').height,
+								}}
+								arrowStyle={{ display: 'none' }}
+								firstTextValue="Stats, Tricks and more..."
+								subTextValue=""
+							/>
+						</ThemedView>
+					)}
+				</View>
 			</View>
 		</ThemedView>
 	);

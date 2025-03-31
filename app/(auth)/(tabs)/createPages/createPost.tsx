@@ -17,7 +17,7 @@ import {
 	Image,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import UploadVideoModal from '@/app/modals/uploadVideoModal';
+import UploadVideoModal from '@/app/(auth)/modals/uploadVideoModal';
 import { Ionicons } from '@expo/vector-icons';
 // import { SliderBox } from 'react-native-image-slider-box';
 

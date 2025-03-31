@@ -56,7 +56,11 @@ const SettingsColumn: React.FC<SettingsColumnProps> = ({
 
 		if (hasIcon && icon && type != 'unordinary') {
 			return (
-				<Ionicons name={icon} size={24} color={Colors[theme].textPrimary} />
+				<Ionicons
+					name={icon as ionicon}
+					size={24}
+					color={Colors[theme].textPrimary}
+				/>
 			);
 		}
 

@@ -10,6 +10,7 @@ import { fetchAdresses } from '@/types';
 import ThemedText from '../general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
 import { router } from 'expo-router';
+import UserProfile from '@/app/(auth)/(tabs)/sharedPages/userProfile';
 
 interface AllUserRowContainerProps {
 	contentTitle?: string;
@@ -50,8 +51,8 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 
 	const handleUserPress = (userId: string) => {
 		router.push({
-			pathname: '/(auth)/profilePages',
-			params: { self: 'false', userId },
+			pathname: '/(auth)/sharedPages/userProfile',
+			params: { userId, self: 'false' },
 		});
 	};
 
@@ -80,12 +81,8 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 								onPress={() => handleUserPress(user.id)}
 								showAvatar={true}
 								avatarUrl={user.imageUrl}
-								title={
-									user.username ??
-									user.firstName + user.lastName ??
-									'no name user'
-								}
-								subtitle={'Rank Silver #51'}
+								title={user.username ?? 'no name user'}
+								subtitle={'Rank Silver #51' + ' ' + user.id}
 							/>
 						)}
 					/>

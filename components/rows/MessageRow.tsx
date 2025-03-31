@@ -28,7 +28,10 @@ const MessageColumn: React.FC<MessageColumnProps> = ({
 	return (
 		<Link
 			asChild
-			href={{ pathname: '/(auth)/homePages/chats/[id]', params: { id } }}>
+			href={{
+				pathname: '/(auth)/(tabs)/homePages/chats/[id]',
+				params: { id },
+			}}>
 			<Column
 				title={name}
 				subtitle={status === UserStatus.OFFLINE ? chatTimeAgo : status}

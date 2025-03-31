@@ -10,7 +10,7 @@ import { Text, StyleSheet } from 'react-native';
 const PostPage = () => {
 	const { data, type } = useLocalSearchParams();
 	const theme = useSystemTheme();
-	const postData = JSON.parse(data);
+	const postData = JSON.parse(data as string);
 	const article = postData.article;
 
 	return (

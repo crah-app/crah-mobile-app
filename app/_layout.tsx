@@ -55,7 +55,7 @@ const Root = () => {
 		const inAuthGroup = segments[0] === '(auth)';
 
 		if (isSignedIn && !inAuthGroup) {
-			router.replace('/(auth)/homePages');
+			router.replace('/(auth)/(tabs)/homePages');
 		} else if (!isSignedIn) {
 			router.replace('/');
 		}

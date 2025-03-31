@@ -47,7 +47,8 @@ const Layout = () => {
 						backgroundColor: Colors[theme].background,
 					},
 					headerLeft: () => (
-						<TouchableOpacity onPress={() => router.push('/(auth)/homePages')}>
+						<TouchableOpacity
+							onPress={() => router.push('/(auth)/(tabs)/homePages')}>
 							<Ionicons
 								name="arrow-back"
 								size={24}

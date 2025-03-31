@@ -23,7 +23,7 @@ const CompareRidersContents: React.FC<CompareRidersContentsProps> = ({
 	const [rider2Stats, setRider2Stats] = useState<any>();
 
 	const fetchUserStats = (userId: string, index: number) => {
-		fetch(`http://192.168.0.136:4000/api/users/stats/${userId}`)
+		fetch(`http://192.168.0.136:4000/api/users/${userId}`)
 			.then((res) => res.json())
 			.then((res) => (index === 1 ? setRider1Stats(res) : setRider2Stats(res)))
 			.catch((err) =>

@@ -17,7 +17,7 @@ const MessagesButton = () => {
 				asChild
 				href={{
 					params: {},
-					pathname: '/(auth)/homePages/chats',
+					pathname: '/(auth)/(tabs)/homePages/chats',
 				}}>
 				<TouchableOpacity>
 					<SvgXml

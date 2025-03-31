@@ -18,6 +18,7 @@ interface NoDataPlaceholderProps {
 	containerStyle?: ViewStyle | ViewStyle[];
 	firstTextValue?: string;
 	subTextValue?: string;
+	onSubTextClickPathname?: string;
 }
 
 const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
@@ -25,6 +26,7 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 	containerStyle,
 	firstTextValue,
 	subTextValue,
+	onSubTextClickPathname,
 }) => {
 	const theme = useSystemTheme();
 
@@ -47,7 +49,11 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 			<Text style={styles.placeholderText}>
 				{firstTextValue ?? "No one's around here"}{' '}
 			</Text>
-			<Link href={{ pathname: '/(auth)/createPages/createVideo' }} asChild>
+			<Link
+				href={{
+					pathname: onSubTextClickPathname,
+				}}
+				asChild>
 				<TouchableOpacity>
 					<Text
 						style={[styles.placeholderText, { color: Colors.default.primary }]}>

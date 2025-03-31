@@ -92,7 +92,7 @@ const Page = () => {
 
 			if (signUpAttempt.status === 'complete') {
 				await setActive({ session: signUpAttempt.createdSessionId });
-				router.replace('/(auth)/profilePages');
+				router.replace('/(auth)/(tabs)/profilePages');
 			} else {
 				console.error(JSON.stringify(signUpAttempt, null, 2));
 			}

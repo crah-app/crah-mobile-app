@@ -13,23 +13,24 @@ interface dropMenuDataInterface {
 	path: pathType;
 }
 
-type pathType =
-	| '/(auth)/createPages/createVideo'
-	| '/(auth)/createPages/createTextPost'
-	| '/(auth)/createPages/createArticle';
+enum pathType {
+	createVideo = '/(auth)/(tabs)/createPages/createVideo',
+	createTextPost = '/(auth)/(tabs)/createPages/createTextPost',
+	createArticle = '/(auth)/(tabs)/createPages/createArticle',
+}
 
 const dropMenuData: Record<CreatePostType, dropMenuDataInterface> = {
 	[CreatePostType.video]: {
 		type: CreatePostType.video,
-		path: '/(auth)/createPages/createVideo',
+		path: pathType.createVideo,
 	},
 	[CreatePostType.post]: {
 		type: CreatePostType.post,
-		path: '/(auth)/createPages/createPost',
+		path: pathType.createTextPost,
 	},
 	[CreatePostType.article]: {
 		type: CreatePostType.article,
-		path: '/(auth)/createPages/createArticle',
+		path: pathType.createArticle,
 	},
 };
 
