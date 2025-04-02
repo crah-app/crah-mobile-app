@@ -4,35 +4,40 @@ import {
 	StyleSheet,
 	FlatList,
 	ScrollView,
-	SafeAreaView,
 	Dimensions,
+	Pressable,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useId, useMemo, useState } from 'react';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/general/ThemedView';
 import { useUser } from '@clerk/clerk-expo';
-import { Link, router } from 'expo-router';
+import { Link, router, useLocalSearchParams } from 'expo-router';
 import ThemedText from '@/components/general/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
 import UserPostGridItem from '@/components/UserPostGridItem';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
 import {
 	BestTrickType,
 	dropDownMenuInputData,
-	GeneralPostTypes,
 	GeneralPostTypesIonicons,
-	PostTypeIonicons,
+	UserGalleryTopics,
 } from '@/types';
 
 // dummy data
 import tricks from '@/JSON/tricks.json';
-import posts from '../../../JSON/posts.json';
+import posts from '../../JSON/posts.json';
 import UserImageCircle from '@/components/general/UserImageCircle';
 import { defaultStyles } from '@/constants/Styles';
 import DropDownMenu from '@/components/general/DropDownMenu';
+import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
+import {
+	useGlobalSearchParams,
+	useSearchParams,
+	useSegments,
+} from 'expo-router/build/hooks';
+import ClerkUser from '@/types/clerk';
 
 interface trickInterface {
 	id: string;
@@ -40,13 +45,15 @@ interface trickInterface {
 	hardness: number;
 }
 
-const Page = () => {
+interface UserProfileProps {
+	userId: string | undefined;
+	self: boolean | 'true' | 'false';
+}
+
+const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
 	const { bottom } = useSafeAreaInsets();
-	const windowWidth = Dimensions.get('window').width;
-
-	const self = false;
 
 	const [activePostFilterIcon, setActivePostFilterIcon] =
 		useState<GeneralPostTypesIonicons>(GeneralPostTypesIonicons.all);
@@ -91,16 +98,80 @@ const Page = () => {
 	const [postsCount, setPostsCount] = useState<number>(50);
 	const [riderType, setRiderType] = useState<string>('Flat Rider');
 	const [bestTrick, setBestTrick] = useState<string>('Buttercup Flat');
+	const [userName, SetUserName] = useState<string>(
+		user?.username ?? 'no user name',
+	);
+
+	const [loadingUser, setLoadingUser] = useState<boolean>(true);
+	const [errLoadingUser, setErrLoadingUser] = useState<{
+		state: boolean;
+		message: string;
+	}>({
+		state: false,
+		message: '200',
+	});
+
+	useEffect(() => {
+		console.log(errLoadingUser, 'user ID:', userId);
+
+		return () => {};
+	}, [errLoadingUser]);
+
+	useEffect(() => {
+		if (!userId) {
+			setErrLoadingUser({ state: true, message: 'Error parsing the userId' });
+			return () => {};
+		}
+
+		const controller = new AbortController();
+
+		fetch(`http://192.168.0.136:4000/api/users/${userId}`, {
+			signal: controller.signal,
+		})
+			.then((res) => res.json())
+			.then((res: ClerkUser) => SetUserName(res.username))
+			.catch((err) => {
+				if (err.name !== 'AbortError') {
+					setErrLoadingUser({
+						state: true,
+						message: 'Error fetching user data',
+					});
+					console.warn(`Error loading user ${userId}`, err);
+				}
+			})
+			.finally(() => setLoadingUser(false));
+
+		return () => controller.abort();
+	}, [userId]);
 
 	const handleCompareYourself = () => {
 		router.push({
 			pathname: '/modals/compareRiders',
 			params: {
-				rider1Id: 'user_2sWdxSqHBDfFtIEpFhjqmDB1ybL',
+				rider1Id: userId,
 				rider2Id: user?.id,
 			},
 		});
 	};
+
+	const handleViewYourStats = () => {
+		router.push({
+			pathname: '/(auth)/(tabs)/statsPages',
+			params: {
+				pageType: UserGalleryTopics.USER_RANK,
+			},
+		});
+	};
+
+	const goBack = () => {
+		if (router.canGoBack()) {
+			router.back();
+		} else {
+			router.replace('/(auth)/(tabs)/profilePages');
+		}
+	};
+
+	const windowHeight = useMemo(() => Dimensions.get('window').height, []);
 
 	const HeaderContainer = () => {
 		return (
@@ -114,7 +185,7 @@ const Page = () => {
 						gap: 12,
 					},
 				]}>
-				{self ? (
+				{self === 'true' || self === true ? (
 					<View
 						style={{
 							position: 'absolute',
@@ -184,6 +255,16 @@ const Page = () => {
 
 				{/* Left container */}
 				<View style={{ height: '100%' }}>
+					<View>
+						<Pressable onPress={goBack}>
+							<Ionicons
+								name="chevron-back"
+								size={24}
+								color={Colors[theme].textPrimary}
+							/>
+						</Pressable>
+					</View>
+
 					<UserImageCircle
 						width={88}
 						height={88}
@@ -203,7 +284,7 @@ const Page = () => {
 						}}>
 						<ThemedText
 							theme={theme}
-							value={user?.username! == '' ? user?.fullName! : user?.username!}
+							value={userName}
 							style={[styles.UserName]}
 						/>
 					</View>
@@ -415,16 +496,29 @@ const Page = () => {
 						/>
 					</View>
 
-					<TouchableOpacity onPress={handleCompareYourself}>
-						<ThemedText
-							theme={theme}
-							value={'compare yourself'}
-							style={[
-								styles.UserDataText,
-								{ color: Colors[theme].primary, fontSize: 15, top: -2 },
-							]}
-						/>
-					</TouchableOpacity>
+					{!self || self === 'false' ? (
+						<TouchableOpacity onPress={handleCompareYourself}>
+							<ThemedText
+								theme={theme}
+								value={'compare yourself'}
+								style={[
+									styles.UserDataText,
+									{ color: Colors[theme].primary, fontSize: 15, top: -2 },
+								]}
+							/>
+						</TouchableOpacity>
+					) : (
+						<TouchableOpacity onPress={handleViewYourStats}>
+							<ThemedText
+								theme={theme}
+								value={'view stats'}
+								style={[
+									styles.UserDataText,
+									{ color: Colors[theme].primary, fontSize: 15, top: -2 },
+								]}
+							/>
+						</TouchableOpacity>
+					)}
 				</View>
 
 				{BestTricksToType[currentSelectedBestTrickType].length > 0 ? (
@@ -540,16 +634,38 @@ const Page = () => {
 				contentContainerStyle={{}}
 				showsVerticalScrollIndicator={true}
 				scrollEnabled={true}>
-				<View
-					style={[
-						styles.scrollViewContainer,
-						{ backgroundColor: Colors[theme].background },
-					]}>
-					<HeaderContainer />
-					<UserProfileContainer />
-					<BestTricksContainer />
-					<UserPostContainer />
-				</View>
+				{errLoadingUser.state ? (
+					<NoDataPlaceholder
+						containerStyle={{
+							flex: 1,
+							justifyContent: 'center',
+							alignItems: 'center',
+							height: windowHeight * 0.75,
+						}}
+						arrowStyle={{ display: 'none' }}
+						subTextValue="Something went wrong"
+						firstTextValue="Sorry :/"
+					/>
+				) : loadingUser ? (
+					<CrahActivityIndicator
+						style={{
+							top: windowHeight * 0.35,
+						}}
+						size={32}
+						color={Colors[theme].primary}
+					/>
+				) : (
+					<View
+						style={[
+							styles.scrollViewContainer,
+							{ backgroundColor: Colors[theme].background },
+						]}>
+						<HeaderContainer />
+						<UserProfileContainer />
+						<BestTricksContainer />
+						<UserPostContainer />
+					</View>
+				)}
 			</ScrollView>
 		</ThemedView>
 	);
@@ -609,4 +725,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default Page;
+export default UserProfile;

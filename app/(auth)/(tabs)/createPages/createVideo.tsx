@@ -34,24 +34,18 @@ import {
 } from 'react-native';
 import * as imagePicker from 'expo-image-picker';
 
-import UploadVideoModal from '@/app/modals/uploadVideoModal';
+import UploadVideoModal from '@/app/(auth)/modals/uploadVideoModal';
 
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-	BottomSheetModal,
-	BottomSheetView,
-	BottomSheetModalProvider,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import {
 	KeyboardAwareScrollView,
 	KeyboardToolbar,
 } from 'react-native-keyboard-controller';
-import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
 import { router } from 'expo-router';
-import Modal from 'react-native-modal';
 import CreatePageHeader from '@/components/create/CreatePageHeader';
 
 interface videoDataInterface {
@@ -132,7 +126,7 @@ const CreateVideo = () => {
 
 		router.push(
 			{
-				pathname: '/(auth)/homePages',
+				pathname: '/(auth)/(tabs)/homePages',
 				params: {
 					video_upload: 'true',
 					video_cover: JSON.stringify(cover),
@@ -506,6 +500,7 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 										}}>
 										{tagsLeft.map((tag) => (
 											<Tag
+												key={tag}
 												touchOpacity={0.2}
 												DisplayRemoveBtn={false}
 												theme={theme}

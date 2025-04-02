@@ -22,11 +22,11 @@ import UserPost from '@/components/home/UserPost';
 import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
 
 // dummy data
-import posts from '../../../JSON/posts.json';
+import posts from '../../../../JSON/posts.json';
 import { Filter, SvgXml } from 'react-native-svg';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 
-import ScooterWheel from '../../../assets/images/vectors/wheel.svg';
+import ScooterWheel from '../../../../assets/images/vectors/wheel.svg';
 import ScooterWheelReflexes from '../../../assets/images/vectors/wheel_reflexes.svg';
 import { Ionicons } from '@expo/vector-icons';
 import PostTypeButton from '@/components/PostTypeButton';
@@ -185,7 +185,7 @@ const Page = () => {
 						scrollEnabled={false}
 					/>
 				) : (
-					<NoDataPlaceholder />
+					<NoDataPlaceholder onSubTextClickPathname="/(auth)/createPages/createVideo" />
 				)}
 			</ScrollView>
 
