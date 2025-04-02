@@ -103,11 +103,11 @@ const Layout = () => {
 				}}
 			/>
 			<Stack.Screen
-				name="compareRider"
+				name="compareRiders"
 				options={{
 					presentation: 'modal',
 					headerShown: true,
-					title: 'compare',
+					title: '',
 					headerStyle: {
 						backgroundColor: Colors[theme].background,
 					},
