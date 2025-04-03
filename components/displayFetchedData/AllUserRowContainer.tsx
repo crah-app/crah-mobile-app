@@ -11,13 +11,16 @@ import ThemedText from '../general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
 import { router } from 'expo-router';
 import UserProfile from '@/app/(auth)/(tabs)/sharedPages/userProfile';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 interface AllUserRowContainerProps {
 	contentTitle?: string;
+	bottomSheet?: boolean;
 }
 
 const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	contentTitle,
+	bottomSheet,
 }) => {
 	const theme = useSystemTheme();
 
@@ -34,6 +37,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 			.then((res) => res.json())
 			.then((res) => {
 				setAllUsers(res);
+				console.log(res);
 			})
 			.catch((err) =>
 				console.warn('An error loading all users occurred: ', err),
@@ -51,7 +55,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 
 	const handleUserPress = (userId: string) => {
 		router.push({
-			pathname: '/(auth)/sharedPages/userProfile',
+			pathname: '/(auth)/(tabs)/sharedPages/userProfile',
 			params: { userId, self: 'false' },
 		});
 	};
@@ -64,29 +68,63 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 					<CrahActivityIndicator color={Colors[theme].surface} size={24} />
 				</View>
 			) : (
-				<ScrollView contentContainerStyle={{ flex: 1 }}>
-					<ThemedText
-						theme={theme}
-						value={contentTitle ?? 'Riders'}
-						style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
-					/>
-
-					<FlatList
-						scrollEnabled={false}
-						contentContainerStyle={{ flex: 1 }}
-						data={allUsers}
-						keyExtractor={(item) => item.id}
-						renderItem={({ item: user }) => (
-							<Row
-								onPress={() => handleUserPress(user.id)}
-								showAvatar={true}
-								avatarUrl={user.imageUrl}
-								title={user.username ?? 'no name user'}
-								subtitle={'Rank Silver #51' + ' ' + user.id}
+				<View style={{ flex: 1 }}>
+					{bottomSheet ? (
+						<BottomSheetScrollView
+							contentContainerStyle={{
+								flex: 1,
+							}}>
+							<ThemedText
+								theme={theme}
+								value={contentTitle ?? 'Riders'}
+								style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
 							/>
-						)}
-					/>
-				</ScrollView>
+
+							<FlatList
+								scrollEnabled={false}
+								contentContainerStyle={{ flex: 1 }}
+								data={allUsers}
+								keyExtractor={(item) => item.id}
+								renderItem={({ item: user }) => (
+									<Row
+										onPress={() => handleUserPress(user.id)}
+										showAvatar={true}
+										avatarUrl={user.imageUrl}
+										title={user.username ?? 'no name user'}
+										subtitle={'Rank Silver #51' + ' ' + user.id}
+									/>
+								)}
+							/>
+						</BottomSheetScrollView>
+					) : (
+						<ScrollView
+							contentContainerStyle={{
+								flex: 1,
+							}}>
+							<ThemedText
+								theme={theme}
+								value={contentTitle ?? 'Riders'}
+								style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
+							/>
+
+							<FlatList
+								scrollEnabled={false}
+								contentContainerStyle={{ flex: 1 }}
+								data={allUsers}
+								keyExtractor={(item) => item.id}
+								renderItem={({ item: user }) => (
+									<Row
+										onPress={() => handleUserPress(user.id)}
+										showAvatar={true}
+										avatarUrl={user.imageUrl}
+										title={user.username ?? 'no name user'}
+										subtitle={'Rank Silver #51' + ' ' + user.id}
+									/>
+								)}
+							/>
+						</ScrollView>
+					)}
+				</View>
 			)}
 		</ThemedView>
 	);

@@ -31,6 +31,7 @@ import { Ionicons } from '@expo/vector-icons';
 import modalDummyContents from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
 import DropDownMenu from '../general/DropDownMenu';
+import SearchBar from '../general/SearchBar';
 
 interface TricksProps {}
 
@@ -209,21 +210,10 @@ const TrickListHeader: React.FC<{
 				flexDirection: 'column',
 				marginBottom: 10,
 			}}>
-			<TextInput
-				style={[
-					styles.search_input,
-					{
-						color: Colors[theme].textPrimary,
-						backgroundColor: Colors[theme].container_surface,
-						cursor: Colors[theme].textPrimary,
-					},
-				]}
-				placeholderTextColor={'grey'}
-				placeholder="Search a trick..."
-				value={text}
-				onChangeText={(text) => setText(text)}
-				clearButtonMode="always"
-				cursorColor={Colors[theme].primary}
+			<SearchBar
+				placeholder={'Search for a trick'}
+				query={text}
+				setQuery={setText}
 			/>
 
 			<View
@@ -298,12 +288,6 @@ const styles = StyleSheet.create({
 		width: Dimensions.get('window').width,
 		justifyContent: 'center',
 		alignItems: 'center',
-	},
-	search_input: {
-		padding: 12,
-		width: Dimensions.get('window').width * 0.95,
-		borderRadius: 10,
-		marginBottom: 10,
 	},
 	HeaderBottomWrapper: {
 		flexDirection: 'row',

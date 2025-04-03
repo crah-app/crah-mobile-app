@@ -1,4 +1,5 @@
 import React, {
+	forwardRef,
 	useCallback,
 	useEffect,
 	useMemo,
@@ -12,6 +13,7 @@ import {
 	Image,
 	Dimensions,
 	TouchableOpacity,
+	TextInput,
 } from 'react-native';
 import ThemedView from '../general/ThemedView';
 import ThemedText from '../general/ThemedText';
@@ -20,10 +22,19 @@ import ClerkUser from '@/types/clerk';
 import { defaultStyles } from '@/constants/Styles';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import {
+	BottomSheetBackdrop,
+	BottomSheetModal,
+	BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
 import { BottomSheetModalRef } from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetModalProvider/types';
 import { useUser } from '@clerk/clerk-expo';
+import SearchBar from '../general/SearchBar';
+import Row from '../general/Row';
+import NoDataPlaceholder from '../general/NoDataPlaceholder';
+import AllUserRowContainer from '../displayFetchedData/AllUserRowContainer';
+import { useSharedValue } from 'react-native-reanimated';
 
 interface CompareRidersContentsProps {
 	rider1Id: string;
@@ -138,27 +149,42 @@ const CompareRidersContents: React.FC<CompareRidersContentsProps> = ({
 	);
 };
 
+let selfIsSelected = false;
+
 const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 	rider,
 	theme,
 }) => {
 	const { user } = useUser();
+
 	const username = user?.id === rider.id ? 'You' : rider.username;
 
+	useEffect(() => {
+		if (user?.id === rider.id && !selfIsSelected) {
+			selfIsSelected = false; // make to false in development if you want to
+		} else if (!selfIsSelected) {
+			selfIsSelected = false;
+		}
+
+		return () => {};
+	}, []);
+
+	// if user didn´t already selected himself he shouldn`t be displayed in the search suggestions
+	const [displaySelfInSuggestions, setDisplaySelfInSuggestions] =
+		useState<boolean>(true);
+
 	const handleSearchUserBottomSheet = () => {
+		if (selfIsSelected) {
+			setDisplaySelfInSuggestions(false);
+		}
+
 		handlePresentModalPress();
 	};
 
-	const SheetRef = useRef<BottomSheetModal>(null);
-
-	const snapPoints = useMemo(() => ['60%'], []);
+	const ref = useRef<BottomSheetModal>();
 
 	const handlePresentModalPress = useCallback(() => {
-		SheetRef.current?.present();
-	}, []);
-
-	const handlCloseModalPress = useCallback(() => {
-		SheetRef.current?.close();
+		ref?.current?.present();
 	}, []);
 
 	return (
@@ -166,22 +192,15 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 			style={[
 				styles.riderCard,
 				{
-					// backgroundColor: rider.username == 'henke_palm' ? 'red' : 'blue',
 					flex: 1,
 				},
 			]}
 			theme={theme}>
-			<BottomSheetModal
-				handleIndicatorStyle={{ backgroundColor: 'gray' }}
-				backgroundStyle={{
-					backgroundColor: Colors[theme].container_surface,
-				}}
-				snapPoints={snapPoints}
-				ref={SheetRef}>
-				<BottomSheetView style={{ flex: 1 }}>
-					<ThemedText value={'lol'} theme={'light'} />
-				</BottomSheetView>
-			</BottomSheetModal>
+			<BottomSheetModalComponent
+				displaySelfInSuggestions={displaySelfInSuggestions}
+				ref={ref}
+				theme={theme}
+			/>
 
 			<View
 				style={{
@@ -196,8 +215,8 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 					}}>
 					<Image
 						source={{ uri: rider?.imageUrl }}
-						width={46}
-						height={46}
+						width={62}
+						height={62}
 						style={[defaultStyles.outlinedBtn, styles.avatar]}
 					/>
 
@@ -205,9 +224,9 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 						style={{ position: 'absolute', right: -25 }}
 						onPress={handleSearchUserBottomSheet}>
 						<Ionicons
-							size={16}
+							size={20}
 							color={Colors[theme].textPrimary}
-							name="chevron-forward"
+							name="chevron-expand-outline"
 						/>
 					</TouchableOpacity>
 				</View>
@@ -265,6 +284,140 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 		</ThemedView>
 	);
 };
+
+interface BottomSheetModalProps {
+	theme: 'light' | 'dark';
+	displaySelfInSuggestions: boolean;
+}
+
+const BottomSheetModalComponent = forwardRef<
+	BottomSheetModal,
+	BottomSheetModalProps
+>((props, ref) => {
+	const snapPoints = useMemo(() => ['60%', '90%'], []);
+	const { user } = useUser();
+
+	const { theme, displaySelfInSuggestions } = props;
+
+	const [searchQuery, setSearchQuery] = useState<string>('');
+	const [searchResultLoaded, setSearchResultLoaded] = useState<boolean>(false);
+	const [searchResult, setSearchResult] = useState<ClerkUser[]>([]);
+	const [errorWhileLoading, setErrorWhileLoading] = useState<boolean>(false);
+
+	const handleCloseModalPress = useCallback(() => {
+		ref?.current?.close();
+	}, []);
+
+	// const renderBackdrop = useCallback((props: any) => {
+	// 	const animatedIndex = useSharedValue(0);
+	// 	const animatedPosition = useSharedValue(1);
+
+	// 	return (
+	// 		<BottomSheetBackdrop
+	// 			animatedIndex={animatedIndex}
+	// 			animatedPosition={animatedPosition}
+	// 			disappearsOnIndex={-1}
+	// 			appearsOnIndex={0}
+	// 		/>
+	// 	);
+	// }, []);
+
+	const handleRiderRowPress = (userId: string | undefined) => {
+		if (!userId) return;
+	};
+
+	return (
+		<BottomSheetModal
+			index={0}
+			// backgroundComponent={renderBackdrop}
+			handleIndicatorStyle={{ backgroundColor: 'gray' }}
+			backgroundStyle={{ backgroundColor: Colors[theme].surface }}
+			containerStyle={{}}
+			snapPoints={snapPoints}
+			ref={ref}
+			onDismiss={handleCloseModalPress}>
+			<BottomSheetView
+				style={{
+					flex: 1,
+					padding: 12,
+				}}>
+				<View
+					style={{
+						width: '100%',
+						gap: 12,
+						justifyContent: 'center',
+						alignItems: 'center',
+					}}>
+					<ThemedText
+						style={[defaultStyles.biggerText]}
+						value="Select new rider"
+						theme={theme}
+					/>
+					<SearchBar
+						placeholder="Type in a username..."
+						query={searchQuery}
+						setQuery={setSearchQuery}
+					/>
+				</View>
+
+				{displaySelfInSuggestions && (
+					<View style={{ paddingHorizontal: 12, gap: 8 }}>
+						<ThemedText
+							style={[defaultStyles.biggerText]}
+							value={'Yourself'}
+							theme={theme}
+						/>
+
+						<View>
+							{/* display user (you) */}
+							<Row
+								onPress={() => handleRiderRowPress(user?.id)}
+								showAvatar={true}
+								avatarUrl={user?.imageUrl}
+								title={'You'}
+								subtitle={'Rank Silver #51'}
+								containerStyle={{
+									backgroundColor: Colors[theme].surface,
+									paddingHorizontal: -12,
+								}}
+							/>
+						</View>
+					</View>
+				)}
+
+				{/* display searched riders here */}
+				<View style={{ flex: 1, paddingHorizontal: 12, gap: 8 }}>
+					<ThemedText
+						style={[defaultStyles.biggerText]}
+						value={searchQuery ? `Results for "${searchQuery}"` : 'Suggestions'}
+						theme={theme}
+					/>
+				</View>
+
+				<View>
+					{/* display search result data */}
+					{searchQuery ? (
+						searchResultLoaded ? (
+							errorWhileLoading ? (
+								<NoDataPlaceholder
+									arrowStyle={{ display: 'none' }}
+									subTextValue="Couldn't find any user :("
+									firstTextValue=""
+								/>
+							) : (
+								<View>{/* Hier kommen die Suchergebnisse */}</View>
+							)
+						) : (
+							<CrahActivityIndicator color={Colors[theme].primary} size={24} />
+						)
+					) : (
+						<View>{/* Hier kommen die Suggestions */}</View>
+					)}
+				</View>
+			</BottomSheetView>
+		</BottomSheetModal>
+	);
+});
 
 interface TrickTextContainerProps {
 	name: string;
@@ -327,9 +480,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 12,
 	},
 	avatar: {
-		width: 50,
-		height: 50,
-		borderRadius: 25,
+		borderRadius: 100,
 		marginBottom: 10,
 	},
 	riderName: {
@@ -343,7 +494,7 @@ const styles = StyleSheet.create({
 	vsText: {
 		fontSize: 20,
 		fontWeight: 'bold',
-		top: 25,
+		top: 28,
 	},
 	resultsContainer: {
 		marginTop: 20,
