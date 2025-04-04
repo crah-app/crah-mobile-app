@@ -14,6 +14,7 @@ import {
 	Dimensions,
 	TouchableOpacity,
 	TextInput,
+	FlatList,
 } from 'react-native';
 import ThemedView from '../general/ThemedView';
 import ThemedText from '../general/ThemedText';
@@ -24,6 +25,7 @@ import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import {
 	BottomSheetBackdrop,
+	BottomSheetFlatList,
 	BottomSheetModal,
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
@@ -35,6 +37,7 @@ import Row from '../general/Row';
 import NoDataPlaceholder from '../general/NoDataPlaceholder';
 import AllUserRowContainer from '../displayFetchedData/AllUserRowContainer';
 import { useSharedValue } from 'react-native-reanimated';
+import { fetchAdresses } from '@/types';
 
 interface CompareRidersContentsProps {
 	rider1Id: string;
@@ -132,24 +135,43 @@ const CompareRidersContents: React.FC<CompareRidersContentsProps> = ({
 
 			{/* comparsion cool box */}
 			<ThemedView
-				style={[
-					styles.comparisonContainer,
-					{ width: Dimensions.get('window').width },
-				]}
+				style={{
+					justifyContent: 'flex-start',
+					alignItems: 'center',
+					flexDirection: 'column',
+					gap: 0,
+				}}
 				theme={theme}>
-				{/* Rider 1 */}
-				<RiderCard theme={theme} rider={rider1!} />
+				<View
+					style={[
+						styles.comparisonContainer,
+						{
+							width: Dimensions.get('window').width,
+							// backgroundColor: Colors[theme].primary,
+						},
+					]}>
+					{/* Rider 1 */}
+					<RiderCard theme={theme} rider={rider1!} />
 
-				<ThemedText value="VS" theme={theme} style={styles.vsText} />
+					<ThemedText value="VS" theme={theme} style={styles.vsText} />
 
-				{/* Rider 2 */}
-				<RiderCard theme={theme} rider={rider2!} />
+					{/* Rider 2 */}
+					<RiderCard theme={theme} rider={rider2!} />
+				</View>
+				{/* <View style={[{ flex: 1 }]}> */}
+				<ThemedText
+					theme={theme}
+					value={'Result'}
+					style={[defaultStyles.biggerText]}
+				/>
+				{/* </View> */}
 			</ThemedView>
 		</ThemedView>
 	);
 };
 
-let selfIsSelected = false;
+let selfIsSelected: boolean = false;
+let g_riderId: string = '';
 
 const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 	rider,
@@ -161,10 +183,12 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 
 	useEffect(() => {
 		if (user?.id === rider.id && !selfIsSelected) {
-			selfIsSelected = false; // make to false in development if you want to
+			selfIsSelected = true; // make to false in development if you want to
 		} else if (!selfIsSelected) {
 			selfIsSelected = false;
 		}
+
+		g_riderId = rider.id;
 
 		return () => {};
 	}, []);
@@ -179,6 +203,7 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 		}
 
 		handlePresentModalPress();
+		fetchUsers();
 	};
 
 	const ref = useRef<BottomSheetModal>();
@@ -186,6 +211,25 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 	const handlePresentModalPress = useCallback(() => {
 		ref?.current?.present();
 	}, []);
+
+	const [allUsers, setAllUsers] = useState<ClerkUser[]>([]);
+	const [usersLoaded, setUsersLoaded] = useState<boolean>(false);
+
+	const fetchUsers = () => {
+		setUsersLoaded(false);
+
+		fetch(fetchAdresses.allUsers, {
+			headers: { 'Cache-Control': 'no-cache' },
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				setAllUsers(res);
+			})
+			.catch((err) =>
+				console.warn('An error loading all users occurred: ', err),
+			)
+			.finally(() => setUsersLoaded(true));
+	};
 
 	return (
 		<ThemedView
@@ -200,6 +244,8 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 				displaySelfInSuggestions={displaySelfInSuggestions}
 				ref={ref}
 				theme={theme}
+				allUsers={allUsers}
+				rider={rider}
 			/>
 
 			<View
@@ -247,7 +293,7 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 				style={styles.riderStats}
 			/>
 
-			<View style={{ height: 400, top: 30 }}>
+			<View style={{ height: 320, top: 30 }}>
 				<ThemedText
 					value={`Top 5 best Tricks`}
 					theme={theme}
@@ -288,6 +334,8 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 interface BottomSheetModalProps {
 	theme: 'light' | 'dark';
 	displaySelfInSuggestions: boolean;
+	allUsers?: ClerkUser[];
+	rider: ClerkUser;
 }
 
 const BottomSheetModalComponent = forwardRef<
@@ -297,7 +345,7 @@ const BottomSheetModalComponent = forwardRef<
 	const snapPoints = useMemo(() => ['60%', '90%'], []);
 	const { user } = useUser();
 
-	const { theme, displaySelfInSuggestions } = props;
+	const { theme, displaySelfInSuggestions, allUsers, rider } = props;
 
 	const [searchQuery, setSearchQuery] = useState<string>('');
 	const [searchResultLoaded, setSearchResultLoaded] = useState<boolean>(false);
@@ -324,6 +372,11 @@ const BottomSheetModalComponent = forwardRef<
 
 	const handleRiderRowPress = (userId: string | undefined) => {
 		if (!userId) return;
+	};
+
+	const handleUserPress = (userId: string | undefined) => {
+		if (!userId) return;
+		handleCloseModalPress();
 	};
 
 	return (
@@ -361,7 +414,7 @@ const BottomSheetModalComponent = forwardRef<
 				</View>
 
 				{displaySelfInSuggestions && (
-					<View style={{ paddingHorizontal: 12, gap: 8 }}>
+					<View style={{ paddingHorizontal: 0, gap: 8 }}>
 						<ThemedText
 							style={[defaultStyles.biggerText]}
 							value={'Yourself'}
@@ -386,7 +439,7 @@ const BottomSheetModalComponent = forwardRef<
 				)}
 
 				{/* display searched riders here */}
-				<View style={{ flex: 1, paddingHorizontal: 12, gap: 8 }}>
+				<View style={{ paddingHorizontal: 0, gap: 8 }}>
 					<ThemedText
 						style={[defaultStyles.biggerText]}
 						value={searchQuery ? `Results for "${searchQuery}"` : 'Suggestions'}
@@ -394,8 +447,9 @@ const BottomSheetModalComponent = forwardRef<
 					/>
 				</View>
 
-				<View>
+				<View style={{ flex: 1 }}>
 					{/* display search result data */}
+
 					{searchQuery ? (
 						searchResultLoaded ? (
 							errorWhileLoading ? (
@@ -411,7 +465,23 @@ const BottomSheetModalComponent = forwardRef<
 							<CrahActivityIndicator color={Colors[theme].primary} size={24} />
 						)
 					) : (
-						<View>{/* Hier kommen die Suggestions */}</View>
+						<View
+							style={{
+								flex: 1,
+							}}>
+							<AllUserRowContainer
+								excludeIds={[g_riderId, user?.id]}
+								contentTitle=""
+								bottomSheet={true}
+								rowStyle={{
+									backgroundColor: Colors[theme].surface,
+									paddingHorizontal: 0,
+								}}
+								contentContainerStyle={{
+									backgroundColor: Colors[theme].surface,
+								}}
+							/>
+						</View>
 					)}
 				</View>
 			</BottomSheetView>

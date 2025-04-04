@@ -1,7 +1,13 @@
 import ClerkUser from '@/types/clerk';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import React, { useEffect, useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
+import {
+	FlatList,
+	ScrollView,
+	StyleSheet,
+	View,
+	ViewStyle,
+} from 'react-native';
 import ThemedView from '../general/ThemedView';
 import Row from '../general/Row';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
@@ -16,11 +22,17 @@ import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 interface AllUserRowContainerProps {
 	contentTitle?: string;
 	bottomSheet?: boolean;
+	contentContainerStyle?: ViewStyle | ViewStyle[];
+	rowStyle?: ViewStyle | ViewStyle[];
+	excludeIds?: Array<ClerkUser['id'] | undefined>;
 }
 
 const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	contentTitle,
 	bottomSheet,
+	contentContainerStyle,
+	rowStyle,
+	excludeIds,
 }) => {
 	const theme = useSystemTheme();
 
@@ -36,6 +48,13 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 		})
 			.then((res) => res.json())
 			.then((res) => {
+				if (excludeIds) {
+					res = res.filter((user: ClerkUser) => !excludeIds.includes(user.id));
+				}
+				// if (res.length === 0) {
+				// 	console.warn('No users found');
+				// 	return;
+				// }
 				setAllUsers(res);
 				console.log(res);
 			})
@@ -61,7 +80,10 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	};
 
 	return (
-		<ThemedView theme={theme} style={[styles.container]} flex={1}>
+		<ThemedView
+			theme={theme}
+			style={[styles.container, contentContainerStyle]}
+			flex={1}>
 			{!usersLoaded || !allUsers ? (
 				<View
 					style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -74,11 +96,13 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 							contentContainerStyle={{
 								flex: 1,
 							}}>
-							<ThemedText
-								theme={theme}
-								value={contentTitle ?? 'Riders'}
-								style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
-							/>
+							{contentTitle && (
+								<ThemedText
+									theme={theme}
+									value={contentTitle ?? 'Riders'}
+									style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
+								/>
+							)}
 
 							<FlatList
 								scrollEnabled={false}
@@ -87,6 +111,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 								keyExtractor={(item) => item.id}
 								renderItem={({ item: user }) => (
 									<Row
+										containerStyle={[rowStyle]}
 										onPress={() => handleUserPress(user.id)}
 										showAvatar={true}
 										avatarUrl={user.imageUrl}
@@ -101,19 +126,26 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 							contentContainerStyle={{
 								flex: 1,
 							}}>
-							<ThemedText
-								theme={theme}
-								value={contentTitle ?? 'Riders'}
-								style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
-							/>
+							{contentTitle && (
+								<ThemedText
+									theme={theme}
+									value={contentTitle ?? 'Riders'}
+									style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
+								/>
+							)}
 
 							<FlatList
 								scrollEnabled={false}
-								contentContainerStyle={{ flex: 1 }}
+								contentContainerStyle={{
+									flex: 1,
+									justifyContent: 'flex-start',
+									alignItems: 'flex-start',
+								}}
 								data={allUsers}
 								keyExtractor={(item) => item.id}
 								renderItem={({ item: user }) => (
 									<Row
+										containerStyle={[rowStyle]}
 										onPress={() => handleUserPress(user.id)}
 										showAvatar={true}
 										avatarUrl={user.imageUrl}
@@ -131,7 +163,9 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 };
 
 const styles = StyleSheet.create({
-	container: {},
+	container: {
+		flex: 1,
+	},
 	userContainer: {
 		flex: 1,
 	},
