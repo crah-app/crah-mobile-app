@@ -3,7 +3,7 @@ import ThemedText from '@/components/general/ThemedText';
 import ThemedTextInput from '@/components/general/ThemedTextInput';
 import ThemedView from '@/components/general/ThemedView';
 import Colors from '@/constants/Colors';
-import { defaultStyles } from '@/constants/Styles';
+import { defaultHeaderBtnSize, defaultStyles } from '@/constants/Styles';
 import { TextInputMaxCharacters, upload_source_ratio } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import * as imagePicker from 'expo-image-picker';
@@ -19,6 +19,11 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import UploadVideoModal from '@/app/(auth)/modals/uploadVideoModal';
 import { Ionicons } from '@expo/vector-icons';
+import helpModalContent from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
+import HeaderScrollView from '@/components/header/HeaderScrollView';
+import CostumHeader from '@/components/header/CostumHeader';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
+import { Link } from 'expo-router';
 // import { SliderBox } from 'react-native-image-slider-box';
 
 const CreateTextPost = () => {
@@ -89,113 +94,141 @@ const CreateTextPost = () => {
 	const previewClickEventHandler = () => {};
 
 	return (
-		<ThemedView flex={1} theme={theme}>
-			<ScrollView>
-				<KeyboardAwareScrollView
-					scrollEnabled={false}
-					contentContainerStyle={[styles.scrollContainer]}>
-					<UploadVideoModal
-						isVisible={modalVisible}
-						setVisibility={setModalVisible}
-						setUploadedImage={setUploadedImages} // we do not use it here. It works as a void filler and typescript error avoider
-						setUploadedCover={setUploadedImages}
-						uploadMode={'Cover'}
-						setSourceRatio={setSourceRatio}
-						cover={uploadedImages}
-					/>
-
-					<ThemedView style={[styles.container]} theme={theme} flex={1}>
-						<CreatePageHeader
-							title={'Create Post'}
-							handleUploadClickEvent={handlePostUploadClickEvent}
-							previewClickEventHandler={previewClickEventHandler}
-						/>
-						{/* first container */}
-						<ThemedView
-							style={[
-								defaultStyles.surface_container,
-								{ backgroundColor: Colors[theme].container_surface },
-							]}
-							theme={theme}>
-							<ThemedTextInput
-								value={text}
-								setValue={setText}
-								theme={theme}
-								placeholder="Your Text..."
-								maxLength={TextInputMaxCharacters.BigDescription}
-								showLength={true}
-								style={{ flexWrap: 'wrap' }}
-								lines={22}
-								multiline={true}
+		<HeaderScrollView
+			theme={theme}
+			headerChildren={
+				<CostumHeader
+					theme={theme}
+					headerLeft={<HeaderLeftLogo position="relative" />}
+					headerRight={
+						<Link
+							asChild
+							href={{
+								params: { contents: JSON.stringify(helpModalContent) },
+								pathname: '/modals/help_modal',
+							}}>
+							<TouchableOpacity>
+								<Ionicons
+									name="help-circle-outline"
+									size={defaultHeaderBtnSize}
+									color={Colors[theme].textPrimary}
+								/>
+							</TouchableOpacity>
+						</Link>
+					}
+				/>
+			}
+			scrollChildren={
+				<ThemedView flex={1} theme={theme}>
+					<ScrollView>
+						<KeyboardAwareScrollView
+							scrollEnabled={false}
+							contentContainerStyle={[styles.scrollContainer]}>
+							<UploadVideoModal
+								isVisible={modalVisible}
+								setVisibility={setModalVisible}
+								setUploadedImage={setUploadedImages} // we do not use it here. It works as a void filler and typescript error avoider
+								setUploadedCover={setUploadedImages}
+								uploadMode={'Cover'}
+								setSourceRatio={setSourceRatio}
+								cover={uploadedImages}
 							/>
 
-							{/* footer of first container */}
-							<View style={{ gap: 8 }}>
-								<TouchableOpacity onPress={() => setModalVisible(true)}>
-									<ThemedText
-										value="Upload images"
-										theme={theme}
-										style={[
-											defaultStyles.primaryBtn,
-											{
-												padding: 14,
-												color: Colors[theme].textPrimaryReverse,
-											},
-										]}
-									/>
-								</TouchableOpacity>
-							</View>
-						</ThemedView>
-						{/*  */}
-
-						{uploadedImages && (
-							<View
-								style={{
-									gap: 8,
-									flexDirection: 'column',
-									marginTop: 8,
-									width: Dimensions.get('window').width,
-								}}>
-								<ThemedText
-									theme={theme}
-									value={`Your uploaded images (${sourceRatio}):`}
-									style={[defaultStyles.biggerText, { fontSize: 18 }]}
+							<ThemedView style={[styles.container]} theme={theme} flex={1}>
+								<CreatePageHeader
+									title={'Create Post'}
+									handleUploadClickEvent={handlePostUploadClickEvent}
+									previewClickEventHandler={previewClickEventHandler}
 								/>
-								<View
-									key={`${1}`}
+								{/* first container */}
+								<ThemedView
 									style={[
-										{
-											alignItems: 'center',
-											justifyContent: 'flex-start',
-											flexDirection: 'column',
-											backgroundColor: Colors[theme].background,
-											width: Dimensions.get('window').width * 0.95,
-											height: dynamicDimensions.height + 100,
-										},
-									]}>
-									<Image
-										resizeMode={'cover'}
-										style={{
-											width: dynamicDimensions.width as number,
-											height: dynamicDimensions.height,
-										}}
-										source={{ uri: uploadedImages[0].uri }}
+										defaultStyles.surface_container,
+										{ backgroundColor: Colors[theme].container_surface },
+									]}
+									theme={theme}>
+									<ThemedTextInput
+										value={text}
+										setValue={setText}
+										theme={theme}
+										placeholder="Your Text..."
+										maxLength={TextInputMaxCharacters.BigDescription}
+										showLength={true}
+										style={{ flexWrap: 'wrap' }}
+										lines={22}
+										multiline={true}
 									/>
-								</View>
 
-								<View style={{ flexDirection: 'row', gap: 8, paddingTop: 8 }}>
-									<Ionicons
-										size={18}
-										color={Colors[theme].surface}
-										name={'ellipse-outline'}
-									/>
-								</View>
-							</View>
-						)}
-					</ThemedView>
-				</KeyboardAwareScrollView>
-			</ScrollView>
-		</ThemedView>
+									{/* footer of first container */}
+									<View style={{ gap: 8 }}>
+										<TouchableOpacity onPress={() => setModalVisible(true)}>
+											<ThemedText
+												value="Upload images"
+												theme={theme}
+												style={[
+													defaultStyles.primaryBtn,
+													{
+														padding: 14,
+														color: Colors[theme].textPrimaryReverse,
+													},
+												]}
+											/>
+										</TouchableOpacity>
+									</View>
+								</ThemedView>
+								{/*  */}
+
+								{uploadedImages && (
+									<View
+										style={{
+											gap: 8,
+											flexDirection: 'column',
+											marginTop: 8,
+											width: Dimensions.get('window').width,
+										}}>
+										<ThemedText
+											theme={theme}
+											value={`Your uploaded images (${sourceRatio}):`}
+											style={[defaultStyles.biggerText, { fontSize: 18 }]}
+										/>
+										<View
+											key={`${1}`}
+											style={[
+												{
+													alignItems: 'center',
+													justifyContent: 'flex-start',
+													flexDirection: 'column',
+													backgroundColor: Colors[theme].background,
+													width: Dimensions.get('window').width * 0.95,
+													height: dynamicDimensions.height + 100,
+												},
+											]}>
+											<Image
+												resizeMode={'cover'}
+												style={{
+													width: dynamicDimensions.width as number,
+													height: dynamicDimensions.height,
+												}}
+												source={{ uri: uploadedImages[0].uri }}
+											/>
+										</View>
+
+										<View
+											style={{ flexDirection: 'row', gap: 8, paddingTop: 8 }}>
+											<Ionicons
+												size={18}
+												color={Colors[theme].surface}
+												name={'ellipse-outline'}
+											/>
+										</View>
+									</View>
+								)}
+							</ThemedView>
+						</KeyboardAwareScrollView>
+					</ScrollView>
+				</ThemedView>
+			}
+		/>
 	);
 };
 

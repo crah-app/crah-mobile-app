@@ -242,6 +242,7 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 			theme={theme}>
 			<BottomSheetModalComponent
 				displaySelfInSuggestions={displaySelfInSuggestions}
+				// @ts-ignore
 				ref={ref}
 				theme={theme}
 				allUsers={allUsers}
@@ -353,6 +354,7 @@ const BottomSheetModalComponent = forwardRef<
 	const [errorWhileLoading, setErrorWhileLoading] = useState<boolean>(false);
 
 	const handleCloseModalPress = useCallback(() => {
+		// @ts-ignore
 		ref?.current?.close();
 	}, []);
 

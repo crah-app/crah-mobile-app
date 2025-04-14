@@ -28,9 +28,15 @@ import TextPostRowContainer from '@/components/displayFetchedData/TextPostRowCon
 import TricksRowContainer from '@/components/displayFetchedData/TricksRowContainer';
 import { Stack } from 'expo-router';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
+import HeaderScrollView from '@/components/header/HeaderScrollView';
+import CostumHeader from '@/components/header/CostumHeader';
+import SearchBar from '@/components/general/SearchBar';
+import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
 
 const Page = () => {
 	const theme = useSystemTheme();
+
+	const [searchQuery, setSearchQuery] = useState<string>('');
 
 	const [selectedCategory, setSelectedCategory] = useState<SearchCategories>(
 		SearchCategories.allPosts,
@@ -214,28 +220,54 @@ const Page = () => {
 		);
 	};
 
-	return (
-		<ThemedView theme={theme} flex={1}>
-			<ScrollView style={{ flex: 1 }}>
-				<ThemedView theme={theme} style={styles.container}>
-					{/* category buttons */}
-					<CategoryButtons />
-					{/* filter container */}
-					<FilterContainer />
+	const handleOptionsPress = () => {};
 
-					<View
-						style={[
-							{
-								width: Dimensions.get('window').width,
-								minHeight: 300,
-								flex: 1,
-							},
-						]}>
-						{CategoryComponent[selectedCategory]}
-					</View>
+	return (
+		<HeaderScrollView
+			headerHeight={120}
+			theme={theme}
+			headerChildren={
+				<CostumHeader
+					theme={theme}
+					headerLeft={<HeaderLeftLogo position="relative" />}
+					headerRight={<View></View>}
+					headerBottom={
+						<View style={{ flex: 1 }}>
+							<SearchBar
+								query={searchQuery}
+								setQuery={setSearchQuery}
+								placeholder={'Search...'}
+								displayOptionsBtn={true}
+								onOptionsPress={handleOptionsPress}
+							/>
+						</View>
+					}
+				/>
+			}
+			scrollChildren={
+				<ThemedView theme={theme} flex={1}>
+					<ScrollView style={{ flex: 1, paddingTop: 4 }}>
+						<ThemedView theme={theme} style={styles.container}>
+							{/* category buttons */}
+							<CategoryButtons />
+							{/* filter container */}
+							<FilterContainer />
+
+							<View
+								style={[
+									{
+										width: Dimensions.get('window').width,
+										minHeight: 300,
+										flex: 1,
+									},
+								]}>
+								{CategoryComponent[selectedCategory]}
+							</View>
+						</ThemedView>
+					</ScrollView>
 				</ThemedView>
-			</ScrollView>
-		</ThemedView>
+			}
+		/>
 	);
 };
 
@@ -252,7 +284,6 @@ const styles = StyleSheet.create({
 		gap: 10,
 		flexWrap: 'wrap',
 		paddingHorizontal: 12,
-		paddingTop: 12,
 	},
 	tag_container: {
 		gap: 10,

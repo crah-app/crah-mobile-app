@@ -1,54 +1,63 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
 	View,
-	Text,
 	FlatList,
 	StyleSheet,
-	Image,
 	TouchableOpacity,
-	ScrollView,
-	SafeAreaView,
 	Animated,
-	Platform,
 	Easing,
-	Modal,
-	useWindowDimensions,
 } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/general/ThemedView';
-import ThemedText from '@/components/general/ThemedText';
 import Colors from '@/constants/Colors';
 import UserPost from '@/components/home/UserPost';
 import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
 
-// dummy data
-import posts from '../../../../JSON/posts.json';
-import { Filter, SvgXml } from 'react-native-svg';
-import { Link, Stack, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 
-import ScooterWheel from '../../../../assets/images/vectors/wheel.svg';
-import ScooterWheelReflexes from '../../../assets/images/vectors/wheel_reflexes.svg';
-import { Ionicons } from '@expo/vector-icons';
-import PostTypeButton from '@/components/PostTypeButton';
 import { filterPosts } from '@/utils/globalFuncs';
 import PostTypeFilterModal from '@/components/home/PostTypeFilterModal';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
-import { ContentFilterTypes, SearchCategories } from '@/types';
-import MessagesButton from '@/components/home/MessagesButton';
+import { ContentFilterTypes } from '@/types';
 import UserUploadsPost from '@/components/home/UserUploadsPost';
-import { set } from 'date-fns';
+import CostumHeader from '@/components/header/CostumHeader';
+import HeaderScrollView from '@/components/header/HeaderScrollView';
+
+// dummy-data
+import posts from '../../../../JSON/posts.json';
+import { SvgXml } from 'react-native-svg';
+import MessagesButton from '@/components/home/MessagesButton';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
+
+import ScooterWheel from '../../../../assets/images/vectors/wheel.svg';
 
 const Page = () => {
 	const theme = useSystemTheme();
-	const [FilterIsVisible, setFilterVisibility] = useState(false);
-	const [UserPosts, SetUserPosts] = useState(posts);
+
+	// content logic
+	const [showFilter, setShowFilter] = useState(true);
+	const [filterIsVisible, setFilterIsVisbile] = useState(false);
+
 	const [ContentFilterSelected, setSelectedContentFilter] =
 		useState<ContentFilterTypes>(ContentFilterTypes.explore);
+
+	const HandleFilterContentType = (type: ContentFilterTypes) => {
+		setSelectedContentFilter(type);
+	};
+
+	const [UserPosts, SetUserPosts] = useState(posts);
+
+	const FilterPosts = (type: string) => {
+		let filteredPosts = filterPosts(posts, type);
+
+		SetUserPosts(filteredPosts);
+		setFilterIsVisbile(false);
+	};
 
 	const rotation = useRef(new Animated.Value(0)).current;
 
 	const handleClickWheel = () => {
-		setFilterVisibility(!FilterIsVisible);
+		setFilterIsVisbile(!filterIsVisible);
 
 		rotation.setValue(0);
 		Animated.timing(rotation, {
@@ -64,18 +73,7 @@ const Page = () => {
 		outputRange: ['0deg', '360deg'],
 	});
 
-	const FilterPosts = (type: string) => {
-		let filteredPosts = filterPosts(posts, type);
-
-		SetUserPosts(filteredPosts);
-		setFilterVisibility(false);
-	};
-
-	const HandleFilterContentType = (type: ContentFilterTypes) => {
-		setSelectedContentFilter(type);
-	};
-
-	// video upload stuff
+	// video upload logic
 	const [userUploadsVideo, setUserUploadsVideo] = useState<boolean>(false);
 	const [uploadProgress, setUploadProgress] = useState<number>(0);
 
@@ -114,11 +112,12 @@ const Page = () => {
 	// ----------------
 
 	return (
-		<ThemedView theme={theme} flex={1}>
-			<Stack.Screen
-				options={{
-					headerTitle: () => <View></View>,
-					headerRight: () => (
+		<HeaderScrollView
+			theme={theme}
+			headerChildren={
+				<CostumHeader
+					headerLeft={<HeaderLeftLogo position="relative" />}
+					headerRight={
 						<View style={{ flexDirection: 'row', gap: 15 }}>
 							<TouchableOpacity onPress={handleClickWheel}>
 								<Animated.View
@@ -134,6 +133,7 @@ const Page = () => {
 										fill={Colors[theme].textPrimary}
 										style={[
 											{
+												//@ts-ignore
 												color: Colors[theme].textPrimary,
 											},
 										]}
@@ -143,71 +143,69 @@ const Page = () => {
 
 							<MessagesButton />
 						</View>
-					),
-				}}
-			/>
+					}
+					theme={theme}
+				/>
+			}
+			scrollChildren={
+				<ThemedView theme={theme} flex={1}>
+					{/* on top filter buttons */}
+					<View style={[styles.ContentFilterContainer]}>
+						{Object.values(ContentFilterTypes).map((value) => (
+							<HomePageFilterButton
+								key={value}
+								text={value as string}
+								onPress={() => HandleFilterContentType(value)}
+								style={[
+									{
+										borderBottomColor:
+											ContentFilterSelected === value
+												? Colors[theme].primary
+												: Colors[theme].surface,
+									},
+								]}
+							/>
+						))}
+					</View>
 
-			<ScrollView>
-				<View style={[styles.ContentFilterContainer]}>
-					{Object.values(ContentFilterTypes).map((value) => (
-						<HomePageFilterButton
-							key={value}
-							text={value as string}
-							onPress={() =>
-								HandleFilterContentType(value as ContentFilterTypes)
-							}
-							style={[
-								{
-									backgroundColor:
-										ContentFilterSelected === value
-											? Colors[theme].primary + 'rgba(255,0,0,0.3)'
-											: Colors[theme].surface,
-								},
-							]}
+					{userUploadsVideo && (
+						<UserUploadsPost
+							cover={video_cover as string}
+							progress={uploadProgress}
+							videoTitle={JSON.parse(video_data as string).title}
 						/>
-					))}
-				</View>
+					)}
 
-				{userUploadsVideo && (
-					<UserUploadsPost
-						cover={video_cover as string}
-						progress={uploadProgress}
-						videoTitle={JSON.parse(video_data as string).title}
+					{UserPosts.length > 0 ? (
+						<FlatList
+							data={UserPosts}
+							keyExtractor={(item) => item.id}
+							renderItem={({ item }) => <UserPost post={item} />}
+							contentContainerStyle={[styles.flatListContainer]}
+							scrollEnabled={false}
+						/>
+					) : (
+						<NoDataPlaceholder onSubTextClickPathname="/(auth)/createPages/createVideo" />
+					)}
+
+					{/* modal */}
+					<PostTypeFilterModal
+						FilterIsVisible={filterIsVisible}
+						FilterPosts={FilterPosts}
+						setFilterVisibility={setFilterIsVisbile}
 					/>
-				)}
-
-				{UserPosts.length > 0 ? (
-					<FlatList
-						data={UserPosts}
-						keyExtractor={(item) => item.id}
-						renderItem={({ item }) => <UserPost post={item} />}
-						contentContainerStyle={[styles.flatListContainer]}
-						scrollEnabled={false}
-					/>
-				) : (
-					<NoDataPlaceholder onSubTextClickPathname="/(auth)/createPages/createVideo" />
-				)}
-			</ScrollView>
-
-			<PostTypeFilterModal
-				FilterIsVisible={FilterIsVisible}
-				FilterPosts={FilterPosts}
-				setFilterVisibility={setFilterVisibility}
-			/>
-		</ThemedView>
+				</ThemedView>
+			}
+		/>
 	);
 };
 
 const styles = StyleSheet.create({
-	flatListContainer: {
-		// paddingHorizontal: 15,
-		// paddingTop: 10,
-		paddingBottom: 100,
-	},
+	flatListContainer: {},
 	ContentFilterContainer: {
-		padding: 10,
+		alignItems: 'flex-end',
+		justifyContent: 'space-around',
 		flexDirection: 'row',
-		gap: 10,
 	},
 });
 

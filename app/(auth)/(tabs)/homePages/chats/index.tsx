@@ -1,6 +1,6 @@
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import { router, Stack } from 'expo-router';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
 	StyleSheet,
@@ -14,10 +14,12 @@ import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/general/ThemedView';
 import ThemedText from '@/components/general/ThemedText';
 import messages from '@/JSON/messages.json';
-import MessageColumn from '@/components/rows/MessageRow';
+import MessageRow from '@/components/rows/MessageRow';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
 import { ChatFilterTypes, UserStatus } from '@/types';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
+import HeaderScrollView from '@/components/header/HeaderScrollView';
+import CostumHeader from '@/components/header/CostumHeader';
 
 const Page = () => {
 	const theme = useSystemTheme();
@@ -41,38 +43,33 @@ const Page = () => {
 	};
 
 	return (
-		<ThemedView theme={theme} flex={1}>
-			<Stack.Screen
-				options={{
-					title: 'Messages',
-					headerTintColor: Colors[theme].textPrimary,
-					headerLargeTitle: false,
-					headerShown: true,
-					headerSearchBarOptions: {
-						placeholder: 'Search',
-						headerIconColor: Colors[theme].textPrimary,
-					},
-					headerLeft: () => (
-						<TouchableOpacity onPress={router.back}>
-							<Ionicons
-								name="chevron-back"
-								size={24}
-								color={Colors[theme].textPrimary}
-							/>
-						</TouchableOpacity>
-					),
-
-					headerTitle: () => (
-						<View style={{ flex: 1 }}>
-							<HeaderLeftLogo
-								style={{
-									bottom: -20,
-								}}
-							/>
-						</View>
-					),
-
-					headerRight: () => (
+		<HeaderScrollView
+			scrollEffect={false}
+			theme={theme}
+			headerChildren={
+				<CostumHeader
+					theme={theme}
+					headerLeft={
+						<ThemedView
+							theme={theme}
+							flex={1}
+							style={{
+								flexDirection: 'row',
+								alignItems: 'center',
+								justifyContent: 'flex-start',
+								gap: 12,
+							}}>
+							<TouchableOpacity onPress={router.back}>
+								<Ionicons
+									name="chevron-back"
+									size={24}
+									color={Colors[theme].textPrimary}
+								/>
+							</TouchableOpacity>
+							<HeaderLeftLogo position="relative" />
+						</ThemedView>
+					}
+					headerRight={
 						<View style={{ flexDirection: 'row', gap: 14 }}>
 							<TouchableOpacity>
 								<Ionicons
@@ -89,13 +86,12 @@ const Page = () => {
 								/>
 							</TouchableOpacity>
 						</View>
-					),
-				}}
-			/>
-			<ScrollView
-				contentInsetAdjustmentBehavior="automatic"
-				contentContainerStyle={{ paddingBottom: 0 }}>
-				<SafeAreaView>
+					}
+				/>
+			}
+			scrollChildren={
+				<ThemedView theme={theme} flex={1}>
+					{/* big filter buttons */}
 					<View style={{ gap: 0, marginTop: 0 }}>
 						<View style={[styles.ContentFilterContainer]}>
 							{Object.values(ChatFilterTypes).map((value, index) => {
@@ -118,11 +114,17 @@ const Page = () => {
 								);
 							})}
 						</View>
+						{/*  */}
 
+						{/* small filter options */}
 						<View style={{ paddingHorizontal: 10, paddingVertical: 5 }}>
 							<TouchableOpacity
 								onPress={() => HandleMessagesDateFilter()}
-								style={{ flexDirection: 'row' }}>
+								style={{
+									flexDirection: 'row',
+									flex: 1,
+									alignItems: 'center',
+								}}>
 								<Ionicons
 									name="chevron-forward"
 									size={16}
@@ -131,20 +133,13 @@ const Page = () => {
 								<ThemedText theme={theme} value={messagesDateFilter} />
 							</TouchableOpacity>
 						</View>
+						{/*  */}
 					</View>
 
+					{/* render chat row */}
 					<View style={[styles.messages_container]}>
 						<FlatList
 							scrollEnabled={false}
-							ItemSeparatorComponent={() => (
-								<View
-									style={{
-										// borderBottomWidth: StyleSheet.hairlineWidth,
-										// borderBottomColor: Colors[theme].textPrimary,
-										marginHorizontal: 0,
-									}}
-								/>
-							)}
 							data={messages}
 							keyExtractor={(item) => item._id.toString()}
 							contentContainerStyle={[
@@ -153,7 +148,7 @@ const Page = () => {
 							]}
 							renderItem={(listItem) => {
 								return (
-									<MessageColumn
+									<MessageRow
 										id={listItem.item._id}
 										name={listItem.item.user.name}
 										avatar={listItem.item.user.avatar}
@@ -168,9 +163,10 @@ const Page = () => {
 							}}
 						/>
 					</View>
-				</SafeAreaView>
-			</ScrollView>
-		</ThemedView>
+					{/*  */}
+				</ThemedView>
+			}
+		/>
 	);
 };
 
@@ -182,12 +178,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'flex-start',
 		alignItems: 'flex-start',
-		// borderBottomWidth: StyleSheet.hairlineWidth,
 	},
 	ContentFilterContainer: {
-		padding: 10,
 		flexDirection: 'row',
-		gap: 10,
 	},
 });
 

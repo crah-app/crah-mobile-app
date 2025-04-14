@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@clerk/clerk-expo": "^2.6.6",
+    "@clerk/themes": "^2.2.27",
     "@expo/config-plugins": "^9.0.17",
     "@expo/vector-icons": "^14.0.2",
     "@gorhom/bottom-sheet": "^5.1.2",

@@ -23,27 +23,7 @@ const Layout = () => {
 			<Stack.Screen
 				name="index"
 				options={{
-					headerStyle: {
-						backgroundColor: Colors[theme].surface,
-					},
-					headerTitleStyle: {
-						color: Colors[theme].textPrimary,
-					},
-					headerShown: true,
-					headerSearchBarOptions: {
-						placeholder: 'Search for...',
-						headerIconColor: Colors[theme].textPrimary,
-						textColor: Colors[theme].textPrimary,
-						tintColor: Colors[theme].textPrimary,
-						hintTextColor: Colors[theme].textPrimary,
-						onChangeText: (text) => setSearchText('sf'),
-					},
-					headerTintColor: Colors[theme].textPrimary,
-					headerLargeTitle: false,
-					headerShadowVisible: false,
-					title: '',
-					headerTitle: () => <View></View>,
-					headerLeft: () => <HeaderLeftLogo />,
+					headerShown: false,
 				}}
 			/>
 		</Stack>

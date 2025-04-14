@@ -124,6 +124,8 @@ const TrickList: React.FC<{
 
 	return (
 		<ScrollView
+			scrollEnabled={true}
+			showsVerticalScrollIndicator={false}
 			contentInsetAdjustmentBehavior="automatic"
 			contentContainerStyle={{
 				justifyContent: 'center',

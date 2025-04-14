@@ -32,6 +32,8 @@ import { QuickReplies } from 'react-native-gifted-chat/lib/QuickReplies';
 
 import initialMessages from '@/JSON/messages.json';
 import { useUser } from '@clerk/clerk-expo';
+import HeaderScrollView from '@/components/header/HeaderScrollView';
+import CostumHeader from '@/components/header/CostumHeader';
 
 const ChatScreen = () => {
 	const params = useLocalSearchParams();

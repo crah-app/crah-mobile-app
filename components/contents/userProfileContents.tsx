@@ -255,15 +255,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 
 				{/* Left container */}
 				<View style={{ height: '100%' }}>
-					<View>
-						<Pressable onPress={goBack}>
-							<Ionicons
-								name="chevron-back"
-								size={24}
-								color={Colors[theme].textPrimary}
-							/>
-						</Pressable>
-					</View>
+					{!self && (
+						<View>
+							<TouchableOpacity onPress={goBack}>
+								<Ionicons
+									name="chevron-back"
+									size={24}
+									color={Colors[theme].textPrimary}
+								/>
+							</TouchableOpacity>
+						</View>
+					)}
 
 					<UserImageCircle
 						width={88}
