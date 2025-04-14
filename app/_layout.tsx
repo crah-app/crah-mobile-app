@@ -22,6 +22,7 @@ import { tokenCache } from '@/cache';
 import { useFonts } from 'expo-font';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { dark } from '@clerk/themes';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -111,7 +112,10 @@ const layout = () => {
 	}
 
 	return (
-		<ClerkProvider tokenCache={tokenCache!} publishableKey={publishableKey!}>
+		<ClerkProvider
+			appearance={{}}
+			tokenCache={tokenCache!}
+			publishableKey={publishableKey!}>
 			<GestureHandlerRootView style={{ flex: 1 }}>
 				<BottomSheetModalProvider>
 					<Root />

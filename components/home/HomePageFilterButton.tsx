@@ -30,13 +30,17 @@ const HomePageFilterButton: React.FC<HomePageFilterButtonProps> = ({
 			onPress={onPress}
 			style={[
 				styles.container,
-				{ backgroundColor: Colors[theme].surface },
+				{
+					backgroundColor: Colors[theme].background,
+					borderBottomWidth: 2,
+				},
 				style,
 			]}>
 			<ThemedText
 				lineNumber={1}
 				value={text}
 				theme={theme}
+				// @ts-ignore
 				style={[styles.text, textStyle]}
 			/>
 		</TouchableOpacity>
@@ -45,10 +49,8 @@ const HomePageFilterButton: React.FC<HomePageFilterButtonProps> = ({
 
 const styles = StyleSheet.create({
 	container: {
+		flex: 1,
 		paddingVertical: 5,
-		borderRadius: 25,
-		width: 100,
-		// borderWidth: 1,
 	},
 	text: {
 		textAlign: 'center',

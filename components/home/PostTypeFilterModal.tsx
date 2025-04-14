@@ -2,9 +2,7 @@ import { useSystemTheme } from '@/utils/useSystemTheme';
 import React from 'react';
 import {
 	StyleSheet,
-	TouchableHighlight,
 	TouchableOpacity,
-	TouchableWithoutFeedbackBase,
 	useWindowDimensions,
 	View,
 	ViewStyle,
@@ -14,9 +12,7 @@ import PostTypeButton from '../PostTypeButton';
 import ThemedText from '../general/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import { PostTypes, SearchCategories } from '@/types';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import { Button } from 'react-native-paper';
+import { GeneralPostTypes } from '@/types';
 import Modal from 'react-native-modal';
 
 interface PostTypeFilterModalProps {
@@ -32,7 +28,7 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
 	FilterPosts,
 }) => {
 	const theme = useSystemTheme();
-	const { width, height } = useWindowDimensions();
+	const { width } = useWindowDimensions();
 
 	return (
 		<Modal
@@ -48,7 +44,7 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
 						styles.popUpInnerWrapper,
 						{
 							width: (width / 10) * 8,
-							height: (height / 10) * 4.5,
+							height: 300,
 							borderRadius: 20,
 							overflow: 'hidden',
 							backgroundColor: Colors[theme].surface,
@@ -71,12 +67,12 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
 					</ThemedView>
 					<ThemedView theme={theme} style={[styles.main]} flex={1}>
 						<View style={[styles.FilterGrid]}>
-							{Object.values(PostTypes).map((val, key) => (
+							{Object.values(GeneralPostTypes).map((val, key) => (
 								<PostTypeButton
 									key={key}
 									val={val}
 									click_action={() =>
-										FilterPosts(`${Object.keys(PostTypes)[key]}`)
+										FilterPosts(`${Object.keys(GeneralPostTypes)[key]}`)
 									}
 								/>
 							))}

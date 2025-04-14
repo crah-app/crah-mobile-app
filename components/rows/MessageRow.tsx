@@ -4,7 +4,7 @@ import React from 'react';
 import { UserStatus } from '@/types';
 import Column from '@/components/general/Row';
 
-interface MessageColumnProps {
+interface MessageRowProps {
 	id: number;
 	name: string;
 	avatar: string;
@@ -12,7 +12,7 @@ interface MessageColumnProps {
 	lastActive?: Date;
 }
 
-const MessageColumn: React.FC<MessageColumnProps> = ({
+const MessageRow: React.FC<MessageRowProps> = ({
 	id,
 	name,
 	avatar,
@@ -42,4 +42,4 @@ const MessageColumn: React.FC<MessageColumnProps> = ({
 	);
 };
 
-export default MessageColumn;
+export default MessageRow;

@@ -1,13 +1,9 @@
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { Link, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
-import { Ionicons } from '@expo/vector-icons';
-
-import helpModalContent from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
-import { defaultHeaderBtnSize } from '@/constants/Styles';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 const Layout = () => {
@@ -31,78 +27,19 @@ const Layout = () => {
 				<Stack.Screen
 					name="createArticle"
 					options={{
-						headerTintColor: Colors[theme].textPrimary,
-						headerShadowVisible: false,
-						headerShown: true,
-						title: 'Create Article',
-						headerTitle: () => <View></View>,
-						headerRight: () => (
-							<Link
-								asChild
-								href={{
-									params: { contents: JSON.stringify(helpModalContent) },
-									pathname: '/modals/help_modal',
-								}}>
-								<TouchableOpacity>
-									<Ionicons
-										name="help-circle-outline"
-										size={defaultHeaderBtnSize}
-										color={Colors[theme].textPrimary}
-									/>
-								</TouchableOpacity>
-							</Link>
-						),
+						headerShown: false,
 					}}
 				/>
 				<Stack.Screen
-					name="createPost"
+					name="createTextPost"
 					options={{
-						headerTintColor: Colors[theme].textPrimary,
-						headerShadowVisible: false,
-						headerShown: true,
-						title: 'Create Text/ Image',
-						headerTitle: () => <View></View>,
-						headerRight: () => (
-							<Link
-								asChild
-								href={{
-									params: { contents: JSON.stringify(helpModalContent) },
-									pathname: '/modals/help_modal',
-								}}>
-								<TouchableOpacity>
-									<Ionicons
-										name="help-circle-outline"
-										size={defaultHeaderBtnSize}
-										color={Colors[theme].textPrimary}
-									/>
-								</TouchableOpacity>
-							</Link>
-						),
+						headerShown: false,
 					}}
 				/>
 				<Stack.Screen
 					name="createVideo"
 					options={{
-						headerTintColor: Colors[theme].textPrimary,
-						headerShadowVisible: false,
-						headerShown: true,
-						headerTitle: () => <View></View>,
-						headerRight: () => (
-							<Link
-								asChild
-								href={{
-									params: { contents: JSON.stringify(helpModalContent) },
-									pathname: '/modals/help_modal',
-								}}>
-								<TouchableOpacity>
-									<Ionicons
-										name="help-circle-outline"
-										size={defaultHeaderBtnSize}
-										color={Colors[theme].textPrimary}
-									/>
-								</TouchableOpacity>
-							</Link>
-						),
+						headerShown: false,
 					}}
 				/>
 			</Stack>

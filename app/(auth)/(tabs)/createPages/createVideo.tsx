@@ -3,8 +3,9 @@ import ThemedText from '@/components/general/ThemedText';
 import ThemedTextInput from '@/components/general/ThemedTextInput';
 import ThemedView from '@/components/general/ThemedView';
 import Colors from '@/constants/Colors';
-import { defaultStyles } from '@/constants/Styles';
+import { defaultHeaderBtnSize, defaultStyles } from '@/constants/Styles';
 import {
+	CreatePostType,
 	modal_mode,
 	Tags,
 	TextInputMaxCharacters,
@@ -45,8 +46,15 @@ import {
 	KeyboardAwareScrollView,
 	KeyboardToolbar,
 } from 'react-native-keyboard-controller';
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import CreatePageHeader from '@/components/create/CreatePageHeader';
+import HeaderScrollView from '@/components/header/HeaderScrollView';
+import CostumHeader from '@/components/header/CostumHeader';
+import helpModalContent from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
+import { SegmentedControl } from '@/components/general/SegmentedControl';
+import { SvgXml } from 'react-native-svg';
+import crahTransparentLogo from '../../../../assets/images/vectors/crah_transparent.svg';
 
 interface videoDataInterface {
 	cover: string; // cover image
@@ -136,31 +144,108 @@ const CreateVideo = () => {
 		);
 	};
 
+	const [currentSelectedSegment, setCurrentSelectedSegment] =
+		useState<CreatePostType>(CreatePostType.video);
+
 	const previewClickEventHandler = () => {};
 
+	const handleOptionPress = (option: string) => {
+		setCurrentSelectedSegment(option as CreatePostType);
+
+		switch (option as CreatePostType) {
+			case CreatePostType.video:
+				router.push('/(auth)/(tabs)/createPages/createVideo');
+
+				break;
+
+			case CreatePostType.article:
+				router.push('/(auth)/(tabs)/createPages/createArticle');
+
+				break;
+
+			case CreatePostType.post:
+				router.push('/(auth)/(tabs)/createPages/createTextPost');
+
+				break;
+		}
+	};
+
 	return (
-		<View style={{ flex: 1 }}>
-			<ThemedView theme={theme} flex={1} style={{ bottom: bottom * 3 }}>
-				<CreatePageHeader
-					title={'Create Video'}
-					handleUploadClickEvent={handleVideoUploadClickEvent}
-					previewClickEventHandler={previewClickEventHandler}
-					style={{ paddingHorizontal: 12, paddingTop: 12 }}
+		<HeaderScrollView
+			theme={theme}
+			headerChildren={
+				<CostumHeader
+					theme={theme}
+					headerLeft={
+						<HeaderLeftLogo position="relative" />
+						// <View>
+						// 	<SvgXml
+						// 		xml={crahTransparentLogo}
+						// 		height={42}
+						// 		width={42}
+						// 		// @ts-ignore
+						// 		style={{ color: Colors[theme].textPrimary }}
+						// 	/>
+						// </View>
+					}
+					headerRight={
+						<Link
+							style={{}}
+							asChild
+							href={{
+								params: { contents: JSON.stringify(helpModalContent) },
+								pathname: '/modals/help_modal',
+							}}>
+							<TouchableOpacity>
+								<Ionicons
+									name="help-circle-outline"
+									size={defaultHeaderBtnSize}
+									color={Colors[theme].textPrimary}
+								/>
+							</TouchableOpacity>
+						</Link>
+					}
+					// headerCenter={
+					// <View style={{ flex: 0 }}>
+					// 	<SegmentedControl
+					// 		theme={theme}
+					// 		options={[
+					// 			CreatePostType.video,
+					// 			CreatePostType.post,
+					// 			CreatePostType.article,
+					// 		]}
+					// 		selectedOption={currentSelectedSegment}
+					// 		onOptionPress={handleOptionPress}
+					// 	/>
+					// </View>
+					// }
 				/>
-				<CreateVideoMainContent
-					cover={cover}
-					setCover={setCover}
-					uploadedSource={uploadedSource}
-					setUploadedSource={setUploadedSource}
-					title={title}
-					setTitle={setTitle}
-					description={description}
-					setDescription={setDescription}
-					tags={tags}
-					setTags={setTags}
-				/>
-			</ThemedView>
-		</View>
+			}
+			scrollChildren={
+				<View style={{ flex: 1 }}>
+					<ThemedView theme={theme} flex={1} style={{ bottom: bottom * 3 }}>
+						<CreatePageHeader
+							title={'Create Video'}
+							handleUploadClickEvent={handleVideoUploadClickEvent}
+							previewClickEventHandler={previewClickEventHandler}
+							style={{ paddingHorizontal: 12 }}
+						/>
+						<CreateVideoMainContent
+							cover={cover}
+							setCover={setCover}
+							uploadedSource={uploadedSource}
+							setUploadedSource={setUploadedSource}
+							title={title}
+							setTitle={setTitle}
+							description={description}
+							setDescription={setDescription}
+							tags={tags}
+							setTags={setTags}
+						/>
+					</ThemedView>
+				</View>
+			}
+		/>
 	);
 };
 
@@ -263,12 +348,7 @@ const CreateVideoMainContent = ({
 						bottomOffset={100}
 						contentContainerStyle={{ gap: 0, paddingBottom: 100 }}
 						style={{ flex: 1 }}>
-						<View
-							style={[
-								styles.Container1,
-								styles.InputContainer,
-								{ paddingTop: 10 },
-							]}>
+						<View style={[styles.Container1, styles.InputContainer]}>
 							<ThemedTextInput
 								value={title}
 								placeholder="Enter the video title here"
@@ -714,7 +794,7 @@ const styles = StyleSheet.create({
 	Container3: {},
 	Container4: {},
 	InputContainer: {
-		paddingVertical: 12,
+		paddingVertical: 8,
 		paddingHorizontal: 12,
 	},
 	videoWrapper: {
@@ -730,7 +810,6 @@ const styles = StyleSheet.create({
 		height: '100%',
 		justifyContent: 'center',
 		alignItems: 'center',
-		// zIndex: 1,
 		flex: 1,
 	},
 });

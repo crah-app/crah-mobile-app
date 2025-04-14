@@ -1,31 +1,17 @@
-import React, { useState } from 'react';
-import { Link, Tabs, useSegments } from 'expo-router';
-import {
-	StyleSheet,
-	View,
-	Modal,
-	Text,
-	TouchableOpacity,
-	Dimensions,
-	Platform,
-	StatusBar,
-} from 'react-native';
+import React from 'react';
+import { Tabs, useSegments } from 'expo-router';
+import { StyleSheet, View, StatusBar } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import Scooter from '../../../assets/images/vectors/scooter.svg';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ThemedText from '@/components/general/ThemedText';
-import CreateModal from '@/components/CreatePostDropDownMenu';
 import CreatePostDropDownMenu from '@/components/CreatePostDropDownMenu';
-import { useUser } from '@clerk/clerk-expo';
 
 const Layout = () => {
 	const theme = useSystemTheme();
-	const { bottom } = useSafeAreaInsets();
 	const segments = useSegments();
-	const { user } = useUser();
+
 	return (
 		<View style={styles.container}>
 			<StatusBar barStyle={'default'} />
@@ -35,7 +21,7 @@ const Layout = () => {
 					tabBarStyle: [
 						styles.tabBarStyle,
 						{
-							borderTopColor: Colors[theme].textPrimary, // top border color
+							borderTopColor: Colors[theme].surface, // top border color
 							backgroundColor: Colors[theme].background, // tab bar background color
 						},
 					],

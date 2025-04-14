@@ -14,11 +14,12 @@ export default {
 		textBubbleOwn: 'rgb(255, 0, 0)',
 		textBubbleOther: 'rgb(44, 44, 44)',
 		borderColor: 'rgb(42, 42, 42)',
+		gray: 'gray',
 	},
 	dark: {
 		primary: 'rgb(255, 0, 0)',
 		green: 'forestgreen',
-		background: 'rgb(22, 22, 22)',
+		background: '#121214',
 		surface: 'rgb(37, 41, 46)',
 		container_surface: 'rgb(30, 30, 30)',
 		textPrimary: 'rgb(255, 255, 255)',
@@ -30,12 +31,15 @@ export default {
 		textBubbleOwn: 'rgb(255, 0, 0)',
 		textBubbleOther: 'rgb(44, 44, 44)',
 		borderColor: 'rgb(42, 42, 42)',
+		gray: 'gray',
 	},
 	default: {
 		primary: 'rgb(255, 0, 0)',
 		borderColor: 'rgb(224, 224, 224)',
 		defaultTextPrimary: 'rgb(33, 33, 33)',
 		green: 'forestgreen',
+		darkPrimary: 'rgb(200, 0, 0)',
+		gray: 'gray',
 	},
 };
 

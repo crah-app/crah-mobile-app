@@ -1,6 +1,12 @@
 import ThemedView from '@/components/general/ThemedView';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
+import {
+	Dimensions,
+	ScrollView,
+	StyleSheet,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { useUser } from '@clerk/clerk-expo';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
@@ -12,6 +18,11 @@ import Tricks from '@/components/rankspage/Tricks';
 import TrickBuilder from '@/components/rankspage/TrickBuilder';
 import { useLocalSearchParams } from 'expo-router';
 import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
+import HeaderScrollView from '@/components/header/HeaderScrollView';
+import CostumHeader from '@/components/header/CostumHeader';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
+import { Ionicons } from '@expo/vector-icons';
+import { defaultHeaderBtnSize } from '@/constants/Styles';
 
 const Page = () => {
 	const theme = useSystemTheme();
@@ -43,53 +54,85 @@ const Page = () => {
 	}, [pageType]);
 
 	return (
-		<ThemedView flex={1} theme={theme}>
-			<View style={styles.content_container}>
-				<ScrollView
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={styles.header_container}
-					style={{ width: 'auto' }}>
-					{Object.values(UserGalleryTopics).map((val, i) => (
-						<HomePageFilterButton
-							text={val}
-							onPress={() => handleGalleryTopic(val)}
-							key={i}
+		<HeaderScrollView
+			scrollEnabled={false}
+			theme={theme}
+			headerChildren={
+				<CostumHeader
+					theme={theme}
+					headerLeft={<HeaderLeftLogo position="relative" />}
+					headerRight={
+						<View
 							style={{
-								minWidth: 90,
-								marginRight: 8,
-								justifyContent: 'center',
-								height: 35,
-								backgroundColor:
-									CurrentGalleryTopic === val
-										? Colors[theme].primary + 'rgba(255,0,0,0.3)'
-										: Colors[theme].surface,
-								zIndex: 1000,
-							}}
-							textStyle={{ fontSize: 15 }}
-						/>
-					))}
-				</ScrollView>
+								borderLeftWidth: StyleSheet.hairlineWidth,
+								borderColor: Colors[theme].textPrimary,
+								paddingLeft: 14,
+							}}>
+							<TouchableOpacity>
+								<Ionicons
+									name="help-circle-outline"
+									size={defaultHeaderBtnSize}
+									color={Colors[theme].textPrimary}
+								/>
+							</TouchableOpacity>
+						</View>
+					}
+				/>
+			}
+			scrollChildren={
+				<ThemedView flex={1} theme={theme}>
+					<View style={styles.content_container}>
+						{/* page navigation buttons */}
+						<ScrollView
+							horizontal
+							showsHorizontalScrollIndicator={false}
+							contentContainerStyle={styles.header_container}
+							style={{ width: 'auto' }}>
+							{Object.values(UserGalleryTopics).map((val, i) => (
+								<HomePageFilterButton
+									text={val}
+									onPress={() => handleGalleryTopic(val)}
+									key={i}
+									style={{
+										minWidth: 90,
+										marginRight: 8,
+										justifyContent: 'center',
+										height: 35,
+										borderBottomColor:
+											CurrentGalleryTopic === val
+												? Colors[theme].primary + 'rgba(255,0,0,0.3)'
+												: Colors[theme].surface,
+										zIndex: 1000,
+									}}
+									textStyle={{ fontSize: 15 }}
+								/>
+							))}
+						</ScrollView>
+						{/*  */}
 
-				<View>
-					{galleryComponents[CurrentGalleryTopic] || (
-						<ThemedView theme={theme} flex={1}>
-							<NoDataPlaceholder
-								containerStyle={{
-									flex: 1,
-									justifyContent: 'center',
-									alignItems: 'center',
-									height: Dimensions.get('window').height,
-								}}
-								arrowStyle={{ display: 'none' }}
-								firstTextValue="Stats, Tricks and more..."
-								subTextValue=""
-							/>
-						</ThemedView>
-					)}
-				</View>
-			</View>
-		</ThemedView>
+						{/* render page content */}
+						<View style={{ marginTop: -4 }}>
+							{galleryComponents[CurrentGalleryTopic] || (
+								<ThemedView theme={theme} flex={1}>
+									<NoDataPlaceholder
+										containerStyle={{
+											flex: 1,
+											justifyContent: 'center',
+											alignItems: 'center',
+											height: Dimensions.get('window').height,
+										}}
+										arrowStyle={{ display: 'none' }}
+										firstTextValue="Stats, Tricks and more..."
+										subTextValue=""
+									/>
+								</ThemedView>
+							)}
+						</View>
+						{/*  */}
+					</View>
+				</ThemedView>
+			}
+		/>
 	);
 };
 
@@ -97,11 +140,8 @@ const styles = StyleSheet.create({
 	content_container: {},
 	header_container: {
 		paddingHorizontal: 10,
-		paddingVertical: 10,
-		backgroundColor: 'transparent',
 		height: 55,
 		flexDirection: 'row',
-		marginBottom: 10,
 	},
 });
 
