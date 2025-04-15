@@ -45,7 +45,6 @@ const Page = () => {
 	const { user } = useUser();
 
 	// content logic
-	const [showFilter, setShowFilter] = useState(true);
 	const [filterIsVisible, setFilterIsVisbile] = useState(false);
 
 	const rotation = useRef(new Animated.Value(0)).current;
@@ -237,7 +236,7 @@ const Page = () => {
 						))}
 					</View>
 
-					<Row
+					{/* <Row
 						title={'Rank #1 Silver'}
 						avatarUrl={user?.imageUrl}
 						costumAvatarHeight={32}
@@ -249,7 +248,7 @@ const Page = () => {
 						}}
 						subtitle="Level 41"
 						highlightWords={['Level 41']}
-					/>
+					/> */}
 
 					{userUploadsVideo && (
 						<UserUploadsPost

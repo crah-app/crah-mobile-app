@@ -2,7 +2,7 @@ import { Link } from 'expo-router';
 import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
 import { UserStatus } from '@/types';
-import Column from '@/components/general/Row';
+import Row from '@/components/general/Row';
 
 interface MessageRowProps {
 	id: number;
@@ -32,7 +32,7 @@ const MessageRow: React.FC<MessageRowProps> = ({
 				pathname: '/(auth)/(tabs)/homePages/chats/[id]',
 				params: { id },
 			}}>
-			<Column
+			<Row
 				title={name}
 				subtitle={status === UserStatus.OFFLINE ? chatTimeAgo : status}
 				showAvatar={true}

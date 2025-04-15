@@ -137,6 +137,7 @@ function HeaderFlatList<T>({
 						arrowStyle={{ display: 'none' }}
 					/>
 				) : data && data.length > 0 ? (
+					// @ts-ignore
 					<FlatList
 						ref={flatListRef} // Referenz auf die FlatList
 						data={data}
