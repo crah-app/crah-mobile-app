@@ -2,7 +2,6 @@ import Reactions from '@/constants/Reactions';
 import UserPostDummyStructure from '@/JSON/posts.json';
 import { Ionicons } from '@expo/vector-icons';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
-import UserPost from '@/JSON/posts.json';
 
 // Ionicons icon type
 export type ionicon = keyof typeof Ionicons.glyphMap;
@@ -68,6 +67,7 @@ export enum AuthStrategy {
 export enum fetchAdresses {
 	commonTricks = 'http://192.168.0.136:4000/public/tricks/commonTricks.json',
 	allUsers = 'http://192.168.0.136:4000/api/users/all',
+	allPosts = 'http://192.168.0.136:4000/api/posts/all',
 }
 
 /* 
@@ -134,17 +134,17 @@ export enum PostTypeIonicons {
 // General user post types
 export enum GeneralPostTypes {
 	all = 'All posts',
-	videos = 'Clips',
-	articles = 'Articles',
+	videos = 'Videos',
 	text_images = 'Text',
+	articles = 'Articles',
 }
 
 // General icons for user post types
 export enum GeneralPostTypesIonicons {
 	all = 'albums-outline',
 	videos = 'videocam-outline',
-	articles = 'book-outline',
 	text_images = 'camera-outline',
+	articles = 'book-outline',
 }
 
 /*
@@ -162,7 +162,7 @@ export enum ExplorePostOrder {
 */
 export enum SearchCategories {
 	allPosts = 'All posts',
-	clips = 'Clips',
+	videos = 'Videos',
 	articles = 'Articles',
 	text = 'Text',
 	riders = 'Riders',

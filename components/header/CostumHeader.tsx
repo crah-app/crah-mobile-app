@@ -1,21 +1,7 @@
-import React, { ReactNode, useRef, useState } from 'react';
-import {
-	StyleSheet,
-	TouchableOpacity,
-	View,
-	Text,
-	Animated,
-	Easing,
-	Dimensions,
-} from 'react-native';
+import React, { ReactNode, useState } from 'react';
+import { StyleSheet, View, Dimensions } from 'react-native';
 import ThemedView from '../general/ThemedView';
-import ThemedText from '../general/ThemedText';
-import { SvgXml } from 'react-native-svg';
-import MessagesButton from '../home/MessagesButton';
 import Colors from '@/constants/Colors';
-import { ContentFilterTypes } from '@/types';
-import { filterPosts } from '@/utils/globalFuncs';
-import SearchBar from '../general/SearchBar';
 
 type Props = {
 	theme: 'light' | 'dark';

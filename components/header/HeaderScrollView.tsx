@@ -79,14 +79,20 @@ const HeaderScrollView: React.FC<HeaderScrollViewProps> = ({
 				{headerChildren}
 			</Animated.View>
 
-			<ScrollView
-				scrollEnabled={scrollEnabled ?? true}
-				showsVerticalScrollIndicator={false}
-				contentContainerStyle={{ paddingTop: headerHeight }}
-				scrollEventThrottle={16}
-				onScroll={handleScroll}>
-				{scrollChildren}
-			</ScrollView>
+			{scrollEnabled ? (
+				<ScrollView
+					scrollEnabled={true}
+					showsVerticalScrollIndicator={false}
+					contentContainerStyle={{ paddingTop: headerHeight }}
+					scrollEventThrottle={16}
+					onScroll={handleScroll}>
+					{scrollChildren}
+				</ScrollView>
+			) : (
+				<View style={{ paddingTop: headerHeight, flex: 1 }}>
+					{scrollChildren}
+				</View>
+			)}
 		</ThemedView>
 	);
 };

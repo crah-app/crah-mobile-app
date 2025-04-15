@@ -16,8 +16,9 @@ import { fetchAdresses } from '@/types';
 import ThemedText from '../general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
 import { router } from 'expo-router';
-import UserProfile from '@/app/(auth)/(tabs)/sharedPages/userProfile';
+import UserProfile from '@/app/(auth)/sharedPages/userProfile';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { useUser } from '@clerk/clerk-expo';
 
 interface AllUserRowContainerProps {
 	contentTitle?: string;
@@ -35,6 +36,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	excludeIds,
 }) => {
 	const theme = useSystemTheme();
+	const { user } = useUser();
 
 	const [usersLoaded, setUsersLoaded] = useState<boolean>(false);
 	const [allUsers, setAllUsers] = useState<ClerkUser[]>();
@@ -74,7 +76,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 
 	const handleUserPress = (userId: string) => {
 		router.push({
-			pathname: '/(auth)/(tabs)/sharedPages/userProfile',
+			pathname: '/(auth)/sharedPages/userProfile',
 			params: { userId, self: 'false' },
 		});
 	};
@@ -82,6 +84,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	return (
 		<ThemedView
 			theme={theme}
+			// @ts-ignore
 			style={[styles.container, contentContainerStyle]}
 			flex={1}>
 			{!usersLoaded || !allUsers ? (
@@ -111,6 +114,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 								keyExtractor={(item) => item.id}
 								renderItem={({ item: user }) => (
 									<Row
+										// @ts-ignore
 										containerStyle={[rowStyle]}
 										onPress={() => handleUserPress(user.id)}
 										showAvatar={true}
@@ -143,14 +147,19 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 								}}
 								data={allUsers}
 								keyExtractor={(item) => item.id}
-								renderItem={({ item: user }) => (
+								renderItem={({ item: FetchedUser }) => (
 									<Row
+										// @ts-ignore
 										containerStyle={[rowStyle]}
-										onPress={() => handleUserPress(user.id)}
+										onPress={() => handleUserPress(FetchedUser.id)}
 										showAvatar={true}
-										avatarUrl={user.imageUrl}
-										title={user.username ?? 'no name user'}
-										subtitle={'Rank Silver #51' + ' ' + user.id}
+										avatarUrl={FetchedUser.imageUrl}
+										title={
+											(FetchedUser.username === user?.username
+												? 'You'
+												: FetchedUser.username) ?? 'no name user'
+										}
+										subtitle={'Rank Silver #51' + ' ' + FetchedUser.id}
 									/>
 								)}
 							/>

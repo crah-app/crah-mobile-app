@@ -5,13 +5,12 @@ import {
 	FlatList,
 	ScrollView,
 	Dimensions,
-	Pressable,
 } from 'react-native';
-import React, { useEffect, useId, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '@/components/general/ThemedView';
 import { useUser } from '@clerk/clerk-expo';
-import { Link, router, useLocalSearchParams } from 'expo-router';
+import { Link, router } from 'expo-router';
 import ThemedText from '@/components/general/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -26,18 +25,14 @@ import {
 } from '@/types';
 
 // dummy data
-import tricks from '@/JSON/tricks.json';
-import posts from '../../JSON/posts.json';
 import UserImageCircle from '@/components/general/UserImageCircle';
 import { defaultStyles } from '@/constants/Styles';
 import DropDownMenu from '@/components/general/DropDownMenu';
 import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
-import {
-	useGlobalSearchParams,
-	useSearchParams,
-	useSegments,
-} from 'expo-router/build/hooks';
 import ClerkUser from '@/types/clerk';
+
+import tricks from '@/JSON/tricks.json';
+import { getCachedData } from '@/hooks/cache';
 
 interface trickInterface {
 	id: string;
@@ -46,9 +41,152 @@ interface trickInterface {
 }
 
 interface UserProfileProps {
-	userId: string | undefined;
+	userId: string;
 	self: boolean | 'true' | 'false';
 }
+
+interface UserPostContainerProps {
+	activePostFilterIcon: GeneralPostTypesIonicons;
+	setActivePostFilterIcon: React.Dispatch<
+		React.SetStateAction<GeneralPostTypesIonicons>
+	>;
+	setPostsCount: (n: number) => void;
+	theme: 'light' | 'dark';
+	containerBorder: number;
+	containerBackground: string;
+	bottom: number;
+	userId: string;
+}
+
+const CACHE_KEY = 'userPosts';
+
+const UserPostContainer: React.FC<UserPostContainerProps> = ({
+	activePostFilterIcon,
+	setActivePostFilterIcon,
+	theme,
+	containerBorder,
+	containerBackground,
+	bottom,
+	userId,
+	setPostsCount,
+}) => {
+	const [postsLoaded, setPostsLoaded] = useState<boolean>();
+	const [errFetchingPosts, setErrFetchingPosts] = useState<boolean>();
+	const [posts, setPosts] = useState<any>();
+
+	const fetchPosts = async () => {
+		setErrFetchingPosts(false);
+		setPostsLoaded(false);
+
+		const cached = await getCachedData<any[]>(CACHE_KEY);
+
+		if (cached) {
+			setPosts(cached);
+			setPostsLoaded(true);
+			console.log(`loaded posts from user ${userId} from cache`);
+			return;
+		}
+
+		console.log(`fetch user posts from id ${userId}`);
+
+		fetch(`http://192.168.0.136:4000/api/posts/user/${userId}`, {
+			headers: { 'Cache-Control': 'no-cache' },
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				setPosts(res);
+				setPostsCount(res.length);
+				// await setCachedData(CACHE_KEY, res.commonTricks); // data gets cached
+			})
+			.catch((err) => setErrFetchingPosts(true))
+			.finally(() => setPostsLoaded(true));
+	};
+
+	useEffect(() => {
+		fetchPosts();
+		return () => {};
+	}, []);
+
+	return (
+		<View
+			style={[
+				defaultStyles.surface_container,
+				{
+					borderTopWidth: containerBorder,
+					borderTopColor: Colors[theme].gray,
+					backgroundColor: containerBackground,
+					width: Dimensions.get('window').width - 24,
+				},
+			]}>
+			<View
+				style={[
+					styles.UserPostFilterContainer,
+					{
+						borderColor: Colors[theme].background,
+					},
+				]}>
+				{Object.values(GeneralPostTypesIonicons).map((icon, index) => (
+					<TouchableOpacity
+						key={index}
+						onPress={() => setActivePostFilterIcon(icon)}>
+						<Ionicons
+							name={icon}
+							size={activePostFilterIcon == icon ? 25 : 25}
+							color={
+								activePostFilterIcon == icon
+									? Colors['default'].primary
+									: Colors[theme].textPrimary
+							}
+						/>
+					</TouchableOpacity>
+				))}
+			</View>
+
+			<View>
+				<View style={{ bottom }}>
+					{!postsLoaded ? (
+						// loading...
+						<CrahActivityIndicator color={Colors[theme].primary} size={24} />
+					) : errFetchingPosts ? (
+						// error while loading
+						<NoDataPlaceholder
+							firstTextValue="Something went wrong..."
+							subTextValue=""
+							arrowStyle={{ display: 'none' }}
+							containerStyle={{ paddingTop: 40 }}
+						/>
+					) : posts && posts.length > 0 ? (
+						// successfully loaded posts
+						<FlatList
+							scrollEnabled={false}
+							data={posts}
+							keyExtractor={(item) => item.id}
+							numColumns={3}
+							renderItem={({ item, index }) => (
+								<UserPostGridItem
+									key={index}
+									post={item}
+									style={[
+										styles.GridItem,
+										{ borderColor: Colors[theme].container_surface },
+									]}
+								/>
+							)}
+						/>
+					) : (
+						// no posts
+						<NoDataPlaceholder
+							firstTextValue="No posts here..."
+							subTextValue=""
+							arrowStyle={{ display: 'none' }}
+							containerStyle={{ paddingTop: 40 }}
+						/>
+					)}
+				</View>
+			</View>
+		</View>
+	);
+};
 
 const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 	const theme = useSystemTheme();
@@ -59,7 +197,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 		useState<GeneralPostTypesIonicons>(GeneralPostTypesIonicons.all);
 
 	const handleBestTricksType = (type: { key: number; text: BestTrickType }) => {
-		console.log(type, 'sdfjoig');
 		setCurrentSelectedBestTrickType(type.text);
 	};
 
@@ -95,7 +232,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 	const [friends, setFriends] = useState<number>(287);
 	const [level, setLevel] = useState<number>(23);
 	const [rank, setRank] = useState<number>(257);
-	const [postsCount, setPostsCount] = useState<number>(50);
+	const [postsCount, setPostsCount] = useState<number | undefined>();
 	const [riderType, setRiderType] = useState<string>('Flat Rider');
 	const [bestTrick, setBestTrick] = useState<string>('Buttercup Flat');
 	const [userName, SetUserName] = useState<string>(
@@ -172,6 +309,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 	};
 
 	const windowHeight = useMemo(() => Dimensions.get('window').height, []);
+	const containerBackground = Colors[theme].background;
+	const containerBorder = 1;
 
 	const HeaderContainer = () => {
 		return (
@@ -180,7 +319,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 					styles.header,
 					defaultStyles.surface_container,
 					{
-						backgroundColor: Colors[theme].container_surface,
+						borderTopWidth:
+							self === 'true' || self === true ? 0 : containerBorder,
+						borderTopColor: Colors[theme].gray,
+						backgroundColor: containerBackground,
 						flexDirection: 'row',
 						gap: 12,
 					},
@@ -255,18 +397,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 
 				{/* Left container */}
 				<View style={{ height: '100%' }}>
-					{!self && (
-						<View>
-							<TouchableOpacity onPress={goBack}>
-								<Ionicons
-									name="chevron-back"
-									size={24}
-									color={Colors[theme].textPrimary}
-								/>
-							</TouchableOpacity>
-						</View>
-					)}
-
 					<UserImageCircle
 						width={88}
 						height={88}
@@ -342,20 +472,25 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 					<View
 						style={{
 							alignItems: 'center',
+							justifyContent: 'flex-start',
 							flexDirection: 'row',
 							gap: 4,
 						}}>
 						{/* user post amount */}
-						<ThemedText
-							theme={theme}
-							value={postsCount.toString()}
-							style={[
-								styles.UserDataText,
-								{
-									color: 'red',
-								},
-							]}
-						/>
+						{postsCount ? (
+							<ThemedText
+								theme={theme}
+								value={postsCount.toString()}
+								style={[
+									styles.UserDataText,
+									{
+										color: 'red',
+									},
+								]}
+							/>
+						) : (
+							<CrahActivityIndicator color={Colors[theme].primary} size={14} />
+						)}
 						<ThemedText
 							theme={theme}
 							value="Posts"
@@ -373,7 +508,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 				style={[
 					defaultStyles.surface_container,
 					{
-						backgroundColor: Colors[theme].container_surface,
+						borderTopWidth: containerBorder,
+						borderTopColor: Colors[theme].gray,
+						backgroundColor: containerBackground,
 						width: Dimensions.get('window').width - 24,
 					},
 				]}>
@@ -466,7 +603,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 				style={[
 					defaultStyles.surface_container,
 					{
-						backgroundColor: Colors[theme].container_surface,
+						backgroundColor: containerBackground,
 						width: Dimensions.get('window').width - 24,
 					},
 				]}>
@@ -525,6 +662,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 
 				{BestTricksToType[currentSelectedBestTrickType].length > 0 ? (
 					<FlatList
+						showsVerticalScrollIndicator={false}
+						showsHorizontalScrollIndicator={false}
 						scrollEnabled={false}
 						data={BestTricksToType[currentSelectedBestTrickType]}
 						keyExtractor={(item) => item.id}
@@ -561,75 +700,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 		);
 	};
 
-	const UserPostContainer = () => {
-		return (
-			<View
-				style={[
-					defaultStyles.surface_container,
-					{
-						backgroundColor: Colors[theme].container_surface,
-						width: Dimensions.get('window').width - 24,
-					},
-				]}>
-				<View
-					style={[
-						styles.UserPostFilterContainer,
-						{
-							borderColor: Colors[theme].background,
-						},
-					]}>
-					{Object.values(GeneralPostTypesIonicons).map((icon, index) => (
-						<TouchableOpacity
-							key={index}
-							onPress={() => setActivePostFilterIcon(icon)}>
-							<Ionicons
-								name={icon}
-								size={activePostFilterIcon == icon ? 25 : 25}
-								color={
-									activePostFilterIcon == icon
-										? Colors['default'].primary
-										: Colors[theme].textPrimary
-								}
-							/>
-						</TouchableOpacity>
-					))}
-				</View>
-
-				<View>
-					<View style={{ bottom }}>
-						{posts.length > 0 ? (
-							<FlatList
-								scrollEnabled={false}
-								data={posts}
-								keyExtractor={(item) => item.id}
-								numColumns={3}
-								renderItem={({ item, index }) => (
-									<UserPostGridItem
-										key={index}
-										post={item}
-										style={[
-											styles.GridItem,
-											{ borderColor: Colors[theme].container_surface },
-										]}
-									/>
-								)}
-							/>
-						) : (
-							<View style={{ width: '100%', height: 200 }}>
-								<NoDataPlaceholder
-									subTextValue=""
-									firstTextValue="No posts here..."
-									arrowStyle={{ display: 'none' }}
-									containerStyle={{ paddingTop: 40 }}
-								/>
-							</View>
-						)}
-					</View>
-				</View>
-			</View>
-		);
-	};
-
 	return (
 		<ThemedView theme={theme} flex={1}>
 			<ScrollView
@@ -662,10 +732,37 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 							styles.scrollViewContainer,
 							{ backgroundColor: Colors[theme].background },
 						]}>
+						{(self === 'false' || self === false) && (
+							<View
+								style={{
+									flex: 1,
+									justifyContent: 'flex-start',
+									alignItems: 'flex-start',
+									width: '100%',
+								}}>
+								<TouchableOpacity onPress={goBack}>
+									<Ionicons
+										name="chevron-back"
+										size={24}
+										color={Colors[theme].textPrimary}
+									/>
+								</TouchableOpacity>
+							</View>
+						)}
+
 						<HeaderContainer />
 						<UserProfileContainer />
 						<BestTricksContainer />
-						<UserPostContainer />
+						<UserPostContainer
+							activePostFilterIcon={activePostFilterIcon}
+							setActivePostFilterIcon={setActivePostFilterIcon}
+							theme={theme}
+							containerBorder={containerBorder}
+							containerBackground={containerBackground}
+							bottom={bottom}
+							userId={userId}
+							setPostsCount={setPostsCount}
+						/>
 					</View>
 				)}
 			</ScrollView>

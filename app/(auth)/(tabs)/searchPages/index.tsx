@@ -13,7 +13,6 @@ import ThemedText from '@/components/general/ThemedText';
 import Colors from '@/constants/Colors';
 import { ExplorePostOrder, Tags, SearchCategories } from '@/types';
 import PostTypeButton from '@/components/PostTypeButton';
-import posts from '../../../../JSON/posts.json'; // posts that are relevant for the search section
 import { filterPosts } from '@/utils/globalFuncs';
 import CheckBox from '@react-native-community/checkbox';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -37,12 +36,11 @@ const Page = () => {
 	const theme = useSystemTheme();
 
 	const [searchQuery, setSearchQuery] = useState<string>('');
-
 	const [selectedCategory, setSelectedCategory] = useState<SearchCategories>(
 		SearchCategories.allPosts,
 	);
-	const [selectedTag, setSelectedTag] = useState<Tags>();
 
+	const [selectedTag, setSelectedTag] = useState<Tags>();
 	const [selectedOrder, setSelectedOrder] = useState<ExplorePostOrder>(
 		ExplorePostOrder.toOldest,
 	);
@@ -50,10 +48,12 @@ const Page = () => {
 	const [friendsOnly, setFriendsOnly] = useState<boolean>(false);
 	const [showAllTags, setShowAllTags] = useState<boolean>(false);
 
+	const [posts, setPosts] = useState<any>();
+
 	const CategoryComponent = {
 		[SearchCategories.allPosts]: <AllPostsRowContainer />,
 		[SearchCategories.articles]: <ArticlesRowContainer />,
-		[SearchCategories.clips]: <VideosRowContainer />,
+		[SearchCategories.videos]: <VideosRowContainer />,
 		[SearchCategories.riders]: <AllUserRowContainer contentTitle="Riders" />,
 		[SearchCategories.text]: <TextPostRowContainer />,
 		[SearchCategories.tricks]: <TricksRowContainer />,
