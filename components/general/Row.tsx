@@ -8,7 +8,7 @@ import {
 	ViewStyle,
 	TextStyle,
 } from 'react-native';
-import React, { forwardRef } from 'react';
+import React from 'react';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { SvgFromXml, SvgXml } from 'react-native-svg';
@@ -35,129 +35,123 @@ interface RowProps {
 	costumAvatarHeight?: number;
 }
 
-const Row = forwardRef<View, RowProps>(
-	(
-		{
-			title,
-			subtitle,
-			showAvatar = true,
-			avatarUrl,
-			customLeftComponent,
-			customRightComponent,
-			onPress,
-			containerStyle,
-			titleStyle,
-			subtitleStyle,
-			avatarIsSVG,
-			leftContainerStyle,
-			subtitleIsMultiline,
-			textInTitleComponent,
-			bottomContainer,
-			textContainerStyle,
-			highlightWords,
-			costumAvatarWidth,
-			costumAvatarHeight,
-		},
-		ref,
-	) => {
-		const theme = useSystemTheme();
+const Row: React.FC<RowProps> = ({
+	title,
+	subtitle,
+	showAvatar = true,
+	avatarUrl,
+	customLeftComponent,
+	customRightComponent,
+	onPress,
+	containerStyle,
+	titleStyle,
+	subtitleStyle,
+	avatarIsSVG,
+	leftContainerStyle,
+	subtitleIsMultiline,
+	textInTitleComponent,
+	bottomContainer,
+	textContainerStyle,
+	highlightWords,
+	costumAvatarWidth,
+	costumAvatarHeight,
+}) => {
+	const theme = useSystemTheme();
 
-		const highlightText = (text: string, words: Array<string> | undefined) => {
-			if (!words || words.length === 0) return text;
+	const highlightText = (text: string, words: Array<string> | undefined) => {
+		if (!words || words.length === 0) return text;
 
-			// Erstelle einen regulären Ausdruck für die Highlight-Wörter
-			const regex = new RegExp(
-				`(${words
-					.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-					.join('|')})`,
-				'gi',
-			);
-
-			// Zerlege den Text in hervorgehobene und normale Teile
-			const parts = text.split(regex);
-
-			return parts.map((part, index) =>
-				words.some((word) => word.toLowerCase() === part.toLowerCase()) ? (
-					<Text key={index} style={{ color: 'red', fontWeight: 'bold' }}>
-						{part}
-					</Text>
-				) : (
-					<Text key={index}>{part}</Text>
-				),
-			);
-		};
-
-		return (
-			<TouchableOpacity
-				ref={ref}
-				style={[
-					styles.container,
-					{ backgroundColor: Colors[theme].background },
-					containerStyle,
-				]}
-				onPress={onPress}
-				activeOpacity={onPress ? 0.7 : 1}>
-				<View style={[styles.leftContainer, leftContainerStyle]}>
-					{showAvatar && avatarUrl ? (
-						<View>
-							{avatarIsSVG ? (
-								<SvgXml
-									xml={avatarUrl}
-									fill={Colors[theme].textPrimary}
-									style={[styles.avatar]}
-									width={46}
-									height={42}
-								/>
-							) : (
-								<Image
-									source={{
-										uri:
-											avatarUrl ??
-											'https://randomuser.me/api/portraits/men/32.jpg',
-									}}
-									style={styles.avatar}
-									width={costumAvatarWidth || 46}
-									height={costumAvatarHeight || 46}
-								/>
-							)}
-						</View>
-					) : (
-						customLeftComponent
-					)}
-				</View>
-
-				<View style={[styles.textContainer, textContainerStyle]}>
-					<View style={{ flexDirection: 'row', gap: 8 }}>
-						<Text
-							style={[
-								styles.title,
-								{ color: Colors[theme].textPrimary },
-								titleStyle,
-							]}
-							numberOfLines={1}>
-							{title}
-						</Text>
-
-						{textInTitleComponent}
-					</View>
-					{subtitle && (
-						<Text
-							style={[styles.subtitle, { color: 'gray' }, subtitleStyle]}
-							numberOfLines={subtitleIsMultiline ? 5 : 1}>
-							{highlightText(subtitle, highlightWords)}
-						</Text>
-					)}
-
-					{bottomContainer}
-				</View>
-
-				{customRightComponent && (
-					<View style={styles.rightContainer}>{customRightComponent}</View>
-				)}
-			</TouchableOpacity>
+		// Erstelle einen regulären Ausdruck für die Highlight-Wörter
+		const regex = new RegExp(
+			`(${words
+				.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+				.join('|')})`,
+			'gi',
 		);
-	},
-);
+
+		// Zerlege den Text in hervorgehobene und normale Teile
+		const parts = text.split(regex);
+
+		return parts.map((part, index) =>
+			words.some((word) => word.toLowerCase() === part.toLowerCase()) ? (
+				<Text key={index} style={{ color: 'red', fontWeight: 'bold' }}>
+					{part}
+				</Text>
+			) : (
+				<Text key={index}>{part}</Text>
+			),
+		);
+	};
+
+	return (
+		<TouchableOpacity
+			style={[
+				styles.container,
+				{ backgroundColor: Colors[theme].background },
+				containerStyle,
+			]}
+			onPress={onPress}
+			activeOpacity={onPress ? 0.7 : 1}>
+			<View style={[styles.leftContainer, leftContainerStyle]}>
+				{showAvatar && avatarUrl ? (
+					<View>
+						{avatarIsSVG ? (
+							<SvgXml
+								xml={avatarUrl}
+								fill={Colors[theme].textPrimary}
+								style={[styles.avatar]}
+								width={46}
+								height={42}
+							/>
+						) : (
+							<Image
+								source={{
+									uri:
+										avatarUrl ??
+										'https://randomuser.me/api/portraits/men/32.jpg',
+								}}
+								style={styles.avatar}
+								width={costumAvatarWidth || 46}
+								height={costumAvatarHeight || 46}
+							/>
+						)}
+					</View>
+				) : (
+					customLeftComponent
+				)}
+			</View>
+
+			<View style={[styles.textContainer, textContainerStyle]}>
+				<View style={{ flexDirection: 'row', gap: 8 }}>
+					<Text
+						style={[
+							styles.title,
+							{ color: Colors[theme].textPrimary },
+							titleStyle,
+						]}
+						numberOfLines={1}>
+						{title}
+					</Text>
+
+					{textInTitleComponent}
+				</View>
+				{subtitle && (
+					<Text
+						style={[styles.subtitle, { color: 'gray' }, subtitleStyle]}
+						numberOfLines={subtitleIsMultiline ? 5 : 1}>
+						{highlightText(subtitle, highlightWords)}
+					</Text>
+				)}
+
+				{bottomContainer}
+			</View>
+
+			{customRightComponent && (
+				<View style={styles.rightContainer}>{customRightComponent}</View>
+			)}
+		</TouchableOpacity>
+	);
+};
 
 const styles = StyleSheet.create({
 	container: {

@@ -27,7 +27,7 @@ const Layout = () => {
 			<Stack.Screen
 				name="[id]"
 				options={{
-					headerShown: false,
+					headerShown: true,
 				}}
 			/>
 		</Stack>

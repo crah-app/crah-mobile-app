@@ -18,6 +18,7 @@ interface SearchBarProps {
 	placeholder: string;
 	displayOptionsBtn?: boolean;
 	onOptionsPress?: () => void;
+	flex?: number;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -26,13 +27,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	placeholder,
 	displayOptionsBtn,
 	onOptionsPress,
+	flex,
 }) => {
 	const theme = useSystemTheme();
 
 	return (
 		<ThemedView
 			theme={theme}
-			flex={1}
+			flex={flex ?? 1}
 			style={{
 				flexDirection: 'row',
 				backgroundColor: Colors[theme].container_surface,
