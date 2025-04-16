@@ -135,8 +135,8 @@ const Page = () => {
 	);
 
 	useEffect(() => {
-		setChats(sortChatsByDate(fetchedChats));
-	}, [messagesDateFilter, fetchedChats]);
+		setChats(sortChatsByDate(chats));
+	}, [messagesDateFilter]);
 
 	// handle navigation logic
 	const handleGoBack = () => {
@@ -240,12 +240,6 @@ const Page = () => {
 			}).start();
 		}
 	}, [showLeftActionSpace]);
-
-	useEffect(() => {
-		console.log('selectedChats:', selectedChats);
-
-		return () => {};
-	}, [selectedChats]);
 
 	// open new chat bottom sheet modal logic
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
