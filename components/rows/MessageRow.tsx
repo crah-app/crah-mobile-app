@@ -10,7 +10,7 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import { Animated, View } from 'react-native';
 
 interface MessageRowProps {
-	id: number | string;
+	id: string;
 	name: string;
 	avatar: string;
 	status: UserStatus;
@@ -19,6 +19,7 @@ interface MessageRowProps {
 	handleOnArchive: () => void;
 	slideRight: boolean;
 	onCheckboxToggle?: (checked: boolean, id: string) => void;
+	checked: boolean;
 }
 
 const MessageRow: React.FC<MessageRowProps> = ({
@@ -31,6 +32,7 @@ const MessageRow: React.FC<MessageRowProps> = ({
 	handleOnDelete,
 	slideRight,
 	onCheckboxToggle,
+	checked,
 }) => {
 	const [isDeleted, setIsDeleted] = useState(false);
 	const [isArchived, setIsArchived] = useState(false);
@@ -103,7 +105,12 @@ const MessageRow: React.FC<MessageRowProps> = ({
 
 	return (
 		<SwipeableRow onDelete={handleOnDelete} onArchive={handleOnArchive}>
-			<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+			<View
+				style={{
+					flexDirection: 'row',
+					alignItems: 'center',
+					paddingHorizontal: 12,
+				}}>
 				<Animated.View
 					style={{
 						opacity: opacityAnim,
@@ -111,6 +118,7 @@ const MessageRow: React.FC<MessageRowProps> = ({
 						transform: [{ translateX: checkboxTranslateX }],
 					}}>
 					<BouncyCheckbox
+						isChecked={checked}
 						size={25}
 						fillColor="red"
 						iconStyle={{ borderColor: 'red' }}

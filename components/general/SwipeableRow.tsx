@@ -67,7 +67,7 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({
 				progress,
 				onDelete,
 			)}
-			{renderAction('Archive', Colors[theme].gray, 150, progress, onArchive)}
+			{/* {renderAction('Archive', Colors[theme].gray, 150, progress, onArchive)} */}
 		</View>
 	);
 

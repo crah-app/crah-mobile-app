@@ -12,14 +12,14 @@ interface SlideRowWrapperProps {
 const SlideRowWrapper: React.FC<SlideRowWrapperProps> = ({
 	children,
 	shouldSlide,
-	slideDistance = 60,
+	slideDistance = 0,
 	style,
 }) => {
-	const translateX = useRef(new Animated.Value(0)).current; // Anfangswert auf 0 setzen
+	const translateX = useRef(new Animated.Value(-60)).current;
 
 	useEffect(() => {
 		Animated.timing(translateX, {
-			toValue: shouldSlide ? slideDistance : 0, // Nur wenn shouldSlide true ist, verschieben
+			toValue: shouldSlide ? slideDistance : -60,
 			duration: 200,
 			useNativeDriver: true,
 		}).start();

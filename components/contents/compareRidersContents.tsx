@@ -343,7 +343,7 @@ const BottomSheetModalComponent = forwardRef<
 	BottomSheetModal,
 	BottomSheetModalProps
 >((props, ref) => {
-	const snapPoints = useMemo(() => ['60%', '90%'], []);
+	const snapPoints = useMemo(() => ['75%', '90%'], []);
 	const { user } = useUser();
 
 	const { theme, displaySelfInSuggestions, allUsers, rider } = props;
