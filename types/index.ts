@@ -70,6 +70,23 @@ export enum fetchAdresses {
 	allPosts = 'http://192.168.0.136:4000/api/posts/all',
 }
 
+/*
+	Link preview fetched from server
+*/
+
+export interface LinkPreview {
+	url: string;
+	title: string;
+	siteName: string;
+	description: string;
+	mediaType: string;
+	contentType: string;
+	images: string[];
+	videos: string[];
+	favicons: string[];
+	charset: string;
+}
+
 /* 
 	The generic drop down component follows a strict item structure
 */

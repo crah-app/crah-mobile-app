@@ -30,6 +30,8 @@ import {
 	ImageSourcePropType,
 	InteractionManager,
 	KeyboardAvoidingView,
+	ActivityIndicator,
+	Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -44,6 +46,10 @@ import { useUser } from '@clerk/clerk-expo';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';
 import RenderFetchedData from '@/components/RenderFetchedData';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { useEvent } from 'expo';
+import ThemedText from '@/components/general/ThemedText';
+import { LinkPreview } from '@/types';
 
 export interface ChatMessage extends IMessage {
 	_id: string;
@@ -305,6 +311,7 @@ const ChatScreen = () => {
 								renderMessageVideo={(props) => (
 									<LinkMessageBubble props={props} />
 								)}
+								isTyping={false}
 							/>
 							{Platform.OS === 'android' && (
 								<KeyboardAvoidingView behavior="padding" />
@@ -405,28 +412,140 @@ const RenderBubble: React.FC<{ props: any }> = ({ props }) => {
 	);
 };
 
-const urlRegex =
-	/(https?:\/\/(?:www\.|(?!www))[^\s.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/;
+const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 const LinkMessageBubble: React.FC<{ props: any }> = ({ props }) => {
-	const messageText = props.currentMessage?.text ?? '';
+	const { currentMessage } = props;
+	const messageText = currentMessage?.text ?? '';
+	const videoUrl = currentMessage?.video;
+	const internetLinks = videoUrl?.match(urlRegex);
+	const isInternetLink = Boolean(internetLinks.length > 0);
+	const theme = useSystemTheme();
 
-	const match = messageText.match(urlRegex);
-	const url = match?.[0];
+	const [previewData, setPreviewData] = useState<LinkPreview>();
+
+	// const player = useVideoPlayer(videoUrl, (player) => {
+	// 	player.loop = true;
+	// 	player.play();
+	// });
+
+	// useEvent(player, 'playingChange', {
+	// 	isPlaying: player.playing,
+	// });
+
+	// useEffect(() => {
+	// 	if (isInternetLink) {
+	// 		fetchLinkPreview(internetLinks[0]).then((previewData: LinkPreview) => {
+	// 			setPreviewData(previewData);
+	// 		});
+	// 	}
+	// }, [internetLinks]);
+
+	const handleLinkPress = async (url: string) => {
+		console.log(url);
+		const canOpen = await Linking.canOpenURL(url);
+		if (canOpen) {
+			Linking.openURL('https://www.youtube.com/watch?v=UTjwyDuVjRM&t');
+		} else {
+			console.error('Cannot open URL');
+		}
+	};
+
+	console.log(isInternetLink);
 
 	return (
-		<View style={{ flex: 1 }}>
-			<RenderBubble props={props} />
-			{url && (
-				<View style={styles.preview}>
-					<UrlPreview text={url} />
+		<View>
+			{isInternetLink ? (
+				<View style={{ flex: 0 }}>
+					{/* <Image
+						style={{
+							width: '100%',
+							height: 100,
+							// flex: 1,
+						}}
+						source={{ uri: previewData?.images[0] }}
+					/>
+					<TouchableOpacity onPress={() => handleLinkPress(videoUrl)}>
+						<ThemedText
+							style={{
+								paddingHorizontal: 10,
+								paddingVertical: 8,
+								color: Colors[theme].primary,
+							}}
+							theme={theme}
+							value={videoUrl}
+						/>
+					</TouchableOpacity> */}
+				</View>
+			) : (
+				<View style={{ flex: 1 }}>
+					{/* <VideoView
+						style={{ flex: 1, width: 200, height: 200 }}
+						player={player}
+						contentFit="contain"
+						allowsFullscreen
+					/> */}
 				</View>
 			)}
 		</View>
 	);
 };
 
+const fetchLinkPreview = async (url: string) => {
+	try {
+		const response = await fetch(
+			`http://192.168.0.136:4000/api/chats/link-preview`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ url }),
+			},
+		);
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		console.error('Fehler beim Laden des Previews:', error);
+		return null;
+	}
+};
+
+const VideoStyles = StyleSheet.create({
+	contentContainer: {
+		flex: 1,
+		padding: 10,
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingHorizontal: 50,
+	},
+	controlsContainer: {
+		padding: 10,
+	},
+});
+
 const styles = StyleSheet.create({
+	container: {
+		flexDirection: 'row',
+		padding: 10,
+		backgroundColor: '#eee',
+		borderRadius: 10,
+		alignItems: 'center',
+	},
+	image: {
+		width: 50,
+		height: 50,
+		borderRadius: 6,
+		marginRight: 10,
+	},
+	title: {
+		fontWeight: 'bold',
+		fontSize: 14,
+	},
+	description: {
+		fontSize: 12,
+		color: '#555',
+	},
 	headerLeft: { marginRight: 20 },
 	headerCenter: {
 		width: 250,

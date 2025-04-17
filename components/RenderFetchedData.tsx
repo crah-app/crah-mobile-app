@@ -13,7 +13,7 @@ interface RenderFetchedDataProps {
 	activityIndicatorColor: string;
 	clientErrorTitle: string;
 	clientErrorSubTitle: string;
-	ActivityIndicatorStyle: ViewStyle | ViewStyle[];
+	ActivityIndicatorStyle?: ViewStyle | ViewStyle[];
 }
 
 const RenderFetchedData: React.FC<RenderFetchedDataProps> = ({
