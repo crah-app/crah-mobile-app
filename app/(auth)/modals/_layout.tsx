@@ -122,6 +122,12 @@ const Layout = () => {
 					),
 				}}
 			/>
+			<Stack.Screen
+				name="chats"
+				options={{
+					headerShown: false,
+				}}
+			/>
 		</Stack>
 	);
 };

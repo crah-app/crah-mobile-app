@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View, ViewStyle } from 'react-native';
 import ThemedView from './general/ThemedView';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import CrahActivityIndicator from './general/CrahActivityIndicator';
@@ -13,6 +13,7 @@ interface RenderFetchedDataProps {
 	activityIndicatorColor: string;
 	clientErrorTitle: string;
 	clientErrorSubTitle: string;
+	ActivityIndicatorStyle: ViewStyle | ViewStyle[];
 }
 
 const RenderFetchedData: React.FC<RenderFetchedDataProps> = ({
@@ -23,6 +24,7 @@ const RenderFetchedData: React.FC<RenderFetchedDataProps> = ({
 	activityIndicatorColor,
 	clientErrorTitle,
 	clientErrorSubTitle,
+	ActivityIndicatorStyle,
 }) => {
 	const theme = useSystemTheme();
 
@@ -44,6 +46,7 @@ const RenderFetchedData: React.FC<RenderFetchedDataProps> = ({
 			) : (
 				// fetching process not finished but also no error
 				<CrahActivityIndicator
+					style={ActivityIndicatorStyle}
 					size={activityIndicatorSize}
 					color={activityIndicatorColor}
 				/>

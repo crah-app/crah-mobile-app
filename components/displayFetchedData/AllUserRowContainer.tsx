@@ -19,6 +19,7 @@ import { router } from 'expo-router';
 import UserProfile from '@/app/(auth)/sharedPages/userProfile';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useUser } from '@clerk/clerk-expo';
+import NoDataPlaceholder from '../general/NoDataPlaceholder';
 
 interface AllUserRowContainerProps {
 	contentTitle?: string;
@@ -50,9 +51,9 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 		})
 			.then((res) => res.json())
 			.then((res) => {
-				if (excludeIds) {
-					res = res.filter((user: ClerkUser) => !excludeIds.includes(user.id));
-				}
+				// if (excludeIds) {
+				// 	res = res.filter((user: ClerkUser) => !excludeIds.includes(user.id));
+				// }
 				// if (res.length === 0) {
 				// 	console.warn('No users found');
 				// 	return;
@@ -108,6 +109,14 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 							)}
 
 							<FlatList
+								ListEmptyComponent={() => (
+									<NoDataPlaceholder
+										containerStyle={{ marginBottom: 100 }}
+										arrowStyle={{ display: 'none' }}
+										subTextValue=""
+										firstTextValue="No users found"
+									/>
+								)}
 								scrollEnabled={false}
 								contentContainerStyle={{ flex: 1 }}
 								data={allUsers}
@@ -160,6 +169,14 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 												: FetchedUser.username) ?? 'no name user'
 										}
 										subtitle={'Rank Silver #51' + ' ' + FetchedUser.id}
+									/>
+								)}
+								ListEmptyComponent={() => (
+									<NoDataPlaceholder
+										containerStyle={{ marginBottom: 100 }}
+										arrowStyle={{ display: 'none' }}
+										subTextValue=""
+										firstTextValue="No users found"
 									/>
 								)}
 							/>

@@ -20,6 +20,7 @@ interface MessageRowProps {
 	slideRight: boolean;
 	onCheckboxToggle?: (checked: boolean, id: string) => void;
 	checked: boolean;
+	unreadCount: number;
 }
 
 const MessageRow: React.FC<MessageRowProps> = ({
@@ -33,9 +34,11 @@ const MessageRow: React.FC<MessageRowProps> = ({
 	slideRight,
 	onCheckboxToggle,
 	checked,
+	unreadCount,
 }) => {
 	const [isDeleted, setIsDeleted] = useState(false);
 	const [isArchived, setIsArchived] = useState(false);
+	const [highlightWords, setHighlightWords] = useState<string[]>(['online']);
 
 	const chatTimeAgo = lastActive
 		? `last seen ${formatDistanceToNow(new Date(lastActive), {
@@ -43,12 +46,34 @@ const MessageRow: React.FC<MessageRowProps> = ({
 		  })}`
 		: '';
 
+	const renderSubTitle = (): string => {
+		let text: string =
+			status === UserStatus.OFFLINE
+				? chatTimeAgo
+				: status.split('o ')[0].charAt(0).toUpperCase() +
+				  status.split('o ')[0].slice(1).toLowerCase();
+
+		if (unreadCount > 0) {
+			text = `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
+		}
+
+		return text;
+	};
+
 	const handleOnPress = () => {
 		router.navigate(`/(auth)/(tabs)/homePages/chats/${id}`);
 	};
 
 	const opacityAnim = useRef(new Animated.Value(0)).current;
 	const checkboxTranslateX = useRef(new Animated.Value(-60)).current; // Startwert für BouncyCheckbox hinter dem Row
+
+	useEffect(() => {
+		if (unreadCount > 0) {
+			setHighlightWords([String(unreadCount), 'new', 'message', 's']);
+		} else {
+			setHighlightWords(['online']);
+		}
+	}, [unreadCount]);
 
 	useEffect(() => {
 		if (slideRight) {
@@ -133,13 +158,8 @@ const MessageRow: React.FC<MessageRowProps> = ({
 					<Row
 						onPress={handleOnPress}
 						title={name}
-						highlightWords={['online']}
-						subtitle={
-							status === UserStatus.OFFLINE
-								? chatTimeAgo
-								: status.split('o ')[0].charAt(0).toUpperCase() +
-								  status.split('o ')[0].slice(1).toLowerCase()
-						}
+						highlightWords={highlightWords}
+						subtitle={renderSubTitle()}
 						showAvatar={true}
 						avatarUrl={avatar}
 					/>

@@ -118,24 +118,8 @@ const ChatScreen = () => {
 
 	// handle navigation logic
 	const handleGoBack = () => {
-		if (router.canGoBack()) {
-			setUserWantsToGoBack(true);
-			setMessages([]);
-		}
+		router.back();
 	};
-
-	useLayoutEffect(() => {
-		if (messages.length === 0 && userWantsToGoBack) {
-			const frame = requestAnimationFrame(() => {
-				// Warten auf UI commit
-				requestAnimationFrame(() => {
-					router.back();
-				});
-			});
-
-			return () => cancelAnimationFrame(frame);
-		}
-	}, [messages, userWantsToGoBack]);
 
 	return (
 		<ThemedView theme={theme} flex={1} style={{}}>

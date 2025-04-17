@@ -12,8 +12,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ThemedText from '../general/ThemedText';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { Link } from 'expo-router';
-import TrickColumn from '../rows/TrickRow';
+import { Link, router } from 'expo-router';
+import TrickRow from '../rows/TrickRow';
 
 import {
 	commonTricksDataStructure,
@@ -116,11 +116,21 @@ const TrickList: React.FC<{
 }> = ({ commonTricks }) => {
 	const [searchQuery, setSearchQuery] = useState<string>('');
 
-	const HandleTrickPress = () => {};
-
 	useEffect(() => {
 		console.log(commonTricks);
 	}, [commonTricks]);
+
+	const handleTrickPress = (item: commonTricksDataStructure) => {
+		router.push({
+			pathname: '/(auth)/modals/TrickModal',
+			params: {
+				data: JSON.stringify({
+					trickName: `${item.words[0]} ${item.words[1]}`,
+					trickDescription: 'trick description',
+				}),
+			},
+		});
+	};
 
 	return (
 		<ScrollView
@@ -138,25 +148,13 @@ const TrickList: React.FC<{
 				data={commonTricks}
 				keyExtractor={(item) => `${item.words[0]} ${item.words[1]}`}
 				renderItem={({ item }) => (
-					<Link
-						asChild
-						href={{
-							pathname: '/modals/TrickModal',
-							params: {
-								data: JSON.stringify({
-									trickName: `${item.words[0]} ${item.words[1]}`,
-									trickDescription: 'trick description',
-								}),
-							},
-						}}>
-						<TrickColumn
-							name={`${item.words[0]} ${item.words[1]}`}
-							points={100}
-							difficulty={TrickDifficulty.POTENTIAL_WORLDS_FIRST}
-							landed={'landed'}
-							onPress={() => HandleTrickPress()}
-						/>
-					</Link>
+					<TrickRow
+						name={`${item.words[0]} ${item.words[1]}`}
+						points={100}
+						difficulty={TrickDifficulty.POTENTIAL_WORLDS_FIRST}
+						landed={'landed'}
+						onPress={() => handleTrickPress(item)}
+					/>
 				)}
 				contentContainerStyle={{ height: 'auto', paddingBottom: 270 }}
 			/>

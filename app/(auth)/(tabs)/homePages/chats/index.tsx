@@ -47,6 +47,7 @@ interface Chat {
 	LastMessageContent: string;
 	LastMessageSenderId: string;
 	LastMessageDate: Date;
+	UnreadCount: number;
 }
 
 const Page = () => {
@@ -97,23 +98,22 @@ const Page = () => {
 
 	const HandleFilterMessagesType = (value: ChatFilterTypes) => {
 		setMessagesFilter(value);
-		setMessagesDateFilter('latest'); // set to default
 	};
 
 	useEffect(() => {
+		let filteredChats = fetchedChats;
+
 		switch (messagesFilterSelected) {
-			case ChatFilterTypes.all:
-				setChats(fetchedChats);
-				break;
-
 			case ChatFilterTypes.groups:
-				setChats((prev) => fetchedChats.filter((chat) => chat.IsGroup));
+				filteredChats = fetchedChats.filter((chat) => chat.IsGroup);
 				break;
-
 			case ChatFilterTypes.unread:
-				setChats(fetchedChats);
+				filteredChats = fetchedChats.filter((chat) => chat.UnreadCount > 0);
 				break;
+			// case all → no filter
 		}
+
+		setChats(sortChatsByDate(filteredChats));
 	}, [messagesFilterSelected]);
 
 	// latest, oldest logic
@@ -141,22 +141,23 @@ const Page = () => {
 	// handle navigation logic
 	const handleGoBack = () => {
 		if (router.canGoBack()) {
-			setUserWantsToGoBack(true);
-			setChats([]);
+			// setUserWantsToGoBack(true);
+			// setChats([]);
+			router.back();
 		}
 	};
 
-	useLayoutEffect(() => {
-		if (chats.length === 0 && userWantsToGoBack) {
-			const frame = requestAnimationFrame(() => {
-				requestAnimationFrame(() => {
-					router.back();
-				});
-			});
+	// useLayoutEffect(() => {
+	// 	if (chats.length === 0 && userWantsToGoBack) {
+	// 		const frame = requestAnimationFrame(() => {
+	// 			requestAnimationFrame(() => {
+	// 				router.back();
+	// 			});
+	// 		});
 
-			return () => cancelAnimationFrame(frame);
-		}
-	}, [chats, userWantsToGoBack]);
+	// 		return () => cancelAnimationFrame(frame);
+	// 	}
+	// }, [chats, userWantsToGoBack]);
 
 	// gestures
 	const handleOnDelete = (id: string) => {
@@ -190,7 +191,8 @@ const Page = () => {
 						selectedGroups.length <= 1 ? '' : 's'
 				  }${
 						selectedChats.length - selectedGroups.length > 0
-							? 'and' +
+							? ' ' +
+							  'and' +
 							  ' ' +
 							  (selectedChats.length - selectedGroups.length) +
 							  ' ' +
@@ -241,260 +243,221 @@ const Page = () => {
 		}
 	}, [showLeftActionSpace]);
 
-	// open new chat bottom sheet modal logic
-	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const snapPoints = useMemo(() => ['75%', '90%'], []);
+	// open new chat modal
+	const OpenNewChatModal = () => {
+		router.navigate('/(auth)/modals/chats/SearchNewChatModal');
+	};
 
-	const handleCloseModalPress = useCallback(() => {
-		bottomSheetRef?.current?.close();
-	}, []);
+	const Header = () => {
+		return (
+			<CostumHeader
+				theme={theme}
+				headerLeft={
+					<ThemedView
+						theme={theme}
+						flex={1}
+						style={{
+							flexDirection: 'row',
+							alignItems: 'center',
+							justifyContent: 'flex-start',
+							gap: 12,
+						}}>
+						<TouchableOpacity onPress={handleGoBack}>
+							<Ionicons
+								name="chevron-back"
+								size={24}
+								color={Colors[theme].textPrimary}
+							/>
+						</TouchableOpacity>
+						<HeaderLeftLogo position="relative" />
+					</ThemedView>
+				}
+				headerRight={
+					<View style={{ flexDirection: 'row', gap: 14 }}>
+						<TouchableOpacity
+							onPress={() => setShowLeftActionSpace(!showLeftActionSpace)}>
+							<Ionicons
+								name="ellipsis-horizontal-outline"
+								size={24}
+								color={Colors[theme].textPrimary}
+							/>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={OpenNewChatModal}>
+							<Ionicons
+								name="create-outline"
+								size={24}
+								color={Colors[theme].textPrimary}
+							/>
+						</TouchableOpacity>
+					</View>
+				}
+			/>
+		);
+	};
 
-	const handlePresentModalPress = useCallback(() => {
-		bottomSheetRef.current?.present();
-	}, []);
+	const ChatList = () => {
+		return (
+			<View
+				style={[
+					styles.messages_container,
+					{
+						borderTopColor: Colors[theme].gray,
+						borderTopWidth: 1,
+					},
+				]}>
+				<RenderFetchedData
+					ActivityIndicatorStyle={{ height: '75%' }}
+					errState={errLoadingChats}
+					loadedState={chatsLoaded}
+					renderComponent={
+						<FlatList
+							scrollEnabled={false}
+							data={chats}
+							keyExtractor={(item) => item.Id}
+							contentContainerStyle={[
+								styles.message_list_container,
+								{ borderColor: 'gray', marginTop: 0 },
+							]}
+							renderItem={({ item }) => (
+								<MessageRow
+									checked={selectedChats.includes(item.Id)}
+									onCheckboxToggle={toggleChatSelection}
+									slideRight={showLeftActionSpace}
+									handleOnArchive={() => handleOnArchive(item.Id)}
+									handleOnDelete={() => handleOnDelete(item.Id)}
+									id={item.Id}
+									name={item.Name}
+									avatar={'https://randomuser.me/api/portraits/men/32.jpg'}
+									lastActive={new Date(item.LastMessageDate)}
+									status={UserStatus.OFFLINE}
+									unreadCount={item.UnreadCount}
+								/>
+							)}
+						/>
+					}
+					activityIndicatorSize={24}
+					activityIndicatorColor={Colors[theme].primary}
+					clientErrorTitle={'Something went wrong...'}
+					clientErrorSubTitle={'May try again?'}
+				/>
+			</View>
+		);
+	};
+
+	const SubHeader = () => {
+		return (
+			<View
+				style={{
+					justifyContent: 'flex-start',
+					alignItems: 'flex-start',
+				}}>
+				<View style={[styles.ContentFilterContainer]}>
+					{Object.values(ChatFilterTypes).map((value, index) => {
+						return (
+							<HomePageFilterButton
+								key={value}
+								text={value as string}
+								onPress={() => HandleFilterMessagesType(value)}
+								style={[
+									{
+										borderColor:
+											messagesFilterSelected === value
+												? Colors[theme].primary
+												: Colors[theme].textPrimary,
+									},
+								]}
+							/>
+						);
+					})}
+				</View>
+				{/*  */}
+
+				<View
+					style={{
+						width: Dimensions.get('window').width,
+						height: 100,
+						justifyContent: 'center',
+						alignItems: 'flex-start',
+						gap: 0,
+					}}>
+					<View
+						style={{
+							width: '100%',
+							justifyContent: 'center',
+							alignItems: 'center',
+						}}>
+						<SearchBar
+							flex={0}
+							placeholder="Search a chat"
+							query={searchQuery}
+							setQuery={setSearchQuery}
+						/>
+					</View>
+
+					<View
+						style={{
+							paddingHorizontal: 12,
+							flexDirection: 'row',
+							justifyContent: 'space-between',
+							alignItems: 'center',
+							width: '100%',
+						}}>
+						{/* small filter options */}
+						<TouchableOpacity
+							onPress={() => HandleMessagesDateFilter()}
+							style={{
+								flexDirection: 'row',
+								alignItems: 'center',
+							}}>
+							<Ionicons
+								name="chevron-forward"
+								size={16}
+								color={Colors[theme].textPrimary}
+							/>
+							<ThemedText theme={theme} value={messagesDateFilter} />
+						</TouchableOpacity>
+
+						{/* display when a chat is selected */}
+						{showLeftActionSpace && (
+							<Animated.View style={{ opacity: OpacityBtn }}>
+								<TouchableOpacity
+									onPress={leaveSelectedChats}
+									style={{
+										flexDirection: 'row',
+										alignItems: 'center',
+									}}>
+									<ThemedText
+										theme={theme}
+										value={'leave'}
+										style={{
+											color:
+												selectedChats.length <= 0
+													? Colors[theme].gray
+													: Colors[theme].primary,
+										}}
+									/>
+								</TouchableOpacity>
+							</Animated.View>
+						)}
+					</View>
+				</View>
+				{/*  */}
+			</View>
+		);
+	};
 
 	return (
 		<HeaderScrollView
 			scrollEffect={false}
 			theme={theme}
-			headerChildren={
-				<CostumHeader
-					theme={theme}
-					headerLeft={
-						<ThemedView
-							theme={theme}
-							flex={1}
-							style={{
-								flexDirection: 'row',
-								alignItems: 'center',
-								justifyContent: 'flex-start',
-								gap: 12,
-							}}>
-							<TouchableOpacity onPress={handleGoBack}>
-								<Ionicons
-									name="chevron-back"
-									size={24}
-									color={Colors[theme].textPrimary}
-								/>
-							</TouchableOpacity>
-							<HeaderLeftLogo position="relative" />
-						</ThemedView>
-					}
-					headerRight={
-						<View style={{ flexDirection: 'row', gap: 14 }}>
-							<TouchableOpacity
-								onPress={() => setShowLeftActionSpace(!showLeftActionSpace)}>
-								<Ionicons
-									name="ellipsis-horizontal-outline"
-									size={24}
-									color={Colors[theme].textPrimary}
-								/>
-							</TouchableOpacity>
-							<TouchableOpacity onPress={handlePresentModalPress}>
-								<Ionicons
-									name="create-outline"
-									size={24}
-									color={Colors[theme].textPrimary}
-								/>
-							</TouchableOpacity>
-						</View>
-					}
-				/>
-			}
+			headerChildren={<Header />}
 			scrollChildren={
 				<ThemedView theme={theme} flex={1}>
-					{/* bottom sheet modal */}
-					<BottomSheetModal
-						ref={bottomSheetRef}
-						index={0}
-						// backgroundComponent={renderBackdrop}
-						handleIndicatorStyle={{ backgroundColor: 'gray' }}
-						backgroundStyle={{ backgroundColor: Colors[theme].surface }}
-						containerStyle={{}}
-						snapPoints={snapPoints}
-						onDismiss={handleCloseModalPress}>
-						<BottomSheetView style={{ padding: 12, flex: 1, gap: 12 }}>
-							<View
-								style={{
-									gap: 12,
-									justifyContent: 'center',
-									alignItems: 'center',
-								}}>
-								<ThemedText
-									style={[defaultStyles.biggerText]}
-									value="Search for friends"
-									theme={theme}
-								/>
-								<SearchBar
-									flex={0}
-									placeholder="Type in a username..."
-									query={searchQuery}
-									setQuery={setSearchQuery}
-								/>
-							</View>
-
-							<View
-								style={{
-									flex: 1,
-								}}>
-								<AllUserRowContainer
-									excludeIds={[user?.id]}
-									contentTitle=""
-									bottomSheet={true}
-									rowStyle={{
-										backgroundColor: Colors[theme].surface,
-										paddingHorizontal: 0,
-									}}
-									contentContainerStyle={{
-										backgroundColor: Colors[theme].surface,
-									}}
-								/>
-							</View>
-						</BottomSheetView>
-					</BottomSheetModal>
-
 					{/* big filter buttons */}
-					<View
-						style={{
-							justifyContent: 'flex-start',
-							alignItems: 'flex-start',
-						}}>
-						<View style={[styles.ContentFilterContainer]}>
-							{Object.values(ChatFilterTypes).map((value, index) => {
-								return (
-									<HomePageFilterButton
-										key={value}
-										text={value as string}
-										onPress={() => HandleFilterMessagesType(value)}
-										style={[
-											{
-												borderColor:
-													messagesFilterSelected === value
-														? Colors[theme].primary
-														: Colors[theme].textPrimary,
-											},
-										]}
-									/>
-								);
-							})}
-						</View>
-						{/*  */}
-
-						<View
-							style={{
-								width: Dimensions.get('window').width,
-								height: 100,
-								justifyContent: 'center',
-								alignItems: 'flex-start',
-								gap: 0,
-							}}>
-							<View
-								style={{
-									width: '100%',
-									justifyContent: 'center',
-									alignItems: 'center',
-								}}>
-								<SearchBar
-									flex={0}
-									placeholder="Search a chat"
-									query={searchQuery}
-									setQuery={setSearchQuery}
-								/>
-							</View>
-
-							<View
-								style={{
-									paddingHorizontal: 12,
-									flexDirection: 'row',
-									justifyContent: 'space-between',
-									alignItems: 'center',
-									width: '100%',
-								}}>
-								{/* small filter options */}
-								<TouchableOpacity
-									onPress={() => HandleMessagesDateFilter()}
-									style={{
-										flexDirection: 'row',
-										alignItems: 'center',
-									}}>
-									<Ionicons
-										name="chevron-forward"
-										size={16}
-										color={Colors[theme].textPrimary}
-									/>
-									<ThemedText theme={theme} value={messagesDateFilter} />
-								</TouchableOpacity>
-
-								{/* display when a chat is selected */}
-								{showLeftActionSpace && (
-									<Animated.View style={{ opacity: OpacityBtn }}>
-										<TouchableOpacity
-											onPress={leaveSelectedChats}
-											style={{
-												flexDirection: 'row',
-												alignItems: 'center',
-											}}>
-											<ThemedText
-												theme={theme}
-												value={'leave'}
-												style={{
-													color:
-														selectedChats.length <= 0
-															? Colors[theme].gray
-															: Colors[theme].primary,
-												}}
-											/>
-										</TouchableOpacity>
-									</Animated.View>
-								)}
-							</View>
-						</View>
-						{/*  */}
-					</View>
+					<SubHeader />
 
 					{/* render chat row */}
-					<View
-						style={[
-							styles.messages_container,
-							{
-								borderTopColor: Colors[theme].gray,
-								borderTopWidth: 1,
-							},
-						]}>
-						<RenderFetchedData
-							errState={errLoadingChats}
-							loadedState={chatsLoaded}
-							renderComponent={
-								<FlatList
-									scrollEnabled={false}
-									data={chats}
-									keyExtractor={(item) => item.Id}
-									contentContainerStyle={[
-										styles.message_list_container,
-										{ borderColor: 'gray', marginTop: 0 },
-									]}
-									renderItem={({ item, index }) => (
-										<MessageRow
-											checked={selectedChats.includes(item.Id)}
-											onCheckboxToggle={toggleChatSelection}
-											slideRight={showLeftActionSpace}
-											handleOnArchive={() => handleOnArchive(item.Id)}
-											handleOnDelete={() => handleOnDelete(item.Id)}
-											id={item.Id}
-											name={item.Name}
-											avatar={'https://randomuser.me/api/portraits/men/32.jpg'}
-											lastActive={new Date(item.LastMessageDate)}
-											status={UserStatus.OFFLINE}
-										/>
-									)}
-								/>
-							}
-							activityIndicatorSize={24}
-							activityIndicatorColor={Colors[theme].primary}
-							clientErrorTitle={'Something went wrong...'}
-							clientErrorSubTitle={'May try again?'}
-						/>
-					</View>
+					<ChatList />
 					{/*  */}
 				</ThemedView>
 			}

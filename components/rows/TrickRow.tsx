@@ -2,7 +2,7 @@ import { TrickDifficulty } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import React from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Column from '../general/Row';
+import Row from '../general/Row';
 
 import Bars from '../../assets/images/vectors/bar.svg';
 import Colors from '@/constants/Colors';
@@ -25,7 +25,7 @@ const TrickColumn: React.FC<TrickColumnProps> = ({
 	const theme = useSystemTheme();
 
 	return (
-		<Column
+		<Row
 			title={name}
 			subtitle={landed}
 			subtitleStyle={{

@@ -7,7 +7,6 @@ import {
 	StyleSheet,
 	TextInput,
 	TouchableOpacity,
-	View,
 } from 'react-native';
 import ThemedView from './ThemedView';
 import { Ionicons } from '@expo/vector-icons';
@@ -58,7 +57,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				placeholderTextColor={'gray'}
 				placeholder={placeholder}
 				value={query}
-				onChangeText={(text) => setQuery(text)}
+				onChangeText={setQuery}
 				clearButtonMode="always"
 				cursorColor={Colors[theme].primary}
 				maxLength={TextInputMaxCharacters.UserName}
