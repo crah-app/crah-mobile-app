@@ -4,6 +4,8 @@ import React, {
 	useEffect,
 	forwardRef,
 	useLayoutEffect,
+	useRef,
+	useMemo,
 } from 'react';
 import {
 	Bubble,
@@ -52,12 +54,34 @@ import RenderFetchedData from '@/components/RenderFetchedData';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import ThemedText from '@/components/general/ThemedText';
-import { chatCostumMsgType, CrahUser, errType, LinkPreview } from '@/types';
+import {
+	chatCostumMsgType,
+	CrahUser,
+	dropDownMenuInputData,
+	errType,
+	ItemText,
+	LinkPreview,
+} from '@/types';
 import Row from '@/components/general/Row';
 import ClerkUser from '@/types/clerk';
 
 import Scooter from '../../../../../assets/images/vectors/scooter.svg';
 import { getTrickTitle } from '@/utils/globalFuncs';
+import DropDownMenu from '@/components/general/DropDownMenu';
+
+import BottomSheet, {
+	BottomSheetBackdrop,
+	BottomSheetFlatList,
+	BottomSheetModal,
+	BottomSheetModalProvider,
+	BottomSheetTextInput,
+	BottomSheetView,
+	useBottomSheetModal,
+} from '@gorhom/bottom-sheet';
+import { useSharedValue } from 'react-native-reanimated';
+import { defaultStyles } from '@/constants/Styles';
+import SearchBar from '@/components/general/SearchBar';
+import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowContainer';
 
 export interface ChatMessage extends IMessage {
 	_id: string;
@@ -248,7 +272,8 @@ const ChatScreen = () => {
 								messages={messages}
 								onSend={(messages) => onSend(messages)}
 								user={{
-									_id: 'user_2vlanCL8M2qebrHnMGQgqdfz7Wo', // chat id
+									// @ts-ignore
+									_id: user.id, // chat id
 								}}
 								onInputTextChanged={setText}
 								// centered system messages
@@ -387,17 +412,142 @@ const RenderSendText: React.FC<{ props: any }> = ({ props }) => {
 
 const RenderRightInputButton: React.FC<{ props: any }> = ({ props }) => {
 	const theme = useSystemTheme();
+	const items: Array<dropDownMenuInputData> = [
+		{
+			key: 0,
+			text: 'Rider',
+		},
+		{
+			key: 1,
+			text: 'Trick',
+		},
+	];
+
+	const [bottomSheetDisplayContentType, setBottomSheetDisplayContentType] =
+		useState<ItemText>();
+
+	const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+	const snapPoints = useMemo(() => ['75%'], []);
+
+	const handlePresentModalPress = useCallback(() => {
+		bottomSheetModalRef.current?.present();
+	}, []);
+
+	const renderBackdrop = useCallback((props: any) => {
+		const animatedIndex = useSharedValue(0);
+		const animatedPosition = useSharedValue(1);
+
+		return (
+			<BottomSheetBackdrop
+				animatedIndex={animatedIndex}
+				animatedPosition={animatedPosition}
+				disappearsOnIndex={-1}
+				appearsOnIndex={0}
+			/>
+		);
+	}, []);
+
+	const handleBottomSheetOpen = () => {
+		handlePresentModalPress();
+	};
+
+	const handleOnSelect = (val: { key: number; text: ItemText }) => {
+		setBottomSheetDisplayContentType(val.text);
+		handleBottomSheetOpen();
+
+		switch (val.text) {
+			case 'Rider':
+				// fetchTricks();
+				break;
+
+			case 'Trick':
+				// fetchRiders();
+				break;
+		}
+	};
+
+	// fetching...
+	const [searchQuery, setSearchQuery] = useState<string>('');
+
+	const [dataLoaded, setDataLoaded] = useState<boolean>();
+	const [err, setErr] = useState<errType>();
+	const [data, setData] = useState<any>();
 
 	return (
-		<TouchableOpacity
-			onPress={() => console.log('Plus pressed')}
-			style={{ paddingHorizontal: 10 }}>
-			<Ionicons
-				name="add-outline"
-				size={24}
-				color={Colors[theme].textPrimary}
+		<View>
+			<BottomSheetModal
+				containerStyle={{}}
+				backdropComponent={renderBackdrop}
+				handleIndicatorStyle={{ backgroundColor: 'gray' }}
+				backgroundStyle={{
+					backgroundColor: Colors[theme].surface,
+				}}
+				ref={bottomSheetModalRef}
+				index={1}
+				snapPoints={snapPoints}>
+				{/* main content */}
+				<BottomSheetView
+					style={{
+						flex: 1,
+						padding: 12,
+					}}>
+					<View
+						style={{
+							flex: 1,
+							gap: 12,
+							height: 94,
+							minHeight: 94,
+							maxHeight: 94,
+						}}>
+						<ThemedText
+							style={[defaultStyles.biggerText]}
+							value={`Select a ${bottomSheetDisplayContentType}`}
+							theme={theme}
+						/>
+						<SearchBar
+							containerStyle={{
+								height: 42,
+								minHeight: 42,
+								maxHeight: 42,
+							}}
+							placeholder={'Search...'}
+							query={searchQuery}
+							setQuery={setSearchQuery}
+						/>
+					</View>
+					{bottomSheetDisplayContentType === 'Rider' ? (
+						<AllUserRowContainer
+							contentContainerStyle={{
+								flex: 1,
+								paddingHorizontal: 0,
+								backgroundColor: Colors[theme].surface,
+							}}
+							rowStyle={{
+								paddingHorizontal: 0,
+								backgroundColor: Colors[theme].surface,
+							}}
+							bottomSheet={true}
+						/>
+					) : (
+						<View></View>
+					)}
+				</BottomSheetView>
+			</BottomSheetModal>
+
+			<DropDownMenu
+				onSelect={(_, val) => handleOnSelect(val)}
+				items={items}
+				triggerComponent={
+					<TouchableOpacity style={{ paddingHorizontal: 10 }}>
+						<Ionicons
+							name="add-outline"
+							size={24}
+							color={Colors[theme].textPrimary}
+						/>
+					</TouchableOpacity>
+				}
 			/>
-		</TouchableOpacity>
+		</View>
 	);
 };
 
@@ -434,7 +584,7 @@ const CustomMessageView: React.FC<{ props: any }> = ({ props }) => {
 		case 'rider':
 			const riderId = props.currentMessage.riderId;
 
-			return <RiderRow riderId="user_2vlanCL8M2qebrHnMGQgqdfz7Wo" />;
+			return <RiderRow riderId={riderId} />;
 
 		default:
 			return null;
@@ -604,8 +754,8 @@ const RenderBubble: React.FC<{ props: any }> = ({ props }) => {
 				],
 			}}
 			textStyle={{
-				right: { color: Colors[theme].textPrimary },
-				left: { color: Colors[theme].textPrimary },
+				right: { color: 'white' },
+				left: { color: 'white' },
 			}}
 		/>
 	);

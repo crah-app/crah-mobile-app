@@ -138,6 +138,9 @@ export enum CreatePostType {
 	article = 'Article',
 }
 
+// special types of messges the user can send in gifted chat
+export type ItemText = 'Rider' | 'Trick';
+
 /*
 	User posts are categorized in these types
 */

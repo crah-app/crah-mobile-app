@@ -215,7 +215,6 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				styles.postContainer,
 				{ backgroundColor: Colors[theme].background },
 			]}>
-			{/* <BottomSheetModalProvider> */}
 			{/* Header */}
 			<PostHeader post={post} postTimeAgo={postTimeAgo} />
 			{/* Main content */}
@@ -244,7 +243,6 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				comments={userComments}
 				username={post.username}
 			/>
-			{/* </BottomSheetModalProvider> */}
 		</View>
 	);
 };

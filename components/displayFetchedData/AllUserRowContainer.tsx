@@ -129,7 +129,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 										showAvatar={true}
 										avatarUrl={user.imageUrl}
 										title={user.username ?? 'no name user'}
-										subtitle={'Rank Silver #51' + ' ' + user.id}
+										subtitle={'Rank Gold #1' + ' ' + user.id}
 									/>
 								)}
 							/>

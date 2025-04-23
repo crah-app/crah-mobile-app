@@ -7,6 +7,7 @@ import {
 	StyleSheet,
 	TextInput,
 	TouchableOpacity,
+	ViewStyle,
 } from 'react-native';
 import ThemedView from './ThemedView';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +19,7 @@ interface SearchBarProps {
 	displayOptionsBtn?: boolean;
 	onOptionsPress?: () => void;
 	flex?: number;
+	containerStyle?: ViewStyle;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -27,6 +29,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	displayOptionsBtn,
 	onOptionsPress,
 	flex,
+	containerStyle,
 }) => {
 	const theme = useSystemTheme();
 
@@ -34,17 +37,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		<ThemedView
 			theme={theme}
 			flex={flex ?? 1}
-			style={{
-				flexDirection: 'row',
-				backgroundColor: Colors[theme].container_surface,
-				alignItems: 'center',
-				justifyContent: 'space-between',
-				width: Dimensions.get('window').width - 24,
-				borderRadius: 10,
-				marginBottom: 10,
-				paddingHorizontal: 12,
-				height: 42,
-			}}>
+			style={[
+				// @ts-ignore
+				containerStyle,
+				{
+					flexDirection: 'row',
+					backgroundColor: Colors[theme].container_surface,
+					alignItems: 'center',
+					justifyContent: 'space-between',
+					width: Dimensions.get('window').width - 24,
+					borderRadius: 10,
+					marginBottom: 10,
+					paddingHorizontal: 12,
+					height: 42,
+				},
+			]}>
 			<TextInput
 				style={[
 					{

@@ -478,7 +478,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 							gap: 4,
 						}}>
 						{/* user post amount */}
-						{postsCount ? (
+						{postsCount != undefined ? (
 							<ThemedText
 								theme={theme}
 								value={postsCount.toString()}
