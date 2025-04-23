@@ -18,6 +18,34 @@ const ChatInfoModal = () => {
 	const { user } = useUser();
 	const [newChatSearchQuery, setNewChatSearchQuery] = useState<string>('');
 
+	const handleUserPress = async (userId: string) => {
+		if (userId === user?.id) return;
+
+		try {
+			const response = await fetch('http://192.168.0.136:4000/api/chats/new', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					senderId: user?.id,
+					receiverId: userId,
+				}),
+			});
+
+			const data = await response.json();
+
+			if (data.chatId) {
+				router.push({
+					pathname: '/(auth)/(tabs)/homePages/chats/[id]',
+					params: { id: data.chatId },
+				});
+			}
+		} catch (err) {
+			console.warn('Chat start failed:', err);
+		}
+	};
+
 	return (
 		<HeaderScrollView
 			headerChildren={
@@ -58,6 +86,7 @@ const ChatInfoModal = () => {
 						excludeIds={[user?.id]}
 						contentTitle=""
 						bottomSheet={false}
+						costumHandleUserPress={handleUserPress}
 					/>
 				</ThemedView>
 			}

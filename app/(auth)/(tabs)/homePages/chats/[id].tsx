@@ -82,6 +82,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import { defaultStyles } from '@/constants/Styles';
 import SearchBar from '@/components/general/SearchBar';
 import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowContainer';
+import socket from '@/utils/socket';
 
 export interface ChatMessage extends IMessage {
 	_id: string;
@@ -115,16 +116,35 @@ const ChatScreen = () => {
 	const [isGroup, setIsGroup] = useState<boolean>();
 	const [chatTitle, setChatTitle] = useState<string>('');
 
+	const [joinedChatRoom, setJoinedChatRoom] = useState<boolean>();
+
 	// send message
-	const onSend = useCallback((newMessages: ChatMessage[] = []) => {
+	const onSend = useCallback((newMessages: any) => {
 		if (!messages) return;
 
+		socket.emit('send-message', { chatId: id, msg: newMessages });
 		setMessages((previousMessages) =>
-			GiftedChat.append(previousMessages, newMessages),
+			GiftedChat.append(previousMessages, { ...newMessages[0], type: 'text' }),
 		);
-
-		console.log(messages, messages[0]);
 	}, []);
+
+	useEffect(() => {
+		socket.on('recieve-message', (msg) => {
+			console.log('object', { ...msg[0], type: 'text' });
+			setMessages((previousMessages) =>
+				GiftedChat.append(previousMessages, { ...msg[0], type: 'text' }),
+			);
+		});
+	}, []);
+
+	useEffect(() => {
+		console.log(id, user?.id);
+		if (id && user?.id && !joinedChatRoom) {
+			socket.emit('join-chat', { chatId: id, userId: user?.id }, () => {
+				setJoinedChatRoom(true);
+			});
+		}
+	}, [id, user]);
 
 	// fetch data
 	const fetchMessages = async () => {

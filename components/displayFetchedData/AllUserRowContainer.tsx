@@ -27,6 +27,7 @@ interface AllUserRowContainerProps {
 	contentContainerStyle?: ViewStyle | ViewStyle[];
 	rowStyle?: ViewStyle | ViewStyle[];
 	excludeIds?: Array<ClerkUser['id'] | undefined>;
+	costumHandleUserPress?: (userId: string) => void;
 }
 
 const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
@@ -35,6 +36,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	contentContainerStyle,
 	rowStyle,
 	excludeIds,
+	costumHandleUserPress,
 }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
@@ -51,13 +53,13 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 		})
 			.then((res) => res.json())
 			.then((res) => {
-				// if (excludeIds) {
-				// 	res = res.filter((user: ClerkUser) => !excludeIds.includes(user.id));
-				// }
-				// if (res.length === 0) {
-				// 	console.warn('No users found');
-				// 	return;
-				// }
+				if (excludeIds) {
+					res = res.filter((user: ClerkUser) => !excludeIds.includes(user.id));
+				}
+				if (res.length === 0) {
+					console.warn('No users found');
+					return;
+				}
 				setAllUsers(res);
 				console.log(res);
 			})
@@ -76,6 +78,11 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	}, [usersLoaded, allUsers]);
 
 	const handleUserPress = (userId: string) => {
+		if (costumHandleUserPress) {
+			costumHandleUserPress(userId);
+			return;
+		}
+
 		router.push({
 			pathname: '/(auth)/sharedPages/userProfile',
 			params: { userId, self: 'false' },
