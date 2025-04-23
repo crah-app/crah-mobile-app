@@ -17,7 +17,7 @@ interface RowProps {
 	title: string;
 	subtitle?: string;
 	showAvatar?: boolean;
-	avatarUrl?: string;
+	avatarUrl?: string | undefined;
 	customLeftComponent?: React.ReactNode;
 	customRightComponent?: React.ReactNode;
 	leftContainerStyle?: ViewStyle | ViewStyle[];
@@ -100,8 +100,8 @@ const Row: React.FC<RowProps> = ({
 								xml={avatarUrl}
 								fill={Colors[theme].textPrimary}
 								style={[styles.avatar]}
-								width={46}
-								height={42}
+								width={costumAvatarWidth ?? 46}
+								height={costumAvatarHeight ?? 42}
 							/>
 						) : (
 							<Image

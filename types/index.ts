@@ -21,6 +21,9 @@ export interface CrahUser {
 	rank?: number;
 }
 
+// error type for error states when fetching from an api
+export type errType = 'not found' | 'deleted' | undefined;
+
 /*
 	Users can let their comments rate from other users
 	the most voted type for a comment is the displayed comment type on the comment row
@@ -68,6 +71,16 @@ export enum fetchAdresses {
 	commonTricks = 'http://192.168.0.136:4000/public/tricks/commonTricks.json',
 	allUsers = 'http://192.168.0.136:4000/api/users/all',
 	allPosts = 'http://192.168.0.136:4000/api/posts/all',
+}
+
+/*
+	costum messgae type for a message in a gifted chat
+*/
+
+export enum chatCostumMsgType {
+	rider = 'rider',
+	trick = 'trick',
+	text = 'text',
 }
 
 /*

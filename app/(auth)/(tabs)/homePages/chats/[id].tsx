@@ -11,7 +11,9 @@ import {
 	GiftedChat,
 	IMessage,
 	InputToolbar,
+	LeftRightStyle,
 	MessageProps,
+	RenderMessageTextProps,
 	SystemMessage,
 	User,
 } from 'react-native-gifted-chat';
@@ -32,6 +34,7 @@ import {
 	KeyboardAvoidingView,
 	ActivityIndicator,
 	Linking,
+	ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -49,7 +52,12 @@ import RenderFetchedData from '@/components/RenderFetchedData';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import ThemedText from '@/components/general/ThemedText';
-import { LinkPreview } from '@/types';
+import { chatCostumMsgType, CrahUser, errType, LinkPreview } from '@/types';
+import Row from '@/components/general/Row';
+import ClerkUser from '@/types/clerk';
+
+import Scooter from '../../../../../assets/images/vectors/scooter.svg';
+import { getTrickTitle } from '@/utils/globalFuncs';
 
 export interface ChatMessage extends IMessage {
 	_id: string;
@@ -104,7 +112,12 @@ const ChatScreen = () => {
 		})
 			.then((res) => res.json())
 			.then((res: ChatMessage[]) => {
-				setMessages(res.splice(1, res.length - 1));
+				setMessages(
+					res.splice(0, res.length - 2).map((msg) => {
+						msg.createdAt = new Date(msg.createdAt);
+						return msg;
+					}),
+				);
 				setFetchedData(res);
 			})
 			.catch((err) => setErrLoadingMessages(true))
@@ -113,7 +126,7 @@ const ChatScreen = () => {
 
 	const setFetchedData = (data: ChatMessage[]) => {
 		setIsGroup(data[0].isGroup);
-		setChatTitle(data[0].ChatName);
+		setChatTitle(data[data.length - 1].ChatName);
 	};
 
 	useEffect(() => {
@@ -122,11 +135,6 @@ const ChatScreen = () => {
 		return () => {};
 	}, []);
 
-	// handle navigation logic
-	const handleGoBack = () => {
-		router.back();
-	};
-
 	return (
 		<ThemedView theme={theme} flex={1} style={{}}>
 			{/* chat header */}
@@ -134,7 +142,7 @@ const ChatScreen = () => {
 				options={{
 					headerBlurEffect: 'regular',
 					headerStyle: {
-						backgroundColor: Colors[theme].surface,
+						backgroundColor: Colors[theme].background,
 					},
 					headerTitleStyle: {
 						color: Colors[theme].textPrimary,
@@ -167,9 +175,7 @@ const ChatScreen = () => {
 					headerLeft: () => (
 						<View style={{}}>
 							{/* navigate back btn */}
-							<TouchableOpacity
-								onPress={handleGoBack}
-								style={styles.headerLeft}>
+							<TouchableOpacity onPress={router.back} style={styles.headerLeft}>
 								<Ionicons
 									name="chevron-back-outline"
 									size={24}
@@ -197,9 +203,7 @@ const ChatScreen = () => {
 										Lade...
 									</Text>
 								) : errLoadingMessages ? (
-									<Text style={[styles.userName, { color: 'red' }]}>
-										Fehler beim Laden
-									</Text>
+									<Text style={[styles.userName, { color: 'red' }]}>Error</Text>
 								) : (
 									<Text
 										style={[
@@ -312,6 +316,9 @@ const ChatScreen = () => {
 									<LinkMessageBubble props={props} />
 								)}
 								isTyping={false}
+								renderCustomView={(props) => (
+									<CustomMessageView props={props} />
+								)}
 							/>
 							{Platform.OS === 'android' && (
 								<KeyboardAvoidingView behavior="padding" />
@@ -394,19 +401,211 @@ const RenderRightInputButton: React.FC<{ props: any }> = ({ props }) => {
 	);
 };
 
+const CustomMessageView: React.FC<{ props: any }> = ({ props }) => {
+	const theme = useSystemTheme();
+	const message = props.currentMessage;
+
+	if (!message || !message.type) return null;
+
+	switch (message.type) {
+		// case 'link-preview':
+		// 	return (
+		// 		<View style={{ padding: 10 }}>
+		// 			<TouchableOpacity
+		// 				onPress={() => Linking.openURL(message.text)}
+		// 				style={{ borderRadius: 10, overflow: 'hidden' }}>
+		// 				<Image
+		// 					source={{ uri: message.previewImage }}
+		// 					style={{ width: 250, height: 130 }}
+		// 					resizeMode="cover"
+		// 				/>
+		// 				<Text style={{ color: Colors[theme].primary, paddingTop: 6 }}>
+		// 					{message.text}
+		// 				</Text>
+		// 			</TouchableOpacity>
+		// 		</View>
+		// 	);
+
+		case 'trick':
+			const trickId = props.currentMessage.trickId;
+
+			return <TrickRow trickId={trickId} />;
+
+		case 'rider':
+			const riderId = props.currentMessage.riderId;
+
+			return <RiderRow riderId="user_2vlanCL8M2qebrHnMGQgqdfz7Wo" />;
+
+		default:
+			return null;
+	}
+};
+
+const RiderRow: React.FC<{ riderId: string }> = ({ riderId }) => {
+	const theme = useSystemTheme();
+	const { user } = useUser();
+
+	const [fetchedRider, setFetchedRider] = useState<ClerkUser>();
+	const [riderLoaded, setRiderLoaded] = useState<boolean>();
+	const [error, setError] = useState<errType>();
+
+	useEffect(() => {
+		const fetchRider = async () => {
+			try {
+				setError(undefined);
+				setRiderLoaded(false);
+
+				const res = await fetch(
+					`http://192.168.0.136:4000/api/users/${riderId}`,
+					{
+						headers: { 'Cache-Control': 'no-cache' },
+					},
+				);
+
+				if (!res.ok) {
+					setError('not found');
+					return;
+				}
+
+				const data = await res.json();
+				setFetchedRider(data);
+			} catch (err) {
+				setError('not found');
+			} finally {
+				setRiderLoaded(true);
+			}
+		};
+
+		fetchRider();
+	}, [riderId]);
+
+	const handleRiderPress = () => {
+		router.push({
+			pathname: '/(auth)/sharedPages/userProfile',
+			params: {
+				userId: riderId,
+				self: riderId !== user?.id ? 'false' : 'true',
+				linking: 'true',
+			},
+		});
+	};
+
+	return (
+		<Row
+			key={riderId}
+			containerStyle={{
+				backgroundColor: Colors[theme].container_surface,
+				borderRadius: 12,
+				width: 250,
+			}}
+			title={
+				!riderLoaded
+					? 'loading rider'
+					: fetchedRider?.username ?? 'Error loading rider'
+			}
+			subtitle="rank silver #3"
+			avatarUrl={fetchedRider?.imageUrl}
+			onPress={handleRiderPress}
+		/>
+	);
+};
+
+const TrickRow: React.FC<{ trickId: number }> = ({ trickId }) => {
+	const theme = useSystemTheme();
+	const [fetchedTrick, setFetchedTrick] = useState<any>();
+	const [trickLoaded, setTrickLoaded] = useState(false);
+	const [error, setError] = useState<errType>();
+
+	useEffect(() => {
+		const fetchTrick = async () => {
+			try {
+				setError(undefined);
+				setTrickLoaded(false);
+
+				const res = await fetch(
+					`http://192.168.0.136:4000/public/tricks/commonTricks.json`,
+					{
+						headers: { 'Cache-Control': 'no-cache' },
+					},
+				);
+
+				if (!res.ok) {
+					setError('not found');
+					return;
+				}
+
+				const data = await res.json();
+				setFetchedTrick(data.commonTricks[trickId]);
+			} catch (err) {
+				setError('not found');
+			} finally {
+				setTrickLoaded(true);
+			}
+		};
+
+		fetchTrick();
+	}, [trickId]);
+
+	const handleTrickPress = () => {
+		router.push({
+			pathname: '/modals/TrickModal',
+			params: {
+				data: JSON.stringify({
+					trickName: getTrickTitle(fetchedTrick),
+					trickDescription: 'lel',
+				}),
+			},
+		});
+	};
+
+	return (
+		<Row
+			key={trickId}
+			avatarIsSVG
+			showAvatar
+			avatarUrl={Scooter}
+			costumAvatarHeight={34}
+			costumAvatarWidth={38}
+			containerStyle={{
+				backgroundColor: Colors[theme].container_surface,
+				borderRadius: 12,
+				width: 250,
+			}}
+			subtitle="costum trick"
+			title={!trickLoaded ? 'loading trick' : getTrickTitle(fetchedTrick)}
+			onPress={handleTrickPress}
+		/>
+	);
+};
+
 const RenderBubble: React.FC<{ props: any }> = ({ props }) => {
 	const theme = useSystemTheme();
+	const msgType: chatCostumMsgType = props.currentMessage.type;
 
 	return (
 		<Bubble
 			{...props}
 			wrapperStyle={{
-				right: { backgroundColor: Colors[theme].textBubbleOwn },
-				left: { backgroundColor: Colors[theme].textBubbleOther },
+				right: [
+					{
+						backgroundColor:
+							msgType !== 'text'
+								? Colors[theme].container_surface
+								: Colors[theme].textBubbleOwn,
+					},
+				],
+				left: [
+					{
+						backgroundColor:
+							msgType !== 'text'
+								? Colors[theme].container_surface
+								: Colors[theme].textBubbleOther,
+					},
+				],
 			}}
 			textStyle={{
-				right: { color: 'white' },
-				left: { color: 'white' },
+				right: { color: Colors[theme].textPrimary },
+				left: { color: Colors[theme].textPrimary },
 			}}
 		/>
 	);
@@ -506,7 +705,7 @@ const fetchLinkPreview = async (url: string) => {
 		const data = await response.json();
 		return data;
 	} catch (error) {
-		console.error('Fehler beim Laden des Previews:', error);
+		console.error('Error while loading preview:', error);
 		return null;
 	}
 };

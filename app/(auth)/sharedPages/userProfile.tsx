@@ -15,12 +15,20 @@ interface UserProfileProps {
 }
 
 const UserProfile = ({}) => {
-	const { userId, self } = useGlobalSearchParams<{
+	const { userId, self, linking } = useGlobalSearchParams<{
 		userId: string;
 		self: 'false' | 'true';
+		linking: 'false' | 'true';
 	}>();
 
-	return <UserProfileContents key={Date.now()} userId={userId} self={self} />;
+	return (
+		<UserProfileContents
+			linking={linking}
+			key={Date.now()}
+			userId={userId}
+			self={self}
+		/>
+	);
 };
 
 const styles = StyleSheet.create({});

@@ -43,6 +43,7 @@ interface trickInterface {
 interface UserProfileProps {
 	userId: string;
 	self: boolean | 'true' | 'false';
+	linking: boolean | 'true' | 'false'; // wether user page is part of a navigation stack
 }
 
 interface UserPostContainerProps {
@@ -188,7 +189,7 @@ const UserPostContainer: React.FC<UserPostContainerProps> = ({
 	);
 };
 
-const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
+const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
 	const { bottom } = useSafeAreaInsets();
@@ -732,7 +733,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self }) => {
 							styles.scrollViewContainer,
 							{ backgroundColor: Colors[theme].background },
 						]}>
-						{(self === 'false' || self === false) && (
+						{(linking || self === 'false' || self === false) && (
 							<View
 								style={{
 									flex: 1,
