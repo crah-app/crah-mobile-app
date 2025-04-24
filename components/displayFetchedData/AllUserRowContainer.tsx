@@ -12,7 +12,7 @@ import ThemedView from '../general/ThemedView';
 import Row from '../general/Row';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
 import Colors from '@/constants/Colors';
-import { fetchAdresses } from '@/types';
+import { fetchAdresses, selectedRiderInterface } from '@/types';
 import ThemedText from '../general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
 import { router } from 'expo-router';
@@ -27,7 +27,7 @@ interface AllUserRowContainerProps {
 	contentContainerStyle?: ViewStyle | ViewStyle[];
 	rowStyle?: ViewStyle | ViewStyle[];
 	excludeIds?: Array<ClerkUser['id'] | undefined>;
-	costumHandleUserPress?: (userId: string) => void;
+	costumHandleUserPress?: (user: selectedRiderInterface) => void;
 }
 
 const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
@@ -61,7 +61,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 					return;
 				}
 				setAllUsers(res);
-				console.log(res);
+				// console.log(res);
 			})
 			.catch((err) =>
 				console.warn('An error loading all users occurred: ', err),
@@ -77,15 +77,15 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 		if (!usersLoaded || !allUsers) return;
 	}, [usersLoaded, allUsers]);
 
-	const handleUserPress = (userId: string) => {
+	const handleUserPress = (selectedUserData: selectedRiderInterface) => {
 		if (costumHandleUserPress) {
-			costumHandleUserPress(userId);
+			costumHandleUserPress(selectedUserData);
 			return;
 		}
 
 		router.push({
 			pathname: '/(auth)/sharedPages/userProfile',
-			params: { userId, self: 'false' },
+			params: { userId: selectedUserData._id, self: 'false' },
 		});
 	};
 
@@ -132,7 +132,17 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 									<Row
 										// @ts-ignore
 										containerStyle={[rowStyle]}
-										onPress={() => handleUserPress(user.id)}
+										onPress={() =>
+											handleUserPress({
+												name: user.username,
+												_id: user.id,
+												avatar: user.imageUrl,
+												// @ts-ignore
+												rank: user.rank ?? 'Diamond',
+												// @ts-ignore
+												rankPosition: user.rankPosition ?? 3,
+											})
+										}
 										showAvatar={true}
 										avatarUrl={user.imageUrl}
 										title={user.username ?? 'no name user'}
@@ -167,7 +177,17 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 									<Row
 										// @ts-ignore
 										containerStyle={[rowStyle]}
-										onPress={() => handleUserPress(FetchedUser.id)}
+										onPress={() =>
+											handleUserPress({
+												name: FetchedUser.username,
+												_id: FetchedUser.id,
+												avatar: FetchedUser.imageUrl,
+												// @ts-ignore
+												rank: FetchedUser.rank ?? 'Diamond',
+												// @ts-ignore
+												rankPosition: FetchedUser.rankPosition ?? 3,
+											})
+										}
 										showAvatar={true}
 										avatarUrl={FetchedUser.imageUrl}
 										title={

@@ -19,3 +19,23 @@ export function getTrickTitle(fetchedTrick?: {
 	}
 	return 'Error loading trick';
 }
+
+export const fetchLinkPreview = async (url: string | undefined) => {
+	try {
+		const response = await fetch(
+			`http://192.168.0.136:4000/api/chats/link-preview`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ url }),
+			},
+		);
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		console.error('Error while loading preview:', error);
+		return null;
+	}
+};

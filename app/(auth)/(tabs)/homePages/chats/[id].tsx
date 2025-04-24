@@ -9,13 +9,16 @@ import React, {
 } from 'react';
 import {
 	Bubble,
+	BubbleProps,
 	Composer,
 	GiftedChat,
 	IMessage,
 	InputToolbar,
 	LeftRightStyle,
 	MessageProps,
+	MessageVideoProps,
 	RenderMessageTextProps,
+	SendProps,
 	SystemMessage,
 	User,
 } from 'react-native-gifted-chat';
@@ -37,6 +40,7 @@ import {
 	ActivityIndicator,
 	Linking,
 	ViewStyle,
+	Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -56,17 +60,21 @@ import { useEvent } from 'expo';
 import ThemedText from '@/components/general/ThemedText';
 import {
 	chatCostumMsgType,
+	ChatFooterBarTypes,
+	ChatMessage,
 	CrahUser,
 	dropDownMenuInputData,
 	errType,
 	ItemText,
 	LinkPreview,
+	Rank,
+	selectedRiderInterface,
+	urlRegex,
 } from '@/types';
 import Row from '@/components/general/Row';
 import ClerkUser from '@/types/clerk';
 
-import Scooter from '../../../../../assets/images/vectors/scooter.svg';
-import { getTrickTitle } from '@/utils/globalFuncs';
+import { fetchLinkPreview, getTrickTitle } from '@/utils/globalFuncs';
 import DropDownMenu from '@/components/general/DropDownMenu';
 
 import BottomSheet, {
@@ -83,27 +91,23 @@ import { defaultStyles } from '@/constants/Styles';
 import SearchBar from '@/components/general/SearchBar';
 import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowContainer';
 import socket from '@/utils/socket';
-
-export interface ChatMessage extends IMessage {
-	_id: string;
-	isGroup: boolean;
-	ChatId: string;
-	ChatName: string;
-	ChatAvatar: string | null;
-	user: {
-		_id: string;
-		name: string;
-		avatar: string;
-	};
-	text: string;
-	createdAt: Date;
-	participants: User[];
-}
+import ChatFooterBar from '@/components/giftedChat/ChatFooter';
+import {
+	RenderSendEmptyText,
+	RenderSendText,
+} from '@/components/giftedChat/ComposerComponents';
+import { RenderRightInputButton } from '@/components/giftedChat/RenderRightInputButton';
+import { RiderRow, TrickRow } from '@/components/giftedChat/UtilityMessageRow';
+import {
+	CustomMessageView,
+	RenderBubble,
+	RenderMessageVideo,
+} from '@/components/giftedChat/RenderBubbleContents';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
-	const { bottom, top } = useSafeAreaInsets();
+	const { bottom } = useSafeAreaInsets();
 	const { id } = useLocalSearchParams();
 
 	// states
@@ -111,34 +115,50 @@ const ChatScreen = () => {
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const [messagesLoaded, setMessagesLoaded] = useState<boolean>();
 	const [errLoadingMessages, setErrLoadingMessages] = useState<boolean>();
-	const [userWantsToGoBack, setUserWantsToGoBack] = useState<boolean>(false);
 
 	const [isGroup, setIsGroup] = useState<boolean>();
 	const [chatTitle, setChatTitle] = useState<string>('');
 
 	const [joinedChatRoom, setJoinedChatRoom] = useState<boolean>();
 
+	// attaching a new message like a trick, rider, audio or source
+	const [displayChatFooter, setDisplayChatFooter] = useState<boolean>();
+	const [attachedMessageType, setAttachedMessageType] = useState<
+		ChatFooterBarTypes | undefined
+	>();
+
+	const [selectedRiderData, setSelectedRiderData] = useState<
+		selectedRiderInterface | undefined
+	>();
+
 	// send message
-	const onSend = useCallback((newMessages: any) => {
+	const onSend = useCallback((newMessages: ChatMessage[]) => {
 		if (!messages) return;
 
+		console.log('object', newMessages);
+
+		setDisplayChatFooter(false);
+		setSelectedRiderData(undefined);
+		setAttachedMessageType(undefined);
+
 		socket.emit('send-message', { chatId: id, msg: newMessages });
+
 		setMessages((previousMessages) =>
-			GiftedChat.append(previousMessages, { ...newMessages[0], type: 'text' }),
+			GiftedChat.append(previousMessages, newMessages),
 		);
 	}, []);
 
 	useEffect(() => {
-		socket.on('recieve-message', (msg) => {
-			console.log('object', { ...msg[0], type: 'text' });
+		socket.on('recieve-message', (msg: ChatMessage[]) => {
+			// console.log('object', msg);
+
 			setMessages((previousMessages) =>
-				GiftedChat.append(previousMessages, { ...msg[0], type: 'text' }),
+				GiftedChat.append(previousMessages, msg),
 			);
 		});
 	}, []);
 
 	useEffect(() => {
-		console.log(id, user?.id);
 		if (id && user?.id && !joinedChatRoom) {
 			socket.emit('join-chat', { chatId: id, userId: user?.id }, () => {
 				setJoinedChatRoom(true);
@@ -196,7 +216,7 @@ const ChatScreen = () => {
 					headerRight: () => (
 						<View style={styles.headerRight}>
 							{/* video call btn */}
-							<TouchableOpacity onPress={() => console.log('Video Call')}>
+							<TouchableOpacity onPress={() => {}}>
 								<Ionicons
 									name="videocam-outline"
 									size={26}
@@ -205,7 +225,7 @@ const ChatScreen = () => {
 							</TouchableOpacity>
 
 							{/* call btn */}
-							<TouchableOpacity onPress={() => console.log('Call')} style={{}}>
+							<TouchableOpacity onPress={() => {}} style={{}}>
 								<Ionicons
 									name="call-outline"
 									size={24}
@@ -278,6 +298,9 @@ const ChatScreen = () => {
 			{/* GiftedChat */}
 			<ImageBackground style={{ flex: 1, paddingBottom: bottom }}>
 				<RenderFetchedData
+					ActivityIndicatorStyle={{
+						marginTop: Dimensions.get('screen').height * 0.25,
+					}}
 					errState={errLoadingMessages}
 					loadedState={messagesLoaded}
 					activityIndicatorColor={Colors[theme].primary}
@@ -287,21 +310,22 @@ const ChatScreen = () => {
 					renderComponent={
 						<View style={{ flex: 1 }}>
 							<GiftedChat
+								optionTintColor="white"
 								isKeyboardInternallyHandled={true}
 								renderAvatar={null}
 								messages={messages}
 								onSend={(messages) => onSend(messages)}
 								user={{
 									// @ts-ignore
-									_id: user.id, // chat id
+									_id: user.id,
+									// @ts-ignore
+									name: user?.username,
+									avatar: user?.imageUrl,
 								}}
 								onInputTextChanged={setText}
 								// centered system messages
 								renderSystemMessage={(props) => (
-									<SystemMessage
-										{...props}
-										textStyle={{ color: Colors[theme].textSecondary }}
-									/>
+									<SystemMessage {...props} textStyle={{ color: 'white' }} />
 								)}
 								// left action: add btn
 								renderActions={(props) => (
@@ -311,8 +335,24 @@ const ChatScreen = () => {
 											justifyContent: 'center',
 											height: 44,
 										}}>
-										<RenderRightInputButton props={props} />
+										<RenderRightInputButton
+											setDisplayFooter={setDisplayChatFooter}
+											props={props}
+											setAttachedMessageType={setAttachedMessageType}
+											setSelectedRiderData={setSelectedRiderData}
+										/>
 									</View>
+								)}
+								// chat footer
+								renderChatFooter={() => (
+									<ChatFooterBar
+										displayFooter={displayChatFooter}
+										msgType={attachedMessageType}
+										riderData={selectedRiderData}
+										setAttachedMessageType={setAttachedMessageType}
+										setDisplayFooter={setDisplayChatFooter}
+										setSelectedRiderData={setSelectedRiderData}
+									/>
 								)}
 								// right btn: send
 								renderSend={(props) => (
@@ -322,8 +362,12 @@ const ChatScreen = () => {
 											justifyContent: 'center',
 											height: 44,
 										}}>
-										{text.length > 0 ? (
-											<RenderSendText props={props} />
+										{text.length > 0 || attachedMessageType !== undefined ? (
+											<RenderSendText
+												selectedRiderData={selectedRiderData}
+												attachedMessageType={attachedMessageType}
+												props={props}
+											/>
 										) : (
 											<RenderSendEmptyText props={props} />
 										)}
@@ -343,12 +387,12 @@ const ChatScreen = () => {
 										{...props}
 										containerStyle={{
 											backgroundColor: Colors[theme].surface,
-											marginTop: 12,
+											marginTop: displayChatFooter ? 0 : 12,
 										}}
 									/>
 								)}
 								renderQuickReplies={(props) => (
-									<QuickReplies color={Colors[theme].primary} {...props} />
+									<QuickReplies color={'white'} {...props} />
 								)}
 								renderComposer={(props) => (
 									<Composer
@@ -358,12 +402,13 @@ const ChatScreen = () => {
 								)}
 								focusOnInputWhenOpeningKeyboard={true}
 								renderMessageVideo={(props) => (
-									<LinkMessageBubble props={props} />
+									<RenderMessageVideo props={props} />
 								)}
 								isTyping={false}
 								renderCustomView={(props) => (
 									<CustomMessageView props={props} />
 								)}
+								renderTime={() => <></>}
 							/>
 							{Platform.OS === 'android' && (
 								<KeyboardAvoidingView behavior="padding" />
@@ -374,510 +419,6 @@ const ChatScreen = () => {
 			</ImageBackground>
 		</ThemedView>
 	);
-};
-
-const RenderSendEmptyText: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-
-	return (
-		<View style={{ flexDirection: 'row', gap: 14, paddingHorizontal: 14 }}>
-			<TouchableOpacity
-				onPress={() => {
-					console.log('camera pressed');
-				}}>
-				<View>
-					<Ionicons
-						name="camera-outline"
-						size={24}
-						color={Colors[theme].textPrimary}
-					/>
-				</View>
-			</TouchableOpacity>
-
-			<TouchableOpacity
-				onPress={() => {
-					console.log('mic pressed');
-				}}>
-				<View>
-					<Ionicons
-						name="mic-outline"
-						size={24}
-						color={Colors[theme].textPrimary}
-					/>
-				</View>
-			</TouchableOpacity>
-		</View>
-	);
-};
-
-const RenderSendText: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-
-	return (
-		<TouchableOpacity
-			onPress={() => {
-				if (props.text && props.text.trim()) {
-					props.onSend({ text: props.text.trim() }, true);
-				}
-			}}
-			style={{ paddingHorizontal: 14 }}>
-			<Ionicons
-				name="send-outline"
-				size={24}
-				color={Colors[theme].textPrimary}
-			/>
-		</TouchableOpacity>
-	);
-};
-
-const RenderRightInputButton: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-	const items: Array<dropDownMenuInputData> = [
-		{
-			key: 0,
-			text: 'Rider',
-		},
-		{
-			key: 1,
-			text: 'Trick',
-		},
-	];
-
-	const [bottomSheetDisplayContentType, setBottomSheetDisplayContentType] =
-		useState<ItemText>();
-
-	const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-	const snapPoints = useMemo(() => ['75%'], []);
-
-	const handlePresentModalPress = useCallback(() => {
-		bottomSheetModalRef.current?.present();
-	}, []);
-
-	const renderBackdrop = useCallback((props: any) => {
-		const animatedIndex = useSharedValue(0);
-		const animatedPosition = useSharedValue(1);
-
-		return (
-			<BottomSheetBackdrop
-				animatedIndex={animatedIndex}
-				animatedPosition={animatedPosition}
-				disappearsOnIndex={-1}
-				appearsOnIndex={0}
-			/>
-		);
-	}, []);
-
-	const handleBottomSheetOpen = () => {
-		handlePresentModalPress();
-	};
-
-	const handleOnSelect = (val: { key: number; text: ItemText }) => {
-		setBottomSheetDisplayContentType(val.text);
-		handleBottomSheetOpen();
-
-		switch (val.text) {
-			case 'Rider':
-				// fetchTricks();
-				break;
-
-			case 'Trick':
-				// fetchRiders();
-				break;
-		}
-	};
-
-	// fetching...
-	const [searchQuery, setSearchQuery] = useState<string>('');
-
-	const [dataLoaded, setDataLoaded] = useState<boolean>();
-	const [err, setErr] = useState<errType>();
-	const [data, setData] = useState<any>();
-
-	return (
-		<View>
-			<BottomSheetModal
-				containerStyle={{}}
-				backdropComponent={renderBackdrop}
-				handleIndicatorStyle={{ backgroundColor: 'gray' }}
-				backgroundStyle={{
-					backgroundColor: Colors[theme].surface,
-				}}
-				ref={bottomSheetModalRef}
-				index={1}
-				snapPoints={snapPoints}>
-				{/* main content */}
-				<BottomSheetView
-					style={{
-						flex: 1,
-						padding: 12,
-					}}>
-					<View
-						style={{
-							flex: 1,
-							gap: 12,
-							height: 94,
-							minHeight: 94,
-							maxHeight: 94,
-						}}>
-						<ThemedText
-							style={[defaultStyles.biggerText]}
-							value={`Select a ${bottomSheetDisplayContentType}`}
-							theme={theme}
-						/>
-						<SearchBar
-							containerStyle={{
-								height: 42,
-								minHeight: 42,
-								maxHeight: 42,
-							}}
-							placeholder={'Search...'}
-							query={searchQuery}
-							setQuery={setSearchQuery}
-						/>
-					</View>
-					{bottomSheetDisplayContentType === 'Rider' ? (
-						<AllUserRowContainer
-							contentContainerStyle={{
-								flex: 1,
-								paddingHorizontal: 0,
-								backgroundColor: Colors[theme].surface,
-							}}
-							rowStyle={{
-								paddingHorizontal: 0,
-								backgroundColor: Colors[theme].surface,
-							}}
-							bottomSheet={true}
-						/>
-					) : (
-						<View></View>
-					)}
-				</BottomSheetView>
-			</BottomSheetModal>
-
-			<DropDownMenu
-				onSelect={(_, val) => handleOnSelect(val)}
-				items={items}
-				triggerComponent={
-					<TouchableOpacity style={{ paddingHorizontal: 10 }}>
-						<Ionicons
-							name="add-outline"
-							size={24}
-							color={Colors[theme].textPrimary}
-						/>
-					</TouchableOpacity>
-				}
-			/>
-		</View>
-	);
-};
-
-const CustomMessageView: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-	const message = props.currentMessage;
-
-	if (!message || !message.type) return null;
-
-	switch (message.type) {
-		// case 'link-preview':
-		// 	return (
-		// 		<View style={{ padding: 10 }}>
-		// 			<TouchableOpacity
-		// 				onPress={() => Linking.openURL(message.text)}
-		// 				style={{ borderRadius: 10, overflow: 'hidden' }}>
-		// 				<Image
-		// 					source={{ uri: message.previewImage }}
-		// 					style={{ width: 250, height: 130 }}
-		// 					resizeMode="cover"
-		// 				/>
-		// 				<Text style={{ color: Colors[theme].primary, paddingTop: 6 }}>
-		// 					{message.text}
-		// 				</Text>
-		// 			</TouchableOpacity>
-		// 		</View>
-		// 	);
-
-		case 'trick':
-			const trickId = props.currentMessage.trickId;
-
-			return <TrickRow trickId={trickId} />;
-
-		case 'rider':
-			const riderId = props.currentMessage.riderId;
-
-			return <RiderRow riderId={riderId} />;
-
-		default:
-			return null;
-	}
-};
-
-const RiderRow: React.FC<{ riderId: string }> = ({ riderId }) => {
-	const theme = useSystemTheme();
-	const { user } = useUser();
-
-	const [fetchedRider, setFetchedRider] = useState<ClerkUser>();
-	const [riderLoaded, setRiderLoaded] = useState<boolean>();
-	const [error, setError] = useState<errType>();
-
-	useEffect(() => {
-		const fetchRider = async () => {
-			try {
-				setError(undefined);
-				setRiderLoaded(false);
-
-				const res = await fetch(
-					`http://192.168.0.136:4000/api/users/${riderId}`,
-					{
-						headers: { 'Cache-Control': 'no-cache' },
-					},
-				);
-
-				if (!res.ok) {
-					setError('not found');
-					return;
-				}
-
-				const data = await res.json();
-				setFetchedRider(data);
-			} catch (err) {
-				setError('not found');
-			} finally {
-				setRiderLoaded(true);
-			}
-		};
-
-		fetchRider();
-	}, [riderId]);
-
-	const handleRiderPress = () => {
-		router.push({
-			pathname: '/(auth)/sharedPages/userProfile',
-			params: {
-				userId: riderId,
-				self: riderId !== user?.id ? 'false' : 'true',
-				linking: 'true',
-			},
-		});
-	};
-
-	return (
-		<Row
-			key={riderId}
-			containerStyle={{
-				backgroundColor: Colors[theme].container_surface,
-				borderRadius: 12,
-				width: 250,
-			}}
-			title={
-				!riderLoaded
-					? 'loading rider'
-					: fetchedRider?.username ?? 'Error loading rider'
-			}
-			subtitle="rank silver #3"
-			avatarUrl={fetchedRider?.imageUrl}
-			onPress={handleRiderPress}
-		/>
-	);
-};
-
-const TrickRow: React.FC<{ trickId: number }> = ({ trickId }) => {
-	const theme = useSystemTheme();
-	const [fetchedTrick, setFetchedTrick] = useState<any>();
-	const [trickLoaded, setTrickLoaded] = useState(false);
-	const [error, setError] = useState<errType>();
-
-	useEffect(() => {
-		const fetchTrick = async () => {
-			try {
-				setError(undefined);
-				setTrickLoaded(false);
-
-				const res = await fetch(
-					`http://192.168.0.136:4000/public/tricks/commonTricks.json`,
-					{
-						headers: { 'Cache-Control': 'no-cache' },
-					},
-				);
-
-				if (!res.ok) {
-					setError('not found');
-					return;
-				}
-
-				const data = await res.json();
-				setFetchedTrick(data.commonTricks[trickId]);
-			} catch (err) {
-				setError('not found');
-			} finally {
-				setTrickLoaded(true);
-			}
-		};
-
-		fetchTrick();
-	}, [trickId]);
-
-	const handleTrickPress = () => {
-		router.push({
-			pathname: '/modals/TrickModal',
-			params: {
-				data: JSON.stringify({
-					trickName: getTrickTitle(fetchedTrick),
-					trickDescription: 'lel',
-				}),
-			},
-		});
-	};
-
-	return (
-		<Row
-			key={trickId}
-			avatarIsSVG
-			showAvatar
-			avatarUrl={Scooter}
-			costumAvatarHeight={34}
-			costumAvatarWidth={38}
-			containerStyle={{
-				backgroundColor: Colors[theme].container_surface,
-				borderRadius: 12,
-				width: 250,
-			}}
-			subtitle="costum trick"
-			title={!trickLoaded ? 'loading trick' : getTrickTitle(fetchedTrick)}
-			onPress={handleTrickPress}
-		/>
-	);
-};
-
-const RenderBubble: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-	const msgType: chatCostumMsgType = props.currentMessage.type;
-
-	return (
-		<Bubble
-			{...props}
-			wrapperStyle={{
-				right: [
-					{
-						backgroundColor:
-							msgType !== 'text'
-								? Colors[theme].container_surface
-								: Colors[theme].textBubbleOwn,
-					},
-				],
-				left: [
-					{
-						backgroundColor:
-							msgType !== 'text'
-								? Colors[theme].container_surface
-								: Colors[theme].textBubbleOther,
-					},
-				],
-			}}
-			textStyle={{
-				right: { color: 'white' },
-				left: { color: 'white' },
-			}}
-		/>
-	);
-};
-
-const urlRegex = /(https?:\/\/[^\s]+)/g;
-
-const LinkMessageBubble: React.FC<{ props: any }> = ({ props }) => {
-	const { currentMessage } = props;
-	const messageText = currentMessage?.text ?? '';
-	const videoUrl = currentMessage?.video;
-	const internetLinks = videoUrl?.match(urlRegex);
-	const isInternetLink = Boolean(internetLinks.length > 0);
-	const theme = useSystemTheme();
-
-	const [previewData, setPreviewData] = useState<LinkPreview>();
-
-	// const player = useVideoPlayer(videoUrl, (player) => {
-	// 	player.loop = true;
-	// 	player.play();
-	// });
-
-	// useEvent(player, 'playingChange', {
-	// 	isPlaying: player.playing,
-	// });
-
-	// useEffect(() => {
-	// 	if (isInternetLink) {
-	// 		fetchLinkPreview(internetLinks[0]).then((previewData: LinkPreview) => {
-	// 			setPreviewData(previewData);
-	// 		});
-	// 	}
-	// }, [internetLinks]);
-
-	const handleLinkPress = async (url: string) => {
-		console.log(url);
-		const canOpen = await Linking.canOpenURL(url);
-		if (canOpen) {
-			Linking.openURL('https://www.youtube.com/watch?v=UTjwyDuVjRM&t');
-		} else {
-			console.error('Cannot open URL');
-		}
-	};
-
-	console.log(isInternetLink);
-
-	return (
-		<View>
-			{isInternetLink ? (
-				<View style={{ flex: 0 }}>
-					{/* <Image
-						style={{
-							width: '100%',
-							height: 100,
-							// flex: 1,
-						}}
-						source={{ uri: previewData?.images[0] }}
-					/>
-					<TouchableOpacity onPress={() => handleLinkPress(videoUrl)}>
-						<ThemedText
-							style={{
-								paddingHorizontal: 10,
-								paddingVertical: 8,
-								color: Colors[theme].primary,
-							}}
-							theme={theme}
-							value={videoUrl}
-						/>
-					</TouchableOpacity> */}
-				</View>
-			) : (
-				<View style={{ flex: 1 }}>
-					{/* <VideoView
-						style={{ flex: 1, width: 200, height: 200 }}
-						player={player}
-						contentFit="contain"
-						allowsFullscreen
-					/> */}
-				</View>
-			)}
-		</View>
-	);
-};
-
-const fetchLinkPreview = async (url: string) => {
-	try {
-		const response = await fetch(
-			`http://192.168.0.136:4000/api/chats/link-preview`,
-			{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ url }),
-			},
-		);
-		const data = await response.json();
-		return data;
-	} catch (error) {
-		console.error('Error while loading preview:', error);
-		return null;
-	}
 };
 
 const VideoStyles = StyleSheet.create({
@@ -894,13 +435,6 @@ const VideoStyles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-	container: {
-		flexDirection: 'row',
-		padding: 10,
-		backgroundColor: '#eee',
-		borderRadius: 10,
-		alignItems: 'center',
-	},
 	image: {
 		width: 50,
 		height: 50,
@@ -910,10 +444,6 @@ const styles = StyleSheet.create({
 	title: {
 		fontWeight: 'bold',
 		fontSize: 14,
-	},
-	description: {
-		fontSize: 12,
-		color: '#555',
 	},
 	headerLeft: { marginRight: 20 },
 	headerCenter: {

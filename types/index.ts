@@ -1,6 +1,7 @@
 import Reactions from '@/constants/Reactions';
 import UserPostDummyStructure from '@/JSON/posts.json';
 import { Ionicons } from '@expo/vector-icons';
+import { IMessage, User } from 'react-native-gifted-chat';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 
 // Ionicons icon type
@@ -20,6 +21,33 @@ export interface CrahUser {
 	level?: number;
 	rank?: number;
 }
+
+// when a user is selected in f.e a gifted chat
+export interface selectedRiderInterface extends User {
+	rank: Rank;
+	rankPosition: number;
+}
+
+// gifted chat footer attachment types
+export type ChatFooterBarTypes = 'TrickRow' | 'RiderRow' | 'Source' | 'Audio';
+
+// chat message for gifted chat
+export interface ChatMessage extends IMessage {
+	_id: string;
+	isGroup: boolean;
+	ChatId: string;
+	ChatName: string;
+	ChatAvatar: string | null;
+	text: string;
+	createdAt: Date;
+	participants: User[];
+	type: chatCostumMsgType;
+	riderId: string;
+	trickId: number;
+}
+
+// identify urls
+export const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 // error type for error states when fetching from an api
 export type errType = 'not found' | 'deleted' | undefined;
