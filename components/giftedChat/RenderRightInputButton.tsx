@@ -5,6 +5,7 @@ import {
 	errType,
 	ItemText,
 	selectedRiderInterface,
+	selectedTrickInterface,
 } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import {
@@ -22,12 +23,14 @@ import SearchBar from '../general/SearchBar';
 import AllUserRowContainer from '../displayFetchedData/AllUserRowContainer';
 import DropDownMenu from '../general/DropDownMenu';
 import { Ionicons } from '@expo/vector-icons';
+import AllTricksRowContainer from '../displayFetchedData/AllTricksRowContainer';
 
 interface RenderRightInputButtonProps {
 	props: any;
 	setDisplayFooter: (b: boolean) => void;
 	setAttachedMessageType: (t: ChatFooterBarTypes) => void;
-	setSelectedRiderData: (u: selectedRiderInterface) => void;
+	setSelectedRiderData: (u: selectedRiderInterface | undefined) => void;
+	setSelectedTrickData: (u: selectedTrickInterface | undefined) => void;
 }
 
 export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
@@ -35,6 +38,7 @@ export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
 	setDisplayFooter,
 	setAttachedMessageType,
 	setSelectedRiderData,
+	setSelectedTrickData,
 }) => {
 	const theme = useSystemTheme();
 	const items: Array<dropDownMenuInputData> = [
@@ -109,6 +113,13 @@ export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
 		setSelectedRiderData(user);
 	};
 
+	const onTrickPress = (trick: selectedTrickInterface) => {
+		handleCloseModalPress();
+		setDisplayFooter(true);
+		setAttachedMessageType('TrickRow');
+		setSelectedTrickData(trick);
+	};
+
 	return (
 		<View>
 			<BottomSheetModal
@@ -166,7 +177,19 @@ export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
 							bottomSheet={true}
 						/>
 					) : (
-						<View></View>
+						<AllTricksRowContainer
+							costumHandleTrickPress={onTrickPress}
+							contentContainerStyle={{
+								flex: 1,
+								paddingHorizontal: 0,
+								backgroundColor: Colors[theme].surface,
+							}}
+							rowStyle={{
+								paddingHorizontal: 0,
+								backgroundColor: Colors[theme].surface,
+							}}
+							bottomSheet={true}
+						/>
 					)}
 				</BottomSheetView>
 			</BottomSheetModal>

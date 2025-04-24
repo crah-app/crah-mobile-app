@@ -11,10 +11,11 @@ export default {
 		accent: 'rgb(69, 123, 157)',
 		buttonDefault: 'rgb(30, 30, 30)',
 		buttonActive: 'rgb(201, 42, 52)',
-		textBubbleOwn: 'rgb(255, 0, 0)',
+		textBubbleOwn: 'rgb(200, 0, 0)',
 		textBubbleOther: 'rgb(44, 44, 44)',
 		borderColor: 'rgb(42, 42, 42)',
 		gray: 'gray',
+		darkPrimary: 'rgb(200, 0, 0)',
 	},
 	dark: {
 		primary: 'rgb(255, 0, 0)',
@@ -32,6 +33,7 @@ export default {
 		textBubbleOther: 'rgb(44, 44, 44)',
 		borderColor: 'rgb(42, 42, 42)',
 		gray: 'gray',
+		darkPrimary: 'rgb(200, 0, 0)',
 	},
 	default: {
 		primary: 'rgb(255, 0, 0)',

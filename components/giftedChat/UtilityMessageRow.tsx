@@ -141,7 +141,7 @@ export const TrickRow: React.FC<{ trickId: number }> = ({ trickId }) => {
 				borderRadius: 12,
 				width: 250,
 			}}
-			subtitle="costum trick"
+			subtitle={'loluis'}
 			title={!trickLoaded ? 'loading trick' : getTrickTitle(fetchedTrick)}
 			onPress={handleTrickPress}
 		/>

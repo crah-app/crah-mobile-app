@@ -4,6 +4,7 @@ import {
 	ChatFooterBarTypes,
 	ChatMessage,
 	selectedRiderInterface,
+	selectedTrickInterface,
 	urlRegex,
 } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -16,12 +17,14 @@ interface RenderSendTextProps {
 	props: SendProps<ChatMessage>;
 	attachedMessageType: ChatFooterBarTypes | undefined;
 	selectedRiderData: selectedRiderInterface | undefined;
+	selectedTrickData: selectedTrickInterface | undefined;
 }
 
 export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	props,
 	attachedMessageType,
 	selectedRiderData,
+	selectedTrickData,
 }) => {
 	const theme = useSystemTheme();
 
@@ -41,7 +44,7 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 
 			case 'TrickRow':
 				message.type = chatCostumMsgType.trick;
-
+				message.trickId = selectedTrickData?.id;
 				break;
 
 			case 'Audio':

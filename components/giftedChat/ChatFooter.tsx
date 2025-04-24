@@ -1,4 +1,8 @@
-import { ChatFooterBarTypes, selectedRiderInterface } from '@/types';
+import {
+	ChatFooterBarTypes,
+	selectedRiderInterface,
+	selectedTrickInterface,
+} from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '../general/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,16 +11,19 @@ import Colors from '@/constants/Colors';
 import React from 'react';
 import Row from '../general/Row';
 
+import Scooter from '../../assets/images/vectors/scooter.svg';
+
 interface ChatFooterBarProps {
 	msgType: ChatFooterBarTypes | undefined;
 	displayFooter: boolean | undefined;
-	trickData?: any;
+	trickData?: selectedTrickInterface;
 	riderData?: selectedRiderInterface;
 	sourceData?: any;
 	audioData?: any;
 	setDisplayFooter: (b: boolean) => void;
 	setAttachedMessageType: (t: ChatFooterBarTypes | undefined) => void;
 	setSelectedRiderData: (u: selectedRiderInterface | undefined) => void;
+	setSelectedTrickData: (u: selectedTrickInterface | undefined) => void;
 }
 
 const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
@@ -29,6 +36,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 	setAttachedMessageType,
 	setDisplayFooter,
 	setSelectedRiderData,
+	setSelectedTrickData,
 }) => {
 	const theme = useSystemTheme();
 
@@ -38,9 +46,10 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 				<Row
 					showAvatar
 					avatarIsSVG
-					avatarUrl={''}
-					title={'Trick'}
-					subtitle="Costum Trick"
+					avatarUrl={Scooter}
+					// @ts-ignore
+					title={trickData?.name}
+					subtitle={trickData?.difficulty}
 					containerStyle={{
 						backgroundColor: Colors[theme].container_surface,
 					}}
@@ -51,7 +60,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 
 	const RiderRow = () => {
 		return (
-			<View style={{ backgroundColor: Colors[theme].surface }}>
+			<View style={{ backgroundColor: Colors[theme].container_surface }}>
 				<Row
 					showAvatar
 					// @ts-ignore
@@ -59,7 +68,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 					// @ts-ignore
 					title={riderData?.name}
 					subtitle={riderData?.rank + ' #' + riderData?.rankPosition}
-					containerStyle={{ backgroundColor: Colors[theme].surface }}
+					containerStyle={{ backgroundColor: Colors[theme].container_surface }}
 				/>
 			</View>
 		);
@@ -91,6 +100,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 
 	const abortAttachedMessage = () => {
 		setSelectedRiderData(undefined);
+		setSelectedTrickData(undefined);
 		setAttachedMessageType(undefined);
 		setDisplayFooter(false);
 	};

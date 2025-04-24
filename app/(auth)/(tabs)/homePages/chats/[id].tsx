@@ -69,6 +69,7 @@ import {
 	LinkPreview,
 	Rank,
 	selectedRiderInterface,
+	selectedTrickInterface,
 	urlRegex,
 } from '@/types';
 import Row from '@/components/general/Row';
@@ -130,6 +131,9 @@ const ChatScreen = () => {
 	const [selectedRiderData, setSelectedRiderData] = useState<
 		selectedRiderInterface | undefined
 	>();
+	const [selectedTrickData, setSelectedTrickData] = useState<
+		selectedTrickInterface | undefined
+	>();
 
 	// send message
 	const onSend = useCallback((newMessages: ChatMessage[]) => {
@@ -139,6 +143,7 @@ const ChatScreen = () => {
 
 		setDisplayChatFooter(false);
 		setSelectedRiderData(undefined);
+		setSelectedTrickData(undefined);
 		setAttachedMessageType(undefined);
 
 		socket.emit('send-message', { chatId: id, msg: newMessages });
@@ -340,6 +345,7 @@ const ChatScreen = () => {
 											props={props}
 											setAttachedMessageType={setAttachedMessageType}
 											setSelectedRiderData={setSelectedRiderData}
+											setSelectedTrickData={setSelectedTrickData}
 										/>
 									</View>
 								)}
@@ -349,9 +355,11 @@ const ChatScreen = () => {
 										displayFooter={displayChatFooter}
 										msgType={attachedMessageType}
 										riderData={selectedRiderData}
+										trickData={selectedTrickData}
 										setAttachedMessageType={setAttachedMessageType}
 										setDisplayFooter={setDisplayChatFooter}
 										setSelectedRiderData={setSelectedRiderData}
+										setSelectedTrickData={setSelectedTrickData}
 									/>
 								)}
 								// right btn: send
@@ -364,6 +372,7 @@ const ChatScreen = () => {
 										}}>
 										{text.length > 0 || attachedMessageType !== undefined ? (
 											<RenderSendText
+												selectedTrickData={selectedTrickData}
 												selectedRiderData={selectedRiderData}
 												attachedMessageType={attachedMessageType}
 												props={props}

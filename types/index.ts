@@ -28,6 +28,14 @@ export interface selectedRiderInterface extends User {
 	rankPosition: number;
 }
 
+// when a trick is selected f.e in a gifted chat
+export interface selectedTrickInterface {
+	id: number;
+	name: string;
+	difficulty: TrickDifficulty;
+	costum?: boolean;
+}
+
 // gifted chat footer attachment types
 export type ChatFooterBarTypes = 'TrickRow' | 'RiderRow' | 'Source' | 'Audio';
 
@@ -99,6 +107,7 @@ export enum fetchAdresses {
 	commonTricks = 'http://192.168.0.136:4000/public/tricks/commonTricks.json',
 	allUsers = 'http://192.168.0.136:4000/api/users/all',
 	allPosts = 'http://192.168.0.136:4000/api/posts/all',
+	allTricks = 'http://192.168.0.136:4000/public/tricks/commonTricks.json',
 }
 
 /*
