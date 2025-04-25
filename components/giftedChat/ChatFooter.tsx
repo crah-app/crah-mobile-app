@@ -24,6 +24,8 @@ interface ChatFooterBarProps {
 	setAttachedMessageType: (t: ChatFooterBarTypes | undefined) => void;
 	setSelectedRiderData: (u: selectedRiderInterface | undefined) => void;
 	setSelectedTrickData: (u: selectedTrickInterface | undefined) => void;
+	setSelectedVideo: (source: string | undefined) => void;
+	setSelectedImage: (source: string | undefined) => void;
 }
 
 const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
@@ -87,15 +89,24 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 	};
 
 	const SourceRow = () => {
-		return (
-			<View style={{ backgroundColor: Colors[theme].container_surface }}>
-				<Row
-					title={'Image'}
-					subtitle="image view"
-					containerStyle={{ backgroundColor: Colors[theme].container_surface }}
-				/>
-			</View>
-		);
+		if (sourceData.type === 'image') {
+			return (
+				<View style={{ backgroundColor: Colors[theme].container_surface }}>
+					<Row
+						showAvatar
+						avatarUrl={sourceData.uri}
+						title={'Image'}
+						subtitle="image view"
+						containerStyle={{
+							backgroundColor: Colors[theme].container_surface,
+						}}
+					/>
+				</View>
+			);
+		}
+
+		// render video
+		return <></>;
 	};
 
 	const abortAttachedMessage = () => {

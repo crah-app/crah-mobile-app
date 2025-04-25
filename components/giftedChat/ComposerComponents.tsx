@@ -9,9 +9,12 @@ import {
 } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, TouchableOpacity, View } from 'react-native';
 import { SendProps } from 'react-native-gifted-chat';
+import CameraComponent from '../../app/(auth)/modals/chats/CameraComponent';
+import { router } from 'expo-router';
+import Modal from 'react-native-modal';
 
 interface RenderSendTextProps {
 	props: SendProps<ChatMessage>;
@@ -93,12 +96,26 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	);
 };
 
-export const RenderSendEmptyText: React.FC<{ props: any }> = ({ props }) => {
+export const RenderSendEmptyText: React.FC<{ props: any; chatId: string }> = ({
+	props,
+	chatId,
+}) => {
 	const theme = useSystemTheme();
+
+	const [useCamera, setUseCamera] = useState<boolean>(false);
+
+	const handleCamera = () => {
+		setUseCamera((c) => !c);
+
+		router.navigate({
+			pathname: '/modals/chats/CameraComponent',
+			params: { page: 'chat', chatId },
+		});
+	};
 
 	return (
 		<View style={{ flexDirection: 'row', gap: 14, paddingHorizontal: 14 }}>
-			<TouchableOpacity onPress={() => {}}>
+			<TouchableOpacity onPress={handleCamera}>
 				<View>
 					<Ionicons
 						name="camera-outline"
