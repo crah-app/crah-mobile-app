@@ -32,6 +32,22 @@ const Layout = () => {
 					headerShown: false,
 				}}
 			/>
+
+			<Stack.Screen
+				name="CameraComponent"
+				options={{
+					animation: 'fade',
+					headerShown: false,
+				}}
+			/>
+
+			<Stack.Screen
+				name="MediaLibrary"
+				options={{
+					animation: 'fade',
+					headerShown: false,
+				}}
+			/>
 		</Stack>
 	);
 };

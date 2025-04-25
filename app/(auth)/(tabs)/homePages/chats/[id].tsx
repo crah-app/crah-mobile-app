@@ -109,7 +109,7 @@ const ChatScreen = () => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
 	const { bottom } = useSafeAreaInsets();
-	const { id } = useLocalSearchParams();
+	const { id, fromCamera, video, image } = useLocalSearchParams(); // when user goes from the camera page back to the chat page the source has to be given vie local params
 
 	// states
 	const [text, setText] = useState('');
@@ -135,16 +135,20 @@ const ChatScreen = () => {
 		selectedTrickInterface | undefined
 	>();
 
+	const [selectedVideo, setSelectedVideo] = useState<string | undefined>();
+	const [selectedImage, setSelectedImage] = useState<string | undefined>();
+
 	// send message
 	const onSend = useCallback((newMessages: ChatMessage[]) => {
 		if (!messages) return;
-
-		console.log('object', newMessages);
+		// console.log('object', newMessages);
 
 		setDisplayChatFooter(false);
 		setSelectedRiderData(undefined);
 		setSelectedTrickData(undefined);
 		setAttachedMessageType(undefined);
+		setSelectedVideo(undefined);
+		setSelectedImage(undefined);
 
 		socket.emit('send-message', { chatId: id, msg: newMessages });
 
@@ -203,6 +207,22 @@ const ChatScreen = () => {
 
 		return () => {};
 	}, []);
+
+	useEffect(() => {
+		if (!fromCamera) return;
+
+		if (video) {
+			setSelectedVideo(video as string);
+			return;
+		}
+
+		if (image) {
+			setSelectedImage(image as string);
+			return;
+		}
+
+		setDisplayChatFooter(true);
+	}, [fromCamera]);
 
 	return (
 		<ThemedView theme={theme} flex={1} style={{}}>
@@ -360,6 +380,14 @@ const ChatScreen = () => {
 										setDisplayFooter={setDisplayChatFooter}
 										setSelectedRiderData={setSelectedRiderData}
 										setSelectedTrickData={setSelectedTrickData}
+										setSelectedImage={setSelectedImage}
+										setSelectedVideo={setSelectedVideo}
+										sourceData={[
+											{
+												uri: selectedImage || selectedVideo,
+												type: selectedImage ? 'image' : 'video',
+											},
+										]}
 									/>
 								)}
 								// right btn: send
@@ -378,7 +406,10 @@ const ChatScreen = () => {
 												props={props}
 											/>
 										) : (
-											<RenderSendEmptyText props={props} />
+											<RenderSendEmptyText
+												chatId={id as string}
+												props={props}
+											/>
 										)}
 									</View>
 								)}
