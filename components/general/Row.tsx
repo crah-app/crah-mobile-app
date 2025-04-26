@@ -74,7 +74,9 @@ const Row: React.FC<RowProps> = ({
 
 		return parts.map((part, index) =>
 			words.some((word) => word.toLowerCase() === part.toLowerCase()) ? (
-				<Text key={index} style={{ color: 'red', fontWeight: 'bold' }}>
+				<Text
+					key={index}
+					style={{ color: Colors[theme].primary, fontWeight: 'bold' }}>
 					{part}
 				</Text>
 			) : (

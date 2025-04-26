@@ -15,18 +15,23 @@ import { router } from 'expo-router';
 import ThemedTextInput from '../general/ThemedTextInput';
 import {
 	BestTrickType,
+	SpotInterface,
 	TextInputMaxCharacters,
 	TrickListSpot,
 	TrickSpot,
 } from '@/types';
 import { defaultStyles } from '@/constants/Styles';
 import { format } from 'date-fns';
+import { SvgXml } from 'react-native-svg';
+import TrickPreviewCard from './TrickPreviewCard';
+import { useUser } from '@clerk/clerk-expo';
 
 interface TrickBuilderProps {}
 
 const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 	const insets = useSafeAreaInsets();
 	const theme = useSystemTheme();
+	const { user } = useUser();
 
 	// trick builder header
 	const TrickBuilderHeader = () => {
@@ -68,16 +73,13 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 	};
 
 	const TrickBuilderBody = () => {
-		// spot row data interface
-		interface SpotInterface {
-			spot: TrickSpot;
-			landing_date: Date;
-		}
-
 		const [value, setValue] = useState<string>('');
 		const [spots, setSpots] = useState<SpotInterface[]>([
 			{ spot: 'Flat', landing_date: new Date() },
-			{ spot: 'Street', landing_date: new Date() },
+			{
+				spot: 'Street',
+				landing_date: new Date(100000000000),
+			},
 		]);
 
 		// spot row
@@ -116,13 +118,11 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 							borderLeftWidth: StyleSheet.hairlineWidth,
 						}}>
 						{addSpot ? (
-							<TouchableOpacity>
-								<Ionicons
-									size={24}
-									color={Colors[theme].gray}
-									name={'add-circle-outline'}
-								/>
-							</TouchableOpacity>
+							<ThemedText
+								style={{ color: Colors[theme].gray }}
+								theme={theme}
+								value={'YYYY-MM-DD'}
+							/>
 						) : (
 							<ThemedText
 								theme={theme}
@@ -134,35 +134,12 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 			);
 		};
 
-		// trick preview
-		const TrickPreview = () => {
-			return (
-				<View
-					style={{
-						width: '100%',
-						flexDirection: 'column',
-						gap: 12,
-					}}>
-					<View style={{ width: '100%' }}>
-						<ThemedText theme={theme} value={'Preview'} />
-					</View>
-
-					<View
-						style={{
-							backgroundColor: Colors[theme].container_surface,
-							height: 200,
-							width: '100%',
-							borderRadius: 8,
-						}}></View>
-				</View>
-			);
-		};
-
 		return (
 			<View style={styles.container}>
 				{/* input field with button */}
 				<View style={{ gap: 12 }}>
 					<ThemedTextInput
+						makeWordToBubble
 						theme={theme}
 						value={value}
 						setValue={setValue}
@@ -174,12 +151,11 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 					<TouchableOpacity>
 						<ThemedText
 							theme={theme}
-							value={'Add'}
+							value={'Create'}
 							style={[defaultStyles.primaryBtn]}
 						/>
 					</TouchableOpacity>
 				</View>
-
 				{/* trick spots */}
 				<View style={{ width: '100%' }}>
 					<View
@@ -215,9 +191,13 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 						/>
 					</View>
 				</View>
-
 				{/* trick preview */}
-				<TrickPreview />
+				<TrickPreviewCard
+					theme={theme}
+					trickName={'Crossfoot Buttercup Crossfoot'}
+					userId={user?.id}
+					spots={spots}
+				/>
 			</View>
 		);
 	};
