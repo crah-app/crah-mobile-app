@@ -413,6 +413,8 @@ export enum BestTrickType {
 	STREET = 'Street',
 }
 
+export type TrickSpot = 'Flat' | 'Park' | 'Street';
+
 /*
 	In what order a trick list should be displayed in a trick list
 */
