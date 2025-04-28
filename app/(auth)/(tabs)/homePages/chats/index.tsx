@@ -329,7 +329,7 @@ const Page = () => {
 									name={item.Name}
 									avatar={'https://randomuser.me/api/portraits/men/32.jpg'}
 									lastActive={new Date(item.LastMessageDate)}
-									status={UserStatus.OFFLINE}
+									status={UserStatus.ONLINE}
 									unreadCount={item.UnreadCount}
 								/>
 							)}

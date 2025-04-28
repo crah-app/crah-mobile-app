@@ -104,6 +104,7 @@ import {
 	RenderBubble,
 	RenderMessageVideo,
 } from '@/components/giftedChat/RenderBubbleContents';
+import storage from '@/utils/storage';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -138,91 +139,133 @@ const ChatScreen = () => {
 	const [selectedVideo, setSelectedVideo] = useState<string | undefined>();
 	const [selectedImage, setSelectedImage] = useState<string | undefined>();
 
-	// send message
-	const onSend = useCallback((newMessages: ChatMessage[]) => {
-		if (!messages) return;
-		// console.log('object', newMessages);
+	// Hilfsfunktion: Nachrichten speichern
+	const saveMessagesToStorage = (messagesToSave: ChatMessage[]) => {
+		storage.set(`chat-messages-${id}`, JSON.stringify(messagesToSave));
+	};
 
-		setDisplayChatFooter(false);
-		setSelectedRiderData(undefined);
-		setSelectedTrickData(undefined);
-		setAttachedMessageType(undefined);
-		setSelectedVideo(undefined);
-		setSelectedImage(undefined);
+	// send messages
+	const onSend = useCallback(
+		(newMessages: ChatMessage[]) => {
+			if (!messages) return;
 
-		socket.emit('send-message', { chatId: id, msg: newMessages });
+			const updatedMessages = GiftedChat.append(messages, newMessages);
+			setMessages(updatedMessages);
+			saveMessagesToStorage(updatedMessages);
 
-		setMessages((previousMessages) =>
-			GiftedChat.append(previousMessages, newMessages),
-		);
-	}, []);
+			setDisplayChatFooter(false);
+			setSelectedRiderData(undefined);
+			setSelectedTrickData(undefined);
+			setAttachedMessageType(undefined);
+			setSelectedVideo(undefined);
+			setSelectedImage(undefined);
 
+			socket.emit('send-message', { chatId: id, msg: newMessages });
+		},
+		[messages, id],
+	);
+
+	// recieve messages
 	useEffect(() => {
-		socket.on('recieve-message', (msg: ChatMessage[]) => {
-			// console.log('object', msg);
+		const receiveMessageHandler = (msg: ChatMessage[]) => {
+			setMessages((previousMessages) => {
+				const updatedMessages = GiftedChat.append(previousMessages, msg);
+				saveMessagesToStorage(updatedMessages);
+				return updatedMessages;
+			});
+		};
 
-			setMessages((previousMessages) =>
-				GiftedChat.append(previousMessages, msg),
-			);
-		});
-	}, []);
+		socket.on('recieve-message', receiveMessageHandler);
 
+		return () => {
+			socket.off('recieve-message', receiveMessageHandler);
+		};
+	}, [id]);
+
+	// load messages from server
+	useEffect(() => {
+		const loadMessages = async () => {
+			try {
+				const storedMessages = storage.getString(`chat-messages-${id}`);
+				if (storedMessages) {
+					const parsed: ChatMessage[] = JSON.parse(storedMessages).map(
+						(msg: ChatMessage) => ({
+							...msg,
+							createdAt: new Date(msg.createdAt),
+						}),
+					);
+					setMessages(parsed);
+					setMessagesLoaded(true);
+					console.log('Loaded messages from MMKV');
+				} else {
+					await fetchMessages();
+				}
+			} catch (error) {
+				console.error('Error loading messages from storage:', error);
+				await fetchMessages();
+			}
+		};
+
+		loadMessages();
+	}, [id]);
+
+	// join chatroom
 	useEffect(() => {
 		if (id && user?.id && !joinedChatRoom) {
 			socket.emit('join-chat', { chatId: id, userId: user?.id }, () => {
 				setJoinedChatRoom(true);
 			});
 		}
-	}, [id, user]);
+	}, [id, user, joinedChatRoom]);
 
-	// fetch data
+	// function for loading messages from server
 	const fetchMessages = async () => {
 		setErrLoadingMessages(false);
 		setMessagesLoaded(false);
 
-		fetch(`http://192.168.0.136:4000/api/chats/messages/${id}/${user?.id}`, {
-			headers: { 'Cache-Control': 'no-cache' },
-		})
-			.then((res) => res.json())
-			.then((res: ChatMessage[]) => {
-				setMessages(
-					res.splice(0, res.length - 2).map((msg) => {
-						msg.createdAt = new Date(msg.createdAt);
-						return msg;
-					}),
-				);
-				setFetchedData(res);
-			})
-			.catch((err) => setErrLoadingMessages(true))
-			.finally(() => setMessagesLoaded(true));
+		try {
+			const response = await fetch(
+				`http://192.168.0.136:4000/api/chats/messages/${id}/${user?.id}`,
+				{
+					headers: { 'Cache-Control': 'no-cache' },
+				},
+			);
+
+			const res: ChatMessage[] = await response.json();
+
+			const updatedMessages = res.slice(0, res.length - 2).map((msg) => ({
+				...msg,
+				createdAt: new Date(msg.createdAt),
+			}));
+
+			setMessages(updatedMessages);
+			saveMessagesToStorage(updatedMessages);
+			setFetchedData(res);
+		} catch (err) {
+			setErrLoadingMessages(true);
+		} finally {
+			setMessagesLoaded(true);
+		}
 	};
 
+	// set meta data for chat
 	const setFetchedData = (data: ChatMessage[]) => {
 		setIsGroup(data[0].isGroup);
 		setChatTitle(data[data.length - 1].ChatName);
 	};
 
-	useEffect(() => {
-		fetchMessages();
-
-		return () => {};
-	}, []);
-
+	// camera logic for uploading camera source
 	useEffect(() => {
 		if (!fromCamera) return;
 
 		if (video) {
 			setSelectedVideo(video as string);
-			return;
-		}
-
-		if (image) {
+		} else if (image) {
 			setSelectedImage(image as string);
-			return;
+		} else {
+			setDisplayChatFooter(true);
 		}
-
-		setDisplayChatFooter(true);
-	}, [fromCamera]);
+	}, [fromCamera, video, image]);
 
 	return (
 		<ThemedView theme={theme} flex={1} style={{}}>

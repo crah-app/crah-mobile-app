@@ -46,16 +46,16 @@ const MessageRow: React.FC<MessageRowProps> = ({
 		  })}`
 		: '';
 
-	const renderSubTitle = (): string => {
-		let text: string =
+	const renderSubTitle = (text?: string): string => {
+		text =
 			status === UserStatus.OFFLINE
 				? chatTimeAgo
 				: status.split('o ')[0].charAt(0).toUpperCase() +
 				  status.split('o ')[0].slice(1).toLowerCase();
 
-		if (unreadCount > 0) {
-			text = `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
-		}
+		// if (unreadCount > 0) {
+		// 	text = `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
+		// }
 
 		return text;
 	};
@@ -68,10 +68,10 @@ const MessageRow: React.FC<MessageRowProps> = ({
 	const checkboxTranslateX = useRef(new Animated.Value(-60)).current; // Startwert für BouncyCheckbox hinter dem Row
 
 	useEffect(() => {
-		if (unreadCount > 0) {
+		if (unreadCount > 0 && status === UserStatus.OFFLINE) {
 			setHighlightWords([String(unreadCount), 'new', 'message', 's']);
 		} else {
-			setHighlightWords(['online']);
+			setHighlightWords(['Online']);
 		}
 	}, [unreadCount]);
 
