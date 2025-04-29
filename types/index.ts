@@ -99,6 +99,12 @@ export enum AuthStrategy {
 	Google = 'oauth_google',
 }
 
+// chat typing status
+export interface TypingStatus {
+	userId: string;
+	isTyping: boolean;
+}
+
 /*
 	This enumeration lists all static endpoints without search parameters that the app fetches from the CRAH API.
 */

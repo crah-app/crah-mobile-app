@@ -70,6 +70,7 @@ import {
 	Rank,
 	selectedRiderInterface,
 	selectedTrickInterface,
+	TypingStatus,
 	urlRegex,
 } from '@/types';
 import Row from '@/components/general/Row';
@@ -103,8 +104,10 @@ import {
 	CustomMessageView,
 	RenderBubble,
 	RenderMessageVideo,
+	TypingIndicator,
 } from '@/components/giftedChat/RenderBubbleContents';
 import storage from '@/utils/storage';
+import { TypingAnimation } from 'react-native-typing-animation';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -117,6 +120,12 @@ const ChatScreen = () => {
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const [messagesLoaded, setMessagesLoaded] = useState<boolean>();
 	const [errLoadingMessages, setErrLoadingMessages] = useState<boolean>();
+	const [typingStatus, setTypingStatus] = useState<TypingStatus | undefined>({
+		userId: '',
+		isTyping: false,
+	});
+	const [typing, setTyping] = useState<boolean>(false);
+	const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const [isGroup, setIsGroup] = useState<boolean>();
 	const [chatTitle, setChatTitle] = useState<string>('');
@@ -139,7 +148,7 @@ const ChatScreen = () => {
 	const [selectedVideo, setSelectedVideo] = useState<string | undefined>();
 	const [selectedImage, setSelectedImage] = useState<string | undefined>();
 
-	// Hilfsfunktion: Nachrichten speichern
+	// helper functin: store messages
 	const saveMessagesToStorage = (messagesToSave: ChatMessage[]) => {
 		storage.set(`chat-messages-${id}`, JSON.stringify(messagesToSave));
 	};
@@ -161,6 +170,7 @@ const ChatScreen = () => {
 			setSelectedImage(undefined);
 
 			socket.emit('send-message', { chatId: id, msg: newMessages });
+			// handleStopTyping();
 		},
 		[messages, id],
 	);
@@ -177,13 +187,6 @@ const ChatScreen = () => {
 
 		socket.on('recieve-message', receiveMessageHandler);
 
-		return () => {
-			socket.off('recieve-message', receiveMessageHandler);
-		};
-	}, [id]);
-
-	// load messages from server
-	useEffect(() => {
 		const loadMessages = async () => {
 			try {
 				const storedMessages = storage.getString(`chat-messages-${id}`);
@@ -253,6 +256,63 @@ const ChatScreen = () => {
 		setIsGroup(data[0].isGroup);
 		setChatTitle(data[data.length - 1].ChatName);
 	};
+
+	// typing handler
+	const typingHandler = (text: string) => {
+		setText(text);
+
+		if (!typing) {
+			setTyping(true);
+			handleTyping();
+		}
+
+		// Clear the previous timeout
+		if (typingTimeoutRef.current) {
+			clearTimeout(typingTimeoutRef.current);
+		}
+
+		// Set a new timeout
+		typingTimeoutRef.current = setTimeout(() => {
+			setTyping(false);
+			handleStopTyping();
+		}, 1000); // Adjust the delay as needed (e.g., 1000ms = 1 second)
+	};
+
+	useEffect(() => {
+		const typingHandler = (data: TypingStatus) => {
+			console.log(data, data.userId !== user?.id);
+			if (data.userId !== user?.id) {
+				setTypingStatus(data);
+			}
+		};
+
+		socket.on('user-typing', typingHandler);
+
+		return () => {
+			socket.off('user-typing', typingHandler);
+			if (typingTimeoutRef.current) {
+				clearTimeout(typingTimeoutRef.current);
+			}
+		};
+	}, [user?.id]);
+
+	// Emit Typing Event
+	const handleTyping = useCallback(() => {
+		socket.emit('user-typing', {
+			chatId: id,
+			userId: user?.id,
+			isTyping: true,
+		});
+	}, [id, user?.id]);
+
+	// Stop Typing Event
+	const handleStopTyping = useCallback(() => {
+		socket.emit('user-typing', {
+			chatId: id,
+			userId: user?.id,
+			isTyping: false,
+		});
+	}, [id, user?.id]);
 
 	// camera logic for uploading camera source
 	useEffect(() => {
@@ -390,7 +450,7 @@ const ChatScreen = () => {
 									name: user?.username,
 									avatar: user?.imageUrl,
 								}}
-								onInputTextChanged={setText}
+								onInputTextChanged={(text) => typingHandler(text)}
 								// centered system messages
 								renderSystemMessage={(props) => (
 									<SystemMessage {...props} textStyle={{ color: 'white' }} />
@@ -470,7 +530,6 @@ const ChatScreen = () => {
 										{...props}
 										containerStyle={{
 											backgroundColor: Colors[theme].surface,
-											marginTop: displayChatFooter ? 0 : 12,
 										}}
 									/>
 								)}
@@ -487,7 +546,10 @@ const ChatScreen = () => {
 								renderMessageVideo={(props) => (
 									<RenderMessageVideo props={props} />
 								)}
-								isTyping={false}
+								isTyping={typingStatus?.isTyping}
+								renderTypingIndicator={() => (
+									<TypingIndicator display={typingStatus?.isTyping || false} />
+								)}
 								renderCustomView={(props) => (
 									<CustomMessageView props={props} />
 								)}

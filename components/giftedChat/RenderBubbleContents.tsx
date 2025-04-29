@@ -10,14 +10,22 @@ import {
 import { RiderRow, TrickRow } from './UtilityMessageRow';
 import { fetchLinkPreview } from '@/utils/globalFuncs';
 import { ImageBackground, View } from 'react-native';
+import { GiftedChatProps } from 'react-native-gifted-chat/lib/GiftedChat/types';
+import TypingAnimation from 'react-native-typing-animation';
+import ThemedText from '../general/ThemedText';
+import Animated, {
+	Easing,
+	useAnimatedStyle,
+	useSharedValue,
+	withRepeat,
+	withTiming,
+} from 'react-native-reanimated';
 
 export const RenderBubble: React.FC<{
 	props: BubbleProps<ChatMessage>;
 }> = ({ props }) => {
 	const theme = useSystemTheme();
 	const msgType: chatCostumMsgType = props.currentMessage.type;
-
-	console.log('object2', props.currentMessage);
 
 	const renderTextColor = (): string => {
 		if (typeof props.currentMessage.video === 'string' && msgType === 'text') {
@@ -67,6 +75,7 @@ export const RenderBubble: React.FC<{
 
 	return (
 		<Bubble
+			containerStyle={{ left: { margin: 2 }, right: { margin: 2 } }}
 			{...props}
 			wrapperStyle={{
 				right: {
@@ -142,5 +151,69 @@ export const RenderMessageVideo: React.FC<{
 				/>
 			)}
 		</View>
+	);
+};
+
+export const TypingIndicator: React.FC<{ display: boolean }> = ({
+	display,
+}) => {
+	const theme = useSystemTheme();
+	const opacity = useSharedValue(display ? 1 : 0);
+	const margin = useSharedValue(display ? 4 : 0);
+	const padding = useSharedValue(display ? 4 : 0);
+
+	useEffect(() => {
+		opacity.value = withRepeat(
+			withTiming(0.5, { duration: 600, easing: Easing.linear }),
+			-1,
+			true,
+		);
+
+		margin.value = withRepeat(
+			withTiming(0.5, { duration: 600, easing: Easing.linear }),
+			-1,
+			true,
+		);
+
+		padding.value = withRepeat(
+			withTiming(0.5, { duration: 600, easing: Easing.linear }),
+			-1,
+			true,
+		);
+	}, []);
+
+	useEffect(() => {
+		opacity.value = withTiming(display ? 1 : 0, { duration: 200 });
+		margin.value = withTiming(display ? 4 : 0, { duration: 200 });
+		padding.value = withTiming(display ? 4 : 0, { duration: 200 });
+	}, [display]);
+
+	const animatedStyle = useAnimatedStyle(() => {
+		return {
+			opacity: opacity.value,
+			margin: margin.value,
+			padding: padding.value,
+		};
+	});
+
+	return (
+		<Animated.View
+			style={[
+				{
+					backgroundColor: Colors[theme].surface,
+					padding: 4,
+					borderRadius: 8,
+					width: 90,
+					justifyContent: 'center',
+					alignItems: 'center',
+				},
+				animatedStyle,
+			]}>
+			<ThemedText
+				style={{ fontWeight: '700' }}
+				theme={theme}
+				value={'is typing...'}
+			/>
+		</Animated.View>
 	);
 };

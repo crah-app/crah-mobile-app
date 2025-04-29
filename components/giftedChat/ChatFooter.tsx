@@ -119,7 +119,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 	if (!displayFooter) return <></>;
 
 	return (
-		<ThemedView theme={theme} style={{ marginTop: 12 }}>
+		<ThemedView theme={theme}>
 			<TouchableOpacity
 				onPress={abortAttachedMessage}
 				style={{
