@@ -30,6 +30,7 @@ import { defaultStyles } from '@/constants/Styles';
 import DropDownMenu from '@/components/general/DropDownMenu';
 import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
 import ClerkUser from '@/types/clerk';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import tricks from '@/JSON/tricks.json';
 import { getCachedData } from '@/hooks/cache';
@@ -669,20 +670,24 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 						data={BestTricksToType[currentSelectedBestTrickType]}
 						keyExtractor={(item) => item.id}
 						renderItem={({ item, index }) => (
-							<ThemedText
-								key={index}
-								theme={theme}
-								value={
-									item.name.length > 22
-										? item.name.substring(0, 20) + '...'
-										: item.name
-								}
-								style={{
-									backgroundColor: 'rgba(255, 0, 0, 0.33)',
-									padding: 10,
-									// borderRadius: 8,
-								}}
-							/>
+							<LinearGradient 
+								colors={[Colors[theme].primary, Colors[theme].darkPrimary]}
+								>
+								<ThemedText
+									key={index}
+									theme={theme}
+									value={
+										item.name.length > 22
+											? item.name.substring(0, 20) + '...'
+											: item.name
+									}
+									style={{
+										backgroundColor: 'rgba(255, 0, 0, 0.33)',
+										padding: 10,
+										borderRadius: 8,
+									}}
+								/>
+							</LinearGradient>
 						)}
 						contentContainerStyle={[styles.bestTricksContainer, {}]}
 					/>
