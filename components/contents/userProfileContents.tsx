@@ -670,9 +670,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 						data={BestTricksToType[currentSelectedBestTrickType]}
 						keyExtractor={(item) => item.id}
 						renderItem={({ item, index }) => (
-							<LinearGradient 
-								colors={[Colors[theme].primary, Colors[theme].darkPrimary]}
-								>
+							<LinearGradient
+								style={{
+									borderRadius: 8,
+									padding: 10,
+								}}
+								colors={[Colors[theme].darkPrimary, 'rgba(190, 0,0,0.5)']}>
 								<ThemedText
 									key={index}
 									theme={theme}
@@ -681,11 +684,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 											? item.name.substring(0, 20) + '...'
 											: item.name
 									}
-									style={{
-										backgroundColor: 'rgba(255, 0, 0, 0.33)',
-										padding: 10,
-										borderRadius: 8,
-									}}
 								/>
 							</LinearGradient>
 						)}

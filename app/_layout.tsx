@@ -23,7 +23,10 @@ import { useFonts } from 'expo-font';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { dark } from '@clerk/themes';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { Appearance } from 'react-native';
 
+Appearance.setColorScheme('dark');
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
@@ -106,22 +109,38 @@ const Root = () => {
 
 const layout = () => {
 	const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+	const theme = useSystemTheme();
 
 	if (!publishableKey) {
 		throw new Error('Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env');
 	}
 
+	const MyTheme = {
+		...DefaultTheme,
+		colors: {
+			...DefaultTheme.colors,
+			primary: Colors[theme].primary,
+			background: Colors[theme].background,
+			text: Colors[theme].textPrimary,
+			card: Colors[theme].surface,
+			border: Colors[theme].borderColor,
+			notification: Colors[theme].primary,
+		},
+	};
+
 	return (
-		<ClerkProvider
-			appearance={{}}
-			tokenCache={tokenCache!}
-			publishableKey={publishableKey!}>
-			<GestureHandlerRootView style={{ flex: 1 }}>
-				<BottomSheetModalProvider>
-					<Root />
-				</BottomSheetModalProvider>
-			</GestureHandlerRootView>
-		</ClerkProvider>
+		<ThemeProvider value={MyTheme}>
+			<ClerkProvider
+				appearance={{}}
+				tokenCache={tokenCache!}
+				publishableKey={publishableKey!}>
+				<GestureHandlerRootView style={{ flex: 1 }}>
+					<BottomSheetModalProvider>
+						<Root />
+					</BottomSheetModalProvider>
+				</GestureHandlerRootView>
+			</ClerkProvider>
+		</ThemeProvider>
 	);
 };
 

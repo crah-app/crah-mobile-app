@@ -296,8 +296,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
 	const theme = useSystemTheme();
 
 	return (
-		<View style={styles.footer}>
-			<View style={styles.upper_footer}>
+		<View style={[styles.footer]}>
+			<View style={[styles.upper_footer]}>
 				{/* <left side of the footer> */}
 				<View style={styles.footerLeft}>
 					{/* like button */}
@@ -352,20 +352,21 @@ const PostFooter: React.FC<PostFooterProps> = ({
 				</TouchableOpacity>
 			</View>
 
+			{/* lower footer */}
 			<View
 				style={[
 					styles.lower_footer,
 					{
-						height:
-							post.type == 'videoPortrait' ||
-							post.type == 'videoLandscape' ||
-							post.type == 'image'
-								? reactions.length > 0
-									? 45
-									: 0
-								: reactions.length > 0
-								? 45
-								: 0,
+						// height: 40,
+						// post.type == 'videoPortrait' ||
+						// post.type == 'videoLandscape' ||
+						// post.type == 'image'
+						// 	? reactions.length > 0
+						// 		? 145
+						// 		: 0
+						// 	: reactions.length > 0
+						// 	? 145
+						// 	: 0,
 					},
 				]}>
 				{/* Reactions in a vertical bubble */}
@@ -404,7 +405,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
 												backgroundColor: 'rgba(100,100,100,0.3)',
 												padding: 10,
 												borderRadius: 20,
-												height: 40,
+												height: 140,
 											}}
 											key={index + 'Container'}>
 											<Text key={index} style={{}}>
@@ -427,9 +428,22 @@ const PostFooter: React.FC<PostFooterProps> = ({
 								</View>
 							</ScrollView>
 						)}
+
+						{/* description */}
+						<ThemedView
+							theme={theme}
+							style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+							<ThemedText
+								style={{ fontWeight: 'bold', marginRight: 4.5 }}
+								theme={theme}
+								value={post.username}
+							/>
+							<ThemedText theme={theme} value={post.caption} />
+						</ThemedView>
 					</View>
 				</View>
 			</View>
+			{/*  */}
 		</View>
 	);
 };
@@ -620,7 +634,7 @@ const PostCommentSection = forwardRef<
 									style={{
 										flex: 1,
 										width: Dimensions.get('window').width,
-										height: 500,
+										height: 600,
 										alignItems: 'center',
 										justifyContent: 'center',
 									}}>
@@ -677,52 +691,6 @@ const PostCommentSection = forwardRef<
 	);
 });
 
-const RenderRightInputButton: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-
-	return (
-		<TouchableOpacity
-			onPress={() => console.log('Plus pressed')}
-			style={{ paddingHorizontal: 10 }}>
-			<Ionicons
-				name="add-outline"
-				size={24}
-				color={Colors[theme].textPrimary}
-			/>
-		</TouchableOpacity>
-	);
-};
-
-const RenderBubble: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-
-	return (
-		<Bubble
-			{...props}
-			containerStyle={{
-				width: Dimensions.get('window').width,
-			}}
-			wrapperStyle={{
-				right: { backgroundColor: Colors[theme].textBubbleOwn },
-				left: { backgroundColor: Colors[theme].textBubbleOther },
-			}}
-			textStyle={{
-				right: { color: 'white' },
-				left: { color: 'white' },
-			}}
-		/>
-	);
-};
-
-const RenderSendEmptyText: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-
-	return (
-		<View
-			style={{ flexDirection: 'row', gap: 14, paddingHorizontal: 14 }}></View>
-	);
-};
-
 const styles = StyleSheet.create({
 	postContainer: {
 		overflow: 'hidden',
@@ -767,8 +735,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 	},
 	lower_footer: {
-		marginTop: 10,
-		height: 45,
+		marginTop: 4,
 		width: '100%',
 		alignItems: 'flex-start',
 		justifyContent: 'flex-start',

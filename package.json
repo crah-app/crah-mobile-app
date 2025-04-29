@@ -63,7 +63,8 @@
     "react-native-web": "~0.19.13",
     "socket.io-client": "^4.8.1",
     "uuid": "^11.0.5",
-    "zeego": "^3.0.3"
+    "zeego": "^3.0.3",
+    "expo-linear-gradient": "~14.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
