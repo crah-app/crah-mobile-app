@@ -17,6 +17,7 @@ import {
 	Dimensions,
 	Platform,
 	SafeAreaView,
+	Share,
 } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -99,6 +100,8 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	const [commentsCount, setCommentsCount] = useState(post.comments.length || 0);
 	const [shareCount, setshareCount] = useState(post.shares || 0);
 
+	const [currentUserLiked, setCurrentUserLiked] = useState<boolean>();
+
 	const handleReaction = (reaction: ReactionType) => {
 		if (reaction) {
 			setReactions((prev: ReactionType[]) => [...prev, reaction]);
@@ -107,15 +110,66 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	};
 
 	const handleLike = () => {
-		setLikesCount(likesCount + 1);
+		setCurrentUserLiked((prev) => {
+			if (!prev) {
+				setLikesCount(likesCount + 1);
+				return true;
+			}
+
+			setLikesCount(likesCount - 1);
+			return false;
+		});
 	};
 
 	const handleComment = () => {
 		setCommentsCount(commentsCount + 1);
 	};
 
-	const handleShare = () => {
-		setshareCount(shareCount + 1);
+	const postId = post.id; // ID des Posts
+	const postDeepLink = `yourapp://post/${postId}`; // Deep Link zu diesem Post
+
+	// const handleDeepLink = (event) => {
+	// 	const deepLink = event.url;
+	// 	if (deepLink.includes('yourapp://post/')) {
+	// 		const postId = deepLink.split('/')[2]; // Extrahiere die Post-ID
+	// 		// Navigiere zum entsprechenden Post in deiner App
+	// 		navigation.navigate('PostDetails', { postId });
+	// 	}
+	// };
+
+	// useEffect(() => {
+	// 	Linking.addEventListener('url', handleDeepLink);
+	// 	return () => {
+	// 		Linking.removeEventListener('url', handleDeepLink);
+	// 	};
+	// }, []);
+
+	const handleShare = async () => {
+		const postId = 123; // Beispiel-Post-ID
+		const postDeepLink = `yourapp://post/${postId}`; // Deep Link erstellen
+
+		try {
+			const result = await Share.share({
+				message: `Schau dir diesen Post an: ${postDeepLink}`,
+				url: postDeepLink, // Der Deep Link
+				title: 'Post teilen',
+			});
+
+			if (result.action === Share.sharedAction) {
+				if (result.activityType) {
+					console.log(
+						'Post geteilt über eine spezielle Aktivität: ',
+						result.activityType,
+					);
+				} else {
+					console.log('Post erfolgreich geteilt!');
+				}
+			} else if (result.action === Share.dismissedAction) {
+				console.log('Teilen abgebrochen');
+			}
+		} catch (error) {
+			console.error('Fehler beim Teilen: ', error);
+		}
 	};
 
 	const renderPostContent = () => {
@@ -230,6 +284,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				handleLike={handleLike}
 				handleShare={handleShare}
 				onCommentsBtnPress={handlePresentModalPress}
+				currentUserLiked={currentUserLiked}
 			/>
 			{/* Reactions Modal */}
 			<UserPostReactionsModal
@@ -280,6 +335,7 @@ interface PostFooterProps {
 	reactions: string[];
 	setShowReactions: (boolean: boolean) => void;
 	onCommentsBtnPress: () => void;
+	currentUserLiked: boolean | undefined;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
@@ -292,6 +348,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
 	setShowReactions,
 	reactions,
 	onCommentsBtnPress,
+	currentUserLiked,
 }) => {
 	const theme = useSystemTheme();
 
@@ -301,17 +358,24 @@ const PostFooter: React.FC<PostFooterProps> = ({
 				{/* <left side of the footer> */}
 				<View style={styles.footerLeft}>
 					{/* like button */}
-					<TouchableOpacity style={styles.iconButton} onPress={handleLike}>
-						<Ionicons
-							name="heart-outline"
-							size={24}
-							color={Colors[theme].textPrimary}
-						/>
+					<View style={styles.iconButton}>
+						<TouchableOpacity onPress={handleLike}>
+							<Ionicons
+								name={currentUserLiked ? 'heart' : 'heart-outline'}
+								size={24}
+								color={
+									currentUserLiked
+										? Colors[theme].primary
+										: Colors[theme].textPrimary
+								}
+							/>
+						</TouchableOpacity>
+
 						<Text
 							style={[styles.iconCount, { color: Colors[theme].textPrimary }]}>
 							{likesCount}
 						</Text>
-					</TouchableOpacity>
+					</View>
 
 					{/* comment button */}
 					<TouchableOpacity
@@ -355,8 +419,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
 			{/* lower footer */}
 			<View
 				style={[
-					styles.lower_footer,
+					// styles.lower_footer,
 					{
+						// height: 200,
 						// height: 40,
 						// post.type == 'videoPortrait' ||
 						// post.type == 'videoLandscape' ||
@@ -392,20 +457,23 @@ const PostFooter: React.FC<PostFooterProps> = ({
 								showsHorizontalScrollIndicator={false}
 								horizontal
 								style={{
+									backgroundColor: 'rgba(100,100,100,0.3)',
+									borderRadius: 20,
+									paddingHorizontal: 12,
 									maxWidth: '100%',
 									flexDirection: 'row',
 									overflowX: 'hidden',
 								}}>
-								<View style={{ flexDirection: 'row', gap: 10 }}>
+								<View style={{ flexDirection: 'row', gap: 12 }}>
 									{reactions.map((reaction: string, index: number) => (
 										<View
 											style={{
 												flexDirection: 'row',
 												gap: 6,
-												backgroundColor: 'rgba(100,100,100,0.3)',
-												padding: 10,
+												// backgroundColor: 'rgba(100,100,100,0.3)',
+												paddingVertical: 10,
 												borderRadius: 20,
-												height: 140,
+												height: 40,
 											}}
 											key={index + 'Container'}>
 											<Text key={index} style={{}}>
@@ -730,6 +798,7 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 	},
 	footer: {
+		gap: 12,
 		padding: 10,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
