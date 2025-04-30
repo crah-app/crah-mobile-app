@@ -28,7 +28,7 @@ import ThemedView from '@/components/general/ThemedView';
 import ThemedText from '@/components/general/ThemedText';
 import MessageRow from '@/components/rows/MessageRow';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
-import { ChatFilterTypes, UserStatus } from '@/types';
+import { Chat, chatCostumMsgType, ChatFilterTypes, UserStatus } from '@/types';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';
@@ -39,16 +39,6 @@ import * as Haptics from 'expo-haptics';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { defaultStyles } from '@/constants/Styles';
 import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowContainer';
-
-interface Chat {
-	Id: string;
-	IsGroup: number;
-	Name: string;
-	LastMessageContent: string;
-	LastMessageSenderId: string;
-	LastMessageDate: Date;
-	UnreadCount: number;
-}
 
 const Page = () => {
 	const theme = useSystemTheme();
@@ -320,6 +310,7 @@ const Page = () => {
 							]}
 							renderItem={({ item }) => (
 								<MessageRow
+									lastMessageType={item.LastMessageType}
 									checked={selectedChats.includes(item.Id)}
 									onCheckboxToggle={toggleChatSelection}
 									slideRight={showLeftActionSpace}

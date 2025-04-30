@@ -41,6 +41,8 @@ import {
 	Linking,
 	ViewStyle,
 	Dimensions,
+	AppState,
+	AppStateStatus,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -107,7 +109,6 @@ import {
 	TypingIndicator,
 } from '@/components/giftedChat/RenderBubbleContents';
 import storage from '@/utils/storage';
-import { TypingAnimation } from 'react-native-typing-animation';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -148,6 +149,14 @@ const ChatScreen = () => {
 	const [selectedVideo, setSelectedVideo] = useState<string | undefined>();
 	const [selectedImage, setSelectedImage] = useState<string | undefined>();
 
+	const [isInChatRoom, setIsInChatRoom] = useState<boolean>();
+
+	const handleGoBack = () => {
+		setIsInChatRoom(false);
+		router.back();
+		socket.off('recieve-message');
+	};
+
 	// helper functin: store messages
 	const saveMessagesToStorage = (messagesToSave: ChatMessage[]) => {
 		storage.set(`chat-messages-${id}`, JSON.stringify(messagesToSave));
@@ -177,32 +186,48 @@ const ChatScreen = () => {
 
 	// recieve messages
 	useEffect(() => {
+		setIsInChatRoom(true);
+
+		console.log('fgkasfderghnadfsrgfsdgklfsdgsfdgdfgsd', id);
+
 		const receiveMessageHandler = (msg: ChatMessage[]) => {
 			setMessages((previousMessages) => {
 				const updatedMessages = GiftedChat.append(previousMessages, msg);
 				saveMessagesToStorage(updatedMessages);
 				return updatedMessages;
 			});
+
+			socket.emit('message-seen', {
+				chatId: id,
+				userId: user?.id,
+				isInChat: isInChatRoom,
+			});
 		};
 
 		socket.on('recieve-message', receiveMessageHandler);
 
 		const loadMessages = async () => {
+			// storage.clearAll();
+
 			try {
-				const storedMessages = storage.getString(`chat-messages-${id}`);
-				if (storedMessages) {
-					const parsed: ChatMessage[] = JSON.parse(storedMessages).map(
-						(msg: ChatMessage) => ({
-							...msg,
-							createdAt: new Date(msg.createdAt),
-						}),
-					);
-					setMessages(parsed);
-					setMessagesLoaded(true);
-					console.log('Loaded messages from MMKV');
-				} else {
-					await fetchMessages();
-				}
+				// const storedMessages: string | undefined = storage.getString(
+				// 	`chat-messages-${id}`,
+				// );
+				// if (storedMessages !== '[]' && storedMessages) {
+				// 	console.log(JSON.parse(storedMessages));
+
+				// 	const parsed: ChatMessage[] = JSON.parse(storedMessages).map(
+				// 		(msg: ChatMessage) => ({
+				// 			...msg,
+				// 			createdAt: new Date(msg.createdAt),
+				// 		}),
+				// 	);
+				// 	setMessages(parsed);
+				// 	setMessagesLoaded(true);
+				// 	console.log('Loaded messages from MMKV');
+				// } else {
+				await fetchMessages();
+				// }
 			} catch (error) {
 				console.error('Error loading messages from storage:', error);
 				await fetchMessages();
@@ -210,7 +235,21 @@ const ChatScreen = () => {
 		};
 
 		loadMessages();
-	}, [id]);
+	}, []);
+
+	useEffect(() => {
+		if (!isInChatRoom) return;
+
+		socket.emit('message-seen', {
+			chatId: id,
+			userId: user?.id,
+			isInChat: isInChatRoom,
+		});
+
+		return () => {
+			socket.off('message-seen');
+		};
+	}, [isInChatRoom]);
 
 	// join chatroom
 	useEffect(() => {
@@ -223,10 +262,15 @@ const ChatScreen = () => {
 
 	// function for loading messages from server
 	const fetchMessages = async () => {
+		console.log(
+			'eosdfl,isadffgdfgdfsijfgjkasdfasfasfadsxYyxyxcvyxvxcvyxvcxyvxcvyxvyxvyvxcvlifgdjklfgjklfgdsjkljkl',
+		);
 		setErrLoadingMessages(false);
 		setMessagesLoaded(false);
 
 		try {
+			console.log(' loading fetch', id, user?.id);
+
 			const response = await fetch(
 				`http://192.168.0.136:4000/api/chats/messages/${id}/${user?.id}`,
 				{
@@ -236,10 +280,14 @@ const ChatScreen = () => {
 
 			const res: ChatMessage[] = await response.json();
 
-			const updatedMessages = res.slice(0, res.length - 2).map((msg) => ({
+			console.log(res);
+
+			const updatedMessages = res.slice(0, res.length - 1).map((msg) => ({
 				...msg,
 				createdAt: new Date(msg.createdAt),
 			}));
+
+			console.log(updatedMessages);
 
 			setMessages(updatedMessages);
 			saveMessagesToStorage(updatedMessages);
@@ -280,7 +328,7 @@ const ChatScreen = () => {
 
 	useEffect(() => {
 		const typingHandler = (data: TypingStatus) => {
-			console.log(data, data.userId !== user?.id);
+			// console.log(data, data.userId !== user?.id);
 			if (data.userId !== user?.id) {
 				setTypingStatus(data);
 			}
@@ -367,7 +415,9 @@ const ChatScreen = () => {
 					headerLeft: () => (
 						<View style={{}}>
 							{/* navigate back btn */}
-							<TouchableOpacity onPress={router.back} style={styles.headerLeft}>
+							<TouchableOpacity
+								onPress={handleGoBack}
+								style={styles.headerLeft}>
 								<Ionicons
 									name="chevron-back-outline"
 									size={24}

@@ -268,6 +268,18 @@ export enum ChatFilterTypes {
 	groups = 'groups',
 }
 
+// when recieving chat meta data as a whole without its messages
+export interface Chat {
+	Id: string;
+	IsGroup: number;
+	Name: string;
+	LastMessageContent: string;
+	LastMessageSenderId: string;
+	LastMessageDate: Date;
+	LastMessageType: chatCostumMsgType;
+	UnreadCount: number;
+}
+
 /* 
 	A user can either be offline or online
 */
