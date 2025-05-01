@@ -1,6 +1,6 @@
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import React, {
 	useCallback,
 	useEffect,
@@ -28,7 +28,13 @@ import ThemedView from '@/components/general/ThemedView';
 import ThemedText from '@/components/general/ThemedText';
 import MessageRow from '@/components/rows/MessageRow';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
-import { Chat, chatCostumMsgType, ChatFilterTypes, UserStatus } from '@/types';
+import {
+	Chat,
+	chatCostumMsgType,
+	ChatFilterTypes,
+	ChatMessage,
+	UserStatus,
+} from '@/types';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';
@@ -39,6 +45,13 @@ import * as Haptics from 'expo-haptics';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { defaultStyles } from '@/constants/Styles';
 import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowContainer';
+import socket from '@/utils/socket';
+
+interface socketJoinedChatRooms {
+	[chatId: string]: {
+		joined: boolean;
+	};
+}
 
 const Page = () => {
 	const theme = useSystemTheme();
@@ -57,12 +70,17 @@ const Page = () => {
 	const [chats, setChats] = useState<Chat[]>([]);
 	const [chatsLoaded, setChatsLoaded] = useState<boolean>();
 	const [errLoadingChats, setErrLoadingChats] = useState<boolean>();
-	const [userWantsToGoBack, setUserWantsToGoBack] = useState<boolean>(false);
 
 	const [showLeftActionSpace, setShowLeftActionSpace] = useState(false);
 	const [selectedChats, setSelectedChats] = useState<string[]>([]);
 
 	const [searchQuery, setSearchQuery] = useState<string>('');
+
+	const [typingChats, setTypingChats] = useState<Record<string, boolean>>({});
+	const typingTimeouts = useRef<Record<string, NodeJS.Timeout>>({});
+
+	const [joinedChatRooms, setJoinedChatRooms] =
+		useState<socketJoinedChatRooms>();
 
 	const fetchChats = async () => {
 		setErrLoadingChats(false);
@@ -79,12 +97,117 @@ const Page = () => {
 			.catch((err) => setErrLoadingChats(true))
 			.finally(() => setChatsLoaded(true));
 	};
+	useFocusEffect(
+		useCallback(() => {
+			fetchChats();
+
+			const handleTyping = ({
+				chatId,
+				userId,
+				isTyping,
+			}: {
+				chatId: string;
+				userId: string;
+				isTyping: boolean;
+			}) => {
+				// set typing state for specific chat
+				setTypingChats((prev) => ({
+					...prev,
+					[chatId]: isTyping,
+				}));
+
+				// clear previous timeout
+				if (typingTimeouts.current[chatId]) {
+					clearTimeout(typingTimeouts.current[chatId]);
+				}
+
+				// set timeout to clear "typing" after 3 seconds
+				if (isTyping) {
+					typingTimeouts.current[chatId] = setTimeout(() => {
+						setTypingChats((prev) => ({
+							...prev,
+							[chatId]: false,
+						}));
+					}, 3000);
+				}
+			};
+
+			socket.on('user-typing', handleTyping);
+
+			// cleanup
+			return () => {
+				socket.off('user-typing', handleTyping);
+
+				// clear all timeouts
+				Object.values(typingTimeouts.current).forEach(clearTimeout);
+				typingTimeouts.current = {};
+			};
+		}, []),
+	);
 
 	useEffect(() => {
-		fetchChats();
+		if (!fetchedChats) return;
+
+		fetchedChats.forEach((chat) => {
+			socket.emit('join-chat', { chatId: chat.Id, userId: user?.id }, () => {
+				setJoinedChatRooms((prev) => ({
+					...prev,
+					[chat.Id]: { joined: true },
+				}));
+			});
+		});
+	}, [fetchedChats]);
+
+	useEffect(() => {
+		socket.on('message-seen', (chatId) => {
+			console.log('message-seen shesh', chatId);
+
+			setChats((prev) =>
+				prev.map((chat) => {
+					if (chat.Id !== chatId) return chat;
+
+					console.log(' unread count ====  0', chatId);
+
+					return {
+						...chat,
+						UnreadCount: 0,
+					};
+				}),
+			);
+		});
 
 		return () => {};
 	}, []);
+
+	useFocusEffect(
+		useCallback(() => {
+			const receiveMessageHandler = (args: {
+				chatId: string;
+				msg: ChatMessage[];
+			}) => {
+				setChats((prevChats) =>
+					prevChats.map((chat) => {
+						if (chat.Id === args.chatId) {
+							const lastMsg = args.msg[args.msg.length - 1];
+
+							return {
+								...chat,
+								LastMessageType: lastMsg.type,
+								UnreadCount: chat.UnreadCount + args.msg.length,
+							};
+						}
+						return chat;
+					}),
+				);
+			};
+
+			socket.on('recieve-message', receiveMessageHandler);
+
+			return () => {
+				socket.off('recieve-message', receiveMessageHandler);
+			};
+		}, []),
+	);
 
 	const HandleFilterMessagesType = (value: ChatFilterTypes) => {
 		setMessagesFilter(value);
@@ -131,23 +254,9 @@ const Page = () => {
 	// handle navigation logic
 	const handleGoBack = () => {
 		if (router.canGoBack()) {
-			// setUserWantsToGoBack(true);
-			// setChats([]);
 			router.back();
 		}
 	};
-
-	// useLayoutEffect(() => {
-	// 	if (chats.length === 0 && userWantsToGoBack) {
-	// 		const frame = requestAnimationFrame(() => {
-	// 			requestAnimationFrame(() => {
-	// 				router.back();
-	// 			});
-	// 		});
-
-	// 		return () => cancelAnimationFrame(frame);
-	// 	}
-	// }, [chats, userWantsToGoBack]);
 
 	// gestures
 	const handleOnDelete = (id: string) => {
@@ -173,7 +282,7 @@ const Page = () => {
 			.map((id) => chats.find((chat) => chat.Id === id))
 			.filter((chat) => chat?.IsGroup === 1);
 
-		console.log('selectedGroups:', selectedGroups);
+		// console.log('selectedGroups:', selectedGroups);
 
 		let alertingText =
 			selectedGroups.length > 0
@@ -237,6 +346,27 @@ const Page = () => {
 	const OpenNewChatModal = () => {
 		router.navigate('/(auth)/modals/chats/SearchNewChatModal');
 	};
+
+	const renderMessageRow = useCallback(
+		({ item }: { item: Chat }) => (
+			<MessageRow
+				lastMessageType={item.LastMessageType}
+				checked={selectedChats.includes(item.Id)}
+				onCheckboxToggle={toggleChatSelection}
+				slideRight={showLeftActionSpace}
+				handleOnArchive={() => handleOnArchive(item.Id)}
+				handleOnDelete={() => handleOnDelete(item.Id)}
+				id={item.Id}
+				name={item.Name}
+				avatar={'https://randomuser.me/api/portraits/men/32.jpg'}
+				lastActive={new Date(item.LastMessageDate)}
+				status={UserStatus.ONLINE}
+				unreadCount={item.UnreadCount}
+				isTyping={typingChats[item.Id] ?? false}
+			/>
+		),
+		[typingChats, selectedChats, toggleChatSelection, showLeftActionSpace],
+	);
 
 	const Header = () => {
 		return (
@@ -308,22 +438,7 @@ const Page = () => {
 								styles.message_list_container,
 								{ borderColor: 'gray', marginTop: 0 },
 							]}
-							renderItem={({ item }) => (
-								<MessageRow
-									lastMessageType={item.LastMessageType}
-									checked={selectedChats.includes(item.Id)}
-									onCheckboxToggle={toggleChatSelection}
-									slideRight={showLeftActionSpace}
-									handleOnArchive={() => handleOnArchive(item.Id)}
-									handleOnDelete={() => handleOnDelete(item.Id)}
-									id={item.Id}
-									name={item.Name}
-									avatar={'https://randomuser.me/api/portraits/men/32.jpg'}
-									lastActive={new Date(item.LastMessageDate)}
-									status={UserStatus.ONLINE}
-									unreadCount={item.UnreadCount}
-								/>
-							)}
+							renderItem={renderMessageRow}
 						/>
 					}
 					activityIndicatorSize={24}

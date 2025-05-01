@@ -48,6 +48,7 @@ import { Ionicons } from '@expo/vector-icons';
 import {
 	router,
 	Stack,
+	useFocusEffect,
 	useLocalSearchParams,
 	useNavigation,
 } from 'expo-router';
@@ -131,8 +132,6 @@ const ChatScreen = () => {
 	const [isGroup, setIsGroup] = useState<boolean>();
 	const [chatTitle, setChatTitle] = useState<string>('');
 
-	const [joinedChatRoom, setJoinedChatRoom] = useState<boolean>();
-
 	// attaching a new message like a trick, rider, audio or source
 	const [displayChatFooter, setDisplayChatFooter] = useState<boolean>();
 	const [attachedMessageType, setAttachedMessageType] = useState<
@@ -185,57 +184,64 @@ const ChatScreen = () => {
 	);
 
 	// recieve messages
-	useEffect(() => {
-		setIsInChatRoom(true);
+	useFocusEffect(
+		useCallback(() => {
+			setIsInChatRoom(true);
 
-		console.log('fgkasfderghnadfsrgfsdgklfsdgsfdgdfgsd', id);
+			const receiveMessageHandler = (args: {
+				chatId: string;
+				msg: ChatMessage[];
+			}) => {
+				setMessages((previousMessages) => {
+					const updatedMessages = GiftedChat.append(previousMessages, args.msg);
+					saveMessagesToStorage(updatedMessages);
+					return updatedMessages;
+				});
 
-		const receiveMessageHandler = (msg: ChatMessage[]) => {
-			setMessages((previousMessages) => {
-				const updatedMessages = GiftedChat.append(previousMessages, msg);
-				saveMessagesToStorage(updatedMessages);
-				return updatedMessages;
-			});
+				socket.emit('message-seen', {
+					chatId: id,
+					userId: user?.id,
+					isInChat: true, // here in this specific case, the user is certanily in the chat
+				});
+			};
 
-			socket.emit('message-seen', {
-				chatId: id,
-				userId: user?.id,
-				isInChat: isInChatRoom,
-			});
-		};
+			socket.on('recieve-message', receiveMessageHandler);
 
-		socket.on('recieve-message', receiveMessageHandler);
+			const loadMessages = async () => {
+				// storage.clearAll();
 
-		const loadMessages = async () => {
-			// storage.clearAll();
+				try {
+					// const storedMessages: string | undefined = storage.getString(
+					// 	`chat-messages-${id}`,
+					// );
+					// if (storedMessages !== '[]' && storedMessages) {
+					// 	console.log(JSON.parse(storedMessages));
 
-			try {
-				// const storedMessages: string | undefined = storage.getString(
-				// 	`chat-messages-${id}`,
-				// );
-				// if (storedMessages !== '[]' && storedMessages) {
-				// 	console.log(JSON.parse(storedMessages));
+					// 	const parsed: ChatMessage[] = JSON.parse(storedMessages).map(
+					// 		(msg: ChatMessage) => ({
+					// 			...msg,
+					// 			createdAt: new Date(msg.createdAt),
+					// 		}),
+					// 	);
+					// 	setMessages(parsed);
+					// 	setMessagesLoaded(true);
+					// 	console.log('Loaded messages from MMKV');
+					// } else {
+					await fetchMessages();
+					// }
+				} catch (error) {
+					console.error('Error loading messages from storage:', error);
+					await fetchMessages();
+				}
+			};
 
-				// 	const parsed: ChatMessage[] = JSON.parse(storedMessages).map(
-				// 		(msg: ChatMessage) => ({
-				// 			...msg,
-				// 			createdAt: new Date(msg.createdAt),
-				// 		}),
-				// 	);
-				// 	setMessages(parsed);
-				// 	setMessagesLoaded(true);
-				// 	console.log('Loaded messages from MMKV');
-				// } else {
-				await fetchMessages();
-				// }
-			} catch (error) {
-				console.error('Error loading messages from storage:', error);
-				await fetchMessages();
-			}
-		};
+			loadMessages();
 
-		loadMessages();
-	}, []);
+			return () => {
+				socket.off('recieve-message');
+			};
+		}, []),
+	);
 
 	useEffect(() => {
 		if (!isInChatRoom) return;
@@ -251,20 +257,8 @@ const ChatScreen = () => {
 		};
 	}, [isInChatRoom]);
 
-	// join chatroom
-	useEffect(() => {
-		if (id && user?.id && !joinedChatRoom) {
-			socket.emit('join-chat', { chatId: id, userId: user?.id }, () => {
-				setJoinedChatRoom(true);
-			});
-		}
-	}, [id, user, joinedChatRoom]);
-
 	// function for loading messages from server
 	const fetchMessages = async () => {
-		console.log(
-			'eosdfl,isadffgdfgdfsijfgjkasdfasfasfadsxYyxyxcvyxvxcvyxvcxyvxcvyxvyxvyvxcvlifgdjklfgjklfgdsjkljkl',
-		);
 		setErrLoadingMessages(false);
 		setMessagesLoaded(false);
 
@@ -292,6 +286,9 @@ const ChatScreen = () => {
 			setMessages(updatedMessages);
 			saveMessagesToStorage(updatedMessages);
 			setFetchedData(res);
+
+			// is in chat room prevents bug where messages are marked as seen although client is not in the chat page itself
+			setIsInChatRoom(true);
 		} catch (err) {
 			setErrLoadingMessages(true);
 		} finally {

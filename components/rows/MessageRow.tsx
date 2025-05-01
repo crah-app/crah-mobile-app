@@ -22,6 +22,7 @@ interface MessageRowProps {
 	checked: boolean;
 	unreadCount: number;
 	lastMessageType: string;
+	isTyping: boolean;
 }
 
 const MessageRow: React.FC<MessageRowProps> = ({
@@ -37,10 +38,23 @@ const MessageRow: React.FC<MessageRowProps> = ({
 	checked,
 	unreadCount,
 	lastMessageType,
+	isTyping,
 }) => {
 	const [isDeleted, setIsDeleted] = useState(false);
 	const [isArchived, setIsArchived] = useState(false);
-	const [highlightWords, setHighlightWords] = useState<string[]>(['Online']);
+	const [highlightWords, setHighlightWords] = useState<string[]>([
+		String(unreadCount),
+		'new',
+		'message',
+		's',
+		'ent',
+		'rider',
+		'trick',
+		'Is',
+		'typing',
+		'...',
+		'Online',
+	]);
 
 	const chatTimeAgo = lastActive
 		? `last seen ${formatDistanceToNow(new Date(lastActive), {
@@ -49,8 +63,11 @@ const MessageRow: React.FC<MessageRowProps> = ({
 		: '';
 
 	const renderSubTitle = (): string => {
+		if (isTyping) {
+			return 'Is typing...';
+		}
+
 		if (unreadCount > 0) {
-			console.log(lastMessageType, 'obnject');
 			switch (lastMessageType) {
 				case 'text':
 					return `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
@@ -75,30 +92,15 @@ const MessageRow: React.FC<MessageRowProps> = ({
 		return prefix.charAt(0).toUpperCase() + prefix.slice(1).toLowerCase();
 	};
 
-	const renderNewMessageType = () => {};
-
 	const handleOnPress = () => {
-		router.navigate(`/(auth)/(tabs)/homePages/chats/${id}`);
+		router.navigate({
+			pathname: `/(auth)/(tabs)/homePages/chats/[id]`,
+			params: { id },
+		});
 	};
 
 	const opacityAnim = useRef(new Animated.Value(0)).current;
 	const checkboxTranslateX = useRef(new Animated.Value(-60)).current;
-
-	useEffect(() => {
-		if (unreadCount > 0) {
-			setHighlightWords([
-				String(unreadCount),
-				'new',
-				'message',
-				's',
-				'ent',
-				'rider',
-				'trick',
-			]);
-		} else {
-			setHighlightWords(['Online']);
-		}
-	}, [unreadCount]);
 
 	useEffect(() => {
 		if (slideRight) {
