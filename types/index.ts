@@ -469,3 +469,21 @@ export const mediaTypeSourceRatio: Record<
 	[upload_source_ratio.LANDSCAPE]: [16, 9],
 	[upload_source_ratio.PORTRAIT]: [9, 16],
 } as const;
+
+/*
+	help modal local parameter to deicde which content to display first to the user
+*/
+
+export enum helpPageTopcis {
+	create = 'Create',
+	ranks = 'Ranks',
+	profile = 'Profile',
+}
+
+export enum helpPageParameter {
+	createVideo = 'Create Video',
+	createTextPost = 'Create Text, Post, Music',
+	createArticle = 'Create Article',
+	statsPages = 'Stats Pages',
+	inbox = 'Inbox',
+}

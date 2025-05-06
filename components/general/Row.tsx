@@ -23,8 +23,8 @@ interface RowProps {
 	leftContainerStyle?: ViewStyle | ViewStyle[];
 	onPress?: () => void;
 	containerStyle?: ViewStyle | ViewStyle[];
-	titleStyle?: TextStyle;
-	subtitleStyle?: TextStyle;
+	titleStyle?: TextStyle | TextStyle[];
+	subtitleStyle?: TextStyle | TextStyle[];
 	avatarIsSVG?: boolean;
 	subtitleIsMultiline?: boolean;
 	textInTitleComponent?: React.ReactNode;
@@ -33,6 +33,7 @@ interface RowProps {
 	highlightWords?: Array<string>;
 	costumAvatarWidth?: number;
 	costumAvatarHeight?: number;
+	children?: React.ReactNode;
 }
 
 const Row: React.FC<RowProps> = ({
@@ -55,6 +56,7 @@ const Row: React.FC<RowProps> = ({
 	highlightWords,
 	costumAvatarWidth,
 	costumAvatarHeight,
+	children,
 }) => {
 	const theme = useSystemTheme();
 
@@ -144,6 +146,7 @@ const Row: React.FC<RowProps> = ({
 				)}
 
 				{bottomContainer}
+				{children && <View style={{ marginTop: 8 }}>{children}</View>}
 			</View>
 
 			{customRightComponent && (

@@ -6,7 +6,7 @@ import CostumHeader from '@/components/header/CostumHeader';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import Colors from '@/constants/Colors';
 import { defaultHeaderBtnSize } from '@/constants/Styles';
-import { TextInputMaxCharacters } from '@/types';
+import { helpPageParameter, TextInputMaxCharacters } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
@@ -19,7 +19,6 @@ import {
 	View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import helpModalContent from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
 const CreateArticle = () => {
@@ -41,7 +40,7 @@ const CreateArticle = () => {
 						<Link
 							asChild
 							href={{
-								params: { contents: JSON.stringify(helpModalContent) },
+								params: { first: helpPageParameter.createArticle },
 								pathname: '/modals/help_modal',
 							}}>
 							<TouchableOpacity>

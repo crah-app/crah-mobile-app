@@ -6,6 +6,7 @@ import Colors from '@/constants/Colors';
 import { defaultHeaderBtnSize, defaultStyles } from '@/constants/Styles';
 import {
 	CreatePostType,
+	helpPageParameter,
 	modal_mode,
 	Tags,
 	TextInputMaxCharacters,
@@ -50,11 +51,7 @@ import { Link, router } from 'expo-router';
 import CreatePageHeader from '@/components/create/CreatePageHeader';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';
-import helpModalContent from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
-import { SegmentedControl } from '@/components/general/SegmentedControl';
-import { SvgXml } from 'react-native-svg';
-import crahTransparentLogo from '../../../../assets/images/vectors/crah_transparent.svg';
 
 interface videoDataInterface {
 	cover: string; // cover image
@@ -193,7 +190,7 @@ const CreateVideo = () => {
 							style={{}}
 							asChild
 							href={{
-								params: { contents: JSON.stringify(helpModalContent) },
+								params: { first: helpPageParameter.createVideo },
 								pathname: '/modals/help_modal',
 							}}>
 							<TouchableOpacity>
