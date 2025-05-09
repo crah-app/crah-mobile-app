@@ -1,5 +1,6 @@
 import {
 	ChatFooterBarTypes,
+	ChatMessage,
 	selectedRiderInterface,
 	selectedTrickInterface,
 } from '@/types';
@@ -8,10 +9,12 @@ import ThemedView from '../general/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
 import { Dimensions, TouchableOpacity, View } from 'react-native';
 import Colors from '@/constants/Colors';
-import React from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import Row from '../general/Row';
 
 import Scooter from '../../assets/images/vectors/scooter.svg';
+import ThemedText from '../general/ThemedText';
+import ReplyMessageBar from './ReplyMessageBar';
 
 interface ChatFooterBarProps {
 	msgType: ChatFooterBarTypes | undefined;
@@ -26,6 +29,8 @@ interface ChatFooterBarProps {
 	setSelectedTrickData: (u: selectedTrickInterface | undefined) => void;
 	setSelectedVideo: (source: string | undefined) => void;
 	setSelectedImage: (source: string | undefined) => void;
+	setReplyMessage: Dispatch<SetStateAction<ChatMessage | undefined>>;
+	replyMessage: ChatMessage | undefined;
 }
 
 const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
@@ -39,8 +44,14 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 	setDisplayFooter,
 	setSelectedRiderData,
 	setSelectedTrickData,
+	setReplyMessage,
+	replyMessage,
 }) => {
 	const theme = useSystemTheme();
+
+	useEffect(() => {
+		console.log(msgType);
+	}, [msgType]);
 
 	const TrickRow = () => {
 		return (
@@ -109,11 +120,22 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 		return <></>;
 	};
 
+	const ReplyRow = () => {
+		return (
+			<ReplyMessageBar
+				trickData={trickData}
+				riderData={riderData}
+				message={replyMessage}
+			/>
+		);
+	};
+
 	const abortAttachedMessage = () => {
 		setSelectedRiderData(undefined);
 		setSelectedTrickData(undefined);
 		setAttachedMessageType(undefined);
 		setDisplayFooter(false);
+		setReplyMessage(undefined);
 	};
 
 	if (!displayFooter) return <></>;
@@ -139,6 +161,8 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 				<AudioRow />
 			) : msgType === 'Source' ? (
 				<SourceRow />
+			) : msgType === 'Reply' ? (
+				<ReplyRow />
 			) : (
 				<></>
 			)}

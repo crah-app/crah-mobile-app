@@ -10,6 +10,7 @@ import React from 'react';
 import { getTrickTitle } from '@/utils/globalFuncs';
 
 import Scooter from '../../assets/images/vectors/scooter.svg';
+import { mmkv } from '@/hooks/mmkv';
 
 export const RiderRow: React.FC<{ riderId: string }> = ({ riderId }) => {
 	const theme = useSystemTheme();
@@ -21,6 +22,15 @@ export const RiderRow: React.FC<{ riderId: string }> = ({ riderId }) => {
 
 	useEffect(() => {
 		const fetchRider = async () => {
+			const cacheKey = `rider_${riderId}`;
+
+			const cache = mmkv.getString(cacheKey);
+			// if (cache) {
+			// 	setFetchedRider(JSON.parse(cache));
+			// 	setRiderLoaded(true);
+			// 	return;
+			// }
+
 			try {
 				setError(undefined);
 				setRiderLoaded(false);
@@ -39,6 +49,19 @@ export const RiderRow: React.FC<{ riderId: string }> = ({ riderId }) => {
 
 				const data = await res.json();
 				setFetchedRider(data);
+
+				mmkv.set(
+					cacheKey,
+					JSON.stringify({
+						name: data.username,
+						_id: data.id,
+						avatar: data.imageUrl,
+						// @ts-ignore
+						rank: data.rank ?? 'Diamond',
+						// @ts-ignore
+						rankPosition: data.rankPosition ?? 3,
+					}),
+				);
 			} catch (err) {
 				setError('not found');
 			} finally {
@@ -88,10 +111,20 @@ export const TrickRow: React.FC<{ trickId: number }> = ({ trickId }) => {
 
 	useEffect(() => {
 		const fetchTrick = async () => {
-			try {
-				setError(undefined);
-				setTrickLoaded(false);
+			setTrickLoaded(false);
+			setError(undefined);
 
+			const cacheKey = `trick_${trickId}`;
+
+			// Check cache first
+			const cached = mmkv.getString(cacheKey);
+			// if (cached) {
+			// 	setFetchedTrick(JSON.parse(cached));
+			// 	setTrickLoaded(true);
+			// 	return;
+			// }
+
+			try {
 				const res = await fetch(
 					`http://192.168.0.136:4000/public/tricks/commonTricks.json`,
 					{
@@ -105,7 +138,10 @@ export const TrickRow: React.FC<{ trickId: number }> = ({ trickId }) => {
 				}
 
 				const data = await res.json();
-				setFetchedTrick(data.commonTricks[trickId]);
+				const trick = data.commonTricks[trickId];
+
+				setFetchedTrick(trick);
+				mmkv.set(cacheKey, JSON.stringify(trick)); // Cache it
 			} catch (err) {
 				setError('not found');
 			} finally {

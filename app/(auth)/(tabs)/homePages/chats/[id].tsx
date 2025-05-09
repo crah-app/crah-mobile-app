@@ -11,6 +11,7 @@ import {
 	Bubble,
 	BubbleProps,
 	Composer,
+	Day,
 	GiftedChat,
 	IMessage,
 	InputToolbar,
@@ -20,6 +21,7 @@ import {
 	RenderMessageTextProps,
 	SendProps,
 	SystemMessage,
+	SystemMessageProps,
 	User,
 } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -110,6 +112,8 @@ import {
 	TypingIndicator,
 } from '@/components/giftedChat/RenderBubbleContents';
 import storage from '@/utils/storage';
+import { Swipeable } from 'react-native-gesture-handler';
+import CostumChatBubble from '@/components/giftedChat/CostumChatBubble';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -150,6 +154,29 @@ const ChatScreen = () => {
 
 	const [isInChatRoom, setIsInChatRoom] = useState<boolean>();
 
+	const swipeableRowRef = useRef<Swipeable | null>(null);
+	const [replyMessage, setReplyMessage] = useState<ChatMessage>();
+
+	const updateRowRef = useCallback(
+		(ref: any) => {
+			if (
+				ref &&
+				replyMessage &&
+				ref.props.children.props.currentMessage?._id === replyMessage._id
+			) {
+				swipeableRowRef.current = ref;
+			}
+		},
+		[replyMessage],
+	);
+
+	useEffect(() => {
+		if (replyMessage && swipeableRowRef.current) {
+			swipeableRowRef.current.close();
+			swipeableRowRef.current = null;
+		}
+	}, [replyMessage]);
+
 	const handleGoBack = () => {
 		setIsInChatRoom(false);
 		router.back();
@@ -176,9 +203,9 @@ const ChatScreen = () => {
 			setAttachedMessageType(undefined);
 			setSelectedVideo(undefined);
 			setSelectedImage(undefined);
+			setReplyMessage(undefined);
 
 			socket.emit('send-message', { chatId: id, msg: newMessages });
-			// handleStopTyping();
 		},
 		[messages, id],
 	);
@@ -274,17 +301,24 @@ const ChatScreen = () => {
 
 			const res: ChatMessage[] = await response.json();
 
-			console.log(res);
+			const updatedMessages = [
+				...res.slice(0, res.length - 1).map((msg) => ({
+					...msg,
+					createdAt: new Date(msg.createdAt),
+				})),
+				// .reverse(),
+			];
 
-			const updatedMessages = res.slice(0, res.length - 1).map((msg) => ({
-				...msg,
-				createdAt: new Date(msg.createdAt),
-			}));
+			const sortedMessages = [...updatedMessages].sort((a, b) => {
+				return (
+					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+				);
+			});
 
 			console.log(updatedMessages);
 
-			setMessages(updatedMessages);
-			saveMessagesToStorage(updatedMessages);
+			setMessages(sortedMessages);
+			saveMessagesToStorage(sortedMessages);
 			setFetchedData(res);
 
 			// is in chat room prevents bug where messages are marked as seen although client is not in the chat page itself
@@ -500,7 +534,7 @@ const ChatScreen = () => {
 								onInputTextChanged={(text) => typingHandler(text)}
 								// centered system messages
 								renderSystemMessage={(props) => (
-									<SystemMessage {...props} textStyle={{ color: 'white' }} />
+									<RenderSystemMessage props={props} />
 								)}
 								// left action: add btn
 								renderActions={(props) => (
@@ -518,6 +552,19 @@ const ChatScreen = () => {
 											setSelectedTrickData={setSelectedTrickData}
 										/>
 									</View>
+								)}
+								renderMessage={(props) => (
+									<CostumChatBubble
+										{...props}
+										setReplyOnSwipeOpen={setReplyMessage}
+										updateRowRef={updateRowRef}
+										setDisplayFooter={setDisplayChatFooter}
+										setAttachedMessageType={setAttachedMessageType}
+										setSelectedRiderData={setSelectedRiderData}
+										setSelectedTrickData={setSelectedTrickData}
+										setSelectedImage={setSelectedImage}
+										setSelectedVideo={setSelectedVideo}
+									/>
 								)}
 								// chat footer
 								renderChatFooter={() => (
@@ -538,6 +585,8 @@ const ChatScreen = () => {
 												type: selectedImage ? 'image' : 'video',
 											},
 										]}
+										setReplyMessage={setReplyMessage}
+										replyMessage={replyMessage}
 									/>
 								)}
 								// right btn: send
@@ -600,7 +649,6 @@ const ChatScreen = () => {
 								renderCustomView={(props) => (
 									<CustomMessageView props={props} />
 								)}
-								renderTime={() => <></>}
 							/>
 							{Platform.OS === 'android' && (
 								<KeyboardAvoidingView behavior="padding" />
@@ -611,6 +659,39 @@ const ChatScreen = () => {
 			</ImageBackground>
 		</ThemedView>
 	);
+};
+
+const RenderSystemMessage: React.FC<{
+	props: SystemMessageProps<ChatMessage>;
+}> = ({ props }) => {
+	const otherUserId = '';
+	const otherUserName = '';
+
+	const navigateToProfile = () => {};
+
+	if (props.currentMessage?._id === 'profile-card') {
+		return (
+			<View style={{ padding: 16, backgroundColor: '#f2f2f2' }}>
+				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+					<Image
+						source={{ uri: `/users/pfps/${otherUserId}.png` }}
+						style={{ width: 40, height: 40, borderRadius: 20, marginRight: 12 }}
+					/>
+					<View>
+						<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+							{otherUserName}
+						</Text>
+						<TouchableOpacity onPress={navigateToProfile}>
+							<Text style={{ color: 'blue' }}>Profil ansehen</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</View>
+		);
+	}
+
+	// Optional: default system message
+	return <SystemMessage {...props} />;
 };
 
 const VideoStyles = StyleSheet.create({

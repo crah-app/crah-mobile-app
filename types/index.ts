@@ -37,7 +37,12 @@ export interface selectedTrickInterface {
 }
 
 // gifted chat footer attachment types
-export type ChatFooterBarTypes = 'TrickRow' | 'RiderRow' | 'Source' | 'Audio';
+export type ChatFooterBarTypes =
+	| 'TrickRow'
+	| 'RiderRow'
+	| 'Source'
+	| 'Audio'
+	| 'Reply';
 
 // chat message for gifted chat
 export interface ChatMessage extends IMessage {
@@ -46,6 +51,7 @@ export interface ChatMessage extends IMessage {
 	ChatId: string;
 	ChatName: string;
 	ChatAvatar: string | null;
+	InitAboutSystemMessage: boolean;
 	text: string;
 	createdAt: Date;
 	participants: User[];
