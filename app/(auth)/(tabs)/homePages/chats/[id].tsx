@@ -313,7 +313,7 @@ const ChatScreen = () => {
 			const res: ChatMessage[] = await response.json();
 
 			const updatedMessages = [
-				...res.slice(0, res.length - 1).map((msg) => ({
+				...res.map((msg) => ({
 					...msg,
 					createdAt: new Date(msg.createdAt),
 				})),

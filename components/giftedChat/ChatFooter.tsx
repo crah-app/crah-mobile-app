@@ -161,6 +161,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 	};
 
 	const abortAttachedMessage = () => {
+		setDisplayFooter(false);
 		// data of attached message
 		setSelectedRiderData(undefined);
 		setSelectedTrickData(undefined);
@@ -185,6 +186,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 			<TouchableOpacity
 				onPress={abortAttachedMessage}
 				style={{
+					display: displayFooter ? 'flex' : 'none',
 					zIndex: 1,
 					position: 'absolute',
 					right: 8,
