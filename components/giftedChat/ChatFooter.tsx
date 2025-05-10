@@ -31,6 +31,10 @@ interface ChatFooterBarProps {
 	setSelectedImage: (source: string | undefined) => void;
 	setReplyMessage: Dispatch<SetStateAction<ChatMessage | undefined>>;
 	replyMessage: ChatMessage | undefined;
+	isReply: boolean;
+	replyToMessageId: string | undefined;
+	setIsReply: (isReply: boolean) => void;
+	setReplyMessageId: (id: string | undefined) => void;
 }
 
 const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
@@ -46,12 +50,14 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 	setSelectedTrickData,
 	setReplyMessage,
 	replyMessage,
+	isReply,
+	replyToMessageId,
+	setIsReply,
+	setReplyMessageId,
+	setSelectedImage,
+	setSelectedVideo,
 }) => {
 	const theme = useSystemTheme();
-
-	useEffect(() => {
-		console.log(msgType);
-	}, [msgType]);
 
 	const TrickRow = () => {
 		return (
@@ -122,20 +128,54 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 
 	const ReplyRow = () => {
 		return (
-			<ReplyMessageBar
-				trickData={trickData}
-				riderData={riderData}
-				message={replyMessage}
-			/>
+			<View>
+				<ReplyMessageBar
+					trickData={trickData}
+					riderData={riderData}
+					message={replyMessage}
+				/>
+
+				{/* when user wants to reply not with plain text but with a different 
+				type of message such as trick, rider, audio or a source */}
+				<RenderReplyRowAttachments />
+			</View>
+		);
+	};
+
+	const RenderReplyRowAttachments = () => {
+		return (
+			<View>
+				{msgType === 'TrickRow' ? (
+					<TrickRow />
+				) : msgType === 'RiderRow' ? (
+					<RiderRow />
+				) : msgType === 'Audio' ? (
+					<AudioRow />
+				) : msgType === 'Source' ? (
+					<SourceRow />
+				) : (
+					<></>
+				)}
+			</View>
 		);
 	};
 
 	const abortAttachedMessage = () => {
+		// data of attached message
 		setSelectedRiderData(undefined);
 		setSelectedTrickData(undefined);
+
+		// message type
 		setAttachedMessageType(undefined);
-		setDisplayFooter(false);
+
+		// source
+		setSelectedVideo(undefined);
+		setSelectedImage(undefined);
+
+		// reply to message data
 		setReplyMessage(undefined);
+		setIsReply(false);
+		setReplyMessageId(undefined);
 	};
 
 	if (!displayFooter) return <></>;
@@ -153,19 +193,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 				<Ionicons name="close" size={20} color={Colors[theme].textPrimary} />
 			</TouchableOpacity>
 
-			{msgType === 'TrickRow' ? (
-				<TrickRow />
-			) : msgType === 'RiderRow' ? (
-				<RiderRow />
-			) : msgType === 'Audio' ? (
-				<AudioRow />
-			) : msgType === 'Source' ? (
-				<SourceRow />
-			) : msgType === 'Reply' ? (
-				<ReplyRow />
-			) : (
-				<></>
-			)}
+			{isReply ? <ReplyRow /> : <RenderReplyRowAttachments />}
 		</ThemedView>
 	);
 };

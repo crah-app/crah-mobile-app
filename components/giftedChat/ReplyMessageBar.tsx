@@ -12,9 +12,8 @@ import { IMessage } from 'react-native-gifted-chat';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import Row from '../general/Row';
 
-import Scooter from '../../assets/images/vectors/scooter.svg';
-import { getTrickTitle } from '@/utils/globalFuncs';
 import { useUser } from '@clerk/clerk-expo';
+import { RenderRider, RenderTrick } from './MessageAttachments';
 
 type ReplyMessageBarProps = {
 	message: ChatMessage | undefined;
@@ -34,45 +33,6 @@ const ReplyMessageBar = ({
 
 	if (message?.user.name === user?.username)
 		username = `You - ${user?.username}`;
-
-	const RenderTrick = () => {
-		return (
-			<View style={{ backgroundColor: Colors[theme].surface }}>
-				<Row
-					costumAvatarWidth={18}
-					costumAvatarHeight={18}
-					showAvatar
-					avatarIsSVG
-					avatarUrl={Scooter}
-					// @ts-ignore
-					title={getTrickTitle(trickData)}
-					containerStyle={{
-						backgroundColor: Colors[theme].surface,
-					}}
-				/>
-			</View>
-		);
-	};
-
-	const RenderRider = () => {
-		console.log(riderData, 'undineuinuunuhs');
-
-		return (
-			<View style={{ backgroundColor: Colors[theme].surface }}>
-				<Row
-					costumAvatarWidth={18}
-					costumAvatarHeight={18}
-					showAvatar
-					// @ts-ignore
-					avatarUrl={riderData?.avatar}
-					// @ts-ignore
-					title={riderData?.name}
-					// subtitle={riderData?.rank + ' #' + riderData?.rankPosition}
-					containerStyle={{ backgroundColor: Colors[theme].surface }}
-				/>
-			</View>
-		);
-	};
 
 	return (
 		<>
@@ -106,14 +66,14 @@ const ReplyMessageBar = ({
 							{username}
 						</Text>
 						{/* render message text */}
-						{message.text && (
+						{message.text && message.type === 'text' && (
 							<Text
 								style={{
 									color: Colors[theme].gray,
 									paddingLeft: 10,
 									paddingTop: 5,
 								}}>
-								{message!.text.length > 40
+								{message.text.length > 40
 									? message?.text.substring(0, 40) + '...'
 									: message?.text}
 							</Text>
@@ -122,9 +82,9 @@ const ReplyMessageBar = ({
 						{/* render other content if it is not a text message */}
 						<View>
 							{message.type === 'rider' ? (
-								<RenderRider />
+								<RenderRider asMessageBubble={false} riderData={riderData} />
 							) : message.type === 'trick' ? (
-								<RenderTrick />
+								<RenderTrick asMessageBubble={false} trickData={trickData} />
 							) : (
 								<></>
 							)}

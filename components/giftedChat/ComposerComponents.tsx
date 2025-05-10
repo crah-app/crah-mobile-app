@@ -21,6 +21,8 @@ interface RenderSendTextProps {
 	attachedMessageType: ChatFooterBarTypes | undefined;
 	selectedRiderData: selectedRiderInterface | undefined;
 	selectedTrickData: selectedTrickInterface | undefined;
+	isReply: boolean;
+	replyToMessageId: string | undefined;
 }
 
 export const RenderSendText: React.FC<RenderSendTextProps> = ({
@@ -28,10 +30,16 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	attachedMessageType,
 	selectedRiderData,
 	selectedTrickData,
+	isReply,
+	replyToMessageId,
 }) => {
 	const theme = useSystemTheme();
 
-	let message: Partial<ChatMessage> = { text: props.text!.trim() };
+	let message: Partial<ChatMessage> = {
+		text: props.text!.trim(),
+		isReply: isReply,
+		replyToMessageId: replyToMessageId,
+	};
 
 	const internetLinks: RegExpMatchArray | [] =
 		props.text!.trim()?.match(urlRegex) ?? [];

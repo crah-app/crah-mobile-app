@@ -37,12 +37,7 @@ export interface selectedTrickInterface {
 }
 
 // gifted chat footer attachment types
-export type ChatFooterBarTypes =
-	| 'TrickRow'
-	| 'RiderRow'
-	| 'Source'
-	| 'Audio'
-	| 'Reply';
+export type ChatFooterBarTypes = 'TrickRow' | 'RiderRow' | 'Source' | 'Audio';
 
 // chat message for gifted chat
 export interface ChatMessage extends IMessage {
@@ -58,6 +53,9 @@ export interface ChatMessage extends IMessage {
 	type: chatCostumMsgType;
 	riderId: string;
 	trickId: number;
+	// reply to a message
+	isReply: boolean;
+	replyToMessageId: string | undefined;
 }
 
 // identify urls

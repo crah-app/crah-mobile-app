@@ -1,4 +1,4 @@
-import { errType } from '@/types';
+import { ChatMessage, errType, TrickDifficulty } from '@/types';
 import ClerkUser from '@/types/clerk';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { useUser } from '@clerk/clerk-expo';
@@ -11,7 +11,10 @@ import { getTrickTitle } from '@/utils/globalFuncs';
 
 import Scooter from '../../assets/images/vectors/scooter.svg';
 import { mmkv } from '@/hooks/mmkv';
+import { View, Text } from 'react-native';
+import { RenderRider, RenderTrick } from './MessageAttachments';
 
+// costum message bubble view for a sended rider
 export const RiderRow: React.FC<{ riderId: string }> = ({ riderId }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
@@ -103,6 +106,7 @@ export const RiderRow: React.FC<{ riderId: string }> = ({ riderId }) => {
 	);
 };
 
+// costum message bubble view for a sended trick
 export const TrickRow: React.FC<{ trickId: number }> = ({ trickId }) => {
 	const theme = useSystemTheme();
 	const [fetchedTrick, setFetchedTrick] = useState<any>();
@@ -141,7 +145,15 @@ export const TrickRow: React.FC<{ trickId: number }> = ({ trickId }) => {
 				const trick = data.commonTricks[trickId];
 
 				setFetchedTrick(trick);
-				mmkv.set(cacheKey, JSON.stringify(trick)); // Cache it
+				mmkv.set(
+					cacheKey,
+					JSON.stringify({
+						id: trickId,
+						name: getTrickTitle(trick),
+						difficulty: TrickDifficulty.GOATED,
+						costum: false,
+					}),
+				); // Cache it
 			} catch (err) {
 				setError('not found');
 			} finally {
@@ -156,10 +168,9 @@ export const TrickRow: React.FC<{ trickId: number }> = ({ trickId }) => {
 		router.push({
 			pathname: '/modals/TrickModal',
 			params: {
-				data: JSON.stringify({
-					trickName: getTrickTitle(fetchedTrick),
-					trickDescription: 'lel',
-				}),
+				trickName: getTrickTitle(fetchedTrick),
+				trickId: trickId,
+				trickDescription: 'lel',
 			},
 		});
 	};
@@ -181,5 +192,95 @@ export const TrickRow: React.FC<{ trickId: number }> = ({ trickId }) => {
 			title={!trickLoaded ? 'loading trick' : getTrickTitle(fetchedTrick)}
 			onPress={handleTrickPress}
 		/>
+	);
+};
+
+// costum reply view to message chat bubble to render message the user replied to
+export const ReplyRow: React.FC<{
+	position: 'right' | 'left'; // is the chat message from current user or other user
+	chatId: string;
+	messageId: string;
+	replyToMessageId: string | undefined;
+}> = ({ position, chatId, messageId, replyToMessageId }) => {
+	const theme = useSystemTheme();
+	const { user } = useUser();
+
+	const cache: ChatMessage[] = JSON.parse(
+		mmkv.getString(`msgs_${chatId}`) ?? '{}',
+	);
+
+	// message the user wants to reply to
+	const cachedMessage: ChatMessage | undefined = cache.find(
+		(msg) => msg._id === replyToMessageId,
+	);
+
+	const replyToMessageTrickId = cachedMessage?.trickId;
+	const replyToMessageRiderId = cachedMessage?.riderId;
+
+	let cachedMessageSenderName: string | undefined = cachedMessage?.user.name;
+
+	// trick- and riderId from message the user wants to reply to
+	const cachedTrick = JSON.parse(
+		mmkv.getString(`trick_${replyToMessageTrickId}`) ?? '{}',
+	);
+	const cachedRider = JSON.parse(
+		mmkv.getString(`rider_${replyToMessageRiderId}`) ?? '{}',
+	);
+
+	if (cachedMessage?.user.name === user?.username) {
+		cachedMessageSenderName = 'You';
+	}
+
+	return (
+		<View
+			style={{
+				paddingBottom: 2,
+			}}>
+			<View style={{ flexDirection: 'column' }}>
+				<Text
+					style={{
+						color: Colors[theme].textSecondary,
+						paddingHorizontal: 10,
+						paddingTop: 5,
+						fontWeight: '600',
+						fontSize: 14,
+					}}>
+					{cachedMessageSenderName}
+				</Text>
+				{/* render message text */}
+				{cachedMessage?.text && cachedMessage.type === 'text' && (
+					<Text
+						style={{
+							color: Colors[theme].textSecondary,
+							paddingHorizontal: 10,
+							fontSize: 13,
+							fontWeight: '500',
+						}}>
+						{cachedMessage.text.length > 20
+							? cachedMessage?.text.substring(0, 20) + '...'
+							: cachedMessage?.text}
+					</Text>
+				)}
+
+				{/* render other content if it is not a text message */}
+				<View>
+					{cachedMessage?.type === 'rider' ? (
+						<RenderRider
+							position={position}
+							asMessageBubble
+							riderData={cachedRider}
+						/>
+					) : cachedMessage?.type === 'trick' ? (
+						<RenderTrick
+							position={position}
+							asMessageBubble
+							trickData={cachedTrick}
+						/>
+					) : (
+						<></>
+					)}
+				</View>
+			</View>
+		</View>
 	);
 };

@@ -114,12 +114,18 @@ import {
 import storage from '@/utils/storage';
 import { Swipeable } from 'react-native-gesture-handler';
 import CostumChatBubble from '@/components/giftedChat/CostumChatBubble';
+import { mmkv } from '@/hooks/mmkv';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
 	const { bottom } = useSafeAreaInsets();
-	const { id, fromCamera, video, image } = useLocalSearchParams(); // when user goes from the camera page back to the chat page the source has to be given vie local params
+	const rawParams = useLocalSearchParams();
+
+	const id = rawParams.id as string;
+	const video = rawParams.video as string;
+	const image = rawParams.image as string;
+	const fromCamera = rawParams.fromCamera === 'true'; // when user goes from the camera page back to the chat page the source has to be given vie local params
 
 	// states
 	const [text, setText] = useState('');
@@ -156,6 +162,8 @@ const ChatScreen = () => {
 
 	const swipeableRowRef = useRef<Swipeable | null>(null);
 	const [replyMessage, setReplyMessage] = useState<ChatMessage>();
+	const [isReply, setIsReply] = useState<boolean>(false);
+	const [replyMessageId, setReplyMessageId] = useState<string | undefined>();
 
 	const updateRowRef = useCallback(
 		(ref: any) => {
@@ -196,6 +204,7 @@ const ChatScreen = () => {
 			const updatedMessages = GiftedChat.append(messages, newMessages);
 			setMessages(updatedMessages);
 			saveMessagesToStorage(updatedMessages);
+			mmkv.set(`msgs_${id}`, JSON.stringify(updatedMessages));
 
 			setDisplayChatFooter(false);
 			setSelectedRiderData(undefined);
@@ -204,6 +213,8 @@ const ChatScreen = () => {
 			setSelectedVideo(undefined);
 			setSelectedImage(undefined);
 			setReplyMessage(undefined);
+			setIsReply(false);
+			setReplyMessageId(undefined);
 
 			socket.emit('send-message', { chatId: id, msg: newMessages });
 		},
@@ -314,12 +325,13 @@ const ChatScreen = () => {
 					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
 				);
 			});
-
-			console.log(updatedMessages);
+			// console.log(updatedMessages);
 
 			setMessages(sortedMessages);
 			saveMessagesToStorage(sortedMessages);
 			setFetchedData(res);
+
+			mmkv.set(`msgs_${id}`, JSON.stringify(sortedMessages));
 
 			// is in chat room prevents bug where messages are marked as seen although client is not in the chat page itself
 			setIsInChatRoom(true);
@@ -564,11 +576,15 @@ const ChatScreen = () => {
 										setSelectedTrickData={setSelectedTrickData}
 										setSelectedImage={setSelectedImage}
 										setSelectedVideo={setSelectedVideo}
+										setIsReply={setIsReply}
+										setReplyMessageId={setReplyMessageId}
 									/>
 								)}
 								// chat footer
 								renderChatFooter={() => (
 									<ChatFooterBar
+										setReplyMessageId={setReplyMessageId}
+										setIsReply={setIsReply}
 										displayFooter={displayChatFooter}
 										msgType={attachedMessageType}
 										riderData={selectedRiderData}
@@ -587,6 +603,8 @@ const ChatScreen = () => {
 										]}
 										setReplyMessage={setReplyMessage}
 										replyMessage={replyMessage}
+										isReply={isReply}
+										replyToMessageId={replyMessageId}
 									/>
 								)}
 								// right btn: send
@@ -599,6 +617,8 @@ const ChatScreen = () => {
 										}}>
 										{text.length > 0 || attachedMessageType !== undefined ? (
 											<RenderSendText
+												isReply={isReply}
+												replyToMessageId={replyMessageId}
 												selectedTrickData={selectedTrickData}
 												selectedRiderData={selectedRiderData}
 												attachedMessageType={attachedMessageType}
@@ -647,7 +667,7 @@ const ChatScreen = () => {
 									<TypingIndicator display={typingStatus?.isTyping || false} />
 								)}
 								renderCustomView={(props) => (
-									<CustomMessageView props={props} />
+									<CustomMessageView chatId={id} props={props} />
 								)}
 							/>
 							{Platform.OS === 'android' && (

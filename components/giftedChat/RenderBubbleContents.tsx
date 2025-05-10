@@ -7,7 +7,7 @@ import {
 	BubbleProps,
 	MessageVideoProps,
 } from 'react-native-gifted-chat';
-import { RiderRow, TrickRow } from './UtilityMessageRow';
+import { ReplyRow, RiderRow, TrickRow } from './UtilityMessageRow';
 import { fetchLinkPreview } from '@/utils/globalFuncs';
 import { ImageBackground, View } from 'react-native';
 import { GiftedChatProps } from 'react-native-gifted-chat/lib/GiftedChat/types';
@@ -93,25 +93,49 @@ export const RenderBubble: React.FC<{
 	);
 };
 
-export const CustomMessageView: React.FC<{ props: any }> = ({ props }) => {
+export const CustomMessageView: React.FC<{
+	props: BubbleProps<ChatMessage>;
+	chatId: string;
+}> = ({ props, chatId }) => {
 	const theme = useSystemTheme();
-	const message = props.currentMessage;
+	const message: ChatMessage = props.currentMessage;
+	// @ts-ignore
+	const messageIsReply = message.isReply === 1 || message.isReply;
+	const riderId = props.currentMessage.riderId;
+	const trickId = props.currentMessage.trickId;
 
 	if (!message || !message.type) return null;
 
+	if (messageIsReply) {
+		return (
+			<View>
+				<ReplyRow
+					position={props.position}
+					chatId={chatId}
+					messageId={message._id}
+					replyToMessageId={message.replyToMessageId}
+				/>
+
+				{message.type === 'rider' ? (
+					<RiderRow riderId={riderId} />
+				) : message.type === 'trick' ? (
+					<TrickRow trickId={trickId} />
+				) : (
+					<></>
+				)}
+			</View>
+		);
+	}
+
 	switch (message.type) {
 		case 'trick':
-			const trickId = props.currentMessage.trickId;
-
 			return <TrickRow trickId={trickId} />;
 
 		case 'rider':
-			const riderId = props.currentMessage.riderId;
-
 			return <RiderRow riderId={riderId} />;
 
 		default:
-			return null;
+			break;
 	}
 };
 

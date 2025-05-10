@@ -21,6 +21,7 @@ import {
 	selectedTrickInterface,
 } from '@/types';
 import { mmkv } from '@/hooks/mmkv';
+import ThemedText from '../general/ThemedText';
 
 type ChatMessageBoxProps = {
 	setReplyOnSwipeOpen: (message: ChatMessage) => void;
@@ -31,6 +32,8 @@ type ChatMessageBoxProps = {
 	setSelectedTrickData: (u: selectedTrickInterface | undefined) => void;
 	setSelectedVideo: (source: string | undefined) => void;
 	setSelectedImage: (source: string | undefined) => void;
+	setIsReply: (isReply: boolean) => void;
+	setReplyMessageId: (id: string | undefined) => void;
 } & MessageProps<IMessage>;
 
 const ChatMessageBox = ({
@@ -42,6 +45,8 @@ const ChatMessageBox = ({
 	setSelectedRiderData,
 	setSelectedTrickData,
 	setSelectedVideo,
+	setIsReply,
+	setReplyMessageId,
 	...props
 }: ChatMessageBoxProps) => {
 	const theme = useSystemTheme();
@@ -57,7 +62,9 @@ const ChatMessageBox = ({
 	const onSwipeOpenAction = () => {
 		if (props.currentMessage) {
 			setDisplayFooter(true);
-			setAttachedMessageType('Reply');
+			setIsReply(true);
+			// @ts-ignore ---- _id is always string
+			setReplyMessageId(props.currentMessage._id);
 			// @ts-ignore
 			setReplyOnSwipeOpen({ ...props.currentMessage });
 
@@ -73,8 +80,10 @@ const ChatMessageBox = ({
 			case 'trick':
 				const trick = JSON.parse(
 					// @ts-ignore
-					mmkv.getString(`trick_${props.currentMessage.trickId}`) || '{}',
+					mmkv.getString(`trick_${props.currentMessage.trickId}`),
 				);
+
+				console.log('get trick from mmkv cache', trick);
 
 				// @ts-ignore
 				setSelectedTrickData(trick);
