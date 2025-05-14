@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import {
 	Bubble,
 	BubbleProps,
+	MessageImageProps,
 	MessageVideoProps,
 } from 'react-native-gifted-chat';
 import { ReplyRow, RiderRow, TrickRow } from './UtilityMessageRow';
@@ -142,29 +143,29 @@ export const CustomMessageView: React.FC<{
 export const RenderMessageVideo: React.FC<{
 	props: MessageVideoProps<ChatMessage>;
 }> = ({ props }) => {
-	const [previewData, setPreviewData] = useState<LinkPreview>();
-	const internetLinks: RegExpMatchArray | [] =
-		props.currentMessage.text?.match(urlRegex) ?? [];
-	const isInternetLink: boolean = internetLinks.length > 0;
+	// const [previewData, setPreviewData] = useState<LinkPreview>();
+	// const internetLinks: RegExpMatchArray | [] =
+	// 	props.currentMessage.text?.match(urlRegex) ?? [];
+	// const isInternetLink: boolean = internetLinks.length > 0;
 
-	useEffect(() => {
-		if (isInternetLink && !previewData) {
-			fetchLinkPreview(internetLinks[0]).then((data: LinkPreview) => {
-				setPreviewData(data);
-			});
-		}
-	}, [internetLinks]);
+	// useEffect(() => {
+	// 	if (isInternetLink && !previewData) {
+	// 		fetchLinkPreview(internetLinks[0]).then((data: LinkPreview) => {
+	// 			setPreviewData(data);
+	// 		});
+	// 	}
+	// }, [internetLinks]);
 
-	if (
-		props.currentMessage.type === 'rider' ||
-		props.currentMessage.type === 'trick'
-	) {
-		return <View></View>;
-	}
+	// if (
+	// 	props.currentMessage.type === 'rider' ||
+	// 	props.currentMessage.type === 'trick'
+	// ) {
+	// 	return <View></View>;
+	// }
 
 	return (
 		<View>
-			{previewData && (
+			{/* {previewData && (
 				<ImageBackground
 					source={{ uri: previewData.images[0] }}
 					style={{
@@ -173,8 +174,26 @@ export const RenderMessageVideo: React.FC<{
 					}}
 					resizeMode="cover"
 				/>
-			)}
+			)} */}
+			<ThemedText theme={'dark'} value={'your video'} />
 		</View>
+	);
+};
+
+export const RenderMessageImage: React.FC<{
+	props: MessageImageProps<ChatMessage>;
+}> = ({ props }) => {
+	return (
+		// <View>
+		<ImageBackground
+			source={{ uri: props.currentMessage.image }}
+			style={{
+				width: 250,
+				height: 500 * (9 / 16),
+			}}
+			resizeMode="cover"
+		/>
+		// </View>
 	);
 };
 

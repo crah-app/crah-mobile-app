@@ -23,6 +23,8 @@ interface RenderSendTextProps {
 	selectedTrickData: selectedTrickInterface | undefined;
 	isReply: boolean;
 	replyToMessageId: string | undefined;
+	image: string | undefined;
+	video: string | undefined;
 }
 
 export const RenderSendText: React.FC<RenderSendTextProps> = ({
@@ -32,6 +34,8 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	selectedTrickData,
 	isReply,
 	replyToMessageId,
+	image,
+	video,
 }) => {
 	const theme = useSystemTheme();
 
@@ -65,8 +69,8 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 
 			case 'Source':
 				message.type = chatCostumMsgType.text;
-				// message.video = '';
-				message.image = '';
+				message.image = image;
+				message.video = video;
 				break;
 
 			case undefined:
@@ -104,21 +108,16 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	);
 };
 
-export const RenderSendEmptyText: React.FC<{ props: any; chatId: string }> = ({
-	props,
-	chatId,
-}) => {
+export const RenderSendEmptyText: React.FC<{
+	props: any;
+	chatId: string;
+	useCamera: boolean;
+	setUseCamera: (use: boolean) => void;
+}> = ({ props, chatId, useCamera, setUseCamera }) => {
 	const theme = useSystemTheme();
 
-	const [useCamera, setUseCamera] = useState<boolean>(false);
-
 	const handleCamera = () => {
-		setUseCamera((c) => !c);
-
-		router.navigate({
-			pathname: '/modals/chats/CameraComponent',
-			params: { page: 'chat', chatId },
-		});
+		setUseCamera(true);
 	};
 
 	return (

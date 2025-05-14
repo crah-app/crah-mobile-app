@@ -108,6 +108,7 @@ import { RiderRow, TrickRow } from '@/components/giftedChat/UtilityMessageRow';
 import {
 	CustomMessageView,
 	RenderBubble,
+	RenderMessageImage,
 	RenderMessageVideo,
 	TypingIndicator,
 } from '@/components/giftedChat/RenderBubbleContents';
@@ -115,6 +116,7 @@ import storage from '@/utils/storage';
 import { Swipeable } from 'react-native-gesture-handler';
 import CostumChatBubble from '@/components/giftedChat/CostumChatBubble';
 import { mmkv } from '@/hooks/mmkv';
+import CameraComponent from '@/app/(auth)/modals/chats/CameraComponent';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -123,9 +125,6 @@ const ChatScreen = () => {
 	const rawParams = useLocalSearchParams();
 
 	const id = rawParams.id as string;
-	const video = rawParams.video as string;
-	const image = rawParams.image as string;
-	const fromCamera = rawParams.fromCamera === 'true'; // when user goes from the camera page back to the chat page the source has to be given vie local params
 
 	// states
 	const [text, setText] = useState('');
@@ -155,15 +154,16 @@ const ChatScreen = () => {
 		selectedTrickInterface | undefined
 	>();
 
-	const [selectedVideo, setSelectedVideo] = useState<string | undefined>();
-	const [selectedImage, setSelectedImage] = useState<string | undefined>();
-
 	const [isInChatRoom, setIsInChatRoom] = useState<boolean>();
 
 	const swipeableRowRef = useRef<Swipeable | null>(null);
 	const [replyMessage, setReplyMessage] = useState<ChatMessage>();
 	const [isReply, setIsReply] = useState<boolean>(false);
 	const [replyMessageId, setReplyMessageId] = useState<string | undefined>();
+
+	const [useCamera, setUseCamera] = useState<boolean>(false);
+	const [image, setImage] = useState<string | undefined>(undefined);
+	const [video, setVideo] = useState<string | undefined>(undefined);
 
 	const updateRowRef = useCallback(
 		(ref: any) => {
@@ -210,11 +210,11 @@ const ChatScreen = () => {
 			setSelectedRiderData(undefined);
 			setSelectedTrickData(undefined);
 			setAttachedMessageType(undefined);
-			setSelectedVideo(undefined);
-			setSelectedImage(undefined);
 			setReplyMessage(undefined);
 			setIsReply(false);
 			setReplyMessageId(undefined);
+			setVideo(undefined);
+			setImage(undefined);
 
 			socket.emit('send-message', { chatId: id, msg: newMessages });
 		},
@@ -405,18 +405,31 @@ const ChatScreen = () => {
 		});
 	}, [id, user?.id]);
 
-	// camera logic for uploading camera source
 	useEffect(() => {
-		if (!fromCamera) return;
+		if (!video && !image) return;
 
-		if (video) {
-			setSelectedVideo(video as string);
-		} else if (image) {
-			setSelectedImage(image as string);
-		} else {
-			setDisplayChatFooter(true);
-		}
-	}, [fromCamera, video, image]);
+		setDisplayChatFooter(true);
+		setAttachedMessageType('Source');
+		setIsReply(false);
+		setReplyMessageId(undefined);
+
+		return () => {};
+	}, [video, image]);
+
+	if (useCamera) {
+		return (
+			<View style={{ flex: 1 }}>
+				<Stack.Screen options={{ headerShown: false }} />
+				<CameraComponent
+					setUseCamera={setUseCamera}
+					setImage={setImage}
+					setVideo={setVideo}
+					video={video}
+					image={image}
+				/>
+			</View>
+		);
+	}
 
 	return (
 		<ThemedView theme={theme} flex={1} style={{}}>
@@ -574,8 +587,8 @@ const ChatScreen = () => {
 										setAttachedMessageType={setAttachedMessageType}
 										setSelectedRiderData={setSelectedRiderData}
 										setSelectedTrickData={setSelectedTrickData}
-										setSelectedImage={setSelectedImage}
-										setSelectedVideo={setSelectedVideo}
+										setSelectedImage={setImage}
+										setSelectedVideo={setVideo}
 										setIsReply={setIsReply}
 										setReplyMessageId={setReplyMessageId}
 									/>
@@ -593,14 +606,12 @@ const ChatScreen = () => {
 										setDisplayFooter={setDisplayChatFooter}
 										setSelectedRiderData={setSelectedRiderData}
 										setSelectedTrickData={setSelectedTrickData}
-										setSelectedImage={setSelectedImage}
-										setSelectedVideo={setSelectedVideo}
-										sourceData={[
-											{
-												uri: selectedImage || selectedVideo,
-												type: selectedImage ? 'image' : 'video',
-											},
-										]}
+										setSelectedImage={setImage}
+										setSelectedVideo={setVideo}
+										sourceData={{
+											uri: image || video,
+											type: image ? 'image' : 'video',
+										}}
 										setReplyMessage={setReplyMessage}
 										replyMessage={replyMessage}
 										isReply={isReply}
@@ -623,11 +634,15 @@ const ChatScreen = () => {
 												selectedRiderData={selectedRiderData}
 												attachedMessageType={attachedMessageType}
 												props={props}
+												image={image}
+												video={video}
 											/>
 										) : (
 											<RenderSendEmptyText
 												chatId={id as string}
 												props={props}
+												useCamera={useCamera}
+												setUseCamera={setUseCamera}
 											/>
 										)}
 									</View>
@@ -661,6 +676,9 @@ const ChatScreen = () => {
 								focusOnInputWhenOpeningKeyboard={true}
 								renderMessageVideo={(props) => (
 									<RenderMessageVideo props={props} />
+								)}
+								renderMessageImage={(props) => (
+									<RenderMessageImage props={props} />
 								)}
 								isTyping={typingStatus?.isTyping}
 								renderTypingIndicator={() => (

@@ -4,254 +4,202 @@ import {
 	TouchableOpacity,
 	View,
 	Text,
-	Button,
 	Image,
 	ImageBackground,
+	Dimensions,
 } from 'react-native';
-
-import * as MediaLibrary from 'expo-media-library';
-import {
-	Camera,
-	CameraType,
-	CameraView,
-	CameraViewRef,
-	FlashMode,
-	useCameraPermissions,
-} from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
-import { Link, router, useLocalSearchParams } from 'expo-router';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import {
+	useCameraPermission,
+	Camera,
+	useCameraDevice,
+} from 'react-native-vision-camera';
+import { useIsFocused } from '@react-navigation/native';
+import { router, useLocalSearchParams, Link } from 'expo-router';
+import * as MediaLibrary from 'expo-media-library';
 import CameraVideoView from '@/components/giftedChat/CameraVideoView';
-import { Asset, getAlbumsAsync, getAssetsAsync } from 'expo-media-library';
+import ThemedView from '@/components/general/ThemedView';
+import { useSystemTheme } from '@/utils/useSystemTheme';
+import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
+import Colors from '@/constants/Colors';
 
-const CameraComponent = () => {
-	const { page, chatId } = useLocalSearchParams(); // page: Page which calls the camera page
+export const CameraComponent: React.FC<{
+	setUseCamera: (use: boolean) => void;
+	image: string | undefined;
+	video: string | undefined;
+	setImage: (image: string | undefined) => void;
+	setVideo: (video: string | undefined) => void;
+}> = ({ setUseCamera, image, video, setImage, setVideo }) => {
+	const theme = useSystemTheme();
 
-	const [permission, requestPermission] = useCameraPermissions();
-	const cameraRef = useRef<CameraView>(null);
+	const { page, chatId } = useLocalSearchParams();
+	const camera = useRef<Camera>(null);
+	const [hasPermission, setHasPermission] = useState(false);
+	const [isRecording, setIsRecording] = useState(false);
 
-	const [isRecording, setIsRecording] = useState<boolean>(false);
-
-	const [image, setImage] = useState<string | undefined>(undefined);
-	const [video, setVideo] = useState<string | undefined>(undefined);
-
-	const [cameraType, setCameraType] = useState<CameraType>('back');
-	const [flash, setFlash] = useState<FlashMode>('off');
-	const [zoom, setZoom] = useState<number>(0);
+	const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>(
+		'back',
+	);
+	const device = useCameraDevice(cameraPosition);
+	const isFocused = useIsFocused();
 
 	useEffect(() => {
-		const permissions = async () => {
-			const cameraStatus = await Camera.requestCameraPermissionsAsync();
-			const soundStatus = await Camera.requestMicrophonePermissionsAsync();
-
-			if (!permission || !cameraStatus || !soundStatus) {
-				// Camera permissions are still loading.
-				return <View />;
-			}
-
-			if (
-				!permission.granted ||
-				!cameraStatus.granted ||
-				!soundStatus.granted
-			) {
-				// Camera permissions are not granted yet.
-				return (
-					<View style={styles.container}>
-						<Text style={styles.message}>
-							We need your permission to show the camera
-						</Text>
-						<Button onPress={requestPermission} title="grant permission" />
-					</View>
-				);
-			}
-		};
-
-		permissions();
+		(async () => {
+			const cameraPermission = await Camera.requestCameraPermission();
+			const micPermission = await Camera.requestMicrophonePermission();
+			setHasPermission(
+				cameraPermission === 'granted' && micPermission === 'granted',
+			);
+		})();
 	}, []);
 
-	const startRecording = async () => {
-		if (!cameraRef.current || isRecording) return;
+	const takePhoto = async () => {
+		if (!camera.current) return;
+		try {
+			const photo = await camera.current.takePhoto({
+				flash: 'off',
+			});
+			console.log('Foto URI:', `file://${photo.path}`);
+			setImage(`file://${photo.path}`);
+		} catch (err) {
+			console.error('Fehler beim Foto:', err);
+		}
+	};
 
+	const startRecording = async () => {
+		if (!camera.current || isRecording) return;
 		try {
 			setIsRecording(true);
-			const recorded = await cameraRef.current.recordAsync();
-			console.log('Recorded video:', recorded);
-			setVideo(recorded?.uri);
-			setIsRecording(false);
+			await camera.current.startRecording({
+				onRecordingFinished: (video) => {
+					console.log('Video aufgenommen:', video);
+					setVideo(`file://${video.path}`);
+				},
+				onRecordingError: (error) => {
+					console.error('Videoaufnahme-Fehler:', error);
+				},
+			});
 		} catch (err) {
-			console.warn('Recording error:', err);
-			setIsRecording(false);
+			console.error('Start recording failed:', err);
 		}
 	};
 
 	const stopRecording = async () => {
-		if (!cameraRef.current || !isRecording) return;
-
+		if (!camera.current || !isRecording) return;
 		try {
-			cameraRef.current.stopRecording();
-		} catch (err) {
-			console.warn('Stop recording failed:', err);
-		}
-	};
-
-	async function toggleRecord() {
-		if (!cameraRef) return;
-
-		console.log('toggle record', video);
-
-		if (isRecording) {
-			console.log('stop recording', video);
-
-			cameraRef.current?.stopRecording();
+			await camera.current.stopRecording();
 			setIsRecording(false);
-		} else {
-			console.log('is recording', video);
-
-			setIsRecording(true);
-			const response = await cameraRef.current?.recordAsync();
-			console.log(response);
-			setVideo(response?.uri);
-		}
-	}
-
-	const takePicture = async () => {
-		if (!cameraRef) return;
-
-		try {
-			const data = await cameraRef.current?.takePictureAsync();
-			console.log(data);
-			setImage(data?.uri);
-		} catch (error) {
-			console.warn(error);
+		} catch (err) {
+			console.error('Stop recording failed:', err);
 		}
 	};
 
 	const savePicture = async () => {
 		if (!image) return;
-
-		try {
-			await MediaLibrary.createAssetAsync(image);
-		} catch (error) {
-			console.warn(error);
-		}
-
+		await MediaLibrary.createAssetAsync(image);
 		handleGoBack();
 	};
 
-	const saveVideo = () => {};
+	const saveVideo = async (video: string | undefined) => {
+		if (!video) return;
+		setVideo(video);
+		await MediaLibrary.createAssetAsync(video);
+		handleGoBack();
+	};
 
 	const handleGoBack = () => {
-		router.navigate({
-			pathname: '/(auth)/(tabs)/homePages/chats/[id]',
-			// @ts-ignore
-			params: { id: chatId, video, image, fromCamera: true },
-		});
+		setUseCamera(false);
 	};
+
+	if (!device || !hasPermission || !isFocused)
+		return <CrahActivityIndicator color={Colors[theme].primary} size={24} />;
 
 	return (
 		<View style={styles.container}>
+			{/* in case currentUser took a photo or a video */}
 			{video ? (
 				<CameraVideoView
 					video={video}
 					setVideo={setVideo}
 					saveVideo={saveVideo}
+					theme={theme}
 				/>
 			) : image ? (
 				<ImageBackground source={{ uri: image }} style={styles.camera}>
-					<View
-						style={{
-							flexDirection: 'row',
-							gap: 12,
-							justifyContent: 'center',
-							alignItems: 'flex-end',
-							flex: 1,
-						}}>
-						<View
-							style={[
-								styles.buttonContainer,
-								{ justifyContent: 'space-around' },
-							]}>
-							<TouchableOpacity
-								onPress={() => setImage(undefined)}
-								style={styles.buttonBackground}>
-								<Ionicons size={24} color={'white'} name={'refresh-outline'} />
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								onPress={savePicture}
-								style={styles.buttonBackground}>
-								<Ionicons
-									size={24}
-									color={'white'}
-									name={'checkmark-outline'}
-								/>
-							</TouchableOpacity>
-						</View>
+					<View style={styles.buttonContainer}>
+						<TouchableOpacity
+							onPress={() => setImage(undefined)}
+							style={styles.buttonBackground}>
+							<Ionicons size={24} color={'white'} name={'refresh-outline'} />
+						</TouchableOpacity>
+						<TouchableOpacity
+							onPress={savePicture}
+							style={styles.buttonBackground}>
+							<Ionicons size={24} color={'white'} name={'checkmark-outline'} />
+						</TouchableOpacity>
 					</View>
 				</ImageBackground>
 			) : (
-				<CameraView
-					zoom={zoom}
-					facing={cameraType}
-					style={styles.camera}
-					flash={flash}
-					ref={cameraRef}>
-					<View style={styles.topContainer}>
-						<TouchableOpacity
-							style={styles.buttonBackground}
-							onPress={() =>
-								setCameraType((prev) => (prev === 'back' ? 'front' : 'back'))
-							}>
-							<Ionicons name={'repeat-outline'} size={24} color={'white'} />
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={styles.buttonBackground}
-							onPress={() =>
-								setFlash((prev) => (prev === 'on' ? 'off' : 'on'))
-							}>
-							<Ionicons
-								name={flash === 'on' ? 'flash' : 'flash-off-outline'}
-								size={24}
-								color={'white'}
+				// in case currentUser has not taken a photo/video
+				<ThemedView theme={theme} style={styles.container} flex={1}>
+					<Camera
+						style={styles.camera}
+						device={device}
+						isActive={isFocused}
+						photo={true}
+						video={true}
+						audio={true}
+						ref={camera}
+					/>
+
+					<View style={styles.actionContainer}>
+						{/* top container */}
+						<View style={styles.topContainer}>
+							{/* change camera position button (front camera and back camera) */}
+							<TouchableOpacity
+								onPress={() =>
+									setCameraPosition((prev) =>
+										prev === 'back' ? 'front' : 'back',
+									)
+								}
+								style={styles.buttonBackground}>
+								<Ionicons name={'repeat-outline'} size={24} color={'white'} />
+							</TouchableOpacity>
+
+							<TouchableOpacity style={styles.buttonBackground}>
+								<Ionicons name={'flash-outline'} size={24} color={'white'} />
+							</TouchableOpacity>
+						</View>
+
+						{/* bottom container */}
+						<View style={styles.buttonContainer}>
+							{/* button for media library */}
+							<Link
+								href={'/modals/chats/MediaLibrary'}
+								asChild
+								style={styles.buttonBackground}>
+								<Ionicons size={24} color={'white'} name={'images-outline'} />
+							</Link>
+
+							<TouchableOpacity
+								onPress={takePhoto}
+								onLongPress={startRecording}
+								onPressOut={stopRecording}
+								style={[
+									styles.mainButton,
+									{ borderColor: isRecording ? 'red' : 'white' },
+								]}
 							/>
-						</TouchableOpacity>
+
+							{/* close camera button */}
+							<TouchableOpacity
+								style={styles.buttonBackground}
+								onPress={handleGoBack}>
+								<Ionicons size={24} color={'white'} name={'close-outline'} />
+							</TouchableOpacity>
+						</View>
 					</View>
-
-					<View style={styles.buttonContainer}>
-						<Link
-							href={'/modals/chats/MediaLibrary'}
-							asChild
-							style={styles.buttonBackground}>
-							<Ionicons size={24} color={'white'} name={'images-outline'} />
-						</Link>
-
-						<TouchableOpacity
-							// onLongPress={toggleRecord}
-							// onPressOut={toggleRecord}
-							style={[
-								styles.mainButton,
-								{ borderColor: isRecording ? 'red' : 'white' },
-							]}
-							onPress={takePicture}
-						/>
-
-						<TouchableOpacity
-							// onLongPress={toggleRecord}
-							// onPressOut={toggleRecord}
-							style={[
-								styles.mainButton,
-								{ borderColor: isRecording ? 'red' : 'white' },
-							]}
-							onPress={toggleRecord}
-						/>
-
-						<TouchableOpacity
-							style={styles.buttonBackground}
-							onPress={router.back}>
-							<Ionicons size={24} color={'white'} name={'close-outline'} />
-						</TouchableOpacity>
-					</View>
-				</CameraView>
+				</ThemedView>
 			)}
 		</View>
 	);
@@ -261,12 +209,13 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 	},
+	actionContainer: {
+		position: 'absolute',
+		width: Dimensions.get('window').width,
+		height: Dimensions.get('window').height,
+	},
 	camera: {
 		flex: 1,
-		width: '100%',
-		height: '100%',
-		flexDirection: 'column',
-		justifyContent: 'space-between',
 	},
 	topContainer: {
 		flexDirection: 'row',
@@ -289,20 +238,10 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(255, 255, 255, 0.2)',
 		borderRadius: 1000,
 	},
-	text: {
-		fontSize: 24,
-		fontWeight: 'bold',
-		color: 'white',
-	},
-	message: {
-		textAlign: 'center',
-		paddingBottom: 10,
-	},
 	mainButton: {
 		width: 78,
 		height: 78,
 		borderWidth: 6,
-		borderColor: 'white',
 		borderRadius: 1000,
 		backgroundColor: 'rgba(255, 255, 255, 0.2)',
 	},

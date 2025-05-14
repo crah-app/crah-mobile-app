@@ -3,6 +3,7 @@ import {
 	ChatMessage,
 	selectedRiderInterface,
 	selectedTrickInterface,
+	sourceDataInterface,
 } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '../general/ThemedView';
@@ -15,13 +16,14 @@ import Row from '../general/Row';
 import Scooter from '../../assets/images/vectors/scooter.svg';
 import ThemedText from '../general/ThemedText';
 import ReplyMessageBar from './ReplyMessageBar';
+import { useVideoPlayer, VideoView } from 'expo-video';
 
 interface ChatFooterBarProps {
 	msgType: ChatFooterBarTypes | undefined;
 	displayFooter: boolean | undefined;
 	trickData?: selectedTrickInterface;
 	riderData?: selectedRiderInterface;
-	sourceData?: any;
+	sourceData: sourceDataInterface;
 	audioData?: any;
 	setDisplayFooter: (b: boolean) => void;
 	setAttachedMessageType: (t: ChatFooterBarTypes | undefined) => void;
@@ -110,20 +112,35 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 			return (
 				<View style={{ backgroundColor: Colors[theme].container_surface }}>
 					<Row
+						avatarStyle={{ borderRadius: 12 }}
 						showAvatar
 						avatarUrl={sourceData.uri}
-						title={'Image'}
-						subtitle="image view"
+						title={'Your taken image'}
+						subtitle="ready to upload"
 						containerStyle={{
 							backgroundColor: Colors[theme].container_surface,
+							padding: 8,
 						}}
 					/>
 				</View>
 			);
 		}
-
 		// render video
-		return <></>;
+		return (
+			<View style={{ backgroundColor: Colors[theme].container_surface }}>
+				<Row
+					avatarStyle={{ borderRadius: 12 }}
+					showAvatar
+					avatarUrl={sourceData.uri}
+					title={'Your taken video'}
+					subtitle="ready to upload"
+					containerStyle={{
+						backgroundColor: Colors[theme].container_surface,
+						padding: 8,
+					}}
+				/>
+			</View>
+		);
 	};
 
 	const ReplyRow = () => {

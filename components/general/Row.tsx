@@ -7,6 +7,7 @@ import {
 	Dimensions,
 	ViewStyle,
 	TextStyle,
+	ImageStyle,
 } from 'react-native';
 import React from 'react';
 import Colors from '@/constants/Colors';
@@ -33,6 +34,7 @@ interface RowProps {
 	highlightWords?: Array<string>;
 	costumAvatarWidth?: number;
 	costumAvatarHeight?: number;
+	avatarStyle?: ImageStyle | ImageStyle[];
 }
 
 const Row: React.FC<RowProps> = ({
@@ -55,6 +57,7 @@ const Row: React.FC<RowProps> = ({
 	highlightWords,
 	costumAvatarWidth,
 	costumAvatarHeight,
+	avatarStyle,
 }) => {
 	const theme = useSystemTheme();
 
@@ -110,7 +113,7 @@ const Row: React.FC<RowProps> = ({
 										avatarUrl ??
 										'https://randomuser.me/api/portraits/men/32.jpg',
 								}}
-								style={styles.avatar}
+								style={[styles.avatar, avatarStyle]}
 								width={costumAvatarWidth || 46}
 								height={costumAvatarHeight || 46}
 							/>

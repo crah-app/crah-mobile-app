@@ -130,6 +130,12 @@ export enum chatCostumMsgType {
 	text = 'text',
 }
 
+// when parsing image/video information from one component to the other
+export interface sourceDataInterface {
+	uri: string | undefined;
+	type: 'image' | 'video';
+}
+
 /*
 	Link preview fetched from server
 */

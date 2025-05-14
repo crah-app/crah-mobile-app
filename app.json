@@ -62,7 +62,15 @@
 				}
 			],
 			"expo-build-properties",
-			"expo-font"
+			"expo-font",
+			[
+				"react-native-vision-camera",
+				{
+					"cameraPermissionText": "Crah needs access to your camera",
+					"enableMicrophonePermission": true,
+					"microphonePermissionText": "Crah needs access to your microphone"
+				}
+			]
 		],
 		"experiments": {
 			"typedRoutes": true
