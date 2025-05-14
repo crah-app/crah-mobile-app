@@ -6,10 +6,12 @@ import {
 	Bubble,
 	BubbleProps,
 	MessageVideoProps,
+	SystemMessage,
+	SystemMessageProps,
 } from 'react-native-gifted-chat';
 import { ReplyRow, RiderRow, TrickRow } from './UtilityMessageRow';
 import { fetchLinkPreview } from '@/utils/globalFuncs';
-import { ImageBackground, View } from 'react-native';
+import { ImageBackground, View, Image, Dimensions } from 'react-native';
 import { GiftedChatProps } from 'react-native-gifted-chat/lib/GiftedChat/types';
 import TypingAnimation from 'react-native-typing-animation';
 import ThemedText from '../general/ThemedText';
@@ -20,6 +22,8 @@ import Animated, {
 	withRepeat,
 	withTiming,
 } from 'react-native-reanimated';
+import { useUser } from '@clerk/clerk-expo';
+import { defaultStyles } from '@/constants/Styles';
 
 export const RenderBubble: React.FC<{
 	props: BubbleProps<ChatMessage>;
@@ -240,4 +244,78 @@ export const TypingIndicator: React.FC<{ display: boolean }> = ({
 			/>
 		</Animated.View>
 	);
+};
+
+// system msgs
+export const RenderSystemMessage: React.FC<{
+	props: SystemMessageProps<ChatMessage>;
+	metadata: ChatMessage;
+}> = ({ props, metadata }) => {
+	const { user } = useUser();
+	const theme = useSystemTheme();
+
+	const otherUser = metadata.participants.find(
+		(userobj) => userobj._id !== user?.id,
+	);
+	const otherUserId = otherUser?._id;
+	const otherUserName = metadata.ChatName; // in group: Group Name; Normal Chat: name of other user
+	const otherUserProfile = otherUser?.avatar;
+
+	const navigateToProfile = () => {};
+
+	// in case of a user to user chat
+	const RenderUserProfileCard = () => {
+		return <View></View>;
+	};
+
+	// in case of a group chat
+	const RenderGroupProfileCard = () => {
+		return (
+			<View
+				style={{
+					justifyContent: 'flex-start',
+					alignItems: 'center',
+					flex: 1,
+					gap: 12,
+				}}>
+				{otherUserProfile && (
+					<Image
+						style={{ borderRadius: 100 }}
+						width={100}
+						height={100}
+						source={{
+							uri:
+								// (otherUserProfile as string)
+								'https://randomuser.me/api/portraits/men/32.jpg',
+						}}
+					/>
+				)}
+				<ThemedText
+					style={[defaultStyles.biggerText]}
+					theme={theme}
+					value={otherUserName as string}
+				/>
+			</View>
+		);
+	};
+
+	if (props.currentMessage?._id === 'profile-card' && otherUser) {
+		return (
+			<View
+				style={{
+					padding: 16,
+					height: Dimensions.get('window').height - 300,
+					// backgroundColor: 'red'
+				}}>
+				{metadata.isGroup ? (
+					<RenderGroupProfileCard />
+				) : (
+					<RenderUserProfileCard />
+				)}
+			</View>
+		);
+	}
+
+	// Optional: default system message
+	return <SystemMessage {...props} />;
 };
