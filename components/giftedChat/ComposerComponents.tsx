@@ -15,7 +15,7 @@ import { SendProps } from 'react-native-gifted-chat';
 import CameraComponent from './CameraComponent';
 import { router } from 'expo-router';
 import Modal from 'react-native-modal';
-import { uploadTestVideo } from '@/hooks/bucketUploadManager';
+import { uploadSource } from '@/hooks/bucketUploadManager';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import { useUser } from '@clerk/clerk-expo';
 
@@ -42,8 +42,6 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
-
-	const [videoUrl, setVideoUrl] = useState<string>(); // link
 
 	let message: Partial<ChatMessage> = {
 		text: props.text!.trim(),
@@ -100,12 +98,6 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	// 	}
 	// }, [internetLinks]);
 
-	useEffect(() => {
-		console.log(videoUrl);
-
-		return () => {};
-	}, [videoUrl]);
-
 	const handleSendMessage = async () => {
 		// console.log(video);
 
@@ -117,15 +109,23 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 		console.log(video);
 
 		if (video) {
-			const recievedVideoUrl = await uploadTestVideo(
+			const recievedVideoUrl = await uploadSource(
 				video,
 				process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string,
 				user?.id as string,
-				setVideoUrl,
-				videoUrl,
 			);
 
 			message.video = recievedVideoUrl as string;
+		}
+
+		if (image) {
+			const recievedImageUrl = await uploadSource(
+				image,
+				process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string,
+				user?.id as string,
+			);
+
+			message.image = recievedImageUrl as string;
 		}
 
 		props.onSend!(message, true);

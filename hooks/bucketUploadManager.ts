@@ -4,13 +4,12 @@ import { VideoMeta } from '@/types';
 import { getMIMEType } from '@/utils/globalFuncs';
 import { useAuth } from '@clerk/clerk-expo';
 import axios from 'axios';
+import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 
-export async function uploadTestVideo(
-	video: VideoMeta,
+export async function uploadSource(
+	video: VideoFile | PhotoFile,
 	clerkToken: string,
 	userId: string,
-	setVideoUrl: (url: string | undefined) => void,
-	videoUrl: string | undefined,
 ) {
 	return new Promise(async (res, rej) => {
 		try {
@@ -35,7 +34,7 @@ export async function uploadTestVideo(
 					body: JSON.stringify({
 						userId,
 						filename: fileName,
-						duration: video.duration,
+						duration: 'duration' in video ? video.duration : 0,
 						height: video.height,
 						width: video.width,
 						contentType: getMIMEType(fileName as string),
@@ -85,9 +84,6 @@ export async function uploadTestVideo(
 						},
 					);
 
-					setVideoUrl(
-						`https://pub-78edb5b6f0d946d28db91b59ddf775af.r2.dev/${key}`,
-					);
 					res(`https://pub-78edb5b6f0d946d28db91b59ddf775af.r2.dev/${key}`);
 				} else {
 					console.error('❌ Error uploading video:', xhr.statusText);
