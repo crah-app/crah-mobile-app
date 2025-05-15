@@ -12,9 +12,12 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, TouchableOpacity, View } from 'react-native';
 import { SendProps } from 'react-native-gifted-chat';
-import CameraComponent from '../../app/(auth)/modals/chats/CameraComponent';
+import CameraComponent from './CameraComponent';
 import { router } from 'expo-router';
 import Modal from 'react-native-modal';
+import { uploadTestVideo } from '@/hooks/bucketUploadManager';
+import { PhotoFile, VideoFile } from 'react-native-vision-camera';
+import { useUser } from '@clerk/clerk-expo';
 
 interface RenderSendTextProps {
 	props: SendProps<ChatMessage>;
@@ -23,8 +26,8 @@ interface RenderSendTextProps {
 	selectedTrickData: selectedTrickInterface | undefined;
 	isReply: boolean;
 	replyToMessageId: string | undefined;
-	image: string | undefined;
-	video: string | undefined;
+	image: PhotoFile | undefined;
+	video: VideoFile | undefined;
 }
 
 export const RenderSendText: React.FC<RenderSendTextProps> = ({
@@ -38,6 +41,9 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	video,
 }) => {
 	const theme = useSystemTheme();
+	const { user } = useUser();
+
+	const [videoUrl, setVideoUrl] = useState<string>(); // link
 
 	let message: Partial<ChatMessage> = {
 		text: props.text!.trim(),
@@ -45,11 +51,19 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 		replyToMessageId: replyToMessageId,
 	};
 
-	const internetLinks: RegExpMatchArray | [] =
-		props.text!.trim()?.match(urlRegex) ?? [];
-	const isInternetLink: boolean = internetLinks.length > 0;
+	// const internetLinks: RegExpMatchArray | [] =
+	// 	props.text!.trim()?.match(urlRegex) ?? [];
+	// const isInternetLink: boolean = internetLinks.length > 0;
 
 	useEffect(() => {
+		console.log(video);
+
+		return () => {};
+	}, []);
+
+	useEffect(() => {
+		console.log(video);
+
 		switch (attachedMessageType) {
 			case 'RiderRow':
 				message.type = chatCostumMsgType.rider;
@@ -69,8 +83,8 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 
 			case 'Source':
 				message.type = chatCostumMsgType.text;
-				message.image = image;
-				message.video = video;
+				message.image = image?.path;
+				message.video = video?.path;
 				break;
 
 			case undefined:
@@ -79,20 +93,42 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 		}
 	}, [props]);
 
-	useEffect(() => {
-		if (isInternetLink) {
-			message.video = internetLinks[0];
-			message.type = chatCostumMsgType.text;
-		}
-	}, [internetLinks]);
+	// useEffect(() => {
+	// 	if (isInternetLink) {
+	// 		// message.video = internetLinks[0];
+	// 		message.type = chatCostumMsgType.text;
+	// 	}
+	// }, [internetLinks]);
 
-	const handleSendMessage = () => {
+	useEffect(() => {
+		console.log(videoUrl);
+
+		return () => {};
+	}, [videoUrl]);
+
+	const handleSendMessage = async () => {
+		// console.log(video);
+
 		if (
-			(props.text && props.text.trim()) ||
-			attachedMessageType !== undefined
-		) {
-			props.onSend!(message, true);
+			!((props.text && props.text.trim()) || attachedMessageType !== undefined)
+		)
+			return;
+
+		console.log(video);
+
+		if (video) {
+			const recievedVideoUrl = await uploadTestVideo(
+				video,
+				process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string,
+				user?.id as string,
+				setVideoUrl,
+				videoUrl,
+			);
+
+			message.video = recievedVideoUrl as string;
 		}
+
+		props.onSend!(message, true);
 	};
 
 	return (

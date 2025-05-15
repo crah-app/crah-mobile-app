@@ -17,6 +17,7 @@ import Scooter from '../../assets/images/vectors/scooter.svg';
 import ThemedText from '../general/ThemedText';
 import ReplyMessageBar from './ReplyMessageBar';
 import { useVideoPlayer, VideoView } from 'expo-video';
+import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 
 interface ChatFooterBarProps {
 	msgType: ChatFooterBarTypes | undefined;
@@ -29,8 +30,8 @@ interface ChatFooterBarProps {
 	setAttachedMessageType: (t: ChatFooterBarTypes | undefined) => void;
 	setSelectedRiderData: (u: selectedRiderInterface | undefined) => void;
 	setSelectedTrickData: (u: selectedTrickInterface | undefined) => void;
-	setSelectedVideo: (source: string | undefined) => void;
-	setSelectedImage: (source: string | undefined) => void;
+	setSelectedVideo: (source: VideoFile | undefined) => void;
+	setSelectedImage: (source: PhotoFile | undefined) => void;
 	setReplyMessage: Dispatch<SetStateAction<ChatMessage | undefined>>;
 	replyMessage: ChatMessage | undefined;
 	isReply: boolean;
@@ -114,7 +115,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 					<Row
 						avatarStyle={{ borderRadius: 12 }}
 						showAvatar
-						avatarUrl={sourceData.uri}
+						avatarUrl={`file://${sourceData.uri}`}
 						title={'Your taken image'}
 						subtitle="ready to upload"
 						containerStyle={{
@@ -131,7 +132,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 				<Row
 					avatarStyle={{ borderRadius: 12 }}
 					showAvatar
-					avatarUrl={sourceData.uri}
+					avatarUrl={`file://${sourceData.uri}`}
 					title={'Your taken video'}
 					subtitle="ready to upload"
 					containerStyle={{

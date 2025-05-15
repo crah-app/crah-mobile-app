@@ -21,6 +21,9 @@ import Animated, {
 	withRepeat,
 	withTiming,
 } from 'react-native-reanimated';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { useEvent } from 'expo';
+import { VideoUIBtns } from '../VideoUI';
 
 export const RenderBubble: React.FC<{
 	props: BubbleProps<ChatMessage>;
@@ -143,46 +146,85 @@ export const CustomMessageView: React.FC<{
 export const RenderMessageVideo: React.FC<{
 	props: MessageVideoProps<ChatMessage>;
 }> = ({ props }) => {
-	// const [previewData, setPreviewData] = useState<LinkPreview>();
-	// const internetLinks: RegExpMatchArray | [] =
-	// 	props.currentMessage.text?.match(urlRegex) ?? [];
-	// const isInternetLink: boolean = internetLinks.length > 0;
+	const theme = useSystemTheme();
 
-	// useEffect(() => {
-	// 	if (isInternetLink && !previewData) {
-	// 		fetchLinkPreview(internetLinks[0]).then((data: LinkPreview) => {
-	// 			setPreviewData(data);
-	// 		});
-	// 	}
-	// }, [internetLinks]);
+	const [previewData, setPreviewData] = useState<LinkPreview>();
+	const internetLinks: RegExpMatchArray | [] =
+		props.currentMessage.text?.match(urlRegex) ?? [];
+	const isInternetLink: boolean = internetLinks.length > 0;
 
-	// if (
-	// 	props.currentMessage.type === 'rider' ||
-	// 	props.currentMessage.type === 'trick'
-	// ) {
-	// 	return <View></View>;
-	// }
+	useEffect(() => {
+		if (isInternetLink && !previewData) {
+			fetchLinkPreview(internetLinks[0]).then((data: LinkPreview) => {
+				setPreviewData(data);
+			});
+		}
+	}, [internetLinks]);
 
-	return (
-		<View>
-			{/* {previewData && (
-				<ImageBackground
-					source={{ uri: previewData.images[0] }}
+	if (
+		props.currentMessage.type === 'rider' ||
+		props.currentMessage.type === 'trick'
+	) {
+		return <View></View>;
+	}
+
+	if (props.currentMessage.video) {
+		const player = useVideoPlayer(props.currentMessage.video, (player) => {
+			player.playbackRate = 1;
+			player.loop = true;
+			player.allowsExternalPlayback = false;
+			player.audioMixingMode = 'doNotMix';
+		});
+
+		const { isPlaying } = useEvent(player, 'playingChange', {
+			isPlaying: player.playing,
+		});
+
+		const handleVideoPlayer = () => {
+			isPlaying ? player.pause() : player.play();
+		};
+
+		return (
+			<View style={{}}>
+				<VideoView
+					player={player}
 					style={{
-						width: '100%',
-						height: 150,
+						width: 250,
+						height: 500 * (9 / 16),
 					}}
-					resizeMode="cover"
+					contentFit={'cover'}
+					nativeControls={false}
 				/>
-			)} */}
-			<ThemedText theme={'dark'} value={'your video'} />
-		</View>
-	);
+				<VideoUIBtns
+					theme={theme}
+					handleVideoPlayer={handleVideoPlayer}
+					isPlaying={isPlaying}
+				/>
+			</View>
+		);
+	}
+
+	if (previewData) {
+		return (
+			<ImageBackground
+				source={{ uri: previewData.images[0] }}
+				style={{
+					width: '100%',
+					height: 150,
+				}}
+				resizeMode="cover"
+			/>
+		);
+	}
+
+	console.log(props.currentMessage.video);
 };
 
 export const RenderMessageImage: React.FC<{
 	props: MessageImageProps<ChatMessage>;
 }> = ({ props }) => {
+	console.log(props.currentMessage.image);
+
 	return (
 		// <View>
 		<ImageBackground

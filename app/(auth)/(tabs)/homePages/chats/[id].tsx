@@ -116,7 +116,8 @@ import storage from '@/utils/storage';
 import { Swipeable } from 'react-native-gesture-handler';
 import CostumChatBubble from '@/components/giftedChat/CostumChatBubble';
 import { mmkv } from '@/hooks/mmkv';
-import CameraComponent from '@/app/(auth)/modals/chats/CameraComponent';
+import CameraComponent from '@/components/giftedChat/CameraComponent';
+import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -162,8 +163,8 @@ const ChatScreen = () => {
 	const [replyMessageId, setReplyMessageId] = useState<string | undefined>();
 
 	const [useCamera, setUseCamera] = useState<boolean>(false);
-	const [image, setImage] = useState<string | undefined>(undefined);
-	const [video, setVideo] = useState<string | undefined>(undefined);
+	const [image, setImage] = useState<PhotoFile | undefined>(undefined);
+	const [video, setVideo] = useState<VideoFile | undefined>(undefined);
 
 	const updateRowRef = useCallback(
 		(ref: any) => {
@@ -609,7 +610,7 @@ const ChatScreen = () => {
 										setSelectedImage={setImage}
 										setSelectedVideo={setVideo}
 										sourceData={{
-											uri: image || video,
+											uri: image?.path || video?.path,
 											type: image ? 'image' : 'video',
 										}}
 										setReplyMessage={setReplyMessage}

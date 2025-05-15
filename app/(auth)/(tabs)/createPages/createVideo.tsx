@@ -55,6 +55,7 @@ import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 import { SegmentedControl } from '@/components/general/SegmentedControl';
 import { SvgXml } from 'react-native-svg';
 import crahTransparentLogo from '../../../../assets/images/vectors/crah_transparent.svg';
+import { VideoUIBtns } from '@/components/VideoUI';
 
 interface videoDataInterface {
 	cover: string; // cover image
@@ -641,8 +642,6 @@ const UploadedSourceContainer = forwardRef<
 		isPlaying: player.playing,
 	});
 
-	const playBtnColor = theme === 'dark' ? 0 : 255;
-
 	const handleVideoPlayer = () => {
 		isPlaying ? player.pause() : player.play();
 	};
@@ -672,35 +671,6 @@ const UploadedSourceContainer = forwardRef<
 					: (Dimensions.get('window').width / (16 / 9)) * 0.94
 				: Dimensions.get('window').width * 0.94,
 	});
-
-	const VideoPlayBtn = () => {
-		return (
-			<TouchableOpacity
-				onPress={handleVideoPlayer}
-				style={styles.playBtn}
-				activeOpacity={0.8}>
-				{!isPlaying && (
-					<View
-						style={{
-							padding: 12,
-							backgroundColor:
-								'gray' +
-								`rgba(${playBtnColor},${playBtnColor},${playBtnColor},0.5)`,
-							borderRadius: '100%',
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}>
-						<Ionicons
-							name={isPlaying ? 'pause' : 'play'}
-							size={24}
-							color={'gray' + `rgba(${255},${255},${255},0.8)`}
-							style={{ textAlign: 'center', marginLeft: 2 }}
-						/>
-					</View>
-				)}
-			</TouchableOpacity>
-		);
-	};
 
 	return (
 		<View
@@ -755,7 +725,11 @@ const UploadedSourceContainer = forwardRef<
 						nativeControls={false}
 					/>
 
-					<VideoPlayBtn />
+					<VideoUIBtns
+						theme={theme}
+						handleVideoPlayer={handleVideoPlayer}
+						isPlaying={isPlaying}
+					/>
 				</View>
 			) : (
 				<View

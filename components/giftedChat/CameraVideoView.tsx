@@ -8,11 +8,12 @@ import Animated, {
 	LinearTransition,
 } from 'react-native-reanimated';
 import ThemedView from '../general/ThemedView';
+import { VideoFile } from 'react-native-vision-camera';
 
 interface CameraVideoViewProps {
-	video: string;
-	setVideo: (s: string | undefined) => void;
-	saveVideo: (s: string) => void;
+	video: VideoFile;
+	setVideo: (s: VideoFile | undefined) => void;
+	saveVideo: (s: VideoFile | undefined) => void;
 	theme: 'light' | 'dark';
 }
 
@@ -22,7 +23,9 @@ const CameraVideoView: React.FC<CameraVideoViewProps> = ({
 	saveVideo,
 	theme,
 }) => {
-	const videoPlayer = useVideoPlayer(video, (player) => {
+	// console.log(video);
+
+	const videoPlayer = useVideoPlayer(`file://${video.path}`, (player) => {
 		player.loop = true;
 		player.play();
 	});

@@ -13,6 +13,9 @@ import {
 	useCameraPermission,
 	Camera,
 	useCameraDevice,
+	PhotoFile,
+	VideoFile,
+	CameraDevice,
 } from 'react-native-vision-camera';
 import { useIsFocused } from '@react-navigation/native';
 import { router, useLocalSearchParams, Link } from 'expo-router';
@@ -25,10 +28,10 @@ import Colors from '@/constants/Colors';
 
 export const CameraComponent: React.FC<{
 	setUseCamera: (use: boolean) => void;
-	image: string | undefined;
-	video: string | undefined;
-	setImage: (image: string | undefined) => void;
-	setVideo: (video: string | undefined) => void;
+	image: PhotoFile | undefined;
+	video: VideoFile | undefined;
+	setImage: (image: PhotoFile | undefined) => void;
+	setVideo: (video: VideoFile | undefined) => void;
 }> = ({ setUseCamera, image, video, setImage, setVideo }) => {
 	const theme = useSystemTheme();
 
@@ -56,11 +59,11 @@ export const CameraComponent: React.FC<{
 	const takePhoto = async () => {
 		if (!camera.current) return;
 		try {
-			const photo = await camera.current.takePhoto({
+			const photo: PhotoFile = await camera.current.takePhoto({
 				flash: 'off',
 			});
 			console.log('Foto URI:', `file://${photo.path}`);
-			setImage(`file://${photo.path}`);
+			setImage(photo);
 		} catch (err) {
 			console.error('Fehler beim Foto:', err);
 		}
@@ -71,9 +74,9 @@ export const CameraComponent: React.FC<{
 		try {
 			setIsRecording(true);
 			await camera.current.startRecording({
-				onRecordingFinished: (video) => {
+				onRecordingFinished: (video: VideoFile) => {
 					console.log('Video aufgenommen:', video);
-					setVideo(`file://${video.path}`);
+					setVideo(video);
 				},
 				onRecordingError: (error) => {
 					console.error('Videoaufnahme-Fehler:', error);
@@ -96,23 +99,25 @@ export const CameraComponent: React.FC<{
 
 	const savePicture = async () => {
 		if (!image) return;
-		await MediaLibrary.createAssetAsync(image);
+		await MediaLibrary.createAssetAsync(`file://${image.path}`);
 		handleGoBack();
 	};
 
-	const saveVideo = async (video: string | undefined) => {
+	const saveVideo = async (video: VideoFile | undefined) => {
 		if (!video) return;
 		setVideo(video);
-		await MediaLibrary.createAssetAsync(video);
+		await MediaLibrary.createAssetAsync(`file://${video.path}`);
 		handleGoBack();
+
+		console.log(video);
 	};
 
 	const handleGoBack = () => {
 		setUseCamera(false);
 	};
 
-	if (!device || !hasPermission || !isFocused)
-		return <CrahActivityIndicator color={Colors[theme].primary} size={24} />;
+	// if (!device || !hasPermission || !isFocused)
+	// 	return <CrahActivityIndicator color={Colors[theme].primary} size={24} />;
 
 	return (
 		<View style={styles.container}>
@@ -125,8 +130,10 @@ export const CameraComponent: React.FC<{
 					theme={theme}
 				/>
 			) : image ? (
-				<ImageBackground source={{ uri: image }} style={styles.camera}>
-					<View style={styles.buttonContainer}>
+				<ImageBackground
+					source={{ uri: `file://${image.path}` }}
+					style={styles.camera}>
+					<View style={[styles.buttonContainer, { marginBottom: 32 }]}>
 						<TouchableOpacity
 							onPress={() => setImage(undefined)}
 							style={styles.buttonBackground}>
@@ -144,7 +151,7 @@ export const CameraComponent: React.FC<{
 				<ThemedView theme={theme} style={styles.container} flex={1}>
 					<Camera
 						style={styles.camera}
-						device={device}
+						device={device as CameraDevice}
 						isActive={isFocused}
 						photo={true}
 						video={true}
@@ -230,7 +237,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
 		alignItems: 'flex-end',
-		marginBottom: 32,
+		marginBottom: 68,
 		paddingHorizontal: 30,
 	},
 	buttonBackground: {

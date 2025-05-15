@@ -136,6 +136,14 @@ export interface sourceDataInterface {
 	type: 'image' | 'video';
 }
 
+// video data structure from vision-camera
+export type VideoMeta = {
+	path: string;
+	width: number;
+	height: number;
+	duration: number;
+};
+
 /*
 	Link preview fetched from server
 */
