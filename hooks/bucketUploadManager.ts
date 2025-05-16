@@ -10,6 +10,7 @@ export async function uploadSource(
 	video: VideoFile | PhotoFile,
 	clerkToken: string,
 	userId: string,
+	setLoadingSourceProgress: (progress: number) => void,
 ) {
 	return new Promise(async (res, rej) => {
 		try {
@@ -69,6 +70,7 @@ export async function uploadSource(
 				if (e.lengthComputable) {
 					const percent = (e.loaded / e.total) * 100;
 					console.log(`Upload progress: ${percent.toFixed(2)}%`);
+					setLoadingSourceProgress(Number(percent.toFixed(2)));
 				}
 			};
 

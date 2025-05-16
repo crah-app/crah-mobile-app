@@ -28,6 +28,8 @@ interface RenderSendTextProps {
 	replyToMessageId: string | undefined;
 	image: PhotoFile | undefined;
 	video: VideoFile | undefined;
+	setLoadingSourceProgress: (progress: number) => void;
+	setLoadingSourceModalVisible: (visible: boolean) => void;
 }
 
 export const RenderSendText: React.FC<RenderSendTextProps> = ({
@@ -39,6 +41,8 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	replyToMessageId,
 	image,
 	video,
+	setLoadingSourceProgress,
+	setLoadingSourceModalVisible,
 }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
@@ -109,25 +113,32 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 		console.log(video);
 
 		if (video) {
+			setLoadingSourceModalVisible(true);
+
 			const recievedVideoUrl = await uploadSource(
 				video,
 				process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string,
 				user?.id as string,
+				setLoadingSourceProgress,
 			);
 
 			message.video = recievedVideoUrl as string;
 		}
 
 		if (image) {
+			setLoadingSourceModalVisible(true);
+
 			const recievedImageUrl = await uploadSource(
 				image,
 				process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string,
 				user?.id as string,
+				setLoadingSourceProgress,
 			);
 
 			message.image = recievedImageUrl as string;
 		}
 
+		setLoadingSourceModalVisible(false);
 		props.onSend!(message, true);
 	};
 

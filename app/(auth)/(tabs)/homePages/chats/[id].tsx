@@ -118,6 +118,7 @@ import CostumChatBubble from '@/components/giftedChat/CostumChatBubble';
 import { mmkv } from '@/hooks/mmkv';
 import CameraComponent from '@/components/giftedChat/CameraComponent';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
+import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -165,6 +166,16 @@ const ChatScreen = () => {
 	const [useCamera, setUseCamera] = useState<boolean>(false);
 	const [image, setImage] = useState<PhotoFile | undefined>(undefined);
 	const [video, setVideo] = useState<VideoFile | undefined>(undefined);
+
+	// user sends source (vidoe, photo, audio, ...) to chat which has to be loaded to the cloud
+	const [loadingSourceToBucket, setLoadingSourceToBucket] = useState<boolean>();
+	const [loadedSourceToBucket, setLoadedSourceToBucket] = useState<boolean>();
+	const [errLoadingSourceToBucket, setErrLoadingSourceToBucket] =
+		useState<boolean>();
+
+	const [loadingSourceProgress, setLoadingSourceProgress] = useState<number>(0);
+	const [loadingSourceModalVisible, setLoadingSourceModalVisible] =
+		useState<boolean>(false);
 
 	const updateRowRef = useCallback(
 		(ref: any) => {
@@ -417,6 +428,11 @@ const ChatScreen = () => {
 		return () => {};
 	}, [video, image]);
 
+	useEffect(() => {
+		console.log(loadingSourceProgress);
+		return () => {};
+	}, [loadingSourceProgress]);
+
 	if (useCamera) {
 		return (
 			<View style={{ flex: 1 }}>
@@ -532,6 +548,12 @@ const ChatScreen = () => {
 
 			{/* GiftedChat */}
 			<ImageBackground style={{ flex: 1, paddingBottom: bottom }}>
+				{/* loading screen for uploading assets */}
+				<TransparentLoadingScreen
+					progress={loadingSourceProgress}
+					visible={loadingSourceModalVisible}
+				/>
+
 				<RenderFetchedData
 					ActivityIndicatorStyle={{
 						marginTop: Dimensions.get('screen').height * 0.25,
@@ -637,6 +659,10 @@ const ChatScreen = () => {
 												props={props}
 												image={image}
 												video={video}
+												setLoadingSourceProgress={setLoadingSourceProgress}
+												setLoadingSourceModalVisible={
+													setLoadingSourceModalVisible
+												}
 											/>
 										) : (
 											<RenderSendEmptyText
