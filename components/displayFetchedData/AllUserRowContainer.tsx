@@ -27,7 +27,9 @@ interface AllUserRowContainerProps {
 	contentContainerStyle?: ViewStyle | ViewStyle[];
 	rowStyle?: ViewStyle | ViewStyle[];
 	excludeIds?: Array<ClerkUser['id'] | undefined>;
-	costumHandleUserPress?: (user: selectedRiderInterface) => void;
+	costumHandleUserPress?: (
+		user: selectedRiderInterface,
+	) => void | Promise<void>;
 }
 
 const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
@@ -146,7 +148,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 										showAvatar={true}
 										avatarUrl={user.imageUrl}
 										title={user.username ?? 'no name user'}
-										subtitle={'Rank Gold #1' + ' ' + user.id}
+										subtitle={'Rank Gold #1'}
 									/>
 								)}
 							/>

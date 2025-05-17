@@ -75,6 +75,7 @@ import {
 	Rank,
 	selectedRiderInterface,
 	selectedTrickInterface,
+	TextInputMaxCharacters,
 	TypingStatus,
 	urlRegex,
 } from '@/types';
@@ -142,6 +143,7 @@ const ChatScreen = () => {
 
 	const [isGroup, setIsGroup] = useState<boolean>();
 	const [chatTitle, setChatTitle] = useState<string>('');
+	const [chatAvatar, setChatAvatar] = useState<string>('');
 
 	// attaching a new message like a trick, rider, audio or source
 	const [displayChatFooter, setDisplayChatFooter] = useState<boolean>();
@@ -358,6 +360,10 @@ const ChatScreen = () => {
 	const setFetchedData = (data: ChatMessage[]) => {
 		setIsGroup(data[0].isGroup);
 		setChatTitle(data[data.length - 1].ChatName);
+		setChatAvatar(
+			data[data.length - 1].ChatAvatar ??
+				'https://randomuser.me/api/portraits/men/32.jpg',
+		);
 	};
 
 	// typing handler
@@ -504,7 +510,9 @@ const ChatScreen = () => {
 						<View style={[styles.headerCenter]}>
 							<Image
 								source={{
-									uri: 'https://randomuser.me/api/portraits/men/32.jpg',
+									uri: isGroup
+										? 'https://randomuser.me/api/portraits/men/32.jpg'
+										: chatAvatar,
 								}}
 								style={styles.profilePic}
 							/>
@@ -515,7 +523,7 @@ const ChatScreen = () => {
 											styles.userName,
 											{ color: Colors[theme].textPrimary },
 										]}>
-										Lade...
+										Loading...
 									</Text>
 								) : errLoadingMessages ? (
 									<Text style={[styles.userName, { color: 'red' }]}>Error</Text>
@@ -525,7 +533,10 @@ const ChatScreen = () => {
 											styles.userName,
 											{ color: Colors[theme].textPrimary },
 										]}>
-										{chatTitle}
+										{chatTitle.length > TextInputMaxCharacters.UserName
+											? chatTitle.slice(0, TextInputMaxCharacters.UserName) +
+											  ' ...'
+											: chatTitle}
 									</Text>
 								)}
 
@@ -714,6 +725,7 @@ const ChatScreen = () => {
 								renderCustomView={(props) => (
 									<CustomMessageView chatId={id} props={props} />
 								)}
+								renderTime={(props) => null}
 							/>
 							{Platform.OS === 'android' && (
 								<KeyboardAvoidingView behavior="padding" />

@@ -33,6 +33,7 @@ import {
 	chatCostumMsgType,
 	ChatFilterTypes,
 	ChatMessage,
+	TextInputMaxCharacters,
 	UserStatus,
 } from '@/types';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
@@ -46,6 +47,8 @@ import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { defaultStyles } from '@/constants/Styles';
 import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowContainer';
 import socket from '@/utils/socket';
+import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
+import { mmkv } from '@/hooks/mmkv';
 
 interface socketJoinedChatRooms {
 	[chatId: string]: {
@@ -93,6 +96,8 @@ const Page = () => {
 			.then((res) => {
 				setFetchedChats(res);
 				setChats(res);
+
+				mmkv.set('loaded_user_chats', JSON.stringify(res));
 			})
 			.catch((err) => setErrLoadingChats(true))
 			.finally(() => setChatsLoaded(true));
@@ -357,7 +362,11 @@ const Page = () => {
 				handleOnArchive={() => handleOnArchive(item.Id)}
 				handleOnDelete={() => handleOnDelete(item.Id)}
 				id={item.Id}
-				name={item.Name}
+				name={
+					item.Name.length > TextInputMaxCharacters.UserName
+						? item.Name.slice(0, TextInputMaxCharacters.UserName) + '...'
+						: item.Name
+				}
 				avatar={'https://randomuser.me/api/portraits/men/32.jpg'}
 				lastActive={new Date(item.LastMessageDate)}
 				status={UserStatus.ONLINE}
@@ -416,6 +425,32 @@ const Page = () => {
 	};
 
 	const ChatList = () => {
+		const RenderListEmpy = () => {
+			const text = messagesFilterSelected === 'unread' ? '' : 'create a chat';
+
+			return (
+				<View
+					style={{
+						flex: 1,
+						justifyContent: 'center',
+						alignItems: 'center',
+						width: Dimensions.get('window').width,
+					}}>
+					{chats.length <= 0 && (
+						<NoDataPlaceholder
+							containerStyle={{
+								marginBottom: 120,
+							}}
+							arrowStyle={{ display: 'none' }}
+							subTextValue={text}
+							firstTextValue="nothing here"
+							onSubTextClickPathname="../../../modals/chats/SearchNewChatModal"
+						/>
+					)}
+				</View>
+			);
+		};
+
 		return (
 			<View
 				style={[
@@ -439,6 +474,7 @@ const Page = () => {
 								{ borderColor: 'gray', marginTop: 0 },
 							]}
 							renderItem={renderMessageRow}
+							ListEmptyComponent={RenderListEmpy}
 						/>
 					}
 					activityIndicatorSize={24}
