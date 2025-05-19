@@ -367,7 +367,7 @@ const Page = () => {
 						? item.Name.slice(0, TextInputMaxCharacters.UserName) + '...'
 						: item.Name
 				}
-				avatar={'https://randomuser.me/api/portraits/men/32.jpg'}
+				avatar={item.Avatar}
 				lastActive={new Date(item.LastMessageDate)}
 				status={UserStatus.ONLINE}
 				unreadCount={item.UnreadCount}
@@ -458,6 +458,7 @@ const Page = () => {
 					{
 						borderTopColor: Colors[theme].gray,
 						borderTopWidth: 1,
+						paddingTop: 4,
 					},
 				]}>
 				<RenderFetchedData

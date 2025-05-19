@@ -292,7 +292,8 @@ export enum ChatFilterTypes {
 export interface Chat {
 	Id: string;
 	IsGroup: number;
-	Name: string;
+	Name: string; // group name or user avatar of other user
+	Avatar: string; // group avatar or user avatar of other user
 	LastMessageContent: string;
 	LastMessageSenderId: string;
 	LastMessageDate: Date;
