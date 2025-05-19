@@ -99,6 +99,10 @@ const MessageRow: React.FC<MessageRowProps> = ({
 		});
 	};
 
+	const handleOnLongPress = () => {
+		console.log('object');
+	};
+
 	const opacityAnim = useRef(new Animated.Value(0)).current;
 	const checkboxTranslateX = useRef(new Animated.Value(-60)).current;
 
@@ -137,6 +141,7 @@ const MessageRow: React.FC<MessageRowProps> = ({
 					isDeleted ? handleOnDelete() : handleOnArchive()
 				}>
 				<Row
+					onLongPress={handleOnLongPress}
 					onPress={handleOnPress}
 					title={name}
 					highlightWords={['online']}

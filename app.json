@@ -38,6 +38,12 @@
 		},
 		"plugins": [
 			[
+				"expo-audio",
+				{
+					"microphonePermission": "Allow crah to access your microphone."
+				}
+			],
+			[
 				"expo-camera",
 				{
 					"cameraPermission": "Allow Crah to access your camera",

@@ -35,6 +35,7 @@ interface RowProps {
 	costumAvatarWidth?: number;
 	costumAvatarHeight?: number;
 	avatarStyle?: ImageStyle | ImageStyle[];
+	onLongPress?: () => void;
 }
 
 const Row: React.FC<RowProps> = ({
@@ -58,6 +59,7 @@ const Row: React.FC<RowProps> = ({
 	costumAvatarWidth,
 	costumAvatarHeight,
 	avatarStyle,
+	onLongPress,
 }) => {
 	const theme = useSystemTheme();
 
@@ -88,6 +90,7 @@ const Row: React.FC<RowProps> = ({
 
 	return (
 		<TouchableOpacity
+			onPressIn={onLongPress}
 			style={[
 				styles.container,
 				{ backgroundColor: Colors[theme].background },

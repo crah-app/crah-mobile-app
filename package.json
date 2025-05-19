@@ -72,7 +72,8 @@
     "react-native-worklets-core": "^1.5.0",
     "socket.io-client": "^4.8.1",
     "uuid": "^11.0.5",
-    "zeego": "^3.0.3"
+    "zeego": "^3.0.3",
+    "expo-audio": "~0.3.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

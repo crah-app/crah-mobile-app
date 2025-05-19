@@ -120,6 +120,7 @@ import { mmkv } from '@/hooks/mmkv';
 import CameraComponent from '@/components/giftedChat/CameraComponent';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
+import { AudioRecorder, RecordingPresets, useAudioRecorder } from 'expo-audio';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -178,6 +179,8 @@ const ChatScreen = () => {
 	const [loadingSourceProgress, setLoadingSourceProgress] = useState<number>(0);
 	const [loadingSourceModalVisible, setLoadingSourceModalVisible] =
 		useState<boolean>(false);
+
+	const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
 	const updateRowRef = useCallback(
 		(ref: any) => {
@@ -677,6 +680,7 @@ const ChatScreen = () => {
 											/>
 										) : (
 											<RenderSendEmptyText
+												audioRecorder={audioRecorder}
 												chatId={id as string}
 												props={props}
 												useCamera={useCamera}

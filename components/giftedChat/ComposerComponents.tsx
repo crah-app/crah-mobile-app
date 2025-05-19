@@ -10,7 +10,7 @@ import {
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, TouchableOpacity, View } from 'react-native';
 import { SendProps } from 'react-native-gifted-chat';
 import CameraComponent from './CameraComponent';
 import { router } from 'expo-router';
@@ -18,6 +18,14 @@ import Modal from 'react-native-modal';
 import { uploadSource } from '@/hooks/bucketUploadManager';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import { useUser } from '@clerk/clerk-expo';
+import {
+	AudioModule,
+	AudioRecorder,
+	RecordingPresets,
+	RecordingStatus,
+	useAudioPlayer,
+	useAudioRecorder,
+} from 'expo-audio';
 
 interface RenderSendTextProps {
 	props: SendProps<ChatMessage>;
@@ -160,12 +168,38 @@ export const RenderSendEmptyText: React.FC<{
 	chatId: string;
 	useCamera: boolean;
 	setUseCamera: (use: boolean) => void;
-}> = ({ props, chatId, useCamera, setUseCamera }) => {
+	audioRecorder: AudioRecorder;
+}> = ({ props, chatId, useCamera, setUseCamera, audioRecorder }) => {
 	const theme = useSystemTheme();
+
+	const [isRecording, setIsRecording] = useState(false);
+
+	// const player = createAudioPlayer(audioSource); // to play audio
 
 	const handleCamera = () => {
 		setUseCamera(true);
 	};
+
+	const record = async () => {
+		await audioRecorder.prepareToRecordAsync();
+		audioRecorder.record();
+		setIsRecording(true);
+	};
+
+	const stopRecording = async () => {
+		// The recording will be available on `audioRecorder.uri`.
+		await audioRecorder.stop();
+		setIsRecording(false);
+	};
+
+	useEffect(() => {
+		(async () => {
+			const status = await AudioModule.requestRecordingPermissionsAsync();
+			if (!status.granted) {
+				Alert.alert('Permission to access microphone was denied');
+			}
+		})();
+	}, []);
 
 	return (
 		<View style={{ flexDirection: 'row', gap: 14, paddingHorizontal: 14 }}>
@@ -179,10 +213,10 @@ export const RenderSendEmptyText: React.FC<{
 				</View>
 			</TouchableOpacity>
 
-			<TouchableOpacity onPress={() => {}}>
+			<TouchableOpacity onPress={isRecording ? stopRecording : record}>
 				<View>
 					<Ionicons
-						name="mic-outline"
+						name={isRecording ? 'mic-outline' : 'mic-off-outline'}
 						size={24}
 						color={Colors[theme].textPrimary}
 					/>
