@@ -127,30 +127,29 @@ const layout = () => {
 			notification: Colors[theme].primary,
 		},
 	};
+	
+  const navigationRef = useNavigationContainerRef();
 
-	  const navigationRef = useNavigationContainerRef();
-	
-	useEffect(() => {
-	// Token holen
-	registerForPushNotificationsAsync().then(token => {
-	// Token an Server schicken
-	});
-	
-	// Notification-Tap
-	const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
-	const data = response.notification.request.content.data;
-	console.log('Notification angeklickt:', data);
-	
-	// Beispiel: Navigiere zur Chat-Seite mit ID
-	if (data?.type === 'chat' && data?.chatId) {
-	navigationRef.navigate('ChatScreen', { chatId: data.chatId });
-	}
-	});
-	
-	return () => {
-	responseListener.remove();
-	};
-	}, []);
+  useEffect(() => {
+    // Expo Push-Token registrieren
+    registerForPushNotificationsAsync().then(token => {
+      console.log('Push-Token:', token);
+      // Optional: an deinen Server schicken
+    });
+
+    // Listener für Notification-Tap
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+      console.log('Notification-Tap:', data);
+
+      // Beispiel: Navigiere zu ChatScreen mit chatId
+      if (data?.type === 'chat' && data?.chatId) {
+        navigationRef.navigate('ChatScreen', { chatId: data.chatId });
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
 
 	return (
 		<ThemeProvider value={MyTheme}>
