@@ -128,6 +128,30 @@ const layout = () => {
 		},
 	};
 
+	  const navigationRef = useNavigationContainerRef();
+	
+	useEffect(() => {
+	// Token holen
+	registerForPushNotificationsAsync().then(token => {
+	// Token an Server schicken
+	});
+	
+	// Notification-Tap
+	const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
+	const data = response.notification.request.content.data;
+	console.log('Notification angeklickt:', data);
+	
+	// Beispiel: Navigiere zur Chat-Seite mit ID
+	if (data?.type === 'chat' && data?.chatId) {
+	navigationRef.navigate('ChatScreen', { chatId: data.chatId });
+	}
+	});
+	
+	return () => {
+	responseListener.remove();
+	};
+	}, []);
+
 	return (
 		<ThemeProvider value={MyTheme}>
 			<ClerkProvider
