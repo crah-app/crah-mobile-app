@@ -49,6 +49,7 @@ import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowConta
 import socket from '@/utils/socket';
 import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
 import { mmkv } from '@/hooks/mmkv';
+import stringSimilarity from 'string-similarity';
 
 interface socketJoinedChatRooms {
 	[chatId: string]: {
@@ -346,6 +347,39 @@ const Page = () => {
 			}).start();
 		}
 	}, [showLeftActionSpace]);
+
+	useEffect(() => {
+		console.log(searchQuery);
+
+		let filteredChats = fetchedChats;
+
+		// Filter nach Typ
+		switch (messagesFilterSelected) {
+			case ChatFilterTypes.groups:
+				filteredChats = filteredChats.filter((chat) => chat.IsGroup);
+				break;
+			case ChatFilterTypes.unread:
+				filteredChats = filteredChats.filter((chat) => chat.UnreadCount > 0);
+				break;
+		}
+
+		// Filter nach Suchanfrage
+		if (searchQuery.trim().length > 0) {
+			filteredChats = filteredChats.filter((chat) => {
+				if (
+					stringSimilarity.compareTwoStrings(
+						chat.Name.toLowerCase(),
+						searchQuery.toLowerCase(),
+					) > 0.19 ||
+					chat.Name.toLowerCase().includes(searchQuery.toLowerCase())
+				) {
+					return chat;
+				}
+			});
+		}
+
+		setChats(sortChatsByDate(filteredChats));
+	}, [messagesFilterSelected, searchQuery, fetchedChats, sortChatsByDate]);
 
 	// open new chat modal
 	const OpenNewChatModal = () => {
