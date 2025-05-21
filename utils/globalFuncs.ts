@@ -44,6 +44,7 @@ export function getMIMEType(filename: string): string {
 	const ext = filename.split('.').pop()?.toLowerCase();
 
 	switch (ext) {
+		// Video
 		case 'mp4':
 			return 'video/mp4';
 		case 'mov':
@@ -54,6 +55,25 @@ export function getMIMEType(filename: string): string {
 			return 'video/x-msvideo';
 		case 'mkv':
 			return 'video/x-matroska';
+
+		// Audio
+		case 'mp3':
+			return 'audio/mpeg';
+		case 'wav':
+			return 'audio/wav';
+		case 'aac':
+			return 'audio/aac';
+		case 'ogg':
+			return 'audio/ogg';
+		case 'm4a':
+			return 'audio/mp4';
+		case 'flac':
+			return 'audio/flac';
+		case 'opus':
+			return 'audio/opus';
+		case 'amr':
+			return 'audio/amr';
+
 		default:
 			return 'application/octet-stream'; // Fallback for unknown types
 	}

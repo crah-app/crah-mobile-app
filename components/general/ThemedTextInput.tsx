@@ -32,7 +32,7 @@ interface ThemedTextInputProps {
 		| undefined;
 	disabled?: boolean; // Add this line
 	onPress?: () => void; // Add this line
-	containerStyle: ViewStyle | ViewStyle[];
+	containerStyle?: ViewStyle | ViewStyle[];
 }
 
 const ThemedTextInput: React.FC<ThemedTextInputProps> = ({

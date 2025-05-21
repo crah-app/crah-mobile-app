@@ -1,5 +1,6 @@
 import Colors from '@/constants/Colors';
 import {
+	AudioFile,
 	chatCostumMsgType,
 	ChatFooterBarTypes,
 	ChatMessage,
@@ -9,9 +10,9 @@ import {
 } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Alert, Dimensions, TouchableOpacity, View } from 'react-native';
-import { SendProps } from 'react-native-gifted-chat';
+import { Composer, ComposerProps, SendProps } from 'react-native-gifted-chat';
 import CameraComponent from './CameraComponent';
 import { router } from 'expo-router';
 import Modal from 'react-native-modal';
@@ -26,6 +27,7 @@ import {
 	useAudioPlayer,
 	useAudioRecorder,
 } from 'expo-audio';
+import Row from '../general/Row';
 
 interface RenderSendTextProps {
 	props: SendProps<ChatMessage>;
@@ -38,6 +40,7 @@ interface RenderSendTextProps {
 	video: VideoFile | undefined;
 	setLoadingSourceProgress: (progress: number) => void;
 	setLoadingSourceModalVisible: (visible: boolean) => void;
+	audio: AudioFile | null;
 }
 
 export const RenderSendText: React.FC<RenderSendTextProps> = ({
@@ -51,6 +54,7 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	video,
 	setLoadingSourceProgress,
 	setLoadingSourceModalVisible,
+	audio,
 }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
@@ -86,11 +90,6 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 				message.trickId = selectedTrickData?.id;
 				break;
 
-			case 'Audio':
-				message.type = chatCostumMsgType.text;
-				message.audio = '';
-				break;
-
 			case 'Source':
 				message.type = chatCostumMsgType.text;
 				message.image = image?.path;
@@ -111,14 +110,18 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	// }, [internetLinks]);
 
 	const handleSendMessage = async () => {
-		// console.log(video);
+		console.log(audio);
 
 		if (
-			!((props.text && props.text.trim()) || attachedMessageType !== undefined)
+			!(
+				(props.text && props.text.trim()) ||
+				attachedMessageType !== undefined ||
+				audio
+			)
 		)
 			return;
 
-		console.log(video);
+		console.log(audio);
 
 		if (video) {
 			setLoadingSourceModalVisible(true);
@@ -146,6 +149,19 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 			message.image = recievedImageUrl as string;
 		}
 
+		if (audio) {
+			setLoadingSourceModalVisible(true);
+
+			const recievedAudioUrl = await uploadSource(
+				audio,
+				process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string,
+				user?.id as string,
+				setLoadingSourceProgress,
+			);
+
+			message.audio = recievedAudioUrl as string;
+		}
+
 		setLoadingSourceModalVisible(false);
 		props.onSend!(message, true);
 	};
@@ -153,7 +169,11 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	return (
 		<TouchableOpacity
 			onPress={handleSendMessage}
-			style={{ paddingHorizontal: 14 }}>
+			style={{
+				paddingHorizontal: 14,
+				alignItems: 'flex-end',
+				justifyContent: 'flex-end',
+			}}>
 			<Ionicons
 				name="send-outline"
 				size={24}
@@ -169,59 +189,116 @@ export const RenderSendEmptyText: React.FC<{
 	useCamera: boolean;
 	setUseCamera: (use: boolean) => void;
 	audioRecorder: AudioRecorder;
-}> = ({ props, chatId, useCamera, setUseCamera, audioRecorder }) => {
+	isRecording: boolean;
+	setIsRecording: Dispatch<SetStateAction<boolean>>;
+	audio: AudioFile | null;
+	setRecordedAudio: Dispatch<SetStateAction<AudioFile | null>>;
+}> = ({
+	props,
+	chatId,
+	useCamera,
+	setUseCamera,
+	audioRecorder,
+	isRecording,
+	setIsRecording,
+	audio,
+	setRecordedAudio,
+}) => {
 	const theme = useSystemTheme();
-
-	const [isRecording, setIsRecording] = useState(false);
-
-	// const player = createAudioPlayer(audioSource); // to play audio
 
 	const handleCamera = () => {
 		setUseCamera(true);
 	};
 
 	const record = async () => {
+		const status = await AudioModule.requestRecordingPermissionsAsync();
+		if (!status.granted) {
+			console.log('Permission to access microphone was denied');
+			return;
+		}
+
 		await audioRecorder.prepareToRecordAsync();
 		audioRecorder.record();
 		setIsRecording(true);
 	};
 
 	const stopRecording = async () => {
-		// The recording will be available on `audioRecorder.uri`.
-		await audioRecorder.stop();
+		setRecordedAudio({
+			width: 0,
+			height: 0,
+			duration: 0,
+			path: `file://${audioRecorder.uri as string}`,
+		});
 		setIsRecording(false);
+		await audioRecorder.stop();
 	};
-
-	useEffect(() => {
-		(async () => {
-			const status = await AudioModule.requestRecordingPermissionsAsync();
-			if (!status.granted) {
-				Alert.alert('Permission to access microphone was denied');
-			}
-		})();
-	}, []);
 
 	return (
 		<View style={{ flexDirection: 'row', gap: 14, paddingHorizontal: 14 }}>
-			<TouchableOpacity onPress={handleCamera}>
-				<View>
-					<Ionicons
-						name="camera-outline"
-						size={24}
-						color={Colors[theme].textPrimary}
-					/>
-				</View>
-			</TouchableOpacity>
+			{!isRecording && !audio?.path && (
+				<TouchableOpacity onPress={handleCamera}>
+					<View>
+						<Ionicons
+							name="camera-outline"
+							size={24}
+							color={Colors[theme].textPrimary}
+						/>
+					</View>
+				</TouchableOpacity>
+			)}
 
 			<TouchableOpacity onPress={isRecording ? stopRecording : record}>
 				<View>
 					<Ionicons
-						name={isRecording ? 'mic-outline' : 'mic-off-outline'}
+						name={isRecording ? 'checkmark-outline' : 'mic-outline'}
 						size={24}
 						color={Colors[theme].textPrimary}
 					/>
 				</View>
 			</TouchableOpacity>
 		</View>
+	);
+};
+
+interface RenderComposerProps {
+	props: ComposerProps;
+	theme: 'light' | 'dark';
+	audio: AudioFile | null;
+	isRecording: boolean;
+	setIsRecording: Dispatch<SetStateAction<boolean>>;
+}
+
+export const RenderComposer: React.FC<RenderComposerProps> = ({
+	props,
+	theme,
+	audio,
+	isRecording,
+	setIsRecording,
+}) => {
+	if (isRecording) {
+		return (
+			<Composer
+				{...props}
+				textInputStyle={{ color: Colors[theme].textPrimary }}
+				text="Recording audio..."
+			/>
+		);
+	}
+
+	if (audio) {
+		return (
+			<Composer
+				{...props}
+				textInputStyle={{ color: Colors[theme].textPrimary }}
+				text="Recorded audio"
+			/>
+		);
+	}
+
+	return (
+		<Composer
+			{...props}
+			textInputStyle={{ color: Colors[theme].textPrimary }}
+		/>
 	);
 };

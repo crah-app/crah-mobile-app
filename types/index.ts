@@ -508,3 +508,10 @@ export const mediaTypeSourceRatio: Record<
 	[upload_source_ratio.LANDSCAPE]: [16, 9],
 	[upload_source_ratio.PORTRAIT]: [9, 16],
 } as const;
+
+export interface AudioFile {
+	path: string;
+	duration: number;
+	width: 0;
+	height: 0;
+}

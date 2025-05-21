@@ -64,6 +64,7 @@ import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import ThemedText from '@/components/general/ThemedText';
 import {
+	AudioFile,
 	chatCostumMsgType,
 	ChatFooterBarTypes,
 	ChatMessage,
@@ -101,6 +102,7 @@ import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowConta
 import socket from '@/utils/socket';
 import ChatFooterBar from '@/components/giftedChat/ChatFooter';
 import {
+	RenderComposer,
 	RenderSendEmptyText,
 	RenderSendText,
 } from '@/components/giftedChat/ComposerComponents';
@@ -120,7 +122,14 @@ import { mmkv } from '@/hooks/mmkv';
 import CameraComponent from '@/components/giftedChat/CameraComponent';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
-import { AudioRecorder, RecordingPresets, useAudioRecorder } from 'expo-audio';
+import {
+	AudioRecorder,
+	AudioSource,
+	RecordingPresets,
+	useAudioPlayer,
+	useAudioRecorder,
+} from 'expo-audio';
+import PlayAudioInstance from '@/components/giftedChat/PlayAudioInstance';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -181,6 +190,9 @@ const ChatScreen = () => {
 		useState<boolean>(false);
 
 	const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+	const [recordedAudio, setRecordedAudio] = useState<AudioFile | null>(null);
+	const [isRecording, setIsRecording] = useState<boolean>(false);
+	const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
 
 	const updateRowRef = useCallback(
 		(ref: any) => {
@@ -232,6 +244,8 @@ const ChatScreen = () => {
 			setReplyMessageId(undefined);
 			setVideo(undefined);
 			setImage(undefined);
+			setRecordedAudio(null);
+			audioRecorder.uri = null;
 
 			socket.emit('send-message', { chatId: id, msg: newMessages });
 		},
@@ -437,11 +451,6 @@ const ChatScreen = () => {
 		return () => {};
 	}, [video, image]);
 
-	useEffect(() => {
-		console.log(loadingSourceProgress);
-		return () => {};
-	}, [loadingSourceProgress]);
-
 	if (useCamera) {
 		return (
 			<View style={{ flex: 1 }}>
@@ -568,6 +577,13 @@ const ChatScreen = () => {
 					visible={loadingSourceModalVisible}
 				/>
 
+				{/* to play audio */}
+				{/* <PlayAudioInstance
+					isPlayingAudio={isPlayingAudio}
+					setIsPlayingAudio={setIsPlayingAudio}
+					recordedAudio={recordedAudio}
+				/> */}
+
 				<RenderFetchedData
 					ActivityIndicatorStyle={{
 						marginTop: Dimensions.get('screen').height * 0.25,
@@ -607,6 +623,12 @@ const ChatScreen = () => {
 											height: 44,
 										}}>
 										<RenderRightInputButton
+											setIsPlayingAudio={setIsPlayingAudio}
+											isPlayingAudio={isPlayingAudio}
+											recordedAudio={recordedAudio}
+											setRecordedAudio={setRecordedAudio}
+											isRecording={isRecording}
+											audio={audioRecorder}
 											setDisplayFooter={setDisplayChatFooter}
 											props={props}
 											setAttachedMessageType={setAttachedMessageType}
@@ -663,8 +685,11 @@ const ChatScreen = () => {
 											justifyContent: 'center',
 											height: 44,
 										}}>
-										{text.length > 0 || attachedMessageType !== undefined ? (
+										{text.length > 0 ||
+										attachedMessageType !== undefined ||
+										(audioRecorder.uri && !isRecording && recordedAudio) ? (
 											<RenderSendText
+												audio={recordedAudio}
 												isReply={isReply}
 												replyToMessageId={replyMessageId}
 												selectedTrickData={selectedTrickData}
@@ -680,6 +705,10 @@ const ChatScreen = () => {
 											/>
 										) : (
 											<RenderSendEmptyText
+												setRecordedAudio={setRecordedAudio}
+												audio={recordedAudio}
+												isRecording={isRecording}
+												setIsRecording={setIsRecording}
 												audioRecorder={audioRecorder}
 												chatId={id as string}
 												props={props}
@@ -710,9 +739,12 @@ const ChatScreen = () => {
 									<QuickReplies color={'white'} {...props} />
 								)}
 								renderComposer={(props) => (
-									<Composer
-										{...props}
-										textInputStyle={{ color: Colors[theme].textPrimary }}
+									<RenderComposer
+										isRecording={isRecording}
+										setIsRecording={setIsRecording}
+										props={props}
+										audio={recordedAudio}
+										theme={theme}
 									/>
 								)}
 								focusOnInputWhenOpeningKeyboard={true}

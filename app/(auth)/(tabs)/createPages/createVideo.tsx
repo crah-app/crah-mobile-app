@@ -56,8 +56,12 @@ import { SegmentedControl } from '@/components/general/SegmentedControl';
 import { SvgXml } from 'react-native-svg';
 import crahTransparentLogo from '../../../../assets/images/vectors/crah_transparent.svg';
 import { VideoUIBtns } from '@/components/VideoUI';
+import { uploadSource } from '@/hooks/bucketUploadManager';
+import { useSession } from '@clerk/clerk-expo';
+import { useAuth, useUser } from '@clerk/clerk-react';
 
 interface videoDataInterface {
+	video: imagePicker.ImagePickerAsset[]; // video
 	cover: string; // cover image
 	title: string; // video title
 	description: string; // video description
@@ -68,6 +72,9 @@ const CreateVideo = () => {
 	const theme = useSystemTheme();
 	const { bottom } = useSafeAreaInsets();
 
+	const { getToken } = useAuth();
+	const { user } = useUser();
+
 	const [cover, setCover] = useState<
 		imagePicker.ImagePickerAsset[] | undefined | string
 	>(); // Lifted state
@@ -77,6 +84,17 @@ const CreateVideo = () => {
 	const [uploadedSource, setUploadedSource] = useState<
 		imagePicker.ImagePickerAsset[] | undefined
 	>();
+
+	const [videoData, setVideoData] = useState<videoDataInterface>({
+		video: uploadedSource as imagePicker.ImagePickerAsset[],
+		title,
+		description,
+		tags,
+		cover: cover as string,
+	});
+
+	const [uploadingVideo, setUploadingVideo] = useState<boolean>(false);
+	const [uploadingProgress, setUploadingProgress] = useState<number>(0);
 
 	const checkUserInputs = () => {
 		if (!cover) {
@@ -118,32 +136,37 @@ const CreateVideo = () => {
 		);
 	};
 
-	const [videoData, setVideoData] = useState<videoDataInterface>({
-		title,
-		description,
-		tags,
-		cover: cover as string,
-	});
-
 	const handleVideoUpload = async () => {
 		setVideoData({
+			video: uploadedSource as imagePicker.ImagePickerAsset[],
 			cover: cover as string, // Use cover state
 			title, // Use title state
 			description, // Use description state
 			tags, // Use tags state
 		});
 
-		router.push(
+		const token = await getToken();
+
+		console.log(token, user?.id);
+
+		if (!token || !user?.id) return;
+
+		await uploadSource(
 			{
-				pathname: '/(auth)/(tabs)/homePages',
-				params: {
-					video_upload: 'true',
-					video_cover: JSON.stringify(cover),
-					video_data: JSON.stringify(videoData),
-				},
-			}, // Use cover state
+				path: videoData.video[0].uri,
+				duration: videoData.video[0].duration ?? 0,
+				width: videoData.video[0].width,
+				height: videoData.video[0].height,
+			},
+			token as string,
+			user?.id as string,
+			setUploadingProgress,
 		);
 	};
+
+	useEffect(() => {
+		console.log(uploadingProgress);
+	}, [uploadingProgress]);
 
 	const [currentSelectedSegment, setCurrentSelectedSegment] =
 		useState<CreatePostType>(CreatePostType.video);
