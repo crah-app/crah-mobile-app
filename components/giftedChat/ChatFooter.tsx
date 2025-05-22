@@ -96,16 +96,9 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 		);
 	};
 
+	// audio logic uses another approach
 	const AudioRow = () => {
-		return (
-			<View style={{ backgroundColor: Colors[theme].container_surface }}>
-				<Row
-					title={'Audio'}
-					subtitle="12 seconds"
-					containerStyle={{ backgroundColor: Colors[theme].container_surface }}
-				/>
-			</View>
-		);
+		return <></>;
 	};
 
 	const SourceRow = () => {

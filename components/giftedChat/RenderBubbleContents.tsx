@@ -1,16 +1,17 @@
 import Colors from '@/constants/Colors';
 import { chatCostumMsgType, ChatMessage, LinkPreview, urlRegex } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import {
 	Bubble,
 	BubbleProps,
+	MessageAudioProps,
 	MessageImageProps,
 	MessageVideoProps,
 } from 'react-native-gifted-chat';
 import { ReplyRow, RiderRow, TrickRow } from './UtilityMessageRow';
 import { fetchLinkPreview } from '@/utils/globalFuncs';
-import { ImageBackground, View } from 'react-native';
+import { ImageBackground, TouchableOpacity, View } from 'react-native';
 import { GiftedChatProps } from 'react-native-gifted-chat/lib/GiftedChat/types';
 import TypingAnimation from 'react-native-typing-animation';
 import ThemedText from '../general/ThemedText';
@@ -24,6 +25,9 @@ import Animated, {
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import { VideoUIBtns } from '../VideoUI';
+import Row from '../general/Row';
+import { Ionicons } from '@expo/vector-icons';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 
 export const RenderBubble: React.FC<{
 	props: BubbleProps<ChatMessage>;
@@ -216,15 +220,11 @@ export const RenderMessageVideo: React.FC<{
 			/>
 		);
 	}
-
-	console.log(props.currentMessage.video);
 };
 
 export const RenderMessageImage: React.FC<{
 	props: MessageImageProps<ChatMessage>;
 }> = ({ props }) => {
-	console.log(props.currentMessage.image);
-
 	return (
 		// <View>
 		<ImageBackground
@@ -300,5 +300,95 @@ export const TypingIndicator: React.FC<{ display: boolean }> = ({
 				value={'is typing...'}
 			/>
 		</Animated.View>
+	);
+};
+
+interface RenderMessageAudioProps {
+	props: MessageAudioProps<ChatMessage>;
+	theme: 'light' | 'dark';
+	audioRecorderPlayer: AudioRecorderPlayer;
+	isPlayingAudio: boolean;
+	setIsPlayingAudio: Dispatch<SetStateAction<boolean>>;
+}
+
+const fakeWaveform = Array.from({ length: 30 }, () =>
+	Math.floor(Math.random() * 20 + 5),
+);
+
+export const RenderMessageAudio: React.FC<RenderMessageAudioProps> = ({
+	props,
+	theme,
+	audioRecorderPlayer,
+	isPlayingAudio,
+	setIsPlayingAudio,
+}) => {
+	const recordedAudio = props.currentMessage.audio;
+
+	const [isPlayingCurrentAudio, setIsPlayingCurrentAudio] = useState<boolean>();
+
+	const playAudio = async () => {
+		try {
+			await audioRecorderPlayer.startPlayer(recordedAudio);
+
+			audioRecorderPlayer.addPlayBackListener((e) => {
+				if (e.currentPosition >= e.duration) {
+					stopAudio();
+				}
+				return;
+			});
+
+			setIsPlayingCurrentAudio(true);
+		} catch (err) {
+			console.warn('Fehler beim Abspielen:', err);
+		}
+	};
+
+	const stopAudio = async () => {
+		try {
+			await audioRecorderPlayer.stopPlayer();
+			audioRecorderPlayer.removePlayBackListener();
+			setIsPlayingCurrentAudio(false);
+		} catch (err) {
+			console.warn('Fehler beim Stoppen:', err);
+		}
+	};
+
+	return (
+		<View
+			style={{
+				flexDirection: 'row',
+				alignItems: 'flex-end',
+				gap: 6,
+				padding: 8,
+				width: 200,
+			}}>
+			<TouchableOpacity
+				onPress={!isPlayingCurrentAudio ? playAudio : stopAudio}>
+				<Ionicons
+					size={24}
+					color={Colors[theme].textPrimary}
+					name={!isPlayingCurrentAudio ? 'play-outline' : 'pause-outline'}
+				/>
+			</TouchableOpacity>
+
+			<View
+				style={{
+					flexDirection: 'row',
+					alignItems: 'flex-end',
+					gap: 3,
+				}}>
+				{fakeWaveform.map((height, idx) => (
+					<View
+						key={idx}
+						style={{
+							width: 2,
+							height,
+							backgroundColor: theme === 'dark' ? 'white' : 'black',
+							borderRadius: 1,
+						}}
+					/>
+				))}
+			</View>
+		</View>
 	);
 };

@@ -65,40 +65,14 @@ import { useEvent } from 'expo';
 import ThemedText from '@/components/general/ThemedText';
 import {
 	AudioFile,
-	chatCostumMsgType,
 	ChatFooterBarTypes,
 	ChatMessage,
-	CrahUser,
-	dropDownMenuInputData,
-	errType,
-	ItemText,
-	LinkPreview,
-	Rank,
 	selectedRiderInterface,
 	selectedTrickInterface,
 	TextInputMaxCharacters,
 	TypingStatus,
 	urlRegex,
 } from '@/types';
-import Row from '@/components/general/Row';
-import ClerkUser from '@/types/clerk';
-
-import { fetchLinkPreview, getTrickTitle } from '@/utils/globalFuncs';
-import DropDownMenu from '@/components/general/DropDownMenu';
-
-import BottomSheet, {
-	BottomSheetBackdrop,
-	BottomSheetFlatList,
-	BottomSheetModal,
-	BottomSheetModalProvider,
-	BottomSheetTextInput,
-	BottomSheetView,
-	useBottomSheetModal,
-} from '@gorhom/bottom-sheet';
-import { useSharedValue } from 'react-native-reanimated';
-import { defaultStyles } from '@/constants/Styles';
-import SearchBar from '@/components/general/SearchBar';
-import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowContainer';
 import socket from '@/utils/socket';
 import ChatFooterBar from '@/components/giftedChat/ChatFooter';
 import {
@@ -111,6 +85,7 @@ import { RiderRow, TrickRow } from '@/components/giftedChat/UtilityMessageRow';
 import {
 	CustomMessageView,
 	RenderBubble,
+	RenderMessageAudio,
 	RenderMessageImage,
 	RenderMessageVideo,
 	TypingIndicator,
@@ -122,14 +97,8 @@ import { mmkv } from '@/hooks/mmkv';
 import CameraComponent from '@/components/giftedChat/CameraComponent';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
-import {
-	AudioRecorder,
-	AudioSource,
-	RecordingPresets,
-	useAudioPlayer,
-	useAudioRecorder,
-} from 'expo-audio';
 import PlayAudioInstance from '@/components/giftedChat/PlayAudioInstance';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -179,20 +148,21 @@ const ChatScreen = () => {
 	const [image, setImage] = useState<PhotoFile | undefined>(undefined);
 	const [video, setVideo] = useState<VideoFile | undefined>(undefined);
 
-	// user sends source (vidoe, photo, audio, ...) to chat which has to be loaded to the cloud
-	const [loadingSourceToBucket, setLoadingSourceToBucket] = useState<boolean>();
-	const [loadedSourceToBucket, setLoadedSourceToBucket] = useState<boolean>();
-	const [errLoadingSourceToBucket, setErrLoadingSourceToBucket] =
-		useState<boolean>();
-
 	const [loadingSourceProgress, setLoadingSourceProgress] = useState<number>(0);
 	const [loadingSourceModalVisible, setLoadingSourceModalVisible] =
 		useState<boolean>(false);
 
-	const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 	const [recordedAudio, setRecordedAudio] = useState<AudioFile | null>(null);
 	const [isRecording, setIsRecording] = useState<boolean>(false);
 	const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
+	const [isPlayingChatAudio, setIsPlayingChatAudio] = useState<boolean>(false);
+
+	const AudioRecorder = useRef(new AudioRecorderPlayer()).current;
+
+	useEffect(() => {
+		console.log('objectasdff', isPlayingChatAudio);
+		return () => {};
+	}, [isPlayingChatAudio]);
 
 	const updateRowRef = useCallback(
 		(ref: any) => {
@@ -245,7 +215,6 @@ const ChatScreen = () => {
 			setVideo(undefined);
 			setImage(undefined);
 			setRecordedAudio(null);
-			audioRecorder.uri = null;
 
 			socket.emit('send-message', { chatId: id, msg: newMessages });
 		},
@@ -623,12 +592,12 @@ const ChatScreen = () => {
 											height: 44,
 										}}>
 										<RenderRightInputButton
+											audioRecorderPlayer={AudioRecorder}
 											setIsPlayingAudio={setIsPlayingAudio}
 											isPlayingAudio={isPlayingAudio}
 											recordedAudio={recordedAudio}
 											setRecordedAudio={setRecordedAudio}
 											isRecording={isRecording}
-											audio={audioRecorder}
 											setDisplayFooter={setDisplayChatFooter}
 											props={props}
 											setAttachedMessageType={setAttachedMessageType}
@@ -687,7 +656,7 @@ const ChatScreen = () => {
 										}}>
 										{text.length > 0 ||
 										attachedMessageType !== undefined ||
-										(audioRecorder.uri && !isRecording && recordedAudio) ? (
+										(!isRecording && recordedAudio) ? (
 											<RenderSendText
 												audio={recordedAudio}
 												isReply={isReply}
@@ -705,11 +674,11 @@ const ChatScreen = () => {
 											/>
 										) : (
 											<RenderSendEmptyText
+												audioRecorderPlayer={AudioRecorder}
 												setRecordedAudio={setRecordedAudio}
 												audio={recordedAudio}
 												isRecording={isRecording}
 												setIsRecording={setIsRecording}
-												audioRecorder={audioRecorder}
 												chatId={id as string}
 												props={props}
 												useCamera={useCamera}
@@ -762,6 +731,15 @@ const ChatScreen = () => {
 									<CustomMessageView chatId={id} props={props} />
 								)}
 								renderTime={(props) => null}
+								renderMessageAudio={(props) => (
+									<RenderMessageAudio
+										audioRecorderPlayer={AudioRecorder}
+										isPlayingAudio={isPlayingChatAudio}
+										setIsPlayingAudio={setIsPlayingChatAudio}
+										theme={theme}
+										props={props}
+									/>
+								)}
 							/>
 							{Platform.OS === 'android' && (
 								<KeyboardAvoidingView behavior="padding" />

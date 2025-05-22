@@ -28,6 +28,10 @@ import {
 	useAudioRecorder,
 } from 'expo-audio';
 import Row from '../general/Row';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import { sleep } from '@/utils/globalFuncs';
+import * as FileSystem from 'expo-file-system';
+import { format } from 'date-fns';
 
 interface RenderSendTextProps {
 	props: SendProps<ChatMessage>;
@@ -70,14 +74,6 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	// const isInternetLink: boolean = internetLinks.length > 0;
 
 	useEffect(() => {
-		console.log(video);
-
-		return () => {};
-	}, []);
-
-	useEffect(() => {
-		console.log(video);
-
 		switch (attachedMessageType) {
 			case 'RiderRow':
 				message.type = chatCostumMsgType.rider;
@@ -110,7 +106,7 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 	// }, [internetLinks]);
 
 	const handleSendMessage = async () => {
-		console.log(audio);
+		console.log('audio haha:', audio);
 
 		if (
 			!(
@@ -120,8 +116,6 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 			)
 		)
 			return;
-
-		console.log(audio);
 
 		if (video) {
 			setLoadingSourceModalVisible(true);
@@ -159,7 +153,10 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 				setLoadingSourceProgress,
 			);
 
+			await sleep(500);
+
 			message.audio = recievedAudioUrl as string;
+			message.text = format(new Date(audio.duration * 1000), 'mm:ss');
 		}
 
 		setLoadingSourceModalVisible(false);
@@ -188,23 +185,25 @@ export const RenderSendEmptyText: React.FC<{
 	chatId: string;
 	useCamera: boolean;
 	setUseCamera: (use: boolean) => void;
-	audioRecorder: AudioRecorder;
 	isRecording: boolean;
 	setIsRecording: Dispatch<SetStateAction<boolean>>;
 	audio: AudioFile | null;
 	setRecordedAudio: Dispatch<SetStateAction<AudioFile | null>>;
+	audioRecorderPlayer: AudioRecorderPlayer;
 }> = ({
 	props,
 	chatId,
 	useCamera,
 	setUseCamera,
-	audioRecorder,
 	isRecording,
 	setIsRecording,
 	audio,
 	setRecordedAudio,
+	audioRecorderPlayer,
 }) => {
 	const theme = useSystemTheme();
+
+	let [recordingDuration, setRecordingDuration] = useState<number>(0);
 
 	const handleCamera = () => {
 		setUseCamera(true);
@@ -213,24 +212,56 @@ export const RenderSendEmptyText: React.FC<{
 	const record = async () => {
 		const status = await AudioModule.requestRecordingPermissionsAsync();
 		if (!status.granted) {
-			console.log('Permission to access microphone was denied');
+			console.log('Permission denied');
 			return;
 		}
 
-		await audioRecorder.prepareToRecordAsync();
-		audioRecorder.record();
-		setIsRecording(true);
+		try {
+			const uri = await audioRecorderPlayer.startRecorder();
+			console.log('Recording started at:', uri);
+
+			audioRecorderPlayer.addRecordBackListener((e) => {
+				setRecordingDuration(e.currentPosition);
+				return;
+			});
+
+			setIsRecording(true);
+		} catch (err) {
+			console.warn('Error while starting recorder:', err);
+		}
 	};
 
 	const stopRecording = async () => {
-		setRecordedAudio({
-			width: 0,
-			height: 0,
-			duration: 0,
-			path: `file://${audioRecorder.uri as string}`,
-		});
-		setIsRecording(false);
-		await audioRecorder.stop();
+		try {
+			const rawResult = await audioRecorderPlayer.stopRecorder();
+			audioRecorderPlayer.removeRecordBackListener();
+			const cleanedPath = rawResult.replace(/^file:\/+/, '/');
+			console.log('Recording stopped, file saved to:', cleanedPath);
+
+			setIsRecording(false);
+
+			// Pfad in `file://`-Format für Anzeige oder Weitergabe
+			const finalPath = 'file://' + cleanedPath;
+
+			const fileInfo = await FileSystem.getInfoAsync(finalPath);
+			console.log('File info:', fileInfo);
+
+			if (!fileInfo.exists) {
+				console.warn('⚠️ Datei existiert nicht:', finalPath);
+				return;
+			}
+
+			console.log(recordingDuration, 'recordiunngduration');
+
+			setRecordedAudio({
+				width: 0,
+				height: 0,
+				duration: Math.floor(recordingDuration / 1000),
+				path: finalPath, // für Anzeige
+			});
+		} catch (err) {
+			console.warn('Error while stopping recorder:', err);
+		}
 	};
 
 	return (
@@ -290,7 +321,10 @@ export const RenderComposer: React.FC<RenderComposerProps> = ({
 			<Composer
 				{...props}
 				textInputStyle={{ color: Colors[theme].textPrimary }}
-				text="Recorded audio"
+				text={`Recorded audio ${format(
+					new Date(audio.duration * 1000),
+					'mm:ss',
+				)}`}
 			/>
 		);
 	}

@@ -78,3 +78,7 @@ export function getMIMEType(filename: string): string {
 			return 'application/octet-stream'; // Fallback for unknown types
 	}
 }
+
+export async function sleep(ms: number) {
+	await setTimeout(async () => {}, ms);
+}

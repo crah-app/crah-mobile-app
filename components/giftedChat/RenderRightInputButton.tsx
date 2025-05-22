@@ -26,6 +26,8 @@ import DropDownMenu from '../general/DropDownMenu';
 import { Ionicons } from '@expo/vector-icons';
 import AllTricksRowContainer from '../displayFetchedData/AllTricksRowContainer';
 import { AudioRecorder, AudioSource, useAudioPlayer } from 'expo-audio';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import * as FileSystem from 'expo-file-system';
 
 interface RenderRightInputButtonProps {
 	props: any;
@@ -33,12 +35,12 @@ interface RenderRightInputButtonProps {
 	setAttachedMessageType: (t: ChatFooterBarTypes) => void;
 	setSelectedRiderData: (u: selectedRiderInterface | undefined) => void;
 	setSelectedTrickData: (u: selectedTrickInterface | undefined) => void;
-	audio: AudioRecorder;
 	isRecording: boolean;
 	setRecordedAudio: Dispatch<SetStateAction<AudioFile | null>>;
 	recordedAudio: AudioFile | null;
 	isPlayingAudio: boolean;
 	setIsPlayingAudio: Dispatch<SetStateAction<boolean>>;
+	audioRecorderPlayer: AudioRecorderPlayer;
 }
 
 export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
@@ -47,12 +49,12 @@ export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
 	setAttachedMessageType,
 	setSelectedRiderData,
 	setSelectedTrickData,
-	audio,
 	isRecording,
 	setRecordedAudio,
 	recordedAudio,
 	isPlayingAudio,
 	setIsPlayingAudio,
+	audioRecorderPlayer,
 }) => {
 	const theme = useSystemTheme();
 	const items: Array<dropDownMenuInputData> = [
@@ -134,47 +136,46 @@ export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
 		setSelectedTrickData(trick);
 	};
 
-	const audioPlayer = useAudioPlayer(
-		recordedAudio?.path,
-		// 'https://pub-78edb5b6f0d946d28db91b59ddf775af.r2.dev/user_2xEVfOKU1aRCbf3XD1PYLJzeBOh/caafd9e8-9ccd-4218-bba0-3411a7a7e0b0/untitled.wav',
-	);
-
-	const playAudio = async () => {
-		// console.log(
-		// 	'ghfghaguhafghfdlgsfdlgkhsdfgljksg',
-		// 	recordedAudio,
-		// 	isPlayingAudio,
-		// );
-
-		// setRecordedAudio({
-		// 	width: 0,
-		// 	height: 0,
-		// 	duration: 0,
-		// 	path: 'https://pub-78edb5b6f0d946d28db91b59ddf775af.r2.dev/user_2xEVfOKU1aRCbf3XD1PYLJzeBOh/caafd9e8-9ccd-4218-bba0-3411a7a7e0b0/untitled.wav',
-		// });
-
-		if (!audio) return;
-
-		if (isPlayingAudio) {
-			setIsPlayingAudio(false);
-			audioPlayer.pause();
-			return;
-		}
-
-		// console.log('object play now', recordedAudio);
-		audioPlayer.currentTime = 0;
-		audioPlayer.play();
-		setIsPlayingAudio(true);
+	const checkAudioFile = async (path: string) => {
+		const info = await FileSystem.getInfoAsync(path);
+		return info;
+		console.log('Audio file info:', info);
 	};
 
-	useEffect(() => {
-		setIsPlayingAudio(audioPlayer.playing);
-	}, [audioPlayer.playing]);
+	const playAudio = async () => {
+		console.log(
+			'file details:',
+			await checkAudioFile(recordedAudio?.path as string),
+		);
 
-	useEffect(() => {
-		console.log('klolus', audio, isRecording, recordedAudio);
-		console.log();
-	}, [audio, isRecording, recordedAudio]);
+		if (!recordedAudio?.path) return;
+
+		try {
+			console.log('Playing audio from:', recordedAudio.path);
+			await audioRecorderPlayer.startPlayer(recordedAudio.path);
+
+			setIsPlayingAudio(true);
+
+			audioRecorderPlayer.addPlayBackListener((e) => {
+				console.log('Progress:', e.currentPosition, e.duration);
+				if (e.duration > 0 && e.currentPosition >= e.duration) {
+					stopAudio();
+				}
+			});
+		} catch (err) {
+			console.warn('Fehler beim Abspielen:', err);
+		}
+	};
+
+	const stopAudio = async () => {
+		try {
+			await audioRecorderPlayer.stopPlayer();
+			audioRecorderPlayer.removePlayBackListener(); // korrekt aufräumen
+			setIsPlayingAudio(false);
+		} catch (err) {
+			console.warn('Fehler beim Stoppen:', err);
+		}
+	};
 
 	return (
 		<View>
@@ -281,7 +282,9 @@ export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
 							/>
 						</TouchableOpacity>
 
-						<TouchableOpacity style={{}} onPress={() => playAudio()}>
+						<TouchableOpacity
+							style={{}}
+							onPress={isPlayingAudio ? stopAudio : playAudio}>
 							<Ionicons
 								name={isPlayingAudio ? 'pause-outline' : 'play-outline'}
 								size={24}
