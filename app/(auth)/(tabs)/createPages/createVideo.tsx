@@ -59,6 +59,8 @@ import { VideoUIBtns } from '@/components/VideoUI';
 import { uploadSource } from '@/hooks/bucketUploadManager';
 import { useSession } from '@clerk/clerk-expo';
 import { useAuth, useUser } from '@clerk/clerk-react';
+import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
+import { sleep } from '@/utils/globalFuncs';
 
 interface videoDataInterface {
 	video: imagePicker.ImagePickerAsset[]; // video
@@ -77,7 +79,11 @@ const CreateVideo = () => {
 
 	const [cover, setCover] = useState<
 		imagePicker.ImagePickerAsset[] | undefined | string
-	>(); // Lifted state
+	>();
+	const [video, setVideo] = useState<
+		imagePicker.ImagePickerAsset[] | undefined | string
+	>();
+
 	const [title, setTitle] = useState<string>('');
 	const [description, setDescription] = useState<string>('');
 	const [tags, setTags] = useState<Tags[] | undefined>();
@@ -86,7 +92,7 @@ const CreateVideo = () => {
 	>();
 
 	const [videoData, setVideoData] = useState<videoDataInterface>({
-		video: uploadedSource as imagePicker.ImagePickerAsset[],
+		video: video as imagePicker.ImagePickerAsset[],
 		title,
 		description,
 		tags,
@@ -95,6 +101,8 @@ const CreateVideo = () => {
 
 	const [uploadingVideo, setUploadingVideo] = useState<boolean>(false);
 	const [uploadingProgress, setUploadingProgress] = useState<number>(0);
+	const [uploadingModalVisible, setUploadingModalVisible] =
+		useState<boolean>(false);
 
 	const checkUserInputs = () => {
 		if (!cover) {
@@ -138,35 +146,53 @@ const CreateVideo = () => {
 
 	const handleVideoUpload = async () => {
 		setVideoData({
-			video: uploadedSource as imagePicker.ImagePickerAsset[],
+			video: video as imagePicker.ImagePickerAsset[],
 			cover: cover as string, // Use cover state
 			title, // Use title state
 			description, // Use description state
 			tags, // Use tags state
 		});
-
-		const token = await getToken();
-
-		console.log(token, user?.id);
-
-		if (!token || !user?.id) return;
-
-		await uploadSource(
-			{
-				path: videoData.video[0].uri,
-				duration: videoData.video[0].duration ?? 0,
-				width: videoData.video[0].width,
-				height: videoData.video[0].height,
-			},
-			token as string,
-			user?.id as string,
-			setUploadingProgress,
-		);
 	};
 
 	useEffect(() => {
-		console.log(uploadingProgress);
-	}, [uploadingProgress]);
+		if (!videoData.video) return;
+
+		const upload = async () => {
+			const token = await getToken();
+
+			console.log(token, user?.id);
+
+			if (!token || !user?.id) return;
+
+			console.log('95840723450967305easdfhgkaskasdjgsg');
+
+			setUploadingModalVisible(true);
+
+			console.log('easdfhgkaskasdjgsg');
+			console.log('easdfhgkaskasdjgsg', videoData.video);
+
+			await uploadSource(
+				{
+					path: videoData.video[0].uri,
+					// @ts-ignore
+					duration: Math.floor(videoData.video[0].duration / 1000) ?? 0,
+					width: videoData.video[0].width,
+					height: videoData.video[0].height,
+				},
+				token as string,
+				user?.id as string,
+				setUploadingProgress,
+			);
+
+			await sleep(300);
+
+			setUploadingModalVisible(false);
+		};
+
+		upload();
+
+		return () => {};
+	}, [videoData]);
 
 	const [currentSelectedSegment, setCurrentSelectedSegment] =
 		useState<CreatePostType>(CreatePostType.video);
@@ -247,6 +273,11 @@ const CreateVideo = () => {
 			}
 			scrollChildren={
 				<View style={{ flex: 1 }}>
+					<TransparentLoadingScreen
+						visible={uploadingModalVisible}
+						progress={uploadingProgress}
+					/>
+
 					<ThemedView theme={theme} flex={1} style={{ bottom: bottom * 3 }}>
 						<CreatePageHeader
 							title={'Create Video'}
@@ -255,6 +286,7 @@ const CreateVideo = () => {
 							style={{ paddingHorizontal: 12 }}
 						/>
 						<CreateVideoMainContent
+							setVideo={setVideo}
 							cover={cover}
 							setCover={setCover}
 							uploadedSource={uploadedSource}
@@ -284,6 +316,7 @@ const CreateVideoMainContent = ({
 	setDescription,
 	tags,
 	setTags,
+	setVideo,
 }: {
 	cover: imagePicker.ImagePickerAsset[] | undefined | string;
 	setCover: React.Dispatch<
@@ -299,6 +332,9 @@ const CreateVideoMainContent = ({
 	setDescription: React.Dispatch<React.SetStateAction<string>>;
 	tags: Tags[] | undefined;
 	setTags: React.Dispatch<React.SetStateAction<Tags[] | undefined>>;
+	setVideo: React.Dispatch<
+		React.SetStateAction<imagePicker.ImagePickerAsset[] | undefined | string>
+	>;
 }) => {
 	const theme = useSystemTheme();
 	const scrollViewRef = useRef<ScrollView>(null);
@@ -357,6 +393,7 @@ const CreateVideoMainContent = ({
 					setVisibility={setModalVisible}
 					setUploadedImage={setUploadedSource}
 					setUploadedCover={setCover}
+					setVideo={setVideo}
 					uploadMode={modalMode}
 					setSourceRatio={setSourceRatio}
 					uploadedSource={uploadedSource}

@@ -21,6 +21,7 @@ export async function uploadSource(
 			// const token = await getToken();
 
 			console.log('loaded token:', token);
+			console.log(source);
 
 			// 1. server request sending video meta-data via body
 			const response = await fetch(
