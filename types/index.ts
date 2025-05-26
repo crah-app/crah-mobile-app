@@ -477,6 +477,14 @@ export enum BestTrickType {
 	STREET = 'Street',
 }
 
+export type TrickSpot = 'Flat' | 'Park' | 'Street';
+
+// spot row data interface
+export interface SpotInterface {
+	spot: TrickSpot;
+	landing_date: Date;
+}
+
 /*
 	In what order a trick list should be displayed in a trick list
 */
