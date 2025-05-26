@@ -41,6 +41,9 @@ interface UploadVideoModalProps {
 	setSourceRatio: (ratio: upload_source_ratio) => void;
 	uploadedSource?: imagePicker.ImagePickerAsset[] | undefined;
 	cover: imagePicker.ImagePickerAsset[] | undefined | string;
+	setVideo: React.Dispatch<
+		React.SetStateAction<imagePicker.ImagePickerAsset[] | undefined | string>
+	>;
 }
 
 const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
@@ -52,6 +55,7 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 	setSourceRatio,
 	uploadedSource,
 	cover,
+	setVideo,
 }) => {
 	const theme = useSystemTheme();
 
@@ -123,6 +127,12 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 		setStateFunction: (assets: imagePicker.ImagePickerAsset[]) => void,
 	) => {
 		if (image) {
+			console.log(uploadMode, 'uploadmode,asdf');
+			if (uploadMode === 'Source') {
+				console.log('your video: ', image);
+				setVideo(image); // name is confusing. it can be image or video
+			}
+
 			setStateFunction(image);
 			setVisibility(false);
 		}

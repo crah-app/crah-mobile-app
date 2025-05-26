@@ -34,6 +34,9 @@ interface ThemedTextInputProps {
 	disabled?: boolean;
 	onPress?: () => void;
 	makeWordToBubble: boolean;
+	disabled?: boolean; // Add this line
+	onPress?: () => void; // Add this line
+	containerStyle?: ViewStyle | ViewStyle[];
 }
 
 const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
@@ -52,6 +55,9 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 	disabled,
 	onPress,
 	makeWordToBubble,
+	disabled, // Add this line
+	onPress, // Add this line
+	containerStyle,
 }) => {
 	const [bubbles, setBubbles] = useState<string[]>([]);
 
@@ -157,6 +163,48 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 				numberOfLines={lines ?? 1}
 				maxLength={maxLength}
 			/>
+			style={[
+				containerStyle,
+				{
+					backgroundColor: Colors[theme].container_surface,
+					borderRadius: 8,
+					paddingBottom: showLength ? 8 : 0,
+					paddingRight: showLength ? 8 : 0,
+					flexDirection: 'column',
+					position: 'relative',
+				},
+			]}>
+			<View
+				style={{
+					justifyContent: 'space-between',
+					height: multiline ? 10 * (lines || 1) : 'auto',
+				}}>
+				<TextInput
+					placeholderTextColor={'gray'}
+					clearButtonMode={clearButton}
+					autoCapitalize={'none'}
+					onChangeText={(newText) => setValue(newText)}
+					value={value}
+					maxLength={maxLength ?? 50}
+					multiline={multiline ?? false}
+					numberOfLines={lines ?? 1}
+					placeholder={placeholder}
+					style={[
+						{
+							backgroundColor: Colors[theme].container_surface,
+							color: Colors[theme].textPrimary,
+							textAlignVertical: 'top',
+							maxHeight: 200,
+						},
+						defaultStyles.textInput,
+						style,
+					]}
+					editable={!disabled}
+					onTouchStart={disabled ? onPress : undefined}
+					onTouchEnd={disabled ? onPress : undefined}
+					onTouchCancel={disabled ? onPress : undefined}
+					onTouchEndCapture={disabled ? onPress : undefined}
+				/>
 
 			{/* Zeichenlänge */}
 			{showLength && (

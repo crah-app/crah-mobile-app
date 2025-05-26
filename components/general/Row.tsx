@@ -7,6 +7,7 @@ import {
 	Dimensions,
 	ViewStyle,
 	TextStyle,
+	ImageStyle,
 } from 'react-native';
 import React from 'react';
 import Colors from '@/constants/Colors';
@@ -23,8 +24,8 @@ interface RowProps {
 	leftContainerStyle?: ViewStyle | ViewStyle[];
 	onPress?: () => void;
 	containerStyle?: ViewStyle | ViewStyle[];
-	titleStyle?: TextStyle;
-	subtitleStyle?: TextStyle;
+	titleStyle?: TextStyle | TextStyle[];
+	subtitleStyle?: TextStyle | TextStyle[];
 	avatarIsSVG?: boolean;
 	subtitleIsMultiline?: boolean;
 	textInTitleComponent?: React.ReactNode;
@@ -33,6 +34,9 @@ interface RowProps {
 	highlightWords?: Array<string>;
 	costumAvatarWidth?: number;
 	costumAvatarHeight?: number;
+	avatarStyle?: ImageStyle | ImageStyle[];
+	onLongPress?: () => void;
+	children?: React.ReactNode;
 }
 
 const Row: React.FC<RowProps> = ({
@@ -55,6 +59,9 @@ const Row: React.FC<RowProps> = ({
 	highlightWords,
 	costumAvatarWidth,
 	costumAvatarHeight,
+	avatarStyle,
+	onLongPress,
+	children,
 }) => {
 	const theme = useSystemTheme();
 
@@ -87,6 +94,7 @@ const Row: React.FC<RowProps> = ({
 
 	return (
 		<TouchableOpacity
+			onPressIn={onLongPress}
 			style={[
 				styles.container,
 				{ backgroundColor: Colors[theme].background },
@@ -112,7 +120,7 @@ const Row: React.FC<RowProps> = ({
 										avatarUrl ??
 										'https://randomuser.me/api/portraits/men/32.jpg',
 								}}
-								style={styles.avatar}
+								style={[styles.avatar, avatarStyle]}
 								width={costumAvatarWidth || 46}
 								height={costumAvatarHeight || 46}
 							/>
@@ -146,6 +154,7 @@ const Row: React.FC<RowProps> = ({
 				)}
 
 				{bottomContainer}
+				{children && <View style={{ marginTop: 8 }}>{children}</View>}
 			</View>
 
 			{customRightComponent && (

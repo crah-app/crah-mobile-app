@@ -69,7 +69,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	const [allTricks, setAllTricks] = useState<Trick[]>();
 
 	// fetch all users
-	const fetchUsers = () => {
+	const fetchTricks = () => {
 		setUsersLoaded(false);
 
 		fetch(fetchAdresses.allTricks, {
@@ -87,13 +87,13 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 				setAllTricks(transformCommonTricks(res));
 			})
 			.catch((err) =>
-				console.warn('An error loading all users occurred: ', err),
+				console.warn('An error loading all tricks occurred: ', err),
 			)
 			.finally(() => setUsersLoaded(true));
 	};
 
 	useEffect(() => {
-		fetchUsers();
+		fetchTricks();
 	}, []);
 
 	useEffect(() => {
@@ -109,10 +109,9 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 		router.push({
 			pathname: '/modals/TrickModal',
 			params: {
-				data: JSON.stringify({
-					trickName: selectedTrickData.name,
-					trickDescription: 'lel',
-				}),
+				trickName: selectedTrickData.name,
+				trickId: selectedTrickData.id,
+				trickDescription: 'lel',
 			},
 		});
 	};

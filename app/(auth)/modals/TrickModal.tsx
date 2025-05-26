@@ -10,44 +10,29 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface TrickStructure {
 	trickName: string;
+	trickId: number;
 	trickDescription: string;
 }
 
 const TrickModal = () => {
 	const theme = useSystemTheme();
-	const { data } = useLocalSearchParams();
+	const { trickName, trickDescription, trickId } = useLocalSearchParams();
 	const insets = useSafeAreaInsets();
-
-	const [trickData, setTrickData] = useState<TrickStructure>();
-	const [trickDataLoaded, setTrickDataLoaded] = useState(false);
-
-	useEffect(() => {
-		setTrickDataLoaded(false);
-
-		if (data) {
-			setTrickData(JSON.parse(data as string));
-			setTrickDataLoaded(true);
-		}
-	}, [data]);
 
 	return (
 		<ThemedView theme={theme} flex={1} style={styles.container}>
-			{trickDataLoaded ? (
-				<View>
-					<Stack.Screen
-						options={{
-							title: trickData?.trickName,
-						}}
-					/>
+			<View>
+				<Stack.Screen
+					options={{
+						title: trickName as string,
+					}}
+				/>
 
-					<ThemedText
-						theme={theme}
-						value={trickData?.trickDescription || 'trick description'}
-					/>
-				</View>
-			) : (
-				<CrahActivityIndicator size={'large'} color={Colors[theme].primary} />
-			)}
+				<ThemedText
+					theme={theme}
+					value={trickId.toString() || 'trick description'}
+				/>
+			</View>
 		</ThemedView>
 	);
 };

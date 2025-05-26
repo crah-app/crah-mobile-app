@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { formatDistanceToNow } from 'date-fns';
 import React, { useEffect, useRef, useState } from 'react';
-import { UserStatus } from '@/types';
+import { chatCostumMsgType, UserStatus } from '@/types';
 import Row from '@/components/general/Row';
 import SwipeableRow from '../general/SwipeableRow';
 import FadeOutRowWrapper from '@/components/general/FadeOutRowWrapper';
@@ -21,6 +21,8 @@ interface MessageRowProps {
 	onCheckboxToggle?: (checked: boolean, id: string) => void;
 	checked: boolean;
 	unreadCount: number;
+	lastMessageType: string;
+	isTyping: boolean;
 }
 
 const MessageRow: React.FC<MessageRowProps> = ({
@@ -35,10 +37,24 @@ const MessageRow: React.FC<MessageRowProps> = ({
 	onCheckboxToggle,
 	checked,
 	unreadCount,
+	lastMessageType,
+	isTyping,
 }) => {
 	const [isDeleted, setIsDeleted] = useState(false);
 	const [isArchived, setIsArchived] = useState(false);
-	const [highlightWords, setHighlightWords] = useState<string[]>(['online']);
+	const [highlightWords, setHighlightWords] = useState<string[]>([
+		String(unreadCount),
+		'new',
+		'message',
+		's',
+		'ent',
+		'rider',
+		'trick',
+		'Is',
+		'typing',
+		'...',
+		'Online',
+	]);
 
 	const chatTimeAgo = lastActive
 		? `last seen ${formatDistanceToNow(new Date(lastActive), {
@@ -47,39 +63,53 @@ const MessageRow: React.FC<MessageRowProps> = ({
 		: '';
 
 	const renderSubTitle = (): string => {
-		let text: string =
-			status === UserStatus.OFFLINE
-				? chatTimeAgo
-				: status.split('o ')[0].charAt(0).toUpperCase() +
-				  status.split('o ')[0].slice(1).toLowerCase();
-
-		if (unreadCount > 0) {
-			text = `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
+		if (isTyping) {
+			return 'Is typing...';
 		}
 
-		return text;
+		if (unreadCount > 0) {
+			switch (lastMessageType) {
+				case 'text':
+					return `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
+				case 'rider':
+					return unreadCount === 1
+						? `sent rider`
+						: `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
+				case 'trick':
+					return unreadCount === 1
+						? `sent trick`
+						: `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
+
+				default:
+					return `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
+			}
+		}
+
+		// fallback to online status or time
+		if (status === UserStatus.OFFLINE && unreadCount <= 0) return chatTimeAgo;
+
+		const [prefix] = status.split('o ');
+		return prefix.charAt(0).toUpperCase() + prefix.slice(1).toLowerCase();
 	};
 
 	const handleOnPress = () => {
-		router.navigate(`/(auth)/(tabs)/homePages/chats/${id}`);
+		router.navigate({
+			pathname: `/(auth)/(tabs)/homePages/chats/[id]`,
+			params: { id },
+		});
+	};
+
+	const handleOnLongPress = () => {
+		console.log('object');
 	};
 
 	const opacityAnim = useRef(new Animated.Value(0)).current;
-	const checkboxTranslateX = useRef(new Animated.Value(-60)).current; // Startwert für BouncyCheckbox hinter dem Row
-
-	useEffect(() => {
-		if (unreadCount > 0) {
-			setHighlightWords([String(unreadCount), 'new', 'message', 's']);
-		} else {
-			setHighlightWords(['online']);
-		}
-	}, [unreadCount]);
+	const checkboxTranslateX = useRef(new Animated.Value(-60)).current;
 
 	useEffect(() => {
 		if (slideRight) {
-			// Wenn geslideRight wird, animiere den BouncyCheckbox in den sichtbaren Bereich
 			Animated.timing(checkboxTranslateX, {
-				toValue: 0, // Der BouncyCheckbox wird jetzt sichtbar hinter dem Row
+				toValue: 0,
 				duration: 200,
 				useNativeDriver: true,
 			}).start();
@@ -90,9 +120,8 @@ const MessageRow: React.FC<MessageRowProps> = ({
 				useNativeDriver: true,
 			}).start();
 		} else {
-			// Wenn nicht geslideRight, setze den BouncyCheckbox wieder hinter den Row
 			Animated.timing(checkboxTranslateX, {
-				toValue: -60, // BouncyCheckbox bleibt hinter dem Row und ist unsichtbar
+				toValue: -60,
 				duration: 200,
 				useNativeDriver: true,
 			}).start();
@@ -112,6 +141,7 @@ const MessageRow: React.FC<MessageRowProps> = ({
 					isDeleted ? handleOnDelete() : handleOnArchive()
 				}>
 				<Row
+					onLongPress={handleOnLongPress}
 					onPress={handleOnPress}
 					title={name}
 					highlightWords={['online']}

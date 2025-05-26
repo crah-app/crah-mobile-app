@@ -2,6 +2,7 @@ import Reactions from '@/constants/Reactions';
 import UserPostDummyStructure from '@/JSON/posts.json';
 import { Ionicons } from '@expo/vector-icons';
 import { IMessage, User } from 'react-native-gifted-chat';
+import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 
 // Ionicons icon type
@@ -46,12 +47,17 @@ export interface ChatMessage extends IMessage {
 	ChatId: string;
 	ChatName: string;
 	ChatAvatar: string | null;
+	InitAboutSystemMessage: boolean;
 	text: string;
 	createdAt: Date;
 	participants: User[];
 	type: chatCostumMsgType;
 	riderId: string;
 	trickId: number;
+	// reply to a message
+	isReply: boolean;
+	replyToMessageId: string | undefined;
+	sourceData: PhotoFile | VideoFile; // meta data
 }
 
 // identify urls
@@ -99,6 +105,12 @@ export enum AuthStrategy {
 	Google = 'oauth_google',
 }
 
+// chat typing status
+export interface TypingStatus {
+	userId: string;
+	isTyping: boolean;
+}
+
 /*
 	This enumeration lists all static endpoints without search parameters that the app fetches from the CRAH API.
 */
@@ -119,6 +131,20 @@ export enum chatCostumMsgType {
 	trick = 'trick',
 	text = 'text',
 }
+
+// when parsing image/video information from one component to the other
+export interface sourceDataInterface {
+	uri: string | undefined;
+	type: 'image' | 'video';
+}
+
+// video data structure from vision-camera
+export type VideoMeta = {
+	path: string;
+	width: number;
+	height: number;
+	duration: number;
+};
 
 /*
 	Link preview fetched from server
@@ -262,6 +288,19 @@ export enum ChatFilterTypes {
 	groups = 'groups',
 }
 
+// when recieving chat meta data as a whole without its messages
+export interface Chat {
+	Id: string;
+	IsGroup: number;
+	Name: string; // group name or user avatar of other user
+	Avatar: string; // group avatar or user avatar of other user
+	LastMessageContent: string;
+	LastMessageSenderId: string;
+	LastMessageDate: Date;
+	LastMessageType: chatCostumMsgType;
+	UnreadCount: number;
+}
+
 /* 
 	A user can either be offline or online
 */
@@ -348,13 +387,38 @@ export enum Tags {
 	Based on his five best tricks, the user gets categorized in a rank with other users
 */
 
-export type Rank =
-	| 'Iron'
-	| 'Bronze'
-	| 'Silver'
-	| 'Gold'
-	| 'Platinum'
-	| 'Diamond';
+export enum Rank {
+	Wood = 'wood',
+	Bronze = 'bronze',
+	Silver = 'silver',
+	Gold = 'gold',
+	Platinum = 'platinum',
+	Diamond = 'diamond',
+	Epic = 'epic',
+	Legendary = 'legendary',
+}
+
+export const RankColors: Record<Rank, string[]> = {
+	[Rank.Wood]: ['#8B4513', '#A0522D'],
+	[Rank.Bronze]: ['#CD7F32', '#B87333'],
+	[Rank.Silver]: ['#C0C0C0', '#DCDCDC'],
+	[Rank.Gold]: ['#FFD700', '#FFEC8B'],
+	[Rank.Platinum]: ['#00CED1', '#E0FFFF'],
+	[Rank.Diamond]: ['#B9F2FF', '#E0FFFF'],
+	[Rank.Epic]: ['#9400D3', '#8A2BE2'],
+	[Rank.Legendary]: ['#FFD700', '#FF4500'],
+};
+
+export const RankColorsDark: Record<Rank, string[]> = {
+	[Rank.Wood]: ['#5C3310', '#704214'],
+	[Rank.Bronze]: ['#8C5A28', '#A97142'],
+	[Rank.Silver]: ['#A9A9A9', '#B0B0B0'],
+	[Rank.Gold]: ['#B8860B', '#C9AE5D'],
+	[Rank.Platinum]: ['#009EA0', '#B0DCDC'],
+	[Rank.Diamond]: ['#7EC8E3', '#B0E0E6'],
+	[Rank.Epic]: ['#6A0DAD', '#5B2C9F'],
+	[Rank.Legendary]: ['#B8860B', '#CC3700'],
+};
 
 /* 
 	A user can get multiple roles at once. A user role determines the user responsibilities.
@@ -477,3 +541,26 @@ export const mediaTypeSourceRatio: Record<
 	[upload_source_ratio.LANDSCAPE]: [16, 9],
 	[upload_source_ratio.PORTRAIT]: [9, 16],
 } as const;
+
+export interface AudioFile {
+	path: string;
+	duration: number;
+	width: 0;
+	height: 0;
+  
+/*
+	help modal local parameter to deicde which content to display first to the user
+*/
+export enum helpPageTopcis {
+	create = 'Create',
+	ranks = 'Ranks',
+	profile = 'Profile',
+}
+
+export enum helpPageParameter {
+	createVideo = 'Create Video',
+	createTextPost = 'Create Text, Post, Music',
+	createArticle = 'Create Article',
+	statsPages = 'Stats Pages',
+	inbox = 'Inbox',
+}

@@ -28,10 +28,10 @@ import {
 import { getCachedData, setCachedData } from '@/hooks/cache';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import modalDummyContents from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
 import DropDownMenu from '../general/DropDownMenu';
 import SearchBar from '../general/SearchBar';
+import { getTrickTitle } from '@/utils/globalFuncs';
 
 interface TricksProps {}
 
@@ -124,10 +124,9 @@ const TrickList: React.FC<{
 		router.push({
 			pathname: '/(auth)/modals/TrickModal',
 			params: {
-				data: JSON.stringify({
-					trickName: `${item.words[0]} ${item.words[1]}`,
-					trickDescription: 'trick description',
-				}),
+				trickName: getTrickTitle(item),
+				trickId: 123,
+				trickDescription: 'trick description',
 			},
 		});
 	};

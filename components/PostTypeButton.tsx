@@ -36,6 +36,7 @@ const PostTypeButton: React.FC<PostTypeButtonProps> = ({
 			<ThemedText
 				theme={theme}
 				value={val}
+				// @ts-ignore
 				style={[styles.FilterButtonText, fontStyle]}
 			/>
 		</TouchableOpacity>
