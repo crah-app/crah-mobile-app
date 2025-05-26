@@ -41,6 +41,7 @@ import {
 	ReactionType,
 	CommentType,
 	TextInputMaxCharacters,
+	RawPost,
 } from '@/types';
 import BottomSheet, {
 	BottomSheetBackdrop,
@@ -67,33 +68,32 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSharedValue } from 'react-native-reanimated';
 import { defaultStyles } from '@/constants/Styles';
 import CommentRow from '../rows/CommentRow';
+import { VideoUIBtns } from '../VideoUI';
 
 const DUMMY_PROFILE_IMAGE = '../../assets/images/vectors/src/person(1).png';
 const videoSource =
 	'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
 interface UserPostComponentProps {
-	post: userPostType;
+	post: RawPost;
 }
 
 const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
-	// const player = useVideoPlayer(post.videoUrl!, (player) => {
-	// 	player.loop = true;
-	// });
-
-	// const { isPlaying } = useEvent(player, 'playingChange', {
-	// 	isPlaying: player.playing,
-	// });
-
 	const theme = useSystemTheme();
 
 	const [userComments, setUserComments] = useState<userCommentType[]>(() => {
-		return post.comments.map((msg: any) => ({
-			// change "createAt" date type
+		// 1. remove all nulls
+		const raw = Array.isArray(post.comments)
+			? post.comments.filter((c): c is NonNullable<typeof c> => c !== null)
+			: [];
+
+		// 2. map
+		return raw.map((msg: any) => ({
 			...msg,
-			createdAt: new Date(msg.createdAt),
+			createdAt: new Date(msg.CreatedAt),
 		}));
 	});
+
 	const [showReactions, setShowReactions] = useState(false);
 	const [reactions, setReactions] = useState<ReactionType[]>([]);
 	const [likesCount, setLikesCount] = useState(post.likes || 0);
@@ -173,23 +173,42 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	};
 
 	const renderPostContent = () => {
-		switch (post.type) {
-			// case 'videoLandscape':
-			// 	return (
-			// 		<View style={styles.contentContainer}>
-			// 			<VideoView
-			// 				nativeControls={true}
-			// 				contentFit="fill"
-			// 				player={player}
-			// 				style={[
-			// 					{
-			// 						width: Dimensions.get('window').width,
-			// 						height: Dimensions.get('window').width,
-			// 					},
-			// 				]}
-			// 			/>
-			// 		</View>
-			// 	);
+		switch (post.Type) {
+			case 'Post':
+				console.log('object, pst', post.Type);
+
+				const player = useVideoPlayer(post.mediaUrl!, (player) => {
+					player.loop = true;
+				});
+
+				const { isPlaying } = useEvent(player, 'playingChange', {
+					isPlaying: player.playing,
+				});
+
+				const handleVideoPlayer = () => {
+					isPlaying ? player.pause() : player.play();
+				};
+
+				return (
+					<View style={styles.contentContainer}>
+						<View style={{}}>
+							<VideoView
+								player={player}
+								style={{
+									width: 250,
+									height: 500 * (9 / 16),
+								}}
+								contentFit={'cover'}
+								nativeControls={false}
+							/>
+							<VideoUIBtns
+								theme={theme}
+								handleVideoPlayer={handleVideoPlayer}
+								isPlaying={isPlaying}
+							/>
+						</View>
+					</View>
+				);
 			// case 'videoPortrait':
 			// 	return (
 			// 		<View style={styles.contentContainer}>
@@ -235,7 +254,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 			default:
 				return (
 					<Image
-						source={{ uri: post.imageUrl }}
+						source={{ uri: post.mediaUrl }}
 						style={[
 							styles.image,
 							{
@@ -248,7 +267,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 		}
 	};
 
-	const postTimeAgo = formatDistanceToNow(new Date(post.timestamp), {
+	const postTimeAgo = formatDistanceToNow(new Date(post.CreatedAt), {
 		addSuffix: true,
 	});
 

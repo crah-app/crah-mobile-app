@@ -132,100 +132,81 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 				</View>
 			))}
 
-			{/* TextInput */}
-			<TextInput
-				cursorColor={Colors[theme].primary}
-				value={value}
-				onChangeText={handleChangeText}
-				onKeyPress={handleKeyPress}
-				placeholder={bubbles.length > 0 ? '' : placeholder}
-				placeholderTextColor="gray"
-				clearButtonMode={clearButton}
-				autoCapitalize="none"
+			<View
 				style={[
+					containerStyle,
 					{
-						color: Colors[theme].textPrimary,
-						minWidth: 50,
-						flexGrow: 1,
-						flexShrink: 1,
+						backgroundColor: Colors[theme].container_surface,
+						borderRadius: 8,
+						paddingBottom: showLength ? 8 : 0,
+						paddingRight: showLength ? 8 : 0,
+						flexDirection: 'column',
+						position: 'relative',
 					},
-					defaultStyles.textInput,
-					style,
-				]}
-				editable={!disabled}
-				onTouchStart={disabled ? onPress : undefined}
-				onTouchEnd={disabled ? onPress : undefined}
-				multiline={multiline ?? false}
-				numberOfLines={lines ?? 1}
-				maxLength={maxLength}
-			/>
-			<View
-			style={[
-				containerStyle,
-				{
-					backgroundColor: Colors[theme].container_surface,
-					borderRadius: 8,
-					paddingBottom: showLength ? 8 : 0,
-					paddingRight: showLength ? 8 : 0,
-					flexDirection: 'column',
-					position: 'relative',
-				},
-			]}>
-			<View
-				style={{
-					justifyContent: 'space-between',
-					height: multiline ? 10 * (lines || 1) : 'auto',
-				}}>
-				<TextInput
-					placeholderTextColor={'gray'}
-					clearButtonMode={clearButton}
-					autoCapitalize={'none'}
-					onChangeText={(newText) => setValue(newText)}
-					value={value}
-					maxLength={maxLength ?? 50}
-					multiline={multiline ?? false}
-					numberOfLines={lines ?? 1}
-					placeholder={placeholder}
-					style={[
-						{
-							backgroundColor: Colors[theme].container_surface,
-							color: Colors[theme].textPrimary,
-							textAlignVertical: 'top',
-							maxHeight: 200,
-						},
-						defaultStyles.textInput,
-						style,
-					]}
-					editable={!disabled}
-					onTouchStart={disabled ? onPress : undefined}
-					onTouchEnd={disabled ? onPress : undefined}
-					onTouchCancel={disabled ? onPress : undefined}
-					onTouchEndCapture={disabled ? onPress : undefined}
-				/>
-			<View/>
-			{/* Zeichenlänge */}
-			{showLength && (
-				<ThemedText
-					value={`${value.length}/${maxLength}`}
-					theme={theme}
+				]}>
+				<View
 					style={{
-						position: 'absolute',
-						right: 8,
-						bottom: 8,
-					}}
-				/>
-			)}
+						justifyContent: 'space-between',
+						height: multiline ? 10 * (lines || 1) : 'auto',
+						width: '100%',
+					}}>
+					<TextInput
+						placeholderTextColor={'gray'}
+						clearButtonMode={clearButton}
+						autoCapitalize={'none'}
+						onChangeText={(newText) => setValue(newText)}
+						value={value}
+						maxLength={maxLength ?? 50}
+						multiline={multiline ?? false}
+						numberOfLines={lines ?? 1}
+						placeholder={placeholder}
+						style={[
+							{
+								backgroundColor: Colors[theme].container_surface,
+								color: Colors[theme].textPrimary,
+								textAlignVertical: 'top',
+								maxHeight: 200,
+							},
+							defaultStyles.textInput,
+							style,
+						]}
+						editable={!disabled}
+						onTouchStart={disabled ? onPress : undefined}
+						onTouchEnd={disabled ? onPress : undefined}
+						onTouchCancel={disabled ? onPress : undefined}
+						onTouchEndCapture={disabled ? onPress : undefined}
+					/>
+					<View />
+					{/* Zeichenlänge */}
+					{showLength && (
+						<View
+							style={{
+								width: '100%',
+								backgroundColor: 'blue',
+								justifyContent: 'flex-end',
+								alignItems: 'center',
+							}}>
+							<ThemedText
+								value={`${value.length}/${maxLength}`}
+								theme={theme}
+								style={{
+									position: 'absolute',
+									right: 8,
+									bottom: 8,
+								}}
+							/>
+						</View>
+					)}
 
-			{/* Extra Children */}
-			{children && (
-				<View style={[{ padding: 12 }, childrenContainerStyle]}>
-					{children}
+					{/* Extra Children */}
+					{children && (
+						<View style={[{ padding: 12 }, childrenContainerStyle]}>
+							{children}
+						</View>
+					)}
 				</View>
-			)}
-				
 			</View>
 		</View>
-	</View>
 	);
 };
 

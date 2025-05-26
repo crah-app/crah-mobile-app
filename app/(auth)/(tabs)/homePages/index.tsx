@@ -161,6 +161,7 @@ const Page = () => {
 			.then((res) => res.json())
 			.then((res) => {
 				setUserPosts(res);
+				console.log(res, 'ghrieodfjssdfgiojiosdfgj,iosdfgjk,sdfgiojioj');
 			})
 			.catch((err) => setErrLoadingUserPosts(err))
 			.finally(() => SetUserPostsLoaded(true));

@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import { AudioFile, VideoMeta } from '@/types';
+import { AudioFile, sourceMetadataInterface, VideoMeta } from '@/types';
 import { getMIMEType } from '@/utils/globalFuncs';
 import { useAuth } from '@clerk/clerk-expo';
 import axios from 'axios';
@@ -11,6 +11,7 @@ export async function uploadSource(
 	clerkToken: string,
 	userId: string,
 	setLoadingSourceProgress: (progress: number) => void,
+	extra_metadata?: sourceMetadataInterface,
 ) {
 	return new Promise(async (res, rej) => {
 		try {
@@ -83,15 +84,23 @@ export async function uploadSource(
 					console.log('✅ source uploaded successfully!');
 					console.log(url);
 
-					await axios.post(
-						'http://192.168.0.136:4000/api/source/mark-source-as-uploaded',
-						{
-							videoId,
-						},
-					);
-
-					setLoadingSourceProgress(100);
-					res(`https://pub-78edb5b6f0d946d28db91b59ddf775af.r2.dev/${key}`);
+					try {
+						await axios.post(
+							'http://192.168.0.136:4000/api/source/mark-source-as-uploaded',
+							{
+								videoId,
+								metadata: extra_metadata,
+								key,
+							},
+						);
+						res(`https://pub-78edb5b6f0d946d28db91b59ddf775af.r2.dev/${key}`);
+					} catch (markErr) {
+						console.warn('Source uploaded, but marking failed:', markErr);
+						res({
+							url: `https://pub-78edb5b6f0d946d28db91b59ddf775af.r2.dev/${key}`,
+							warning: 'Uploaded, but could not mark as uploaded',
+						});
+					}
 				} else {
 					console.error('❌ Error uploading video:', xhr.statusText);
 				}

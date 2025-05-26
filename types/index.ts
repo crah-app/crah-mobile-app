@@ -11,6 +11,28 @@ export type ionicon = keyof typeof Ionicons.glyphMap;
 export type userPostType = (typeof UserPostDummyStructure)[number]; // the json structure itself
 export type postKeys = keyof userPostType; // a single key of the json structure
 
+export interface RawComment {
+	Id: number;
+	PostId: number;
+	UserId: string;
+	Message: string;
+	CreatedAt: string; // ISO-Datumsstring aus MySQL DATETIME
+	UpdatedAt: string; // ISO-Datumsstring aus MySQL DATETIME
+}
+
+export type RawPost = {
+	Id: number;
+	UserId: string;
+	Type: 'Article' | 'Video' | 'Post' | 'Music';
+	Title: string | null;
+	Description: string;
+	Content: string | null;
+	CreatedAt: string; // ISO-Datum als String
+	UpdatedAt: string; // ISO-Datum als String
+	comments: Array<RawComment | null>;
+	mediaUrl: string;
+};
+
 // reaction type based on reactions array
 export type ReactionType = (typeof Reactions)[number];
 
@@ -564,4 +586,12 @@ export enum helpPageParameter {
 	createArticle = 'Create Article',
 	statsPages = 'Stats Pages',
 	inbox = 'Inbox',
+}
+
+export type postTypes = 'Article' | 'Video' | 'Post' | 'Music';
+
+export interface sourceMetadataInterface {
+	type: postTypes;
+	userId: string;
+	data: any;
 }
