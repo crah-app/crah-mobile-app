@@ -88,6 +88,7 @@ import {
 	RenderMessageAudio,
 	RenderMessageImage,
 	RenderMessageVideo,
+	RenderSystemMessage,
 	TypingIndicator,
 } from '@/components/giftedChat/RenderBubbleContents';
 import storage from '@/utils/storage';
@@ -581,7 +582,10 @@ const ChatScreen = () => {
 								onInputTextChanged={(text) => typingHandler(text)}
 								// centered system messages
 								renderSystemMessage={(props) => (
-									<RenderSystemMessage props={props} />
+									<RenderSystemMessage
+										props={props}
+										metadata={messages[messages.length - 1]}
+									/>
 								)}
 								// left action: add btn
 								renderActions={(props) => (
@@ -750,39 +754,6 @@ const ChatScreen = () => {
 			</ImageBackground>
 		</ThemedView>
 	);
-};
-
-const RenderSystemMessage: React.FC<{
-	props: SystemMessageProps<ChatMessage>;
-}> = ({ props }) => {
-	const otherUserId = '';
-	const otherUserName = '';
-
-	const navigateToProfile = () => {};
-
-	if (props.currentMessage?._id === 'profile-card') {
-		return (
-			<View style={{ padding: 16, backgroundColor: '#f2f2f2' }}>
-				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<Image
-						source={{ uri: `/users/pfps/${otherUserId}.png` }}
-						style={{ width: 40, height: 40, borderRadius: 20, marginRight: 12 }}
-					/>
-					<View>
-						<Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-							{otherUserName}
-						</Text>
-						<TouchableOpacity onPress={navigateToProfile}>
-							<Text style={{ color: 'blue' }}>Profil ansehen</Text>
-						</TouchableOpacity>
-					</View>
-				</View>
-			</View>
-		);
-	}
-
-	// Optional: default system message
-	return <SystemMessage {...props} />;
 };
 
 const VideoStyles = StyleSheet.create({

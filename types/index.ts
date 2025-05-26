@@ -387,13 +387,38 @@ export enum Tags {
 	Based on his five best tricks, the user gets categorized in a rank with other users
 */
 
-export type Rank =
-	| 'Iron'
-	| 'Bronze'
-	| 'Silver'
-	| 'Gold'
-	| 'Platinum'
-	| 'Diamond';
+export enum Rank {
+	Wood = 'wood',
+	Bronze = 'bronze',
+	Silver = 'silver',
+	Gold = 'gold',
+	Platinum = 'platinum',
+	Diamond = 'diamond',
+	Epic = 'epic',
+	Legendary = 'legendary',
+}
+
+export const RankColors: Record<Rank, string[]> = {
+	[Rank.Wood]: ['#8B4513', '#A0522D'],
+	[Rank.Bronze]: ['#CD7F32', '#B87333'],
+	[Rank.Silver]: ['#C0C0C0', '#DCDCDC'],
+	[Rank.Gold]: ['#FFD700', '#FFEC8B'],
+	[Rank.Platinum]: ['#00CED1', '#E0FFFF'],
+	[Rank.Diamond]: ['#B9F2FF', '#E0FFFF'],
+	[Rank.Epic]: ['#9400D3', '#8A2BE2'],
+	[Rank.Legendary]: ['#FFD700', '#FF4500'],
+};
+
+export const RankColorsDark: Record<Rank, string[]> = {
+	[Rank.Wood]: ['#5C3310', '#704214'],
+	[Rank.Bronze]: ['#8C5A28', '#A97142'],
+	[Rank.Silver]: ['#A9A9A9', '#B0B0B0'],
+	[Rank.Gold]: ['#B8860B', '#C9AE5D'],
+	[Rank.Platinum]: ['#009EA0', '#B0DCDC'],
+	[Rank.Diamond]: ['#7EC8E3', '#B0E0E6'],
+	[Rank.Epic]: ['#6A0DAD', '#5B2C9F'],
+	[Rank.Legendary]: ['#B8860B', '#CC3700'],
+};
 
 /* 
 	A user can get multiple roles at once. A user role determines the user responsibilities.
