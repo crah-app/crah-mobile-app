@@ -4,7 +4,11 @@ import ThemedTextInput from '@/components/general/ThemedTextInput';
 import ThemedView from '@/components/general/ThemedView';
 import Colors from '@/constants/Colors';
 import { defaultHeaderBtnSize, defaultStyles } from '@/constants/Styles';
-import { TextInputMaxCharacters, upload_source_ratio } from '@/types';
+import {
+	helpPageParameter,
+	TextInputMaxCharacters,
+	upload_source_ratio,
+} from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import * as imagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
@@ -19,7 +23,6 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import UploadVideoModal from '@/app/(auth)/modals/uploadVideoModal';
 import { Ionicons } from '@expo/vector-icons';
-import helpModalContent from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
@@ -104,7 +107,7 @@ const CreateTextPost = () => {
 						<Link
 							asChild
 							href={{
-								params: { contents: JSON.stringify(helpModalContent) },
+								params: { first: helpPageParameter.createTextPost },
 								pathname: '/modals/help_modal',
 							}}>
 							<TouchableOpacity>

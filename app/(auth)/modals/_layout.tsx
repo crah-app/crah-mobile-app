@@ -61,7 +61,7 @@ const Layout = () => {
 			<Stack.Screen
 				name="help_modal"
 				options={{
-					headerShown: true,
+					headerShown: false,
 					title: 'Help',
 					headerStyle: {
 						backgroundColor: Colors[theme].background,

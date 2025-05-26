@@ -20,6 +20,7 @@ interface SearchBarProps {
 	onOptionsPress?: () => void;
 	flex?: number;
 	containerStyle?: ViewStyle;
+	displayLeftSearchIcon?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -30,6 +31,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	onOptionsPress,
 	flex,
 	containerStyle,
+	displayLeftSearchIcon = false,
 }) => {
 	const theme = useSystemTheme();
 
@@ -52,13 +54,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
 					height: 42,
 				},
 			]}>
+			{displayLeftSearchIcon && (
+				<Ionicons name={'search'} size={22} color={Colors[theme].gray} />
+			)}
 			<TextInput
 				style={[
 					{
+						marginLeft: 12,
+						flex: 1,
 						color: Colors[theme].textPrimary,
 						backgroundColor: Colors[theme].container_surface,
 						cursor: Colors[theme].textPrimary,
-						fontSize: 16,
+						fontSize: 18,
 					},
 				]}
 				placeholderTextColor={'gray'}

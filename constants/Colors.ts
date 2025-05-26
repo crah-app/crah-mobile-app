@@ -3,6 +3,7 @@ export default {
 		primary: 'rgb(255, 0, 0)',
 		green: 'forestgreen',
 		background: 'rgb(239, 239, 239)',
+		background2: 'rgb(220, 220, 220)', // ✅ NEU
 		surface: 'rgb(225, 225, 225)',
 		container_surface: 'rgb(210, 210, 210)',
 		textPrimary: 'rgb(33, 33, 33)',
@@ -15,12 +16,14 @@ export default {
 		textBubbleOther: 'rgb(44, 44, 44)',
 		borderColor: 'rgb(42, 42, 42)',
 		gray: 'gray',
+		lightGray: 'rgb(65,65,65)',
 		darkPrimary: 'rgb(200, 0, 0)',
 	},
 	dark: {
 		primary: 'rgb(255, 0, 0)',
 		green: 'forestgreen',
 		background: '#121214',
+		background2: '#1a1a1d',
 		surface: 'rgb(37, 41, 46)',
 		container_surface: 'rgb(30, 30, 30)',
 		textPrimary: 'rgb(255, 255, 255)',
@@ -33,6 +36,7 @@ export default {
 		textBubbleOther: 'rgb(44, 44, 44)',
 		borderColor: 'rgb(42, 42, 42)',
 		gray: 'gray',
+		lightGray: 'rgb(195,195,195)',
 		darkPrimary: 'rgb(200, 0, 0)',
 	},
 	default: {

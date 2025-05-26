@@ -17,6 +17,7 @@ import {
 	Dimensions,
 	Platform,
 	SafeAreaView,
+	Share,
 } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -99,6 +100,8 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	const [commentsCount, setCommentsCount] = useState(post.comments.length || 0);
 	const [shareCount, setshareCount] = useState(post.shares || 0);
 
+	const [currentUserLiked, setCurrentUserLiked] = useState<boolean>();
+
 	const handleReaction = (reaction: ReactionType) => {
 		if (reaction) {
 			setReactions((prev: ReactionType[]) => [...prev, reaction]);
@@ -107,15 +110,66 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	};
 
 	const handleLike = () => {
-		setLikesCount(likesCount + 1);
+		setCurrentUserLiked((prev) => {
+			if (!prev) {
+				setLikesCount(likesCount + 1);
+				return true;
+			}
+
+			setLikesCount(likesCount - 1);
+			return false;
+		});
 	};
 
 	const handleComment = () => {
 		setCommentsCount(commentsCount + 1);
 	};
 
-	const handleShare = () => {
-		setshareCount(shareCount + 1);
+	const postId = post.id; // ID des Posts
+	const postDeepLink = `yourapp://post/${postId}`; // Deep Link zu diesem Post
+
+	// const handleDeepLink = (event) => {
+	// 	const deepLink = event.url;
+	// 	if (deepLink.includes('yourapp://post/')) {
+	// 		const postId = deepLink.split('/')[2]; // Extrahiere die Post-ID
+	// 		// Navigiere zum entsprechenden Post in deiner App
+	// 		navigation.navigate('PostDetails', { postId });
+	// 	}
+	// };
+
+	// useEffect(() => {
+	// 	Linking.addEventListener('url', handleDeepLink);
+	// 	return () => {
+	// 		Linking.removeEventListener('url', handleDeepLink);
+	// 	};
+	// }, []);
+
+	const handleShare = async () => {
+		const postId = 123; // Beispiel-Post-ID
+		const postDeepLink = `yourapp://post/${postId}`; // Deep Link erstellen
+
+		try {
+			const result = await Share.share({
+				message: `Schau dir diesen Post an: ${postDeepLink}`,
+				url: postDeepLink, // Der Deep Link
+				title: 'Post teilen',
+			});
+
+			if (result.action === Share.sharedAction) {
+				if (result.activityType) {
+					console.log(
+						'Post geteilt über eine spezielle Aktivität: ',
+						result.activityType,
+					);
+				} else {
+					console.log('Post erfolgreich geteilt!');
+				}
+			} else if (result.action === Share.dismissedAction) {
+				console.log('Teilen abgebrochen');
+			}
+		} catch (error) {
+			console.error('Fehler beim Teilen: ', error);
+		}
 	};
 
 	const renderPostContent = () => {
@@ -230,6 +284,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				handleLike={handleLike}
 				handleShare={handleShare}
 				onCommentsBtnPress={handlePresentModalPress}
+				currentUserLiked={currentUserLiked}
 			/>
 			{/* Reactions Modal */}
 			<UserPostReactionsModal
@@ -280,6 +335,7 @@ interface PostFooterProps {
 	reactions: string[];
 	setShowReactions: (boolean: boolean) => void;
 	onCommentsBtnPress: () => void;
+	currentUserLiked: boolean | undefined;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
@@ -292,26 +348,34 @@ const PostFooter: React.FC<PostFooterProps> = ({
 	setShowReactions,
 	reactions,
 	onCommentsBtnPress,
+	currentUserLiked,
 }) => {
 	const theme = useSystemTheme();
 
 	return (
-		<View style={styles.footer}>
-			<View style={styles.upper_footer}>
+		<View style={[styles.footer]}>
+			<View style={[styles.upper_footer]}>
 				{/* <left side of the footer> */}
 				<View style={styles.footerLeft}>
 					{/* like button */}
-					<TouchableOpacity style={styles.iconButton} onPress={handleLike}>
-						<Ionicons
-							name="heart-outline"
-							size={24}
-							color={Colors[theme].textPrimary}
-						/>
+					<View style={styles.iconButton}>
+						<TouchableOpacity onPress={handleLike}>
+							<Ionicons
+								name={currentUserLiked ? 'heart' : 'heart-outline'}
+								size={24}
+								color={
+									currentUserLiked
+										? Colors[theme].primary
+										: Colors[theme].textPrimary
+								}
+							/>
+						</TouchableOpacity>
+
 						<Text
 							style={[styles.iconCount, { color: Colors[theme].textPrimary }]}>
 							{likesCount}
 						</Text>
-					</TouchableOpacity>
+					</View>
 
 					{/* comment button */}
 					<TouchableOpacity
@@ -352,20 +416,22 @@ const PostFooter: React.FC<PostFooterProps> = ({
 				</TouchableOpacity>
 			</View>
 
+			{/* lower footer */}
 			<View
 				style={[
-					styles.lower_footer,
+					// styles.lower_footer,
 					{
-						height:
-							post.type == 'videoPortrait' ||
-							post.type == 'videoLandscape' ||
-							post.type == 'image'
-								? reactions.length > 0
-									? 45
-									: 0
-								: reactions.length > 0
-								? 45
-								: 0,
+						// height: 200,
+						// height: 40,
+						// post.type == 'videoPortrait' ||
+						// post.type == 'videoLandscape' ||
+						// post.type == 'image'
+						// 	? reactions.length > 0
+						// 		? 145
+						// 		: 0
+						// 	: reactions.length > 0
+						// 	? 145
+						// 	: 0,
 					},
 				]}>
 				{/* Reactions in a vertical bubble */}
@@ -391,18 +457,21 @@ const PostFooter: React.FC<PostFooterProps> = ({
 								showsHorizontalScrollIndicator={false}
 								horizontal
 								style={{
+									backgroundColor: 'rgba(100,100,100,0.3)',
+									borderRadius: 20,
+									paddingHorizontal: 12,
 									maxWidth: '100%',
 									flexDirection: 'row',
 									overflowX: 'hidden',
 								}}>
-								<View style={{ flexDirection: 'row', gap: 10 }}>
+								<View style={{ flexDirection: 'row', gap: 12 }}>
 									{reactions.map((reaction: string, index: number) => (
 										<View
 											style={{
 												flexDirection: 'row',
 												gap: 6,
-												backgroundColor: 'rgba(100,100,100,0.3)',
-												padding: 10,
+												// backgroundColor: 'rgba(100,100,100,0.3)',
+												paddingVertical: 10,
 												borderRadius: 20,
 												height: 40,
 											}}
@@ -427,9 +496,22 @@ const PostFooter: React.FC<PostFooterProps> = ({
 								</View>
 							</ScrollView>
 						)}
+
+						{/* description */}
+						<ThemedView
+							theme={theme}
+							style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+							<ThemedText
+								style={{ fontWeight: 'bold', marginRight: 4.5 }}
+								theme={theme}
+								value={post.username}
+							/>
+							<ThemedText theme={theme} value={post.caption} />
+						</ThemedView>
 					</View>
 				</View>
 			</View>
+			{/*  */}
 		</View>
 	);
 };
@@ -620,7 +702,7 @@ const PostCommentSection = forwardRef<
 									style={{
 										flex: 1,
 										width: Dimensions.get('window').width,
-										height: 500,
+										height: 600,
 										alignItems: 'center',
 										justifyContent: 'center',
 									}}>
@@ -677,52 +759,6 @@ const PostCommentSection = forwardRef<
 	);
 });
 
-const RenderRightInputButton: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-
-	return (
-		<TouchableOpacity
-			onPress={() => console.log('Plus pressed')}
-			style={{ paddingHorizontal: 10 }}>
-			<Ionicons
-				name="add-outline"
-				size={24}
-				color={Colors[theme].textPrimary}
-			/>
-		</TouchableOpacity>
-	);
-};
-
-const RenderBubble: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-
-	return (
-		<Bubble
-			{...props}
-			containerStyle={{
-				width: Dimensions.get('window').width,
-			}}
-			wrapperStyle={{
-				right: { backgroundColor: Colors[theme].textBubbleOwn },
-				left: { backgroundColor: Colors[theme].textBubbleOther },
-			}}
-			textStyle={{
-				right: { color: 'white' },
-				left: { color: 'white' },
-			}}
-		/>
-	);
-};
-
-const RenderSendEmptyText: React.FC<{ props: any }> = ({ props }) => {
-	const theme = useSystemTheme();
-
-	return (
-		<View
-			style={{ flexDirection: 'row', gap: 14, paddingHorizontal: 14 }}></View>
-	);
-};
-
 const styles = StyleSheet.create({
 	postContainer: {
 		overflow: 'hidden',
@@ -762,13 +798,13 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 	},
 	footer: {
+		gap: 12,
 		padding: 10,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
 	},
 	lower_footer: {
-		marginTop: 10,
-		height: 45,
+		marginTop: 4,
 		width: '100%',
 		alignItems: 'flex-start',
 		justifyContent: 'flex-start',

@@ -514,4 +514,20 @@ export interface AudioFile {
 	duration: number;
 	width: 0;
 	height: 0;
+  
+/*
+	help modal local parameter to deicde which content to display first to the user
+*/
+export enum helpPageTopcis {
+	create = 'Create',
+	ranks = 'Ranks',
+	profile = 'Profile',
+}
+
+export enum helpPageParameter {
+	createVideo = 'Create Video',
+	createTextPost = 'Create Text, Post, Music',
+	createArticle = 'Create Article',
+	statsPages = 'Stats Pages',
+	inbox = 'Inbox',
 }
