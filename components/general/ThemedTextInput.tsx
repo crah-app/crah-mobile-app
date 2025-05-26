@@ -33,9 +33,7 @@ interface ThemedTextInputProps {
 		| undefined;
 	disabled?: boolean;
 	onPress?: () => void;
-	makeWordToBubble: boolean;
-	disabled?: boolean; // Add this line
-	onPress?: () => void; // Add this line
+	makeWordToBubble?: boolean;
 	containerStyle?: ViewStyle | ViewStyle[];
 }
 
@@ -55,8 +53,6 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 	disabled,
 	onPress,
 	makeWordToBubble,
-	disabled, // Add this line
-	onPress, // Add this line
 	containerStyle,
 }) => {
 	const [bubbles, setBubbles] = useState<string[]>([]);
@@ -163,6 +159,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 				numberOfLines={lines ?? 1}
 				maxLength={maxLength}
 			/>
+			<View
 			style={[
 				containerStyle,
 				{
@@ -205,7 +202,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 					onTouchCancel={disabled ? onPress : undefined}
 					onTouchEndCapture={disabled ? onPress : undefined}
 				/>
-
+			<View/>
 			{/* Zeichenlänge */}
 			{showLength && (
 				<ThemedText
@@ -225,7 +222,10 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 					{children}
 				</View>
 			)}
+				
+			</View>
 		</View>
+	</View>
 	);
 };
 

@@ -411,6 +411,7 @@ const CreateVideoMainContent = ({
 						style={{ flex: 1 }}>
 						<View style={[styles.Container1, styles.InputContainer]}>
 							<ThemedTextInput
+							makeWordToBubble={false}
 								value={title}
 								placeholder="Enter the video title here"
 								theme={theme}
@@ -552,9 +553,7 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 		<View>
 			<View style={[styles.Container3, styles.InputContainer]}>
 				<ThemedTextInput
-					placeholder={
-						'Enter description, insights, hashtags, your thoughts...'
-					}
+					placeholder={'Enter description, insights, hashtags, your thoughts...'}
 					theme={theme}
 					lines={30}
 					multiline={true}
@@ -562,8 +561,7 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 					showLength={true}
 					children={null}
 					value={description}
-					setValue={setDescription}
-				/>
+					setValue={setDescription} makeWordToBubble={false}				/>
 			</View>
 			<View style={[styles.Container4, styles.InputContainer]}>
 				<View

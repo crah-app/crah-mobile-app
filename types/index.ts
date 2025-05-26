@@ -547,7 +547,8 @@ export interface AudioFile {
 	duration: number;
 	width: 0;
 	height: 0;
-  
+}
+
 /*
 	help modal local parameter to deicde which content to display first to the user
 */

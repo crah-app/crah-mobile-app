@@ -28,8 +28,8 @@ import {
 	Dimensions,
 	StyleSheet,
 	FlatList,
+	TouchableOpacity,
 } from 'react-native';
-import { ImageBackground, TouchableOpacity, View } from 'react-native';
 import { GiftedChatProps } from 'react-native-gifted-chat/lib/GiftedChat/types';
 import TypingAnimation from 'react-native-typing-animation';
 import ThemedText from '../general/ThemedText';
@@ -636,7 +636,8 @@ export const RenderSystemMessage: React.FC<{
 
 	// Optional: default system message
 	return <SystemMessage {...props} />;
-  
+};
+
 interface RenderMessageAudioProps {
 	props: MessageAudioProps<ChatMessage>;
 	theme: 'light' | 'dark';

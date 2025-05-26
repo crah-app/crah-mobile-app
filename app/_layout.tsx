@@ -127,29 +127,29 @@ const layout = () => {
 			notification: Colors[theme].primary,
 		},
 	};
-	
-  const navigationRef = useNavigationContainerRef();
 
-  useEffect(() => {
-    // Expo Push-Token registrieren
-    registerForPushNotificationsAsync().then(token => {
-      console.log('Push-Token:', token);
-      // Optional: an deinen Server schicken
-    });
+	//   const navigationRef = useNavigationContainerRef();
 
-    // Listener für Notification-Tap
-    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-      const data = response.notification.request.content.data;
-      console.log('Notification-Tap:', data);
+	//   useEffect(() => {
+	//     // Expo Push-Token registrieren
+	//     registerForPushNotificationsAsync().then(token => {
+	//       console.log('Push-Token:', token);
+	//       // Optional: an deinen Server schicken
+	//     });
 
-      // Beispiel: Navigiere zu ChatScreen mit chatId
-      if (data?.type === 'chat' && data?.chatId) {
-        navigationRef.navigate('ChatScreen', { chatId: data.chatId });
-      }
-    });
+	//     // Listener für Notification-Tap
+	//     const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+	//       const data = response.notification.request.content.data;
+	//       console.log('Notification-Tap:', data);
 
-    return () => subscription.remove();
-  }, []);
+	//       // Beispiel: Navigiere zu ChatScreen mit chatId
+	//       if (data?.type === 'chat' && data?.chatId) {
+	//         navigationRef.navigate('ChatScreen', { chatId: data.chatId });
+	//       }
+	//     });
+
+	//     return () => subscription.remove();
+	//   }, []);
 
 	return (
 		<ThemeProvider value={MyTheme}>
