@@ -22,6 +22,7 @@ import {
 } from '@/types';
 import { mmkv } from '@/hooks/mmkv';
 import ThemedText from '../general/ThemedText';
+import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 
 type ChatMessageBoxProps = {
 	setReplyOnSwipeOpen: (message: ChatMessage) => void;
@@ -30,8 +31,8 @@ type ChatMessageBoxProps = {
 	setAttachedMessageType: (t: ChatFooterBarTypes | undefined) => void;
 	setSelectedRiderData: (u: selectedRiderInterface | undefined) => void;
 	setSelectedTrickData: (u: selectedTrickInterface | undefined) => void;
-	setSelectedVideo: (source: string | undefined) => void;
-	setSelectedImage: (source: string | undefined) => void;
+	setSelectedVideo: (source: VideoFile | undefined) => void;
+	setSelectedImage: (source: PhotoFile | undefined) => void;
 	setIsReply: (isReply: boolean) => void;
 	setReplyMessageId: (id: string | undefined) => void;
 } & MessageProps<IMessage>;

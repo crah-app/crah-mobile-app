@@ -28,7 +28,6 @@ import {
 import { getCachedData, setCachedData } from '@/hooks/cache';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import modalDummyContents from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
 import DropDownMenu from '../general/DropDownMenu';
 import SearchBar from '../general/SearchBar';

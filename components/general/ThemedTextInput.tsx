@@ -32,6 +32,7 @@ interface ThemedTextInputProps {
 		| undefined;
 	disabled?: boolean; // Add this line
 	onPress?: () => void; // Add this line
+	containerStyle?: ViewStyle | ViewStyle[];
 }
 
 const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
@@ -49,17 +50,21 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 	clearButton,
 	disabled, // Add this line
 	onPress, // Add this line
+	containerStyle,
 }) => {
 	return (
 		<View
-			style={{
-				backgroundColor: Colors[theme].container_surface,
-				borderRadius: 8,
-				paddingBottom: showLength ? 8 : 0,
-				paddingRight: showLength ? 8 : 0,
-				flexDirection: 'column',
-				position: 'relative',
-			}}>
+			style={[
+				containerStyle,
+				{
+					backgroundColor: Colors[theme].container_surface,
+					borderRadius: 8,
+					paddingBottom: showLength ? 8 : 0,
+					paddingRight: showLength ? 8 : 0,
+					flexDirection: 'column',
+					position: 'relative',
+				},
+			]}>
 			<View
 				style={{
 					justifyContent: 'space-between',

@@ -9,10 +9,12 @@ import {
 	urlRegex,
 } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import {
 	Bubble,
 	BubbleProps,
+	MessageAudioProps,
+	MessageImageProps,
 	MessageVideoProps,
 	SystemMessage,
 	SystemMessageProps,
@@ -27,6 +29,7 @@ import {
 	StyleSheet,
 	FlatList,
 } from 'react-native';
+import { ImageBackground, TouchableOpacity, View } from 'react-native';
 import { GiftedChatProps } from 'react-native-gifted-chat/lib/GiftedChat/types';
 import TypingAnimation from 'react-native-typing-animation';
 import ThemedText from '../general/ThemedText';
@@ -41,6 +44,12 @@ import { useUser } from '@clerk/clerk-expo';
 import { defaultStyles } from '@/constants/Styles';
 import AuraUserProfile from '../AuraUserProfile';
 import PostTypeButton from '../PostTypeButton';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { useEvent } from 'expo';
+import { VideoUIBtns } from '../VideoUI';
+import Row from '../general/Row';
+import { Ionicons } from '@expo/vector-icons';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 
 export const RenderBubble: React.FC<{
 	props: BubbleProps<ChatMessage>;
@@ -163,6 +172,8 @@ export const CustomMessageView: React.FC<{
 export const RenderMessageVideo: React.FC<{
 	props: MessageVideoProps<ChatMessage>;
 }> = ({ props }) => {
+	const theme = useSystemTheme();
+
 	const [previewData, setPreviewData] = useState<LinkPreview>();
 	const internetLinks: RegExpMatchArray | [] =
 		props.currentMessage.text?.match(urlRegex) ?? [];
@@ -183,19 +194,70 @@ export const RenderMessageVideo: React.FC<{
 		return <View></View>;
 	}
 
-	return (
-		<View>
-			{previewData && (
-				<ImageBackground
-					source={{ uri: previewData.images[0] }}
+	if (props.currentMessage.video) {
+		const player = useVideoPlayer(props.currentMessage.video, (player) => {
+			player.playbackRate = 1;
+			player.loop = true;
+			player.allowsExternalPlayback = false;
+			player.audioMixingMode = 'doNotMix';
+		});
+
+		const { isPlaying } = useEvent(player, 'playingChange', {
+			isPlaying: player.playing,
+		});
+
+		const handleVideoPlayer = () => {
+			isPlaying ? player.pause() : player.play();
+		};
+
+		return (
+			<View style={{}}>
+				<VideoView
+					player={player}
 					style={{
-						width: '100%',
-						height: 150,
+						width: 250,
+						height: 500 * (9 / 16),
 					}}
-					resizeMode="cover"
+					contentFit={'cover'}
+					nativeControls={false}
 				/>
-			)}
-		</View>
+				<VideoUIBtns
+					theme={theme}
+					handleVideoPlayer={handleVideoPlayer}
+					isPlaying={isPlaying}
+				/>
+			</View>
+		);
+	}
+
+	if (previewData) {
+		return (
+			<ImageBackground
+				source={{ uri: previewData.images[0] }}
+				style={{
+					width: '100%',
+					height: 150,
+				}}
+				resizeMode="cover"
+			/>
+		);
+	}
+};
+
+export const RenderMessageImage: React.FC<{
+	props: MessageImageProps<ChatMessage>;
+}> = ({ props }) => {
+	return (
+		// <View>
+		<ImageBackground
+			source={{ uri: props.currentMessage.image }}
+			style={{
+				width: 250,
+				height: 500 * (9 / 16),
+			}}
+			resizeMode="cover"
+		/>
+		// </View>
 	);
 };
 
@@ -574,4 +636,93 @@ export const RenderSystemMessage: React.FC<{
 
 	// Optional: default system message
 	return <SystemMessage {...props} />;
+  
+interface RenderMessageAudioProps {
+	props: MessageAudioProps<ChatMessage>;
+	theme: 'light' | 'dark';
+	audioRecorderPlayer: AudioRecorderPlayer;
+	isPlayingAudio: boolean;
+	setIsPlayingAudio: Dispatch<SetStateAction<boolean>>;
+}
+
+const fakeWaveform = Array.from({ length: 30 }, () =>
+	Math.floor(Math.random() * 20 + 5),
+);
+
+export const RenderMessageAudio: React.FC<RenderMessageAudioProps> = ({
+	props,
+	theme,
+	audioRecorderPlayer,
+	isPlayingAudio,
+	setIsPlayingAudio,
+}) => {
+	const recordedAudio = props.currentMessage.audio;
+
+	const [isPlayingCurrentAudio, setIsPlayingCurrentAudio] = useState<boolean>();
+
+	const playAudio = async () => {
+		try {
+			await audioRecorderPlayer.startPlayer(recordedAudio);
+
+			audioRecorderPlayer.addPlayBackListener((e) => {
+				if (e.currentPosition >= e.duration) {
+					stopAudio();
+				}
+				return;
+			});
+
+			setIsPlayingCurrentAudio(true);
+		} catch (err) {
+			console.warn('Fehler beim Abspielen:', err);
+		}
+	};
+
+	const stopAudio = async () => {
+		try {
+			await audioRecorderPlayer.stopPlayer();
+			audioRecorderPlayer.removePlayBackListener();
+			setIsPlayingCurrentAudio(false);
+		} catch (err) {
+			console.warn('Fehler beim Stoppen:', err);
+		}
+	};
+
+	return (
+		<View
+			style={{
+				flexDirection: 'row',
+				alignItems: 'flex-end',
+				gap: 6,
+				padding: 8,
+				width: 200,
+			}}>
+			<TouchableOpacity
+				onPress={!isPlayingCurrentAudio ? playAudio : stopAudio}>
+				<Ionicons
+					size={24}
+					color={Colors[theme].textPrimary}
+					name={!isPlayingCurrentAudio ? 'play-outline' : 'pause-outline'}
+				/>
+			</TouchableOpacity>
+
+			<View
+				style={{
+					flexDirection: 'row',
+					alignItems: 'flex-end',
+					gap: 3,
+				}}>
+				{fakeWaveform.map((height, idx) => (
+					<View
+						key={idx}
+						style={{
+							width: 2,
+							height,
+							backgroundColor: theme === 'dark' ? 'white' : 'black',
+							borderRadius: 1,
+						}}
+					/>
+				))}
+			</View>
+		</View>
+	);
 };

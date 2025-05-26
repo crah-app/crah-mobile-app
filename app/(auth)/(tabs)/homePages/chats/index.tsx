@@ -33,6 +33,7 @@ import {
 	chatCostumMsgType,
 	ChatFilterTypes,
 	ChatMessage,
+	TextInputMaxCharacters,
 	UserStatus,
 } from '@/types';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
@@ -46,6 +47,9 @@ import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { defaultStyles } from '@/constants/Styles';
 import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowContainer';
 import socket from '@/utils/socket';
+import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
+import { mmkv } from '@/hooks/mmkv';
+import stringSimilarity from 'string-similarity';
 
 interface socketJoinedChatRooms {
 	[chatId: string]: {
@@ -93,6 +97,8 @@ const Page = () => {
 			.then((res) => {
 				setFetchedChats(res);
 				setChats(res);
+
+				mmkv.set('loaded_user_chats', JSON.stringify(res));
 			})
 			.catch((err) => setErrLoadingChats(true))
 			.finally(() => setChatsLoaded(true));
@@ -342,6 +348,39 @@ const Page = () => {
 		}
 	}, [showLeftActionSpace]);
 
+	useEffect(() => {
+		console.log(searchQuery);
+
+		let filteredChats = fetchedChats;
+
+		// Filter nach Typ
+		switch (messagesFilterSelected) {
+			case ChatFilterTypes.groups:
+				filteredChats = filteredChats.filter((chat) => chat.IsGroup);
+				break;
+			case ChatFilterTypes.unread:
+				filteredChats = filteredChats.filter((chat) => chat.UnreadCount > 0);
+				break;
+		}
+
+		// Filter nach Suchanfrage
+		if (searchQuery.trim().length > 0) {
+			filteredChats = filteredChats.filter((chat) => {
+				if (
+					stringSimilarity.compareTwoStrings(
+						chat.Name.toLowerCase(),
+						searchQuery.toLowerCase(),
+					) > 0.19 ||
+					chat.Name.toLowerCase().includes(searchQuery.toLowerCase())
+				) {
+					return chat;
+				}
+			});
+		}
+
+		setChats(sortChatsByDate(filteredChats));
+	}, [messagesFilterSelected, searchQuery, fetchedChats, sortChatsByDate]);
+
 	// open new chat modal
 	const OpenNewChatModal = () => {
 		router.navigate('/(auth)/modals/chats/SearchNewChatModal');
@@ -357,8 +396,12 @@ const Page = () => {
 				handleOnArchive={() => handleOnArchive(item.Id)}
 				handleOnDelete={() => handleOnDelete(item.Id)}
 				id={item.Id}
-				name={item.Name}
-				avatar={'https://randomuser.me/api/portraits/men/32.jpg'}
+				name={
+					item.Name.length > TextInputMaxCharacters.UserName
+						? item.Name.slice(0, TextInputMaxCharacters.UserName) + '...'
+						: item.Name
+				}
+				avatar={item.Avatar}
 				lastActive={new Date(item.LastMessageDate)}
 				status={UserStatus.ONLINE}
 				unreadCount={item.UnreadCount}
@@ -416,6 +459,32 @@ const Page = () => {
 	};
 
 	const ChatList = () => {
+		const RenderListEmpy = () => {
+			const text = messagesFilterSelected === 'unread' ? '' : 'create a chat';
+
+			return (
+				<View
+					style={{
+						flex: 1,
+						justifyContent: 'center',
+						alignItems: 'center',
+						width: Dimensions.get('window').width,
+					}}>
+					{chats.length <= 0 && (
+						<NoDataPlaceholder
+							containerStyle={{
+								marginBottom: 120,
+							}}
+							arrowStyle={{ display: 'none' }}
+							subTextValue={text}
+							firstTextValue="nothing here"
+							onSubTextClickPathname="../../../modals/chats/SearchNewChatModal"
+						/>
+					)}
+				</View>
+			);
+		};
+
 		return (
 			<View
 				style={[
@@ -423,6 +492,7 @@ const Page = () => {
 					{
 						borderTopColor: Colors[theme].gray,
 						borderTopWidth: 1,
+						paddingTop: 4,
 					},
 				]}>
 				<RenderFetchedData
@@ -439,6 +509,7 @@ const Page = () => {
 								{ borderColor: 'gray', marginTop: 0 },
 							]}
 							renderItem={renderMessageRow}
+							ListEmptyComponent={RenderListEmpy}
 						/>
 					}
 					activityIndicatorSize={24}

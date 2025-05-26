@@ -1,5 +1,6 @@
 import Colors from '@/constants/Colors';
 import {
+	AudioFile,
 	ChatFooterBarTypes,
 	dropDownMenuInputData,
 	errType,
@@ -13,7 +14,7 @@ import {
 	BottomSheetModal,
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
@@ -24,6 +25,9 @@ import AllUserRowContainer from '../displayFetchedData/AllUserRowContainer';
 import DropDownMenu from '../general/DropDownMenu';
 import { Ionicons } from '@expo/vector-icons';
 import AllTricksRowContainer from '../displayFetchedData/AllTricksRowContainer';
+import { AudioRecorder, AudioSource, useAudioPlayer } from 'expo-audio';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import * as FileSystem from 'expo-file-system';
 
 interface RenderRightInputButtonProps {
 	props: any;
@@ -31,6 +35,12 @@ interface RenderRightInputButtonProps {
 	setAttachedMessageType: (t: ChatFooterBarTypes) => void;
 	setSelectedRiderData: (u: selectedRiderInterface | undefined) => void;
 	setSelectedTrickData: (u: selectedTrickInterface | undefined) => void;
+	isRecording: boolean;
+	setRecordedAudio: Dispatch<SetStateAction<AudioFile | null>>;
+	recordedAudio: AudioFile | null;
+	isPlayingAudio: boolean;
+	setIsPlayingAudio: Dispatch<SetStateAction<boolean>>;
+	audioRecorderPlayer: AudioRecorderPlayer;
 }
 
 export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
@@ -39,6 +49,12 @@ export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
 	setAttachedMessageType,
 	setSelectedRiderData,
 	setSelectedTrickData,
+	isRecording,
+	setRecordedAudio,
+	recordedAudio,
+	isPlayingAudio,
+	setIsPlayingAudio,
+	audioRecorderPlayer,
 }) => {
 	const theme = useSystemTheme();
 	const items: Array<dropDownMenuInputData> = [
@@ -120,6 +136,47 @@ export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
 		setSelectedTrickData(trick);
 	};
 
+	const checkAudioFile = async (path: string) => {
+		const info = await FileSystem.getInfoAsync(path);
+		return info;
+		console.log('Audio file info:', info);
+	};
+
+	const playAudio = async () => {
+		console.log(
+			'file details:',
+			await checkAudioFile(recordedAudio?.path as string),
+		);
+
+		if (!recordedAudio?.path) return;
+
+		try {
+			console.log('Playing audio from:', recordedAudio.path);
+			await audioRecorderPlayer.startPlayer(recordedAudio.path);
+
+			setIsPlayingAudio(true);
+
+			audioRecorderPlayer.addPlayBackListener((e) => {
+				console.log('Progress:', e.currentPosition, e.duration);
+				if (e.duration > 0 && e.currentPosition >= e.duration) {
+					stopAudio();
+				}
+			});
+		} catch (err) {
+			console.warn('Fehler beim Abspielen:', err);
+		}
+	};
+
+	const stopAudio = async () => {
+		try {
+			await audioRecorderPlayer.stopPlayer();
+			audioRecorderPlayer.removePlayBackListener(); // korrekt aufräumen
+			setIsPlayingAudio(false);
+		} catch (err) {
+			console.warn('Fehler beim Stoppen:', err);
+		}
+	};
+
 	return (
 		<View>
 			<BottomSheetModal
@@ -194,19 +251,49 @@ export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
 				</BottomSheetView>
 			</BottomSheetModal>
 
-			<DropDownMenu
-				onSelect={(_, val) => handleOnSelect(val)}
-				items={items}
-				triggerComponent={
-					<TouchableOpacity style={{ paddingHorizontal: 10 }}>
-						<Ionicons
-							name="add-outline"
-							size={24}
-							color={Colors[theme].textPrimary}
-						/>
-					</TouchableOpacity>
-				}
-			/>
+			<View style={{ flexDirection: 'row', gap: 8, marginLeft: 8 }}>
+				{!isRecording && !recordedAudio && (
+					<DropDownMenu
+						onSelect={(_, val) => handleOnSelect(val)}
+						items={items}
+						triggerComponent={
+							<TouchableOpacity style={{}}>
+								<Ionicons
+									name="add-outline"
+									size={24}
+									color={Colors[theme].textPrimary}
+								/>
+							</TouchableOpacity>
+						}
+					/>
+				)}
+
+				{!isRecording && recordedAudio && (
+					<View style={{ flexDirection: 'row', gap: 8 }}>
+						<TouchableOpacity
+							style={{}}
+							onPress={() => {
+								setRecordedAudio(null);
+							}}>
+							<Ionicons
+								name="trash-outline"
+								size={24}
+								color={Colors[theme].textPrimary}
+							/>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={{}}
+							onPress={isPlayingAudio ? stopAudio : playAudio}>
+							<Ionicons
+								name={isPlayingAudio ? 'pause-outline' : 'play-outline'}
+								size={24}
+								color={Colors[theme].textPrimary}
+							/>
+						</TouchableOpacity>
+					</View>
+				)}
+			</View>
 		</View>
 	);
 };

@@ -15,13 +15,13 @@ import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { Link, router } from 'expo-router';
 
-import helpModalContent from '@/JSON/non_dummy_data/inbox_help_modal_content.json';
 import FriendRequestColumn from '@/components/rows/FriendRequestRow';
 import UpdateInformationColumn from '@/components/rows/UpdateInformationRow';
 
 // dummy data. replace with database data
 import UpdateInformation from '@/JSON/update_information_modal_content.json';
 import RankColumn from '@/components/rows/InboxRankRow';
+import { helpPageParameter } from '@/types';
 
 const Page = () => {
 	const theme = useSystemTheme();
@@ -40,7 +40,7 @@ const Page = () => {
 	const HandleUpdateInformationPress = () => {
 		router.push({
 			pathname: '/modals/help_modal',
-			params: { contents: JSON.stringify(UpdateInformation) },
+			params: { first: 'Inbox' },
 		});
 	};
 
@@ -119,7 +119,7 @@ const Header = () => {
 			<Link
 				asChild
 				href={{
-					params: { contents: JSON.stringify(helpModalContent) },
+					params: { first: helpPageParameter.inbox },
 					pathname: '/modals/help_modal',
 				}}>
 				<TouchableOpacity>

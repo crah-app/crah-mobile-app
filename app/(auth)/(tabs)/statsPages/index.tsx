@@ -10,13 +10,13 @@ import {
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { useUser } from '@clerk/clerk-expo';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
-import { UserGalleryTopics } from '@/types';
+import { helpPageParameter, UserGalleryTopics } from '@/types';
 import Colors from '@/constants/Colors';
 import LeaguesPage from '@/components/rankspage/Leagues';
 import YourRank from '@/components/rankspage/YourRank';
 import Tricks from '@/components/rankspage/Tricks';
 import TrickBuilder from '@/components/rankspage/TrickBuilder';
-import { useLocalSearchParams } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';
@@ -68,13 +68,19 @@ const Page = () => {
 								borderColor: Colors[theme].textPrimary,
 								paddingLeft: 14,
 							}}>
-							<TouchableOpacity>
-								<Ionicons
-									name="help-circle-outline"
-									size={defaultHeaderBtnSize}
-									color={Colors[theme].textPrimary}
-								/>
-							</TouchableOpacity>
+							<Link
+								href={{
+									pathname: '/(auth)/modals/help_modal',
+									params: { first: helpPageParameter.statsPages },
+								}}>
+								<TouchableOpacity>
+									<Ionicons
+										name="help-circle-outline"
+										size={defaultHeaderBtnSize}
+										color={Colors[theme].textPrimary}
+									/>
+								</TouchableOpacity>
+							</Link>
 						</View>
 					}
 				/>

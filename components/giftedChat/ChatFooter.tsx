@@ -3,6 +3,7 @@ import {
 	ChatMessage,
 	selectedRiderInterface,
 	selectedTrickInterface,
+	sourceDataInterface,
 } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedView from '../general/ThemedView';
@@ -15,20 +16,22 @@ import Row from '../general/Row';
 import Scooter from '../../assets/images/vectors/scooter.svg';
 import ThemedText from '../general/ThemedText';
 import ReplyMessageBar from './ReplyMessageBar';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 
 interface ChatFooterBarProps {
 	msgType: ChatFooterBarTypes | undefined;
 	displayFooter: boolean | undefined;
 	trickData?: selectedTrickInterface;
 	riderData?: selectedRiderInterface;
-	sourceData?: any;
+	sourceData: sourceDataInterface;
 	audioData?: any;
 	setDisplayFooter: (b: boolean) => void;
 	setAttachedMessageType: (t: ChatFooterBarTypes | undefined) => void;
 	setSelectedRiderData: (u: selectedRiderInterface | undefined) => void;
 	setSelectedTrickData: (u: selectedTrickInterface | undefined) => void;
-	setSelectedVideo: (source: string | undefined) => void;
-	setSelectedImage: (source: string | undefined) => void;
+	setSelectedVideo: (source: VideoFile | undefined) => void;
+	setSelectedImage: (source: PhotoFile | undefined) => void;
 	setReplyMessage: Dispatch<SetStateAction<ChatMessage | undefined>>;
 	replyMessage: ChatMessage | undefined;
 	isReply: boolean;
@@ -93,16 +96,9 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 		);
 	};
 
+	// audio logic uses another approach
 	const AudioRow = () => {
-		return (
-			<View style={{ backgroundColor: Colors[theme].container_surface }}>
-				<Row
-					title={'Audio'}
-					subtitle="12 seconds"
-					containerStyle={{ backgroundColor: Colors[theme].container_surface }}
-				/>
-			</View>
-		);
+		return <></>;
 	};
 
 	const SourceRow = () => {
@@ -110,20 +106,35 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 			return (
 				<View style={{ backgroundColor: Colors[theme].container_surface }}>
 					<Row
+						avatarStyle={{ borderRadius: 12 }}
 						showAvatar
-						avatarUrl={sourceData.uri}
-						title={'Image'}
-						subtitle="image view"
+						avatarUrl={`file://${sourceData.uri}`}
+						title={'Your taken image'}
+						subtitle="ready to upload"
 						containerStyle={{
 							backgroundColor: Colors[theme].container_surface,
+							padding: 8,
 						}}
 					/>
 				</View>
 			);
 		}
-
 		// render video
-		return <></>;
+		return (
+			<View style={{ backgroundColor: Colors[theme].container_surface }}>
+				<Row
+					avatarStyle={{ borderRadius: 12 }}
+					showAvatar
+					avatarUrl={`file://${sourceData.uri}`}
+					title={'Your taken video'}
+					subtitle="ready to upload"
+					containerStyle={{
+						backgroundColor: Colors[theme].container_surface,
+						padding: 8,
+					}}
+				/>
+			</View>
+		);
 	};
 
 	const ReplyRow = () => {

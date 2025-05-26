@@ -64,42 +64,19 @@ import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import ThemedText from '@/components/general/ThemedText';
 import {
-	chatCostumMsgType,
+	AudioFile,
 	ChatFooterBarTypes,
 	ChatMessage,
-	CrahUser,
-	dropDownMenuInputData,
-	errType,
-	ItemText,
-	LinkPreview,
-	Rank,
 	selectedRiderInterface,
 	selectedTrickInterface,
+	TextInputMaxCharacters,
 	TypingStatus,
 	urlRegex,
 } from '@/types';
-import Row from '@/components/general/Row';
-import ClerkUser from '@/types/clerk';
-
-import { fetchLinkPreview, getTrickTitle } from '@/utils/globalFuncs';
-import DropDownMenu from '@/components/general/DropDownMenu';
-
-import BottomSheet, {
-	BottomSheetBackdrop,
-	BottomSheetFlatList,
-	BottomSheetModal,
-	BottomSheetModalProvider,
-	BottomSheetTextInput,
-	BottomSheetView,
-	useBottomSheetModal,
-} from '@gorhom/bottom-sheet';
-import { useSharedValue } from 'react-native-reanimated';
-import { defaultStyles } from '@/constants/Styles';
-import SearchBar from '@/components/general/SearchBar';
-import AllUserRowContainer from '@/components/displayFetchedData/AllUserRowContainer';
 import socket from '@/utils/socket';
 import ChatFooterBar from '@/components/giftedChat/ChatFooter';
 import {
+	RenderComposer,
 	RenderSendEmptyText,
 	RenderSendText,
 } from '@/components/giftedChat/ComposerComponents';
@@ -108,6 +85,8 @@ import { RiderRow, TrickRow } from '@/components/giftedChat/UtilityMessageRow';
 import {
 	CustomMessageView,
 	RenderBubble,
+	RenderMessageAudio,
+	RenderMessageImage,
 	RenderMessageVideo,
 	RenderSystemMessage,
 	TypingIndicator,
@@ -116,6 +95,11 @@ import storage from '@/utils/storage';
 import { Swipeable } from 'react-native-gesture-handler';
 import CostumChatBubble from '@/components/giftedChat/CostumChatBubble';
 import { mmkv } from '@/hooks/mmkv';
+import CameraComponent from '@/components/giftedChat/CameraComponent';
+import { PhotoFile, VideoFile } from 'react-native-vision-camera';
+import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
+import PlayAudioInstance from '@/components/giftedChat/PlayAudioInstance';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 
 const ChatScreen = () => {
 	const theme = useSystemTheme();
@@ -124,9 +108,6 @@ const ChatScreen = () => {
 	const rawParams = useLocalSearchParams();
 
 	const id = rawParams.id as string;
-	const video = rawParams.video as string;
-	const image = rawParams.image as string;
-	const fromCamera = rawParams.fromCamera === 'true'; // when user goes from the camera page back to the chat page the source has to be given vie local params
 
 	// states
 	const [text, setText] = useState('');
@@ -142,6 +123,7 @@ const ChatScreen = () => {
 
 	const [isGroup, setIsGroup] = useState<boolean>();
 	const [chatTitle, setChatTitle] = useState<string>('');
+	const [chatAvatar, setChatAvatar] = useState<string>('');
 
 	// attaching a new message like a trick, rider, audio or source
 	const [displayChatFooter, setDisplayChatFooter] = useState<boolean>();
@@ -156,15 +138,32 @@ const ChatScreen = () => {
 		selectedTrickInterface | undefined
 	>();
 
-	const [selectedVideo, setSelectedVideo] = useState<string | undefined>();
-	const [selectedImage, setSelectedImage] = useState<string | undefined>();
-
 	const [isInChatRoom, setIsInChatRoom] = useState<boolean>();
 
 	const swipeableRowRef = useRef<Swipeable | null>(null);
 	const [replyMessage, setReplyMessage] = useState<ChatMessage>();
 	const [isReply, setIsReply] = useState<boolean>(false);
 	const [replyMessageId, setReplyMessageId] = useState<string | undefined>();
+
+	const [useCamera, setUseCamera] = useState<boolean>(false);
+	const [image, setImage] = useState<PhotoFile | undefined>(undefined);
+	const [video, setVideo] = useState<VideoFile | undefined>(undefined);
+
+	const [loadingSourceProgress, setLoadingSourceProgress] = useState<number>(0);
+	const [loadingSourceModalVisible, setLoadingSourceModalVisible] =
+		useState<boolean>(false);
+
+	const [recordedAudio, setRecordedAudio] = useState<AudioFile | null>(null);
+	const [isRecording, setIsRecording] = useState<boolean>(false);
+	const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
+	const [isPlayingChatAudio, setIsPlayingChatAudio] = useState<boolean>(false);
+
+	const AudioRecorder = useRef(new AudioRecorderPlayer()).current;
+
+	useEffect(() => {
+		console.log('objectasdff', isPlayingChatAudio);
+		return () => {};
+	}, [isPlayingChatAudio]);
 
 	const updateRowRef = useCallback(
 		(ref: any) => {
@@ -211,11 +210,12 @@ const ChatScreen = () => {
 			setSelectedRiderData(undefined);
 			setSelectedTrickData(undefined);
 			setAttachedMessageType(undefined);
-			setSelectedVideo(undefined);
-			setSelectedImage(undefined);
 			setReplyMessage(undefined);
 			setIsReply(false);
 			setReplyMessageId(undefined);
+			setVideo(undefined);
+			setImage(undefined);
+			setRecordedAudio(null);
 
 			socket.emit('send-message', { chatId: id, msg: newMessages });
 		},
@@ -347,6 +347,10 @@ const ChatScreen = () => {
 	const setFetchedData = (data: ChatMessage[]) => {
 		setIsGroup(data[0].isGroup);
 		setChatTitle(data[data.length - 1].ChatName);
+		setChatAvatar(
+			data[data.length - 1].ChatAvatar ??
+				'https://randomuser.me/api/portraits/men/32.jpg',
+		);
 	};
 
 	// typing handler
@@ -406,18 +410,31 @@ const ChatScreen = () => {
 		});
 	}, [id, user?.id]);
 
-	// camera logic for uploading camera source
 	useEffect(() => {
-		if (!fromCamera) return;
+		if (!video && !image) return;
 
-		if (video) {
-			setSelectedVideo(video as string);
-		} else if (image) {
-			setSelectedImage(image as string);
-		} else {
-			setDisplayChatFooter(true);
-		}
-	}, [fromCamera, video, image]);
+		setDisplayChatFooter(true);
+		setAttachedMessageType('Source');
+		setIsReply(false);
+		setReplyMessageId(undefined);
+
+		return () => {};
+	}, [video, image]);
+
+	if (useCamera) {
+		return (
+			<View style={{ flex: 1 }}>
+				<Stack.Screen options={{ headerShown: false }} />
+				<CameraComponent
+					setUseCamera={setUseCamera}
+					setImage={setImage}
+					setVideo={setVideo}
+					video={video}
+					image={image}
+				/>
+			</View>
+		);
+	}
 
 	return (
 		<ThemedView theme={theme} flex={1} style={{}}>
@@ -475,7 +492,9 @@ const ChatScreen = () => {
 						<View style={[styles.headerCenter]}>
 							<Image
 								source={{
-									uri: 'https://randomuser.me/api/portraits/men/32.jpg',
+									uri: isGroup
+										? 'https://randomuser.me/api/portraits/men/32.jpg'
+										: chatAvatar,
 								}}
 								style={styles.profilePic}
 							/>
@@ -486,7 +505,7 @@ const ChatScreen = () => {
 											styles.userName,
 											{ color: Colors[theme].textPrimary },
 										]}>
-										Lade...
+										Loading...
 									</Text>
 								) : errLoadingMessages ? (
 									<Text style={[styles.userName, { color: 'red' }]}>Error</Text>
@@ -496,7 +515,10 @@ const ChatScreen = () => {
 											styles.userName,
 											{ color: Colors[theme].textPrimary },
 										]}>
-										{chatTitle}
+										{chatTitle.length > TextInputMaxCharacters.UserName
+											? chatTitle.slice(0, TextInputMaxCharacters.UserName) +
+											  ' ...'
+											: chatTitle}
 									</Text>
 								)}
 
@@ -519,6 +541,19 @@ const ChatScreen = () => {
 
 			{/* GiftedChat */}
 			<ImageBackground style={{ flex: 1, paddingBottom: bottom }}>
+				{/* loading screen for uploading assets */}
+				<TransparentLoadingScreen
+					progress={loadingSourceProgress}
+					visible={loadingSourceModalVisible}
+				/>
+
+				{/* to play audio */}
+				{/* <PlayAudioInstance
+					isPlayingAudio={isPlayingAudio}
+					setIsPlayingAudio={setIsPlayingAudio}
+					recordedAudio={recordedAudio}
+				/> */}
+
 				<RenderFetchedData
 					ActivityIndicatorStyle={{
 						marginTop: Dimensions.get('screen').height * 0.25,
@@ -561,6 +596,12 @@ const ChatScreen = () => {
 											height: 44,
 										}}>
 										<RenderRightInputButton
+											audioRecorderPlayer={AudioRecorder}
+											setIsPlayingAudio={setIsPlayingAudio}
+											isPlayingAudio={isPlayingAudio}
+											recordedAudio={recordedAudio}
+											setRecordedAudio={setRecordedAudio}
+											isRecording={isRecording}
 											setDisplayFooter={setDisplayChatFooter}
 											props={props}
 											setAttachedMessageType={setAttachedMessageType}
@@ -578,8 +619,8 @@ const ChatScreen = () => {
 										setAttachedMessageType={setAttachedMessageType}
 										setSelectedRiderData={setSelectedRiderData}
 										setSelectedTrickData={setSelectedTrickData}
-										setSelectedImage={setSelectedImage}
-										setSelectedVideo={setSelectedVideo}
+										setSelectedImage={setImage}
+										setSelectedVideo={setVideo}
 										setIsReply={setIsReply}
 										setReplyMessageId={setReplyMessageId}
 									/>
@@ -597,14 +638,12 @@ const ChatScreen = () => {
 										setDisplayFooter={setDisplayChatFooter}
 										setSelectedRiderData={setSelectedRiderData}
 										setSelectedTrickData={setSelectedTrickData}
-										setSelectedImage={setSelectedImage}
-										setSelectedVideo={setSelectedVideo}
-										sourceData={[
-											{
-												uri: selectedImage || selectedVideo,
-												type: selectedImage ? 'image' : 'video',
-											},
-										]}
+										setSelectedImage={setImage}
+										setSelectedVideo={setVideo}
+										sourceData={{
+											uri: image?.path || video?.path,
+											type: image ? 'image' : 'video',
+										}}
 										setReplyMessage={setReplyMessage}
 										replyMessage={replyMessage}
 										isReply={isReply}
@@ -619,19 +658,35 @@ const ChatScreen = () => {
 											justifyContent: 'center',
 											height: 44,
 										}}>
-										{text.length > 0 || attachedMessageType !== undefined ? (
+										{text.length > 0 ||
+										attachedMessageType !== undefined ||
+										(!isRecording && recordedAudio) ? (
 											<RenderSendText
+												audio={recordedAudio}
 												isReply={isReply}
 												replyToMessageId={replyMessageId}
 												selectedTrickData={selectedTrickData}
 												selectedRiderData={selectedRiderData}
 												attachedMessageType={attachedMessageType}
 												props={props}
+												image={image}
+												video={video}
+												setLoadingSourceProgress={setLoadingSourceProgress}
+												setLoadingSourceModalVisible={
+													setLoadingSourceModalVisible
+												}
 											/>
 										) : (
 											<RenderSendEmptyText
+												audioRecorderPlayer={AudioRecorder}
+												setRecordedAudio={setRecordedAudio}
+												audio={recordedAudio}
+												isRecording={isRecording}
+												setIsRecording={setIsRecording}
 												chatId={id as string}
 												props={props}
+												useCamera={useCamera}
+												setUseCamera={setUseCamera}
 											/>
 										)}
 									</View>
@@ -657,14 +712,20 @@ const ChatScreen = () => {
 									<QuickReplies color={'white'} {...props} />
 								)}
 								renderComposer={(props) => (
-									<Composer
-										{...props}
-										textInputStyle={{ color: Colors[theme].textPrimary }}
+									<RenderComposer
+										isRecording={isRecording}
+										setIsRecording={setIsRecording}
+										props={props}
+										audio={recordedAudio}
+										theme={theme}
 									/>
 								)}
 								focusOnInputWhenOpeningKeyboard={true}
 								renderMessageVideo={(props) => (
 									<RenderMessageVideo props={props} />
+								)}
+								renderMessageImage={(props) => (
+									<RenderMessageImage props={props} />
 								)}
 								isTyping={typingStatus?.isTyping}
 								renderTypingIndicator={() => (
@@ -672,6 +733,16 @@ const ChatScreen = () => {
 								)}
 								renderCustomView={(props) => (
 									<CustomMessageView chatId={id} props={props} />
+								)}
+								renderTime={(props) => null}
+								renderMessageAudio={(props) => (
+									<RenderMessageAudio
+										audioRecorderPlayer={AudioRecorder}
+										isPlayingAudio={isPlayingChatAudio}
+										setIsPlayingAudio={setIsPlayingChatAudio}
+										theme={theme}
+										props={props}
+									/>
 								)}
 							/>
 							{Platform.OS === 'android' && (
