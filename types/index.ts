@@ -2,6 +2,7 @@ import Reactions from '@/constants/Reactions';
 import UserPostDummyStructure from '@/JSON/posts.json';
 import { Ionicons } from '@expo/vector-icons';
 import { IMessage, User } from 'react-native-gifted-chat';
+import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 
 // Ionicons icon type
@@ -46,12 +47,17 @@ export interface ChatMessage extends IMessage {
 	ChatId: string;
 	ChatName: string;
 	ChatAvatar: string | null;
+	InitAboutSystemMessage: boolean;
 	text: string;
 	createdAt: Date;
 	participants: User[];
 	type: chatCostumMsgType;
 	riderId: string;
 	trickId: number;
+	// reply to a message
+	isReply: boolean;
+	replyToMessageId: string | undefined;
+	sourceData: PhotoFile | VideoFile; // meta data
 }
 
 // identify urls
@@ -99,6 +105,12 @@ export enum AuthStrategy {
 	Google = 'oauth_google',
 }
 
+// chat typing status
+export interface TypingStatus {
+	userId: string;
+	isTyping: boolean;
+}
+
 /*
 	This enumeration lists all static endpoints without search parameters that the app fetches from the CRAH API.
 */
@@ -119,6 +131,20 @@ export enum chatCostumMsgType {
 	trick = 'trick',
 	text = 'text',
 }
+
+// when parsing image/video information from one component to the other
+export interface sourceDataInterface {
+	uri: string | undefined;
+	type: 'image' | 'video';
+}
+
+// video data structure from vision-camera
+export type VideoMeta = {
+	path: string;
+	width: number;
+	height: number;
+	duration: number;
+};
 
 /*
 	Link preview fetched from server
@@ -260,6 +286,19 @@ export enum ChatFilterTypes {
 	all = 'all',
 	unread = 'unread',
 	groups = 'groups',
+}
+
+// when recieving chat meta data as a whole without its messages
+export interface Chat {
+	Id: string;
+	IsGroup: number;
+	Name: string; // group name or user avatar of other user
+	Avatar: string; // group avatar or user avatar of other user
+	LastMessageContent: string;
+	LastMessageSenderId: string;
+	LastMessageDate: Date;
+	LastMessageType: chatCostumMsgType;
+	UnreadCount: number;
 }
 
 /* 
@@ -470,10 +509,15 @@ export const mediaTypeSourceRatio: Record<
 	[upload_source_ratio.PORTRAIT]: [9, 16],
 } as const;
 
+export interface AudioFile {
+	path: string;
+	duration: number;
+	width: 0;
+	height: 0;
+  
 /*
 	help modal local parameter to deicde which content to display first to the user
 */
-
 export enum helpPageTopcis {
 	create = 'Create',
 	ranks = 'Ranks',

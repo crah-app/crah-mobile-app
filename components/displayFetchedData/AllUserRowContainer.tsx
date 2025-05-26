@@ -27,7 +27,9 @@ interface AllUserRowContainerProps {
 	contentContainerStyle?: ViewStyle | ViewStyle[];
 	rowStyle?: ViewStyle | ViewStyle[];
 	excludeIds?: Array<ClerkUser['id'] | undefined>;
-	costumHandleUserPress?: (user: selectedRiderInterface) => void;
+	costumHandleUserPress?: (
+		user: selectedRiderInterface,
+	) => void | Promise<void>;
 }
 
 const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
@@ -43,10 +45,12 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 
 	const [usersLoaded, setUsersLoaded] = useState<boolean>(false);
 	const [allUsers, setAllUsers] = useState<ClerkUser[]>();
+	const [noUsersFound, setNoUsersFound] = useState<boolean>(false);
 
 	// fetch all users
 	const fetchUsers = () => {
 		setUsersLoaded(false);
+		setNoUsersFound(false);
 
 		fetch(fetchAdresses.allUsers, {
 			headers: { 'Cache-Control': 'no-cache' },
@@ -58,6 +62,9 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 				}
 				if (res.length === 0) {
 					console.warn('No users found');
+					setUsersLoaded(true);
+					setNoUsersFound(true);
+					setAllUsers([]);
 					return;
 				}
 				setAllUsers(res);
@@ -68,6 +75,10 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 			)
 			.finally(() => setUsersLoaded(true));
 	};
+
+	useEffect(() => {
+		console.log(usersLoaded);
+	}, [usersLoaded]);
 
 	useEffect(() => {
 		fetchUsers();
@@ -107,12 +118,14 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 							contentContainerStyle={{
 								flex: 1,
 							}}>
-							{contentTitle && (
+							{contentTitle && allUsers.length > 0 && !noUsersFound ? (
 								<ThemedText
 									theme={theme}
 									value={contentTitle ?? 'Riders'}
 									style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
 								/>
+							) : (
+								<View></View>
 							)}
 
 							<FlatList
@@ -146,7 +159,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 										showAvatar={true}
 										avatarUrl={user.imageUrl}
 										title={user.username ?? 'no name user'}
-										subtitle={'Rank Gold #1' + ' ' + user.id}
+										subtitle={'Rank Gold #1'}
 									/>
 								)}
 							/>
@@ -156,12 +169,14 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 							contentContainerStyle={{
 								flex: 1,
 							}}>
-							{contentTitle && (
+							{contentTitle && allUsers.length > 0 && !noUsersFound ? (
 								<ThemedText
 									theme={theme}
 									value={contentTitle ?? 'Riders'}
 									style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
 								/>
+							) : (
+								<View></View>
 							)}
 
 							<FlatList

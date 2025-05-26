@@ -28,7 +28,8 @@
 			},
 			"package": "com.anonymous.crahapp",
 			"softwareKeyboardLayoutMode": "pan",
-			"scheme": "crah"
+			"scheme": "crah",
+			"permissions": ["CAMERA", "RECORD_AUDIO"]
 		},
 		"web": {
 			"bundler": "metro",
@@ -37,11 +38,25 @@
 		},
 		"plugins": [
 			[
+				"expo-audio",
+				{
+					"microphonePermission": "Allow crah to access your microphone."
+				}
+			],
+			[
+				"expo-camera",
+				{
+					"cameraPermission": "Allow Crah to access your camera",
+					"microphonePermission": "Allow Crah to access your microphone",
+					"recordAudioAndroid": true
+				}
+			],
+			[
 				"expo-image-picker",
 				{
-					"photosPermission": "Crah needs permission to access your photos.",
-					"cameraPermission": "Crah needs permission to access your camera.",
-					"microphonePermission": "Crah needs permission to access your microphone."
+					"photosPermission": "Allow Crah to access your photos",
+					"cameraPermission": "Allow Crah to access your camera",
+					"microphonePermission": "Allow Crah to access your microphone"
 				}
 			],
 			"expo-router",
@@ -53,7 +68,15 @@
 				}
 			],
 			"expo-build-properties",
-			"expo-font"
+			"expo-font",
+			[
+				"react-native-vision-camera",
+				{
+					"cameraPermissionText": "Crah needs access to your camera",
+					"enableMicrophonePermission": true,
+					"microphonePermissionText": "Crah needs access to your microphone"
+				}
+			]
 		],
 		"experiments": {
 			"typedRoutes": true

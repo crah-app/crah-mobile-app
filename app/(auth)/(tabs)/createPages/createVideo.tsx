@@ -52,8 +52,18 @@ import CreatePageHeader from '@/components/create/CreatePageHeader';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
+import { SegmentedControl } from '@/components/general/SegmentedControl';
+import { SvgXml } from 'react-native-svg';
+import crahTransparentLogo from '../../../../assets/images/vectors/crah_transparent.svg';
+import { VideoUIBtns } from '@/components/VideoUI';
+import { uploadSource } from '@/hooks/bucketUploadManager';
+import { useSession } from '@clerk/clerk-expo';
+import { useAuth, useUser } from '@clerk/clerk-react';
+import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
+import { sleep } from '@/utils/globalFuncs';
 
 interface videoDataInterface {
+	video: imagePicker.ImagePickerAsset[]; // video
 	cover: string; // cover image
 	title: string; // video title
 	description: string; // video description
@@ -64,15 +74,35 @@ const CreateVideo = () => {
 	const theme = useSystemTheme();
 	const { bottom } = useSafeAreaInsets();
 
+	const { getToken } = useAuth();
+	const { user } = useUser();
+
 	const [cover, setCover] = useState<
 		imagePicker.ImagePickerAsset[] | undefined | string
-	>(); // Lifted state
+	>();
+	const [video, setVideo] = useState<
+		imagePicker.ImagePickerAsset[] | undefined | string
+	>();
+
 	const [title, setTitle] = useState<string>('');
 	const [description, setDescription] = useState<string>('');
 	const [tags, setTags] = useState<Tags[] | undefined>();
 	const [uploadedSource, setUploadedSource] = useState<
 		imagePicker.ImagePickerAsset[] | undefined
 	>();
+
+	const [videoData, setVideoData] = useState<videoDataInterface>({
+		video: video as imagePicker.ImagePickerAsset[],
+		title,
+		description,
+		tags,
+		cover: cover as string,
+	});
+
+	const [uploadingVideo, setUploadingVideo] = useState<boolean>(false);
+	const [uploadingProgress, setUploadingProgress] = useState<number>(0);
+	const [uploadingModalVisible, setUploadingModalVisible] =
+		useState<boolean>(false);
 
 	const checkUserInputs = () => {
 		if (!cover) {
@@ -114,32 +144,55 @@ const CreateVideo = () => {
 		);
 	};
 
-	const [videoData, setVideoData] = useState<videoDataInterface>({
-		title,
-		description,
-		tags,
-		cover: cover as string,
-	});
-
 	const handleVideoUpload = async () => {
 		setVideoData({
+			video: video as imagePicker.ImagePickerAsset[],
 			cover: cover as string, // Use cover state
 			title, // Use title state
 			description, // Use description state
 			tags, // Use tags state
 		});
-
-		router.push(
-			{
-				pathname: '/(auth)/(tabs)/homePages',
-				params: {
-					video_upload: 'true',
-					video_cover: JSON.stringify(cover),
-					video_data: JSON.stringify(videoData),
-				},
-			}, // Use cover state
-		);
 	};
+
+	useEffect(() => {
+		if (!videoData.video) return;
+
+		const upload = async () => {
+			const token = await getToken();
+
+			console.log(token, user?.id);
+
+			if (!token || !user?.id) return;
+
+			console.log('95840723450967305easdfhgkaskasdjgsg');
+
+			setUploadingModalVisible(true);
+
+			console.log('easdfhgkaskasdjgsg');
+			console.log('easdfhgkaskasdjgsg', videoData.video);
+
+			await uploadSource(
+				{
+					path: videoData.video[0].uri,
+					// @ts-ignore
+					duration: Math.floor(videoData.video[0].duration / 1000) ?? 0,
+					width: videoData.video[0].width,
+					height: videoData.video[0].height,
+				},
+				token as string,
+				user?.id as string,
+				setUploadingProgress,
+			);
+
+			await sleep(300);
+
+			setUploadingModalVisible(false);
+		};
+
+		upload();
+
+		return () => {};
+	}, [videoData]);
 
 	const [currentSelectedSegment, setCurrentSelectedSegment] =
 		useState<CreatePostType>(CreatePostType.video);
@@ -220,6 +273,11 @@ const CreateVideo = () => {
 			}
 			scrollChildren={
 				<View style={{ flex: 1 }}>
+					<TransparentLoadingScreen
+						visible={uploadingModalVisible}
+						progress={uploadingProgress}
+					/>
+
 					<ThemedView theme={theme} flex={1} style={{ bottom: bottom * 3 }}>
 						<CreatePageHeader
 							title={'Create Video'}
@@ -228,6 +286,7 @@ const CreateVideo = () => {
 							style={{ paddingHorizontal: 12 }}
 						/>
 						<CreateVideoMainContent
+							setVideo={setVideo}
 							cover={cover}
 							setCover={setCover}
 							uploadedSource={uploadedSource}
@@ -257,6 +316,7 @@ const CreateVideoMainContent = ({
 	setDescription,
 	tags,
 	setTags,
+	setVideo,
 }: {
 	cover: imagePicker.ImagePickerAsset[] | undefined | string;
 	setCover: React.Dispatch<
@@ -272,6 +332,9 @@ const CreateVideoMainContent = ({
 	setDescription: React.Dispatch<React.SetStateAction<string>>;
 	tags: Tags[] | undefined;
 	setTags: React.Dispatch<React.SetStateAction<Tags[] | undefined>>;
+	setVideo: React.Dispatch<
+		React.SetStateAction<imagePicker.ImagePickerAsset[] | undefined | string>
+	>;
 }) => {
 	const theme = useSystemTheme();
 	const scrollViewRef = useRef<ScrollView>(null);
@@ -330,6 +393,7 @@ const CreateVideoMainContent = ({
 					setVisibility={setModalVisible}
 					setUploadedImage={setUploadedSource}
 					setUploadedCover={setCover}
+					setVideo={setVideo}
 					uploadMode={modalMode}
 					setSourceRatio={setSourceRatio}
 					uploadedSource={uploadedSource}
@@ -638,8 +702,6 @@ const UploadedSourceContainer = forwardRef<
 		isPlaying: player.playing,
 	});
 
-	const playBtnColor = theme === 'dark' ? 0 : 255;
-
 	const handleVideoPlayer = () => {
 		isPlaying ? player.pause() : player.play();
 	};
@@ -669,35 +731,6 @@ const UploadedSourceContainer = forwardRef<
 					: (Dimensions.get('window').width / (16 / 9)) * 0.94
 				: Dimensions.get('window').width * 0.94,
 	});
-
-	const VideoPlayBtn = () => {
-		return (
-			<TouchableOpacity
-				onPress={handleVideoPlayer}
-				style={styles.playBtn}
-				activeOpacity={0.8}>
-				{!isPlaying && (
-					<View
-						style={{
-							padding: 12,
-							backgroundColor:
-								'gray' +
-								`rgba(${playBtnColor},${playBtnColor},${playBtnColor},0.5)`,
-							borderRadius: '100%',
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}>
-						<Ionicons
-							name={isPlaying ? 'pause' : 'play'}
-							size={24}
-							color={'gray' + `rgba(${255},${255},${255},0.8)`}
-							style={{ textAlign: 'center', marginLeft: 2 }}
-						/>
-					</View>
-				)}
-			</TouchableOpacity>
-		);
-	};
 
 	return (
 		<View
@@ -752,7 +785,11 @@ const UploadedSourceContainer = forwardRef<
 						nativeControls={false}
 					/>
 
-					<VideoPlayBtn />
+					<VideoUIBtns
+						theme={theme}
+						handleVideoPlayer={handleVideoPlayer}
+						isPlaying={isPlaying}
+					/>
 				</View>
 			) : (
 				<View
