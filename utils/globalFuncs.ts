@@ -1,4 +1,5 @@
-import { SearchCategories } from '@/types';
+import { SearchCategories, upload_source_ratio } from '@/types';
+import { Dimensions } from 'react-native';
 
 export const filterPosts = (
 	posts: any[],
@@ -81,4 +82,33 @@ export function getMIMEType(filename: string): string {
 
 export async function sleep(ms: number) {
 	await setTimeout(async () => {}, ms);
+}
+
+export function calculateDimensions(sourceWidth: number, sourceHeight: number) {
+	const screenWidth = Dimensions.get('window').width;
+	const screenHeight = Dimensions.get('window').height;
+
+	const sourceRatio = sourceWidth / sourceHeight;
+	const screenRatio = screenWidth / screenHeight;
+
+	let width: number;
+	let height: number;
+
+	if (sourceRatio < 1) {
+		// Portrait oder Hochformat
+		width = screenWidth * 0.8;
+		height = (width / sourceRatio) * 0.8;
+	} else {
+		// Landscape oder Querformat
+		height = screenHeight;
+		width = height * sourceRatio;
+
+		// Falls Breite zu groß, auf screenWidth begrenzen
+		if (width > screenWidth) {
+			width = screenWidth;
+			height = width / sourceRatio;
+		}
+	}
+
+	return { width, height };
 }

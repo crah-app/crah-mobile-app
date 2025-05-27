@@ -37,11 +37,11 @@ import { SvgXml } from 'react-native-svg';
 import {
 	CommentPurpose,
 	userCommentType,
-	userPostType,
 	ReactionType,
 	CommentType,
 	TextInputMaxCharacters,
 	RawPost,
+	upload_source_ratio,
 } from '@/types';
 import BottomSheet, {
 	BottomSheetBackdrop,
@@ -69,8 +69,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import { defaultStyles } from '@/constants/Styles';
 import CommentRow from '../rows/CommentRow';
 import { VideoUIBtns } from '../VideoUI';
-
-const DUMMY_PROFILE_IMAGE = '../../assets/images/vectors/src/person(1).png';
+import { useDynamicDimensions } from '@/hooks/useDynamicRatioDimensions';
 
 interface UserPostComponentProps {
 	post: RawPost;
@@ -123,7 +122,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 		setCommentsCount(commentsCount + 1);
 	};
 
-	const postId = post.id; // ID des Posts
+	const postId = post.Id; // ID des Posts
 	const postDeepLink = `yourapp://post/${postId}`; // Deep Link zu diesem Post
 
 	// const handleDeepLink = (event) => {
@@ -171,11 +170,16 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	};
 
 	const renderPostContent = () => {
-		switch (post.Type) {
-			case 'Post':
-				console.log('object, pst', post.Type);
+		const mediaUrl = `https://pub-78edb5b6f0d946d28db91b59ddf775af.r2.dev/${post.SourceKey}`;
 
-				const player = useVideoPlayer(post.mediaUrl!, (player) => {
+		const { width, height } = useDynamicDimensions(
+			post.sourceWidth,
+			post.sourceHeight,
+		);
+
+		switch (post.Type) {
+			case 'Video':
+				const player = useVideoPlayer(mediaUrl, (player) => {
 					player.loop = true;
 				});
 
@@ -188,30 +192,35 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				};
 
 				return (
-					<View style={styles.contentContainer}>
-						
-							<VideoView
-								player={player}
-								style={{
-									width: 250,
-									height: 500 * (9 / 16),
-								}}
-								contentFit={'cover'}
-								nativeControls={false}
-							/>
-							<VideoUIBtns
-								theme={theme}
-								handleVideoPlayer={handleVideoPlayer}
-								isPlaying={isPlaying}
-							/>
-					
+					<View
+						style={[
+							styles.contentContainer,
+							{ backgroundColor: Colors[theme].absoluteContrast },
+						]}>
+						<VideoView
+							player={player}
+							style={{
+								width: width,
+								height: height,
+								alignSelf: 'center',
+							}}
+							contentFit={'contain'} // or cover
+							nativeControls={false}
+						/>
+
+						<VideoUIBtns
+							theme={theme}
+							handleVideoPlayer={handleVideoPlayer}
+							isPlaying={isPlaying}
+						/>
 					</View>
 				);
 			case 'Image':
-
 				return (
 					<Image
-						source={{ uri: post.mediaUrl }}
+						source={{
+							uri: mediaUrl,
+						}}
 						style={[
 							styles.image,
 							{
@@ -221,39 +230,39 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 						]}
 					/>
 				);
-			 case 'Article':
-			 	return (
-			 		<Link
-			 			asChild
-			 			href={{
-			 				pathname: '/modals/postView',
-			 				params: { data: JSON.stringify(post), type: post.Type },
-			 			}}
-			 			style={[styles.textPost]}>
-			 			<TouchableOpacity>
-			 				<ThemedText
-			 					style={[
-			 						styles.articlePreview,
-			 						{ color: Colors[theme].textPrimary },
-			 					]}
-			 					theme={theme}
-			 					value={`${post.article?.slice(0, 150)}...`}
-			 				/>
-			 			</TouchableOpacity>
-			 		</Link>
-			 	);
-			case 'Text':
-			 	return (
-			 		<Text style={[styles.textPost, { color: Colors[theme].textPrimary }]}>
-						{post.Text}
-			 		</Text>
-			 	);
-
-			case "Music": 
+			case 'Article':
 				return (
-						<View>
-							<ThemedText theme={theme} value={"music lol"}/>
-						</View>
+					<Link
+						asChild
+						href={{
+							pathname: '/modals/postView',
+							params: { data: JSON.stringify(post), type: post.Type },
+						}}
+						style={[styles.textPost]}>
+						<TouchableOpacity>
+							<ThemedText
+								style={[
+									styles.articlePreview,
+									{ color: Colors[theme].textPrimary },
+								]}
+								theme={theme}
+								value={`${post.Content?.slice(0, 150)}...`}
+							/>
+						</TouchableOpacity>
+					</Link>
+				);
+			case 'Text':
+				return (
+					<Text style={[styles.textPost, { color: Colors[theme].textPrimary }]}>
+						{post.Description}
+					</Text>
+				);
+
+			case 'Music':
+				return (
+					<View>
+						<ThemedText theme={theme} value={'music lol'} />
+					</View>
 				);
 		}
 	};
@@ -306,13 +315,13 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 			<PostCommentSection
 				ref={bottomSheetModalRef}
 				comments={userComments}
-				username={post.username}
+				username={post.UserName}
 			/>
 		</View>
 	);
 };
 
-const PostHeader: React.FC<{ post: userPostType; postTimeAgo: string }> = ({
+const PostHeader: React.FC<{ post: RawPost; postTimeAgo: string }> = ({
 	post,
 	postTimeAgo,
 }) => {
@@ -321,14 +330,17 @@ const PostHeader: React.FC<{ post: userPostType; postTimeAgo: string }> = ({
 	return (
 		<View>
 			<View style={styles.header}>
-				<Image
-					source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
-					style={styles.profileImage}
-				/>
+				<Image source={{ uri: post.UserAvatar }} style={styles.profileImage} />
 
-				<Text style={[styles.username, { color: Colors[theme].textPrimary }]}>
-					{post.username}
-				</Text>
+				<View style={{ flexDirection: 'column', gap: 2 }}>
+					<Text style={[styles.username, { color: Colors[theme].textPrimary }]}>
+						{post.UserName}
+					</Text>
+
+					<Text style={[{ color: Colors[theme].gray, fontSize: 14 }]}>
+						{post.Title}
+					</Text>
+				</View>
 			</View>
 			<Text style={[styles.postTime, { color: 'gray' }]}>{postTimeAgo}</Text>
 		</View>
@@ -340,7 +352,7 @@ interface PostFooterProps {
 	handleLike: () => void;
 	handleShare: () => void;
 	commentsCount: number;
-	post: userPostType;
+	post: RawPost;
 	shareCount: number;
 	reactions: string[];
 	setShowReactions: (boolean: boolean) => void;
@@ -514,9 +526,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
 							<ThemedText
 								style={{ fontWeight: 'bold', marginRight: 4.5 }}
 								theme={theme}
-								value={post.username}
+								value={post.UserName}
 							/>
-							<ThemedText theme={theme} value={post.caption} />
+							<ThemedText theme={theme} value={post.Description} />
 						</ThemedView>
 					</View>
 				</View>
@@ -774,6 +786,7 @@ const styles = StyleSheet.create({
 		overflow: 'hidden',
 		shadowColor: '#000',
 		flex: 1,
+		marginTop: 2,
 	},
 	header: {
 		padding: 10,
@@ -860,10 +873,8 @@ const styles = StyleSheet.create({
 	},
 	contentContainer: {
 		flex: 1,
-		paddingVertical: 10,
-		// alignItems: 'center',
-		// justifyContent: 'center',
-		// paddingHorizontal: 50,
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
 	composer: {
 		padding: 20,

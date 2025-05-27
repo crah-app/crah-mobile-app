@@ -5,12 +5,14 @@ import { getMIMEType } from '@/utils/globalFuncs';
 import { useAuth } from '@clerk/clerk-expo';
 import axios from 'axios';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
+import { Dispatch, SetStateAction } from 'react';
 
 export async function uploadSource(
 	source: VideoFile | PhotoFile | AudioFile, // in case of a photo, video or audio file
 	clerkToken: string,
 	userId: string,
-	setLoadingSourceProgress: (progress: number) => void,
+	setLoadingSourceProgress: Dispatch<SetStateAction<number>>,
+	setError: Dispatch<SetStateAction<boolean>>,
 	extra_metadata?: sourceMetadataInterface,
 ) {
 	return new Promise(async (res, rej) => {
@@ -41,6 +43,7 @@ export async function uploadSource(
 						height: source.height,
 						width: source.width,
 						contentType: getMIMEType(fileName as string),
+						sourceRatio: extra_metadata?.data.ratio,
 					}),
 				},
 			);
@@ -102,18 +105,22 @@ export async function uploadSource(
 						});
 					}
 				} else {
+					setError(true);
 					console.error('❌ Error uploading video:', xhr.statusText);
 				}
 			};
 
 			xhr.onerror = (e) => {
 				console.error('❌ A network error occured uploading video', e);
+				setError(true);
+				rej(false);
 			};
 
 			xhr.send(bytes.buffer); // send video as array-buffer
 		} catch (error) {
 			console.error('❌ Error during video-upload:', error);
-			rej(error);
+			setError(true);
+			rej(false);
 		}
 	});
 }

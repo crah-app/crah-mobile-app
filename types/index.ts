@@ -8,29 +8,38 @@ import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 // Ionicons icon type
 export type ionicon = keyof typeof Ionicons.glyphMap;
 
-export type userPostType = (typeof UserPostDummyStructure)[number]; // the json structure itself
-export type postKeys = keyof userPostType; // a single key of the json structure
-
 export interface RawComment {
 	Id: number;
 	PostId: number;
 	UserId: string;
 	Message: string;
-	CreatedAt: string; // ISO-Datumsstring aus MySQL DATETIME
-	UpdatedAt: string; // ISO-Datumsstring aus MySQL DATETIME
+	CreatedAt: string; // ISO-Date string from MySQL DATETIME
+	UpdatedAt: string; // ISO-Date string from MySQL DATETIME
 }
 
 export type RawPost = {
 	Id: number;
+
 	UserId: string;
-	Type: 'Article' | 'Video' | 'Post' | 'Music';
+	UserName: string;
+	UserAvatar: string;
+
+	Type: 'Article' | 'Video' | 'Image' | 'Music' | 'Text';
 	Title: string | null;
 	Description: string;
 	Content: string | null;
-	CreatedAt: string; // ISO-Datum als String
-	UpdatedAt: string; // ISO-Datum als String
+	CreatedAt: string; // ISO-Date as string
+	UpdatedAt: string; // ISO-Date as string
 	comments: Array<RawComment | null>;
-	mediaUrl: string;
+
+	SourceKey: string; // SourceKey
+	sourceWidth: number;
+	sourceHeight: number;
+
+	Likes: number;
+	Shares: number;
+
+	sourceRatio: upload_source_ratio;
 };
 
 // reaction type based on reactions array

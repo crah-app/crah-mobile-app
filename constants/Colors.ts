@@ -18,6 +18,7 @@ export default {
 		gray: 'gray',
 		lightGray: 'rgb(65,65,65)',
 		darkPrimary: 'rgb(200, 0, 0)',
+		absoluteContrast: 'rgb(255,255,255)',
 	},
 	dark: {
 		primary: 'rgb(255, 0, 0)',
@@ -38,6 +39,7 @@ export default {
 		gray: 'gray',
 		lightGray: 'rgb(195,195,195)',
 		darkPrimary: 'rgb(200, 0, 0)',
+		absoluteContrast: 'rgb(0,0,0)',
 	},
 	default: {
 		primary: 'rgb(255, 0, 0)',

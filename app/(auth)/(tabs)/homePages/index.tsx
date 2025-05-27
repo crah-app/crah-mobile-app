@@ -251,13 +251,13 @@ const Page = () => {
 						highlightWords={['Level 41']}
 					/> */}
 
-					{userUploadsVideo && (
+					{/* {userUploadsVideo && (
 						<UserUploadsPost
 							cover={video_cover as string}
 							progress={uploadProgress}
 							videoTitle={JSON.parse(video_data as string).title}
 						/>
-					)}
+					)} */}
 
 					<PostTypeFilterModal
 						FilterPosts={FilterPosts}

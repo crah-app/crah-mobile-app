@@ -15,7 +15,9 @@ import {
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import React, {
+	Dispatch,
 	forwardRef,
+	SetStateAction,
 	useCallback,
 	useEffect,
 	useImperativeHandle,
@@ -68,6 +70,7 @@ interface videoDataInterface {
 	title: string; // video title
 	description: string; // video description
 	tags: Tags[] | undefined; // video tags
+	ratio: string;
 }
 
 const CreateVideo = () => {
@@ -91,18 +94,25 @@ const CreateVideo = () => {
 		imagePicker.ImagePickerAsset[] | undefined
 	>();
 
+	const [sourceRatio, setSourceRatio] = useState<upload_source_ratio>(
+		upload_source_ratio.SQUARE,
+	);
+
 	const [videoData, setVideoData] = useState<videoDataInterface>({
 		video: video as imagePicker.ImagePickerAsset[],
 		title,
 		description,
 		tags,
 		cover: cover as string,
+		ratio: sourceRatio,
 	});
 
-	const [uploadingVideo, setUploadingVideo] = useState<boolean>(false);
+	const [errorUploadingSource, setErrorUploadingSource] =
+		useState<boolean>(false);
 	const [uploadingProgress, setUploadingProgress] = useState<number>(0);
 	const [uploadingModalVisible, setUploadingModalVisible] =
 		useState<boolean>(false);
+	const [wantsToUpload, setWantsToUpload] = useState<boolean>(false);
 
 	const checkUserInputs = () => {
 		if (!cover) {
@@ -151,27 +161,26 @@ const CreateVideo = () => {
 			title, // Use title state
 			description, // Use description state
 			tags, // Use tags state
+			ratio: sourceRatio, // ratio the user claimed the source to be
 		});
+
+		setWantsToUpload(true);
 	};
 
 	useEffect(() => {
-		if (!videoData.video) return;
+		if (!videoData.video && !wantsToUpload) return;
 
 		const upload = async () => {
 			const token = await getToken();
 
-			console.log(token, user?.id);
-
 			if (!token || !user?.id) return;
 
-			console.log('95840723450967305easdfhgkaskasdjgsg');
-
+			setUploadingProgress(0);
+			setErrorUploadingSource(false);
 			setUploadingModalVisible(true);
+			setWantsToUpload(false);
 
-			console.log('easdfhgkaskasdjgsg');
-			console.log('easdfhgkaskasdjgsg', videoData.video);
-
-			await uploadSource(
+			const result = await uploadSource(
 				{
 					path: videoData.video[0].uri,
 					// @ts-ignore
@@ -182,27 +191,43 @@ const CreateVideo = () => {
 				token as string,
 				user?.id as string,
 				setUploadingProgress,
-
+				setErrorUploadingSource,
 				{
-					type: 'Post',
+					type: 'Video',
 					userId: user.id,
 					data: {
 						title: videoData.title,
 						description: videoData.description,
 						tags: videoData.tags,
+						ratio: sourceRatio,
 					},
 				},
 			);
 
-			await sleep(300);
+			if (result) {
+				router.navigate('/(auth)/(tabs)/homePages');
+			}
 
+			await sleep(300);
 			setUploadingModalVisible(false);
+			setWantsToUpload(false);
+			setUploadingProgress(0);
+
+			return result;
 		};
 
 		upload();
 
 		return () => {};
-	}, [videoData]);
+	}, [wantsToUpload]);
+
+	useEffect(() => {
+		if (!errorUploadingSource) return;
+
+		setUploadingModalVisible(false);
+		setErrorUploadingSource(false);
+		Alert.alert('Something went wrong uploading the post');
+	}, [errorUploadingSource]);
 
 	const [currentSelectedSegment, setCurrentSelectedSegment] =
 		useState<CreatePostType>(CreatePostType.video);
@@ -307,6 +332,8 @@ const CreateVideo = () => {
 							setDescription={setDescription}
 							tags={tags}
 							setTags={setTags}
+							sourceRatio={sourceRatio}
+							setSourceRatio={setSourceRatio}
 						/>
 					</ThemedView>
 				</View>
@@ -327,6 +354,8 @@ const CreateVideoMainContent = ({
 	tags,
 	setTags,
 	setVideo,
+	sourceRatio,
+	setSourceRatio,
 }: {
 	cover: imagePicker.ImagePickerAsset[] | undefined | string;
 	setCover: React.Dispatch<
@@ -345,16 +374,14 @@ const CreateVideoMainContent = ({
 	setVideo: React.Dispatch<
 		React.SetStateAction<imagePicker.ImagePickerAsset[] | undefined | string>
 	>;
+	sourceRatio: upload_source_ratio;
+	setSourceRatio: Dispatch<SetStateAction<upload_source_ratio>>;
 }) => {
 	const theme = useSystemTheme();
 	const scrollViewRef = useRef<ScrollView>(null);
 
 	const [modalVisible, setModalVisible] = useState(false);
 	const [modalMode, setModalMode] = useState<modal_mode | undefined>();
-
-	const [sourceRatio, setSourceRatio] = useState<upload_source_ratio>(
-		upload_source_ratio.SQUARE,
-	);
 
 	useEffect(() => {
 		GlobalFinalUserInputSourceRatio = sourceRatio;
