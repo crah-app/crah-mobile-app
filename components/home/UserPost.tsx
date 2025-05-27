@@ -71,8 +71,6 @@ import CommentRow from '../rows/CommentRow';
 import { VideoUIBtns } from '../VideoUI';
 
 const DUMMY_PROFILE_IMAGE = '../../assets/images/vectors/src/person(1).png';
-const videoSource =
-	'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
 interface UserPostComponentProps {
 	post: RawPost;
@@ -96,9 +94,9 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 
 	const [showReactions, setShowReactions] = useState(false);
 	const [reactions, setReactions] = useState<ReactionType[]>([]);
-	const [likesCount, setLikesCount] = useState(post.likes || 0);
+	const [likesCount, setLikesCount] = useState(post.Likes || 0);
 	const [commentsCount, setCommentsCount] = useState(post.comments.length || 0);
-	const [shareCount, setshareCount] = useState(post.shares || 0);
+	const [shareCount, setshareCount] = useState(post.Shares || 0);
 
 	const [currentUserLiked, setCurrentUserLiked] = useState<boolean>();
 
@@ -191,7 +189,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 
 				return (
 					<View style={styles.contentContainer}>
-						<View style={{}}>
+						
 							<VideoView
 								player={player}
 								style={{
@@ -206,52 +204,11 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 								handleVideoPlayer={handleVideoPlayer}
 								isPlaying={isPlaying}
 							/>
-						</View>
+					
 					</View>
 				);
-			// case 'videoPortrait':
-			// 	return (
-			// 		<View style={styles.contentContainer}>
-			// 			<VideoView
-			// 				nativeControls={true}
-			// 				player={player}
-			// 				style={[
-			// 					{
-			// 						width: Dimensions.get('window').width,
-			// 						height: Dimensions.get('window').width,
-			// 					},
-			// 				]}
-			// 			/>
-			// 		</View>
-			// 	);
-			// case 'article':
-			// 	return (
-			// 		<Link
-			// 			asChild
-			// 			href={{
-			// 				pathname: '/modals/postView',
-			// 				params: { data: JSON.stringify(post), type: post.type },
-			// 			}}
-			// 			style={[styles.textPost]}>
-			// 			<TouchableOpacity>
-			// 				<ThemedText
-			// 					style={[
-			// 						styles.articlePreview,
-			// 						{ color: Colors[theme].textPrimary },
-			// 					]}
-			// 					theme={theme}
-			// 					value={`${post.article?.slice(0, 150)}...`}
-			// 				/>
-			// 			</TouchableOpacity>
-			// 		</Link>
-			// 	);
-			// case 'text':
-			// 	return (
-			// 		<Text style={[styles.textPost, { color: Colors[theme].textPrimary }]}>
-			// 			{post.text}
-			// 		</Text>
-			// 	);
-			default:
+			case 'Image':
+
 				return (
 					<Image
 						source={{ uri: post.mediaUrl }}
@@ -263,6 +220,40 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 							},
 						]}
 					/>
+				);
+			 case 'Article':
+			 	return (
+			 		<Link
+			 			asChild
+			 			href={{
+			 				pathname: '/modals/postView',
+			 				params: { data: JSON.stringify(post), type: post.Type },
+			 			}}
+			 			style={[styles.textPost]}>
+			 			<TouchableOpacity>
+			 				<ThemedText
+			 					style={[
+			 						styles.articlePreview,
+			 						{ color: Colors[theme].textPrimary },
+			 					]}
+			 					theme={theme}
+			 					value={`${post.article?.slice(0, 150)}...`}
+			 				/>
+			 			</TouchableOpacity>
+			 		</Link>
+			 	);
+			case 'Text':
+			 	return (
+			 		<Text style={[styles.textPost, { color: Colors[theme].textPrimary }]}>
+						{post.Text}
+			 		</Text>
+			 	);
+
+			case "Music": 
+				return (
+						<View>
+							<ThemedText theme={theme} value={"music lol"}/>
+						</View>
 				);
 		}
 	};
