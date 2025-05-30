@@ -32,7 +32,9 @@ export type RawPost = {
 	UpdatedAt: string; // ISO-Date as string
 	comments: Array<RawComment | null>;
 
-	SourceKey: string; // SourceKey
+	SourceKey: string; // SourceKey for cloud access
+	CoverSourceKey: string; // Cover SourceKey for cloud access
+
 	sourceWidth: number;
 	sourceHeight: number;
 

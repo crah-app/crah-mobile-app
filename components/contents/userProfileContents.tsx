@@ -144,7 +144,7 @@ const UserPostContainer: React.FC<UserPostContainerProps> = ({
 				))}
 			</View>
 
-			<View>
+			<View style={{}}>
 				<View style={{ bottom }}>
 					{!postsLoaded ? (
 						// loading...
@@ -820,11 +820,9 @@ const styles = StyleSheet.create({
 		paddingBottom: 10,
 	},
 	GridItem: {
-		width: '33.33%',
-		aspectRatio: 1,
+		width: Dimensions.get('window').width / 3 - 12,
+		height: Dimensions.get('window').width / 3 - 12,
 		borderWidth: StyleSheet.hairlineWidth,
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 });
 

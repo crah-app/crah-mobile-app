@@ -66,7 +66,7 @@ import { sleep } from '@/utils/globalFuncs';
 
 interface videoDataInterface {
 	video: imagePicker.ImagePickerAsset[]; // video
-	cover: string; // cover image
+	cover: imagePicker.ImagePickerAsset[]; // cover image
 	title: string; // video title
 	description: string; // video description
 	tags: Tags[] | undefined; // video tags
@@ -103,7 +103,7 @@ const CreateVideo = () => {
 		title,
 		description,
 		tags,
-		cover: cover as string,
+		cover: cover as imagePicker.ImagePickerAsset[],
 		ratio: sourceRatio,
 	});
 
@@ -157,7 +157,7 @@ const CreateVideo = () => {
 	const handleVideoUpload = async () => {
 		setVideoData({
 			video: video as imagePicker.ImagePickerAsset[],
-			cover: cover as string, // Use cover state
+			cover: cover as imagePicker.ImagePickerAsset[], // Use cover state
 			title, // Use title state
 			description, // Use description state
 			tags, // Use tags state
@@ -168,17 +168,16 @@ const CreateVideo = () => {
 	};
 
 	useEffect(() => {
-		if (!videoData.video && !wantsToUpload) return;
+		if (!videoData.video && !videoData.cover && !wantsToUpload) return;
 
 		const upload = async () => {
 			const token = await getToken();
 
-			if (!token || !user?.id) return;
+			if (!token || !user?.id || !wantsToUpload) return;
 
 			setUploadingProgress(0);
 			setErrorUploadingSource(false);
 			setUploadingModalVisible(true);
-			setWantsToUpload(false);
 
 			const result = await uploadSource(
 				{
@@ -187,6 +186,14 @@ const CreateVideo = () => {
 					duration: Math.floor(videoData.video[0].duration / 1000) ?? 0,
 					width: videoData.video[0].width,
 					height: videoData.video[0].height,
+				},
+				{
+					width: videoData.cover[0].width,
+					height: videoData.cover[0].height,
+					path: videoData.cover[0].uri,
+					orientation: 'portrait', // do not need this information
+					isMirrored: false,
+					isRawPhoto: false,
 				},
 				token as string,
 				user?.id as string,
@@ -199,19 +206,20 @@ const CreateVideo = () => {
 						title: videoData.title,
 						description: videoData.description,
 						tags: videoData.tags,
-						ratio: sourceRatio,
 					},
 				},
 			);
-
-			if (result) {
-				router.navigate('/(auth)/(tabs)/homePages');
-			}
 
 			await sleep(300);
 			setUploadingModalVisible(false);
 			setWantsToUpload(false);
 			setUploadingProgress(0);
+
+			// do a cool animation on the modal that upload is finished
+
+			if (result) {
+				router.navigate('/(auth)/(tabs)/homePages');
+			}
 
 			return result;
 		};

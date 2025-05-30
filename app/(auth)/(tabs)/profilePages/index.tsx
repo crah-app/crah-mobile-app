@@ -13,7 +13,12 @@ const Page = () => {
 	const { user } = useUser();
 
 	return (
-		<UserProfileContents key={Date.now()} userId={user?.id} self={'true'} />
+		<UserProfileContents
+			key={Date.now()}
+			userId={user?.id as string}
+			self={'true'}
+			linking={false}
+		/>
 	);
 };
 

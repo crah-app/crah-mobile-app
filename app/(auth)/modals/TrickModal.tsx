@@ -2,6 +2,7 @@ import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
 import ThemedText from '@/components/general/ThemedText';
 import ThemedView from '@/components/general/ThemedView';
 import Colors from '@/constants/Colors';
+import getTrickIllustration from '@/hooks/getTrickIllustrations';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -18,6 +19,8 @@ const TrickModal = () => {
 	const theme = useSystemTheme();
 	const { trickName, trickDescription, trickId } = useLocalSearchParams();
 	const insets = useSafeAreaInsets();
+
+	const trickIllustrations = getTrickIllustration(trickName as string);
 
 	return (
 		<ThemedView theme={theme} flex={1} style={styles.container}>

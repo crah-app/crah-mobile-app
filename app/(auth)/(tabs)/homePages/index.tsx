@@ -20,7 +20,12 @@ import { useLocalSearchParams } from 'expo-router';
 import { filterPosts } from '@/utils/globalFuncs';
 import PostTypeFilterModal from '@/components/home/PostTypeFilterModal';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
-import { ContentFilterTypes, fetchAdresses, GeneralPostTypes } from '@/types';
+import {
+	ContentFilterTypes,
+	fetchAdresses,
+	GeneralPostTypes,
+	RawPost,
+} from '@/types';
 import UserUploadsPost from '@/components/home/UserUploadsPost';
 import CostumHeader from '@/components/header/CostumHeader';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
@@ -67,44 +72,6 @@ const Page = () => {
 		inputRange: [0, 1],
 		outputRange: ['0deg', '360deg'],
 	});
-
-	// video upload logic
-	const [userUploadsVideo, setUserUploadsVideo] = useState<boolean>(false);
-	const [uploadProgress, setUploadProgress] = useState<number>(0);
-
-	const [uploadFinished, setUploadFinished] = useState<boolean>(false);
-	const [videoData, setVideoData] = useState<string | null>(null);
-
-	const { video_upload, video_cover, video_data } = useLocalSearchParams();
-
-	useEffect(() => {
-		// console.log(video_upload, video_cover);
-		if (video_upload && video_cover && video_data) {
-			setVideoData(video_data as string);
-			setUserUploadsVideo(true);
-			handleUploadVideoProgress();
-		}
-	}, [video_upload, video_cover, video_data]);
-
-	const handleUploadVideoProgress = () => {
-		if (uploadFinished) return;
-		setUploadProgress((prev) => prev + 1);
-	};
-
-	useEffect(() => {
-		if (uploadProgress === 100) {
-			setUploadFinished(true);
-
-			setTimeout(() => {
-				setUserUploadsVideo(false);
-			}, 1000);
-			return;
-		}
-		setTimeout(() => {
-			handleUploadVideoProgress();
-		}, 1000);
-	}, [uploadProgress]);
-	// ----------------
 
 	// fetch posts logic
 	const [ContentFilterSelected, setSelectedContentFilter] =
@@ -161,7 +128,6 @@ const Page = () => {
 			.then((res) => res.json())
 			.then((res) => {
 				setUserPosts(res);
-				console.log(res, 'ghrieodfjssdfgiojiosdfgj,iosdfgjk,sdfgiojioj');
 			})
 			.catch((err) => setErrLoadingUserPosts(err))
 			.finally(() => SetUserPostsLoaded(true));
@@ -187,8 +153,8 @@ const Page = () => {
 			theme={theme}
 			headerHeight={60}
 			data={userPosts}
-			keyExtractor={(item: any) => item.id}
-			renderItem={({ item }) => <UserPost post={item} />}
+			keyExtractor={(item: RawPost) => item.Id.toString()}
+			renderItem={({ item }) => <UserPost key={item.Id} post={item} />}
 			refreshing={refreshing}
 			onRefresh={handleRefresh}
 			headerChildren={
