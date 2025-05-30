@@ -80,20 +80,7 @@ const Layout = () => {
 			<Stack.Screen
 				name="TrickModal"
 				options={{
-					headerShown: true,
-					title: 'Trick',
-					headerStyle: {
-						backgroundColor: Colors[theme].background,
-					},
-					headerLeft: () => (
-						<TouchableOpacity onPress={router.back}>
-							<Ionicons
-								name="arrow-back"
-								size={24}
-								color={Colors[theme].textPrimary}
-							/>
-						</TouchableOpacity>
-					),
+					headerShown: false,
 				}}
 			/>
 			<Stack.Screen

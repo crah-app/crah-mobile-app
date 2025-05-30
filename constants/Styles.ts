@@ -51,6 +51,14 @@ export const defaultStyles = StyleSheet.create({
 		fontSize: 22,
 		fontWeight: '700',
 	},
+	bigText: {
+		fontSize: 27,
+	},
+	biggerOpacityText: {
+		fontSize: 22,
+		fontWeight: '700',
+		opacity: 0.7,
+	},
 	separator: {
 		height: StyleSheet.hairlineWidth,
 		backgroundColor: 'gray',

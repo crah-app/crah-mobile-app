@@ -16,7 +16,9 @@ import {
 	fetchAdresses,
 	selectedRiderInterface,
 	selectedTrickInterface,
+	Trick,
 	TrickDifficulty,
+	TrickType,
 } from '@/types';
 import ThemedText from '../general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
@@ -27,7 +29,6 @@ import { useUser } from '@clerk/clerk-expo';
 import NoDataPlaceholder from '../general/NoDataPlaceholder';
 
 import Scooter from '../../assets/images/vectors/scooter.svg';
-import { getTrickTitle } from '@/utils/globalFuncs';
 
 interface AllUserRowContainerProps {
 	contentTitle?: string;
@@ -37,22 +38,6 @@ interface AllUserRowContainerProps {
 	excludeIds?: number[];
 	costumHandleTrickPress?: (user: selectedTrickInterface) => void;
 }
-
-interface Trick {
-	id: number;
-	name: string;
-	costum?: boolean;
-}
-
-// temporary function for tricks object
-const transformCommonTricks = (data: {
-	commonTricks: { words: string[] }[];
-}): Trick[] => {
-	return data.commonTricks.map((trickObj, index) => ({
-		id: index,
-		name: trickObj.words.join(' '),
-	}));
-};
 
 const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	contentTitle,
@@ -65,12 +50,12 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	const theme = useSystemTheme();
 	const { user } = useUser();
 
-	const [usersLoaded, setUsersLoaded] = useState<boolean>(false);
+	const [tricksLoaded, setTricksLoaded] = useState<boolean>(false);
 	const [allTricks, setAllTricks] = useState<Trick[]>();
 
 	// fetch all users
 	const fetchTricks = () => {
-		setUsersLoaded(false);
+		setTricksLoaded(false);
 
 		fetch(fetchAdresses.allTricks, {
 			headers: { 'Cache-Control': 'no-cache' },
@@ -84,12 +69,12 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 
 				console.log(res);
 
-				setAllTricks(transformCommonTricks(res));
+				setAllTricks(res);
 			})
 			.catch((err) =>
 				console.warn('An error loading all tricks occurred: ', err),
 			)
-			.finally(() => setUsersLoaded(true));
+			.finally(() => setTricksLoaded(true));
 	};
 
 	useEffect(() => {
@@ -97,8 +82,8 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	}, []);
 
 	useEffect(() => {
-		if (!usersLoaded || !allTricks) return;
-	}, [usersLoaded, allTricks]);
+		if (!tricksLoaded || !allTricks) return;
+	}, [tricksLoaded, allTricks]);
 
 	const handleTrickPress = (selectedTrickData: selectedTrickInterface) => {
 		if (costumHandleTrickPress) {
@@ -109,9 +94,11 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 		router.push({
 			pathname: '/modals/TrickModal',
 			params: {
-				trickName: selectedTrickData.name,
-				trickId: selectedTrickData.id,
+				trickName: selectedTrickData.Name,
 				trickDescription: 'lel',
+				trickId: selectedTrickData.Name,
+				trickType: selectedTrickData.Type,
+				trickDefaultPoints: selectedTrickData.DefaultPoints,
 			},
 		});
 	};
@@ -122,7 +109,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 			// @ts-ignore
 			style={[styles.container, contentContainerStyle]}
 			flex={1}>
-			{!usersLoaded || !allTricks ? (
+			{!tricksLoaded || !allTricks ? (
 				<View
 					style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 					<CrahActivityIndicator color={Colors[theme].surface} size={24} />
@@ -154,24 +141,26 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 								scrollEnabled={false}
 								contentContainerStyle={{ flex: 1 }}
 								data={allTricks}
-								keyExtractor={(item) => item.id.toString()}
+								keyExtractor={(item) => item.Name}
 								renderItem={({ item: trick }) => (
 									<Row
 										// @ts-ignore
 										containerStyle={[rowStyle]}
 										onPress={() =>
 											handleTrickPress({
-												id: trick.id,
-												name: trick.name,
-												difficulty: TrickDifficulty.GOATED,
-												costum: false,
+												Id: trick.Name,
+												Name: trick.Name,
+												DefaultPoints: trick.DefaultPoints,
+												Difficulty: TrickDifficulty.GOATED,
+												Costum: false,
+												Type: trick.Type as TrickType,
 											})
 										}
 										avatarIsSVG
 										showAvatar={true}
 										avatarUrl={Scooter}
-										title={trick.name ?? 'no name trick'}
-										subtitle={'Rank Gold #1' + ' ' + trick.id}
+										title={trick.Name ?? 'no name trick'}
+										subtitle={'Rank Gold #1' + ' ' + trick.Name}
 									/>
 								)}
 							/>
@@ -205,23 +194,25 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 									alignItems: 'flex-start',
 								}}
 								data={allTricks}
-								keyExtractor={(item) => item.id.toString()}
+								keyExtractor={(item) => item.Name}
 								renderItem={({ item: FetchedTrick }) => (
 									<Row
 										// @ts-ignore
 										containerStyle={[rowStyle]}
 										onPress={() =>
 											handleTrickPress({
-												id: FetchedTrick.id,
-												name: FetchedTrick.name,
-												difficulty: TrickDifficulty.GOATED,
-												costum: false,
+												Id: FetchedTrick.Name,
+												Name: FetchedTrick.Name,
+												DefaultPoints: FetchedTrick.DefaultPoints,
+												Difficulty: TrickDifficulty.GOATED,
+												Costum: false,
+												Type: FetchedTrick.Type as TrickType,
 											})
 										}
 										showAvatar={true}
 										avatarIsSVG
 										avatarUrl={Scooter}
-										title={FetchedTrick.name ?? 'no name trick'}
+										title={FetchedTrick.Name ?? 'no name trick'}
 										subtitle={TrickDifficulty.INTERMEDIATE}
 									/>
 								)}

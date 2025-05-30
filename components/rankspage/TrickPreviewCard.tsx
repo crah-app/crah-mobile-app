@@ -33,11 +33,15 @@ const TrickPreviewCard: React.FC<TrickPreviewProps> = ({
 			}}>
 			<View style={{ width: '100%', flexDirection: 'row' }}>
 				<ThemedText
-					style={{ fontWeight: '600' }}
+					style={{ fontWeight: '600', fontSize: 18 }}
 					theme={theme}
 					value={`${trickName}`}
 				/>
-				<ThemedText theme={theme} value={' - Preview'} />
+				<ThemedText
+					style={{ fontSize: 18 }}
+					theme={theme}
+					value={' - Your Preview'}
+				/>
 			</View>
 
 			<View

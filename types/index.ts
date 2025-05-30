@@ -64,10 +64,12 @@ export interface selectedRiderInterface extends User {
 
 // when a trick is selected f.e in a gifted chat
 export interface selectedTrickInterface {
-	id: number;
-	name: string;
-	difficulty: TrickDifficulty;
-	costum?: boolean;
+	Id: string;
+	Name: string;
+	DefaultPoints: number;
+	Difficulty: TrickDifficulty;
+	Type: TrickType;
+	Costum?: boolean;
 }
 
 // gifted chat footer attachment types
@@ -152,8 +154,17 @@ export enum fetchAdresses {
 	commonTricks = 'http://192.168.0.136:4000/public/tricks/commonTricks.json',
 	allUsers = 'http://192.168.0.136:4000/api/users/all',
 	allPosts = 'http://192.168.0.136:4000/api/posts/all',
-	allTricks = 'http://192.168.0.136:4000/public/tricks/commonTricks.json',
+	allTricks = 'http://192.168.0.136:4000/api/tricks/all',
 }
+
+export interface Trick {
+	Name: string;
+	DefaultPoints: number;
+	Costum: boolean;
+	Type: string;
+}
+
+export type TrickType = 'Overhead' | 'Rewind' | 'Whip' | 'Balance' | 'Grab';
 
 /*
 	costum messgae type for a message in a gifted chat
@@ -364,18 +375,32 @@ export enum UserGalleryTopics {
 */
 
 export enum TrickDifficulty {
-	NOVICE = 'novice',
-	BEGINNER = 'beginner',
-	NORMAL = 'normal',
-	INTERMEDIATE = 'intermediate',
-	ADVANCED = 'advanced',
-	HARD = 'hard',
-	VERY_HARD = 'very hard',
-	MONSTER = 'monster',
-	IMPOSSIBLE = 'impossible',
-	GOATED = 'goated',
-	POTENTIAL_WORLDS_FIRST = 'potential worlds first',
+	NOVICE = 'Novice',
+	BEGINNER = 'Beginner',
+	NORMAL = 'Normal',
+	INTERMEDIATE = 'Intermediate',
+	ADVANCED = 'Advanced',
+	HARD = 'Hard',
+	VERY_HARD = 'Very Hard',
+	MONSTER = 'Monster',
+	IMPOSSIBLE = 'Impossible',
+	GOATED = 'Goated',
+	POTENTIAL_WORLDS_FIRST = "Potential World's First",
 }
+
+export const TrickDifficultyColorMap: Record<TrickDifficulty, string> = {
+	[TrickDifficulty.NOVICE]: '#d3f9d8', // light green
+	[TrickDifficulty.BEGINNER]: '#b2f2bb', // medium green
+	[TrickDifficulty.NORMAL]: '#8ce99a', // green
+	[TrickDifficulty.INTERMEDIATE]: '#ffe066', // yellow
+	[TrickDifficulty.ADVANCED]: '#fab005', // orange
+	[TrickDifficulty.HARD]: '#ff922b', // dark orange
+	[TrickDifficulty.VERY_HARD]: '#fa5252', // red
+	[TrickDifficulty.MONSTER]: '#e64980', // pink
+	[TrickDifficulty.IMPOSSIBLE]: '#be4bdb', // purple
+	[TrickDifficulty.GOATED]: '#5f3dc4', // deep purple
+	[TrickDifficulty.POTENTIAL_WORLDS_FIRST]: '#ffffff', // black
+};
 
 /* 
 	General text input max characters

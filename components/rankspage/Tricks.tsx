@@ -19,10 +19,13 @@ import {
 	commonTricksDataStructure,
 	dropDownMenuInputData,
 	fetchAdresses,
+	selectedTrickInterface,
+	Trick,
 	TrickDifficulty,
 	TrickListFilterOptions,
 	TrickListGeneralSpotCategory,
 	TrickListOrderTypes,
+	TrickType,
 } from '@/types';
 
 import { getCachedData, setCachedData } from '@/hooks/cache';
@@ -38,12 +41,9 @@ interface TricksProps {}
 const CACHE_KEY = 'commonTricks';
 
 const Tricks: React.FC<TricksProps> = ({}) => {
-	const insets = useSafeAreaInsets();
 	const theme = useSystemTheme();
 
-	const [commonTricks, setCommonTricks] = useState<
-		commonTricksDataStructure[] | undefined
-	>();
+	const [commonTricks, setCommonTricks] = useState<Trick[] | undefined>();
 
 	const [commonTricksLoaded, setCommonTricksLoaded] = useState(false);
 	const [errWhileLoadingCommonTricks, setErrWhileLoadingCommonTricks] =
@@ -53,7 +53,7 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 		setCommonTricksLoaded(false);
 		setErrWhileLoadingCommonTricks(null);
 
-		const cached = await getCachedData<commonTricksDataStructure[]>(CACHE_KEY);
+		const cached = await getCachedData<Trick[]>(CACHE_KEY);
 
 		if (cached) {
 			setCommonTricks(cached);
@@ -64,13 +64,13 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 
 		console.log('fetch common tricks');
 
-		fetch('http://192.168.0.136:4000/public/tricks/commonTricks.json', {
+		fetch(fetchAdresses.allTricks, {
 			headers: { 'Cache-Control': 'no-cache' },
 		})
 			.then((res) => res.json())
 			.then(async (res) => {
-				setCommonTricks(res.commonTricks);
-				await setCachedData(CACHE_KEY, res.commonTricks);
+				setCommonTricks(res);
+				await setCachedData(CACHE_KEY, res);
 			})
 			.catch((err) => setErrWhileLoadingCommonTricks(err))
 			.finally(() => setCommonTricksLoaded(true));
@@ -79,10 +79,6 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 	useEffect(() => {
 		fetchCommonTricks();
 	}, []);
-
-	useEffect(() => {
-		console.log(commonTricks);
-	}, [commonTricks]);
 
 	useEffect(() => {
 		errWhileLoadingCommonTricks &&
@@ -112,21 +108,19 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 };
 
 const TrickList: React.FC<{
-	commonTricks: commonTricksDataStructure[] | undefined | [];
+	commonTricks: Trick[] | undefined | [];
 }> = ({ commonTricks }) => {
 	const [searchQuery, setSearchQuery] = useState<string>('');
 
-	useEffect(() => {
-		console.log(commonTricks);
-	}, [commonTricks]);
-
-	const handleTrickPress = (item: commonTricksDataStructure) => {
+	const handleTrickPress = (selectedTrickData: selectedTrickInterface) => {
 		router.push({
-			pathname: '/(auth)/modals/TrickModal',
+			pathname: '/modals/TrickModal',
 			params: {
-				trickName: getTrickTitle(item),
-				trickId: 123,
-				trickDescription: 'trick description',
+				trickName: selectedTrickData.Name,
+				trickDescription: 'lel',
+				trickId: selectedTrickData.Name,
+				trickType: selectedTrickData.Type,
+				trickDefaultPoints: selectedTrickData.DefaultPoints,
 			},
 		});
 	};
@@ -145,14 +139,22 @@ const TrickList: React.FC<{
 			<FlatList
 				scrollEnabled={false}
 				data={commonTricks}
-				keyExtractor={(item) => `${item.words[0]} ${item.words[1]}`}
-				renderItem={({ item }) => (
+				keyExtractor={(item) => item.Name}
+				renderItem={({ item }: { item: Trick }) => (
 					<TrickRow
-						name={`${item.words[0]} ${item.words[1]}`}
+						name={item.Name}
 						points={100}
 						difficulty={TrickDifficulty.POTENTIAL_WORLDS_FIRST}
 						landed={'landed'}
-						onPress={() => handleTrickPress(item)}
+						onPress={() =>
+							handleTrickPress({
+								Id: item.Name,
+								Name: item.Name,
+								DefaultPoints: item.DefaultPoints,
+								Difficulty: TrickDifficulty.NOVICE,
+								Type: item.Type as TrickType,
+							})
+						}
 					/>
 				)}
 				contentContainerStyle={{ height: 'auto', paddingBottom: 270 }}
