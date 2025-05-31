@@ -1,61 +1,77 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Image, Dimensions } from 'react-native';
 import ThemedText from '../general/ThemedText';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import UserImageCircle from '../general/UserImageCircle';
 import Colors from '@/constants/Colors';
+import Row from '../general/Row';
+import { CrahUser } from '@/types';
 
-interface UserRankColumnprops {
-	user: string;
-	user_id: number;
-	rank: number;
-	best_trick: string;
+interface UserRankRowprops {
+	user: CrahUser;
+	isSticky?: boolean | null; // sticky to the screen
 }
 
-const UserRankColumn: React.FC<UserRankColumnprops> = ({
-	user,
-	user_id,
-	rank,
-	best_trick,
-}) => {
+const UserRankRow: React.FC<UserRankRowprops> = ({ user, isSticky = null }) => {
 	const theme = useSystemTheme();
-	const ParsedUser = JSON.parse(user);
-
-	if (!ParsedUser) return <View />;
 
 	return (
-		<View
-			style={[styles.container, { backgroundColor: Colors[theme].surface }]}>
-			{/* left side */}
-			<View style={styles.containerInnerLeft}>
-				<View style={{ justifyContent: 'center', alignContent: 'center' }}>
-					<UserImageCircle
-						width={50}
-						height={50}
-						imageUri={JSON.stringify(ParsedUser?.imageUrl)}
-						style={{ borderWidth: 0, padding: 0, margin: 0 }}
+		<Row
+			key={user?.id}
+			containerStyle={{
+				backgroundColor: isSticky
+					? 'rgb(105,15,15)'
+					: Colors[theme].container_surface,
+				width: Dimensions.get('window').width - 16,
+				borderRadius: 22,
+				position: isSticky ? 'fixed' : 'relative',
+				borderWidth: 5,
+				borderColor: isSticky ? Colors[theme].background : 'transparent',
+				padding: 8,
+			}}
+			title={user?.username ?? 'no name'}
+			titleStyle={{ fontSize: 20, fontWeight: '400', marginLeft: 6 }}
+			avatarUrl={user?.imageUrl}
+			showAvatar={false}
+			subtitle="Quint Whip Flat"
+			subtitleStyle={{
+				marginLeft: 6,
+				fontSize: 15,
+			}}
+			customLeftComponent={
+				<View
+					style={{
+						flex: 1,
+						flexDirection: 'row',
+						alignItems: 'center',
+						gap: 12,
+						marginLeft: 8,
+					}}>
+					<ThemedText theme={theme} value={'#1'} style={{ fontSize: 22 }} />
+
+					<Image
+						source={{
+							uri: user?.imageUrl,
+						}}
+						style={[styles.avatar]}
+						width={46}
+						height={46}
 					/>
 				</View>
-
-				<View style={styles.containerInnerUserInfo}>
-					<ThemedText
-						value={ParsedUser?.username}
-						theme={theme}
-						style={{ fontSize: 30 }}
-					/>
-					<ThemedText
-						value={`Rank #${rank}`}
-						theme={theme}
-						style={{ fontSize: 22 }}
-					/>
+			}
+			customRightComponent={
+				<View
+					style={{
+						flex: 1,
+						flexDirection: 'row',
+						alignItems: 'center',
+						gap: 12,
+						marginRight: 8,
+					}}>
+					<ThemedText theme={theme} value={'1240'} style={{ fontSize: 20 }} />
 				</View>
-			</View>
-
-			{/* right side */}
-			<View style={styles.containerInnerRight}>
-				<ThemedText value={`best trick: ${best_trick}`} theme={theme} />
-			</View>
-		</View>
+			}
+		/>
 	);
 };
 
@@ -88,6 +104,9 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 		justifyContent: 'center',
 	},
+	avatar: {
+		borderRadius: 23,
+	},
 });
 
-export default UserRankColumn;
+export default UserRankRow;

@@ -19,7 +19,6 @@ import {
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { useUser } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
 	StyleSheet,
@@ -29,7 +28,6 @@ import {
 	TouchableOpacity,
 	ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface Props {
 	trickName: string;

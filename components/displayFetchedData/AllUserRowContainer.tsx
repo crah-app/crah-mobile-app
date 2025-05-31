@@ -1,6 +1,6 @@
 import ClerkUser from '@/types/clerk';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import React, { useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import {
 	FlatList,
 	ScrollView,
@@ -30,6 +30,7 @@ interface AllUserRowContainerProps {
 	costumHandleUserPress?: (
 		user: selectedRiderInterface,
 	) => void | Promise<void>;
+	CostumRow?: React.ComponentType<any>;
 }
 
 const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
@@ -39,6 +40,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	rowStyle,
 	excludeIds,
 	costumHandleUserPress,
+	CostumRow,
 }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
@@ -105,14 +107,19 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 			theme={theme}
 			// @ts-ignore
 			style={[styles.container, contentContainerStyle]}
-			flex={1}>
+			flex={0}>
 			{!usersLoaded || !allUsers ? (
 				<View
-					style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-					<CrahActivityIndicator color={Colors[theme].surface} size={24} />
+					style={{
+						flex: 1,
+						justifyContent: 'center',
+						alignItems: 'center',
+						top: 100,
+					}}>
+					<CrahActivityIndicator color={Colors[theme].primary} size={24} />
 				</View>
 			) : (
-				<View style={{ flex: 1 }}>
+				<View style={{ flex: 0 }}>
 					{bottomSheet ? (
 						<BottomSheetScrollView
 							contentContainerStyle={{
@@ -142,32 +149,38 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 								data={allUsers}
 								keyExtractor={(item) => item.id}
 								renderItem={({ item: user }) => (
-									<Row
-										// @ts-ignore
-										containerStyle={[rowStyle]}
-										onPress={() =>
-											handleUserPress({
-												name: user.username,
-												_id: user.id,
-												avatar: user.imageUrl,
+									<View>
+										{!CostumRow ? (
+											<Row
 												// @ts-ignore
-												rank: user.rank ?? 'Diamond',
-												// @ts-ignore
-												rankPosition: user.rankPosition ?? 3,
-											})
-										}
-										showAvatar={true}
-										avatarUrl={user.imageUrl}
-										title={user.username ?? 'no name user'}
-										subtitle={'Rank Gold #1'}
-									/>
+												containerStyle={[rowStyle]}
+												onPress={() =>
+													handleUserPress({
+														name: user.username ?? undefined,
+														_id: user.id,
+														avatar: user.imageUrl,
+														// @ts-ignore
+														rank: user.rank ?? 'Diamond',
+														// @ts-ignore
+														rankPosition: user.rankPosition ?? 3,
+													})
+												}
+												showAvatar={true}
+												avatarUrl={user.imageUrl}
+												title={user.username ?? 'no name user'}
+												subtitle={'Rank Gold #1'}
+											/>
+										) : (
+											<CostumRow />
+										)}
+									</View>
 								)}
 							/>
 						</BottomSheetScrollView>
 					) : (
 						<ScrollView
 							contentContainerStyle={{
-								flex: 1,
+								flex: 0,
 							}}>
 							{contentTitle && allUsers.length > 0 && !noUsersFound ? (
 								<ThemedText
@@ -182,36 +195,43 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 							<FlatList
 								scrollEnabled={false}
 								contentContainerStyle={{
-									flex: 1,
-									justifyContent: 'flex-start',
-									alignItems: 'flex-start',
+									flex: 0,
+									justifyContent: 'center',
+									alignItems: 'center',
+									gap: 10,
 								}}
 								data={allUsers}
 								keyExtractor={(item) => item.id}
 								renderItem={({ item: FetchedUser }) => (
-									<Row
-										// @ts-ignore
-										containerStyle={[rowStyle]}
-										onPress={() =>
-											handleUserPress({
-												name: FetchedUser.username,
-												_id: FetchedUser.id,
-												avatar: FetchedUser.imageUrl,
+									<View>
+										{!CostumRow ? (
+											<Row
 												// @ts-ignore
-												rank: FetchedUser.rank ?? 'Diamond',
-												// @ts-ignore
-												rankPosition: FetchedUser.rankPosition ?? 3,
-											})
-										}
-										showAvatar={true}
-										avatarUrl={FetchedUser.imageUrl}
-										title={
-											(FetchedUser.username === user?.username
-												? 'You'
-												: FetchedUser.username) ?? 'no name user'
-										}
-										subtitle={'Rank Silver #51' + ' ' + FetchedUser.id}
-									/>
+												containerStyle={[rowStyle]}
+												onPress={() =>
+													handleUserPress({
+														name: FetchedUser.username ?? undefined,
+														_id: FetchedUser.id,
+														avatar: FetchedUser.imageUrl,
+														// @ts-ignore
+														rank: FetchedUser.rank ?? 'Diamond',
+														// @ts-ignore
+														rankPosition: FetchedUser.rankPosition ?? 3,
+													})
+												}
+												showAvatar={true}
+												avatarUrl={FetchedUser.imageUrl}
+												title={
+													(FetchedUser.username === user?.username
+														? 'You'
+														: FetchedUser.username) ?? 'no name user'
+												}
+												subtitle={'Rank Silver #51' + ' ' + FetchedUser.id}
+											/>
+										) : (
+											<CostumRow user={FetchedUser} />
+										)}
+									</View>
 								)}
 								ListEmptyComponent={() => (
 									<NoDataPlaceholder
@@ -231,12 +251,8 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-	userContainer: {
-		flex: 1,
-	},
+	container: {},
+	userContainer: {},
 });
 
 export default AllUserRowContainer;

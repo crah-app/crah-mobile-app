@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { IMessage, User } from 'react-native-gifted-chat';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
+import ClerkUser from './clerk';
 
 // Ionicons icon type
 export type ionicon = keyof typeof Ionicons.glyphMap;
@@ -48,10 +49,7 @@ export type RawPost = {
 export type ReactionType = (typeof Reactions)[number];
 
 // simple user interface
-export interface CrahUser {
-	name: string;
-	avatar: string;
-	_id: number;
+export interface CrahUser extends ClerkUser {
 	level?: number;
 	rank?: number;
 }

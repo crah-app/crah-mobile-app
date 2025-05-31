@@ -19,6 +19,7 @@ export default {
 		lightGray: 'rgb(65,65,65)',
 		darkPrimary: 'rgb(200, 0, 0)',
 		absoluteContrast: 'rgb(255,255,255)',
+		highlightPrimary: 'rgb(105,15,15)',
 	},
 	dark: {
 		primary: 'rgb(255, 0, 0)',
@@ -40,6 +41,7 @@ export default {
 		lightGray: 'rgb(195,195,195)',
 		darkPrimary: 'rgb(200, 0, 0)',
 		absoluteContrast: 'rgb(0,0,0)',
+		highlightPrimary: 'rgb(105,15,15)',
 	},
 	default: {
 		primary: 'rgb(255, 0, 0)',
@@ -48,6 +50,7 @@ export default {
 		green: 'forestgreen',
 		darkPrimary: 'rgb(200, 0, 0)',
 		gray: 'gray',
+		highlightPrimary: 'rgb(105,15,15)',
 	},
 };
 

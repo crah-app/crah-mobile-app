@@ -31,9 +31,9 @@ const Page = () => {
 	const { pageType } = useLocalSearchParams();
 
 	const galleryComponents = {
-		[UserGalleryTopics.USER_RANK]: <YourRank user={JSON.stringify(user)} />,
+		[UserGalleryTopics.USER_RANK]: <YourRank />,
 
-		[UserGalleryTopics.LEAGUES]: <LeaguesPage user={JSON.stringify(user)} />,
+		[UserGalleryTopics.LEAGUES]: <LeaguesPage theme={theme} />,
 
 		[UserGalleryTopics.TRICKS]: <Tricks />,
 
