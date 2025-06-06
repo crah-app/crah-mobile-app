@@ -18,6 +18,8 @@ export interface RawComment {
 	UpdatedAt: string; // ISO-Date string from MySQL DATETIME
 }
 
+export type svg_name = "textlogo";
+
 export type RawPost = {
 	Id: number;
 

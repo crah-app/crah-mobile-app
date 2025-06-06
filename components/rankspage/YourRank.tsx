@@ -10,10 +10,10 @@ import { defaultStyles } from '@/constants/Styles';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 
-import bg from '../../assets/images/output.svg';
+// import bg from '../../assets/images/output.svg';
 // import { Canvas, Path, Skia } from '@shopify/react-native-skia';
 
-const cleanSvg = bg.replace(/(fill|stroke)="undefined"/g, '');
+// const cleanSvg = bg.replace(/(fill|stroke)="undefined"/g, '');
 
 interface YourRankProps {
 	theme: 'light' | 'dark';
@@ -203,7 +203,7 @@ const YourRank: React.FC<YourRankProps> = ({ theme }) => {
 						width: Dimensions.get('window').width,
 					},
 				]}>
-				<SvgXml width={600} height={200} xml={cleanSvg} />
+				{/* <SvgXml width={600} height={200} xml={cleanSvg} /> */}
 				<View
 					style={{
 						backgroundColor: 'rgba(0, 0, 0, 0.2)',

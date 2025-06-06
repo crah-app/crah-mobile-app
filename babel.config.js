@@ -3,13 +3,13 @@ module.exports = function (api) {
 	return {
 		presets: ['babel-preset-expo'],
 		plugins: [
-			'react-native-reanimated/plugin',
 			[
 				'babel-plugin-inline-import',
 				{
 					extensions: ['.svg'],
 				},
 			],
+			'react-native-reanimated/plugin',
 		],
 	};
 };
