@@ -1,50 +1,50 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import {
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuItemIcon,
-	DropdownMenuItemTitle,
-	DropdownMenuRoot,
-	DropdownMenuTrigger,
-} from '../zeego/dropdown-menu';
-import { dropDownMenuInputData } from '@/types';
+// import React from 'react';
+// import { StyleSheet, View } from 'react-native';
+// import {
+// 	DropdownMenuContent,
+// 	DropdownMenuItem,
+// 	DropdownMenuItemIcon,
+// 	DropdownMenuItemTitle,
+// 	DropdownMenuRoot,
+// 	DropdownMenuTrigger,
+// } from '../zeego/dropdown-menu';
+// import { dropDownMenuInputData } from '@/types';
 
-interface DropDownMenuProps {
-	items: Array<dropDownMenuInputData>;
-	onSelect: (numb: number, val: any) => void;
-	triggerComponent: React.ReactNode;
-}
+// interface DropDownMenuProps {
+// 	items: Array<dropDownMenuInputData>;
+// 	onSelect: (numb: number, val: any) => void;
+// 	triggerComponent: React.ReactNode;
+// }
 
-const DropDownMenu: React.FC<DropDownMenuProps> = ({
-	items,
-	triggerComponent,
-	onSelect,
-}) => {
-	return (
-		<DropdownMenuRoot>
-			<DropdownMenuTrigger>{triggerComponent}</DropdownMenuTrigger>
+// const DropDownMenu: React.FC<DropDownMenuProps> = ({
+// 	items,
+// 	triggerComponent,
+// 	onSelect,
+// }) => {
+// 	return (
+// 		<DropdownMenuRoot>
+// 			<DropdownMenuTrigger>{triggerComponent}</DropdownMenuTrigger>
 
-			<DropdownMenuContent>
-				{items.map((val, key) => (
-					<DropdownMenuItem
-						onSelect={() => onSelect(key, val)}
-						key={key.toString()}>
-						<DropdownMenuItemTitle>{val.text}</DropdownMenuItemTitle>
+// 			<DropdownMenuContent>
+// 				{items.map((val, key) => (
+// 					<DropdownMenuItem
+// 						onSelect={() => onSelect(key, val)}
+// 						key={key.toString()}>
+// 						<DropdownMenuItemTitle>{val.text}</DropdownMenuItemTitle>
 
-						{(val.iconIOS || val.iconAndroid) && (
-							<DropdownMenuItemIcon
-								ios={{ name: val?.iconIOS as any, pointSize: 18 }}
-								androidIconName={val?.iconAndroid}
-							/>
-						)}
-					</DropdownMenuItem>
-				))}
-			</DropdownMenuContent>
-		</DropdownMenuRoot>
-	);
-};
+// 						{(val.iconIOS || val.iconAndroid) && (
+// 							<DropdownMenuItemIcon
+// 								ios={{ name: val?.iconIOS as any, pointSize: 18 }}
+// 								androidIconName={val?.iconAndroid}
+// 							/>
+// 						)}
+// 					</DropdownMenuItem>
+// 				))}
+// 			</DropdownMenuContent>
+// 		</DropdownMenuRoot>
+// 	);
+// };
 
-const styles = StyleSheet.create({});
+// const styles = StyleSheet.create({});
 
-export default DropDownMenu;
+// export default DropDownMenu;

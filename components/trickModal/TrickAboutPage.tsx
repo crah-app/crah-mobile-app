@@ -1,5 +1,5 @@
 import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
-import DropDownMenu from '@/components/general/DropDownMenu';
+// import DropDownMenu from '@/components/general/DropDownMenu';
 import ThemedText from '@/components/general/ThemedText';
 import ThemedView from '@/components/general/ThemedView';
 import TrickPreviewCard from '@/components/rankspage/TrickPreviewCard';
@@ -183,7 +183,7 @@ const TrickAboutPage: React.FC<Props> = ({
 							<ThemedText style={[]} value={'default'} theme={theme} />
 
 							{/* see difficulty and points depending on default, park, street, flat */}
-							<DropDownMenu
+							{/* <DropDownMenu
 								onSelect={(_, val) => handleOnSelect(val)}
 								items={items}
 								triggerComponent={
@@ -195,7 +195,7 @@ const TrickAboutPage: React.FC<Props> = ({
 										/>
 									</TouchableOpacity>
 								}
-							/>
+							/> */}
 						</View>
 					</View>
 

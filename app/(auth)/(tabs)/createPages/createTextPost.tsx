@@ -135,6 +135,13 @@ const CreateTextPost = () => {
 								uploadMode={'Cover'}
 								setSourceRatio={setSourceRatio}
 								cover={uploadedImages}
+								setVideo={function (
+									value: React.SetStateAction<
+										string | imagePicker.ImagePickerAsset[] | undefined
+									>,
+								): void {
+									throw new Error('Function not implemented.');
+								}}
 							/>
 
 							<ThemedView style={[styles.container]} theme={theme} flex={1}>

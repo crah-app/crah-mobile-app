@@ -3,7 +3,7 @@ export default {
 		primary: 'rgb(255, 0, 0)',
 		green: 'forestgreen',
 		background: 'rgb(239, 239, 239)',
-		background2: 'rgb(220, 220, 220)', // ✅ NEU
+		background2: 'rgb(220, 220, 220)',
 		surface: 'rgb(225, 225, 225)',
 		container_surface: 'rgb(210, 210, 210)',
 		textPrimary: 'rgb(33, 33, 33)',

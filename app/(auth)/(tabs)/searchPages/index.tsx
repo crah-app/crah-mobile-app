@@ -14,7 +14,6 @@ import Colors from '@/constants/Colors';
 import { ExplorePostOrder, Tags, SearchCategories } from '@/types';
 import PostTypeButton from '@/components/PostTypeButton';
 import { filterPosts } from '@/utils/globalFuncs';
-import CheckBox from '@react-native-community/checkbox';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import UserPost from '@/components/home/UserPost';
 import Tag from '@/components/tag';

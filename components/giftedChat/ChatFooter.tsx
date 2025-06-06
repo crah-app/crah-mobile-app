@@ -71,7 +71,7 @@ const ChatFooterBar: React.FC<ChatFooterBarProps> = ({
 					avatarUrl={Scooter}
 					// @ts-ignore
 					title={trickData?.name}
-					subtitle={trickData?.difficulty}
+					subtitle={trickData?.Difficulty}
 					containerStyle={{
 						backgroundColor: Colors[theme].container_surface,
 					}}

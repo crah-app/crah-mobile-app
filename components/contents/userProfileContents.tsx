@@ -27,7 +27,7 @@ import {
 // dummy data
 import UserImageCircle from '@/components/general/UserImageCircle';
 import { defaultStyles } from '@/constants/Styles';
-import DropDownMenu from '@/components/general/DropDownMenu';
+// import DropDownMenu from '@/components/general/DropDownMenu';
 import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
 import ClerkUser from '@/types/clerk';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -268,7 +268,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 			signal: controller.signal,
 		})
 			.then((res) => res.json())
-			.then((res: ClerkUser) => SetUserName(res.username))
+			.then((res: ClerkUser) => SetUserName(res?.username ?? 'no user name'))
 			.catch((err) => {
 				if (err.name !== 'AbortError') {
 					setErrLoadingUser({
@@ -621,7 +621,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 							value={`Top 5 Best ${currentSelectedBestTrickType} Tricks`}
 							style={[styles.UserDataText]}
 						/>
-
+						{/* 
 						<DropDownMenu
 							items={BestTricks}
 							onSelect={(numb, val) => handleBestTricksType(val)}
@@ -634,7 +634,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 									/>
 								</TouchableOpacity>
 							}
-						/>
+						/> */}
 					</View>
 
 					{!self || self === 'false' ? (

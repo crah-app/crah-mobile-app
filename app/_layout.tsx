@@ -22,7 +22,7 @@ import { tokenCache } from '@/cache';
 import { useFonts } from 'expo-font';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { dark } from '@clerk/themes';
+// import { dark } from '@clerk/themes';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Appearance } from 'react-native';
 

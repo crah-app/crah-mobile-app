@@ -609,10 +609,11 @@ const PostCommentSection = forwardRef<
 		const newComment: userCommentType = {
 			avatar: 'https://randomuser.me/api/portraits/men/32.jp',
 			text: 'Das ist ein großartiger Kommentar!',
+			// @ts-ignore
 			user: {
-				_id: 1,
-				name: 'Felix Schmidt',
-				avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+				id: 'felixschmidt',
+				username: 'Felix Schmidt',
+				imageUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
 			},
 			_id: 101,
 			createdAt: new Date('2024-03-04T12:00:00Z'),
@@ -701,13 +702,13 @@ const PostCommentSection = forwardRef<
 													<CommentRow
 														key={index}
 														style={{ backgroundColor: Colors[theme].surface }}
-														userId={comment.user._id}
+														userId={comment.user.id}
 														avatar={comment.avatar}
 														text={comment.text}
 														responses={replies.length}
 														likes={comment.likes}
 														date={new Date(comment.createdAt)}
-														username={comment.user.name}
+														username={comment.user.username}
 														purpose={comment.purpose}
 														type={comment.type}
 														commentId={comment._id}

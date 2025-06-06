@@ -86,7 +86,7 @@ export interface ChatMessage extends IMessage {
 	participants: User[];
 	type: chatCostumMsgType;
 	riderId: string;
-	trickId: number;
+	trickId: string;
 	// reply to a message
 	isReply: boolean;
 	replyToMessageId: string | undefined;

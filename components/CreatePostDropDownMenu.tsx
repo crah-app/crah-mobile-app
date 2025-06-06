@@ -4,7 +4,9 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CreatePostType, dropDownMenuInputData } from '@/types';
-import DropDownMenu from './general/DropDownMenu';
+import ThemedText from './general/ThemedText';
+import { useSystemTheme } from '@/utils/useSystemTheme';
+// import DropDownMenu from './general/DropDownMenu';
 
 interface CreatePostDropDownMenu {}
 
@@ -54,18 +56,23 @@ const CreatePostDropDownMenu: React.FC<CreatePostDropDownMenu> = ({}) => {
 		router.push(Object.values(dropMenuData)[key].path);
 	};
 
+	const theme = useSystemTheme();
+
 	return (
-		<DropDownMenu
-			onSelect={handleSelect}
-			triggerComponent={
-				<TouchableOpacity style={styles.plusButtonContainer}>
-					<View style={styles.plusButton}>
-						<Ionicons name="add" size={30} color="#FFF" />
-					</View>
-				</TouchableOpacity>
-			}
-			items={dropDownMenuItemsData}
-		/>
+		<View>
+			<ThemedText theme={theme} value={'implement zeego'} />
+		</View>
+		// <DropDownMenu
+		// 	onSelect={handleSelect}
+		// 	triggerComponent={
+		// 		<TouchableOpacity style={styles.plusButtonContainer}>
+		// 			<View style={styles.plusButton}>
+		// 				<Ionicons name="add" size={30} color="#FFF" />
+		// 			</View>
+		// 		</TouchableOpacity>
+		// 	}
+		// 	items={dropDownMenuItemsData}
+		// />
 	);
 };
 

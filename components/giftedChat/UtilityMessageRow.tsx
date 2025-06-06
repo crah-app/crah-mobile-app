@@ -107,7 +107,7 @@ export const RiderRow: React.FC<{ riderId: string }> = ({ riderId }) => {
 };
 
 // costum message bubble view for a sended trick
-export const TrickRow: React.FC<{ trickId: number }> = ({ trickId }) => {
+export const TrickRow: React.FC<{ trickId: string }> = ({ trickId }) => {
 	const theme = useSystemTheme();
 	const [fetchedTrick, setFetchedTrick] = useState<any>();
 	const [trickLoaded, setTrickLoaded] = useState(false);

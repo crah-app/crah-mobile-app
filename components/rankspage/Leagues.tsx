@@ -18,7 +18,6 @@ interface LeaguesProps {
 }
 
 const LeaguesPage: React.FC<LeaguesProps> = ({ theme }) => {
-	const insets = useSafeAreaInsets();
 	const { user } = useUser();
 
 	const [query, setQuery] = useState<string>('');
@@ -26,29 +25,7 @@ const LeaguesPage: React.FC<LeaguesProps> = ({ theme }) => {
 	return (
 		<View>
 			<View style={[styles.leagues_container]}>
-				{/* <View style={styles.TopThreeUsers}>
-					<LeaderBoardUserCircle
-						width={100}
-						height={100}
-						imageUri={JSON.stringify(user?.imageUrl)}
-						rank={2}
-						style={{ top: 30 }}
-					/>
-					<LeaderBoardUserCircle
-						width={120}
-						height={120}
-						imageUri={JSON.stringify(user?.imageUrl)}
-						rank={1}
-					/>
-					<LeaderBoardUserCircle
-						width={100}
-						height={100}
-						imageUri={JSON.stringify(user?.imageUrl)}
-						rank={3}
-						style={{ top: 30 }}
-					/>
-				</View> */}
-
+				{/* filter and search */}
 				<View
 					style={{
 						height: 65,
@@ -59,8 +36,9 @@ const LeaguesPage: React.FC<LeaguesProps> = ({ theme }) => {
 					<SearchBar
 						query={query}
 						setQuery={setQuery}
-						placeholder={'Find a Trick to compare'}
+						placeholder={'Find a Rider to compare'}
 						displayLeftSearchIcon
+						displayOptionsBtn
 						containerStyle={{ flex: 0 }}
 					/>
 				</View>

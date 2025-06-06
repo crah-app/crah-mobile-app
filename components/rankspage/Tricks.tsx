@@ -32,7 +32,7 @@ import { getCachedData, setCachedData } from '@/hooks/cache';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
-import DropDownMenu from '../general/DropDownMenu';
+// import DropDownMenu from '../general/DropDownMenu';
 import SearchBar from '../general/SearchBar';
 import { getTrickTitle } from '@/utils/globalFuncs';
 
@@ -223,7 +223,7 @@ const TrickListHeader: React.FC<{
 					{ borderBottomColor: Colors[theme].textPrimary },
 				]}>
 				<View style={styles.headerContainerWrapper}>
-					<DropDownMenu
+					{/* <DropDownMenu
 						items={OrderOptions}
 						onSelect={handleFilterBtnEvent}
 						triggerComponent={
@@ -238,9 +238,9 @@ const TrickListHeader: React.FC<{
 								</View>
 							</TouchableOpacity>
 						}
-					/>
+					/> */}
 
-					<DropDownMenu
+					{/* <DropDownMenu
 						items={FilterOptions}
 						onSelect={handleFilterBtnEvent}
 						triggerComponent={
@@ -255,7 +255,7 @@ const TrickListHeader: React.FC<{
 								</View>
 							</TouchableOpacity>
 						}
-					/>
+					/> */}
 				</View>
 
 				<View style={styles.headerContainerWrapper}>

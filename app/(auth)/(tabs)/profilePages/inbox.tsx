@@ -21,7 +21,7 @@ import UpdateInformationColumn from '@/components/rows/UpdateInformationRow';
 // dummy data. replace with database data
 import UpdateInformation from '@/JSON/update_information_modal_content.json';
 import RankColumn from '@/components/rows/InboxRankRow';
-import { helpPageParameter } from '@/types';
+import { helpPageParameter, Rank } from '@/types';
 
 const Page = () => {
 	const theme = useSystemTheme();
@@ -89,8 +89,8 @@ const Page = () => {
 					/>
 
 					<RankColumn
-						currentRank="Gold"
-						previousRank="Silver"
+						currentRank={Rank.Gold}
+						previousRank={Rank.Silver}
 						onPress={() => console.log('Rank details clicked')}
 					/>
 				</View>

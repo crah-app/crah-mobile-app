@@ -27,6 +27,7 @@ const MessagesButton = () => {
 						fill={Colors[theme].textPrimary}
 						style={[
 							{
+								// @ts-ignore
 								color: Colors[theme].textPrimary,
 							},
 						]}

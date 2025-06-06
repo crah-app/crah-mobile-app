@@ -10,28 +10,28 @@ import TitleImageDark from '../assets/images/vectors/crah_transparent_black.svg'
 import { useSystemTheme } from '@/utils/useSystemTheme';
 
 const Page = () => {
-  const theme = useSystemTheme();
-  return (
-    <View style={styles.container}>
-      <WelcomeTitle />
-      {theme == `dark` ? (
-        <SvgXml width="250" height="250" xml={TitleImageDark} />
-      ) : (
-        <SvgXml width="250" height="250" xml={TitleImage} />
-      )}
+	const theme = useSystemTheme();
+	return (
+		<View style={styles.container}>
+			<WelcomeTitle />
+			{theme == `dark` ? (
+				<SvgXml width="250" height="250" xml={TitleImageDark} />
+			) : (
+				<SvgXml width="250" height="250" xml={TitleImage} />
+			)}
 
-      <BottomAuthSheet />
-    </View>
-  );
+			<BottomAuthSheet />
+		</View>
+	);
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.default.primary,
-  },
+	container: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: Colors.default.primary,
+	},
 });
 
 export default Page;

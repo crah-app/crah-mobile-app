@@ -532,7 +532,7 @@ const CreateVideoMainContent = ({
 						<CreateVideoTextInputs
 							setDescription={setDescription}
 							description={description}
-							scrollViewRef={scrollViewRef}
+							scrollViewRef={scrollViewRef as React.RefObject<ScrollView>}
 							tags={tags}
 							setTags={setTags}
 						/>

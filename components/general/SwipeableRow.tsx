@@ -16,9 +16,9 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({
 	onArchive,
 }) => {
 	const theme = useSystemTheme();
-	let swipeableRow: Swipeable | null = null;
+	const swipeableRow = React.useRef<Swipeable | null>(null);
 
-	const close = () => swipeableRow?.close();
+	const close = () => swipeableRow.current?.close();
 
 	const renderAction = (
 		text: string,
@@ -82,7 +82,7 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({
 
 	return (
 		<Swipeable
-			ref={(ref) => (swipeableRow = ref)}
+			ref={swipeableRow}
 			enableTrackpadTwoFingerGesture
 			friction={1.4}
 			overshootRight={false}

@@ -206,7 +206,7 @@ const RiderCard: React.FC<{ rider: ClerkUser; theme: 'light' | 'dark' }> = ({
 		fetchUsers();
 	};
 
-	const ref = useRef<BottomSheetModal>();
+	const ref = useRef<BottomSheetModal>(null);
 
 	const handlePresentModalPress = useCallback(() => {
 		ref?.current?.present();

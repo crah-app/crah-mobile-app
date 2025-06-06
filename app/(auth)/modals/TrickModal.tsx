@@ -1,5 +1,5 @@
 import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
-import DropDownMenu from '@/components/general/DropDownMenu';
+// import DropDownMenu from '@/components/general/DropDownMenu';
 import ThemedText from '@/components/general/ThemedText';
 import ThemedView from '@/components/general/ThemedView';
 import TrickPreviewCard from '@/components/rankspage/TrickPreviewCard';

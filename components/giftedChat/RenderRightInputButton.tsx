@@ -22,10 +22,9 @@ import ThemedText from '../general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
 import SearchBar from '../general/SearchBar';
 import AllUserRowContainer from '../displayFetchedData/AllUserRowContainer';
-import DropDownMenu from '../general/DropDownMenu';
+// import DropDownMenu from '../general/DropDownMenu';
 import { Ionicons } from '@expo/vector-icons';
 import AllTricksRowContainer from '../displayFetchedData/AllTricksRowContainer';
-import { AudioRecorder, AudioSource, useAudioPlayer } from 'expo-audio';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import * as FileSystem from 'expo-file-system';
 
@@ -253,19 +252,22 @@ export const RenderRightInputButton: React.FC<RenderRightInputButtonProps> = ({
 
 			<View style={{ flexDirection: 'row', gap: 8, marginLeft: 8 }}>
 				{!isRecording && !recordedAudio && (
-					<DropDownMenu
-						onSelect={(_, val) => handleOnSelect(val)}
-						items={items}
-						triggerComponent={
-							<TouchableOpacity style={{}}>
-								<Ionicons
-									name="add-outline"
-									size={24}
-									color={Colors[theme].textPrimary}
-								/>
-							</TouchableOpacity>
-						}
-					/>
+					<View>
+						<ThemedText theme={theme} value={'implement zeego'} />
+					</View>
+					// <DropDownMenu
+					// 	onSelect={(_, val) => handleOnSelect(val)}
+					// 	items={items}
+					// 	triggerComponent={
+					// 		<TouchableOpacity style={{}}>
+					// 			<Ionicons
+					// 				name="add-outline"
+					// 				size={24}
+					// 				color={Colors[theme].textPrimary}
+					// 			/>
+					// 		</TouchableOpacity>
+					// 	}
+					// />
 				)}
 
 				{!isRecording && recordedAudio && (

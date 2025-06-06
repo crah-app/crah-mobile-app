@@ -41,6 +41,7 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 					styles.arrow,
 					arrowStyle,
 					{
+						// @ts-ignore
 						color: Colors[theme].textPrimary,
 					},
 				]}
@@ -51,7 +52,7 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 			</Text>
 			<Link
 				href={{
-					pathname: onSubTextClickPathname,
+					pathname: onSubTextClickPathname ?? '/',
 				}}
 				asChild>
 				<TouchableOpacity>

@@ -22,7 +22,7 @@ const LeaderBoardUserCircle: React.FC<LeaderBoardUserCircleProps> = ({
 			width={width}
 			height={height}
 			imageUri={imageUri}
-			style={[styles.image, style]}
+			style={[styles.image, style as ImageStyle]}
 		/>
 	);
 };

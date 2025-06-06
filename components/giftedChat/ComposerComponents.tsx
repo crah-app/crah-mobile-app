@@ -19,14 +19,6 @@ import Modal from 'react-native-modal';
 import { uploadSource } from '@/hooks/bucketUploadManager';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import { useUser } from '@clerk/clerk-expo';
-import {
-	AudioModule,
-	AudioRecorder,
-	RecordingPresets,
-	RecordingStatus,
-	useAudioPlayer,
-	useAudioRecorder,
-} from 'expo-audio';
 import Row from '../general/Row';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import { sleep } from '@/utils/globalFuncs';
@@ -42,7 +34,7 @@ interface RenderSendTextProps {
 	replyToMessageId: string | undefined;
 	image: PhotoFile | undefined;
 	video: VideoFile | undefined;
-	setLoadingSourceProgress: (progress: number) => void;
+	setLoadingSourceProgress: Dispatch<SetStateAction<number>>;
 	setLoadingSourceModalVisible: (visible: boolean) => void;
 	audio: AudioFile | null;
 }
@@ -62,6 +54,8 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
+
+	const [error, setError] = useState<boolean>(false);
 
 	let message: Partial<ChatMessage> = {
 		text: props.text!.trim(),
@@ -83,7 +77,7 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 
 			case 'TrickRow':
 				message.type = chatCostumMsgType.trick;
-				message.trickId = selectedTrickData?.id;
+				message.trickId = selectedTrickData?.Id;
 				break;
 
 			case 'Source':
@@ -122,9 +116,11 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 
 			const recievedVideoUrl = await uploadSource(
 				video,
+				null,
 				process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string,
 				user?.id as string,
 				setLoadingSourceProgress,
+				setError,
 			);
 
 			message.video = recievedVideoUrl as string;
@@ -135,9 +131,11 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 
 			const recievedImageUrl = await uploadSource(
 				image,
+				null,
 				process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string,
 				user?.id as string,
 				setLoadingSourceProgress,
+				setError,
 			);
 
 			message.image = recievedImageUrl as string;
@@ -148,9 +146,11 @@ export const RenderSendText: React.FC<RenderSendTextProps> = ({
 
 			const recievedAudioUrl = await uploadSource(
 				audio,
+				null,
 				process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string,
 				user?.id as string,
 				setLoadingSourceProgress,
+				setError,
 			);
 
 			await sleep(500);
@@ -210,12 +210,6 @@ export const RenderSendEmptyText: React.FC<{
 	};
 
 	const record = async () => {
-		const status = await AudioModule.requestRecordingPermissionsAsync();
-		if (!status.granted) {
-			console.log('Permission denied');
-			return;
-		}
-
 		try {
 			const uri = await audioRecorderPlayer.startRecorder();
 			console.log('Recording started at:', uri);

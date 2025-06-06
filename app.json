@@ -4,85 +4,40 @@
 		"slug": "Crah",
 		"version": "1.0.0",
 		"orientation": "portrait",
-		"icon": "./assets/images/crah.png",
-		"scheme": "crah",
+		"icon": "./assets/images/icon.png",
+		"scheme": "Crah",
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
 		"splash": {
-			"image": "./assets/images/crah.png",
+			"image": "./assets/images/splash-icon.png",
 			"resizeMode": "contain",
-			"backgroundColor": "#ff0000"
+			"backgroundColor": "#ffffff"
 		},
 		"ios": {
-			"supportsTablet": true,
-			"infoPlist": {
-				"NSPhotoLibraryUsageDescription": "We need access to your photos for the upload."
-			},
-			"scheme": "crah",
-			"bundleIdentifier": "com.anonymous.crahapp"
+			"supportsTablet": true
 		},
 		"android": {
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/images/crah.png",
-				"backgroundColor": "#ff0000"
+				"foregroundImage": "./assets/images/adaptive-icon.png",
+				"backgroundColor": "#ffffff"
 			},
-			"package": "com.anonymous.crahapp",
-			"softwareKeyboardLayoutMode": "pan",
-			"scheme": "crah",
-			"permissions": ["CAMERA", "RECORD_AUDIO"]
+			"edgeToEdgeEnabled": true,
+			"package": "com.anonymous.crah"
 		},
 		"web": {
 			"bundler": "metro",
 			"output": "static",
-			"favicon": "./assets/images/crah.png"
+			"favicon": "./assets/images/favicon.png"
 		},
 		"plugins": [
-			[
-				"expo-audio",
-				{
-					"microphonePermission": "Allow crah to access your microphone."
-				}
-			],
-			[
-				"expo-camera",
-				{
-					"cameraPermission": "Allow Crah to access your camera",
-					"microphonePermission": "Allow Crah to access your microphone",
-					"recordAudioAndroid": true
-				}
-			],
-			[
-				"expo-image-picker",
-				{
-					"photosPermission": "Allow Crah to access your photos",
-					"cameraPermission": "Allow Crah to access your camera",
-					"microphonePermission": "Allow Crah to access your microphone"
-				}
-			],
 			"expo-router",
-			[
-				"expo-video",
-				{
-					"supportsBackgroundPlayback": true,
-					"supportsPictureInPicture": true
-				}
-			],
 			"expo-build-properties",
-			"expo-font",
-			[
-				"react-native-vision-camera",
-				{
-					"cameraPermissionText": "Crah needs access to your camera",
-					"enableMicrophonePermission": true,
-					"microphonePermissionText": "Crah needs access to your microphone"
-				}
-			]
+			"expo-secure-store",
+			"expo-video",
+			"react-native-vision-camera"
 		],
 		"experiments": {
 			"typedRoutes": true
-		},
-		"extra": {
-			"expoRouterAppRoot": "/"
 		}
 	}
 }

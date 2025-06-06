@@ -8,6 +8,7 @@ import {
 	View,
 	RefreshControl,
 	Dimensions,
+	ListRenderItem,
 } from 'react-native';
 import ThemedView from '../general/ThemedView';
 import Colors from '@/constants/Colors';
@@ -21,7 +22,7 @@ const SCROLL_THRESHOLD = 10;
 interface HeaderFlatListProps<T> {
 	headerChildren: ReactNode;
 	data: T[];
-	renderItem: ({ item }: { item: T }) => ReactNode;
+	renderItem: ListRenderItem<T>;
 	theme: 'light' | 'dark';
 	scrollEffect?: boolean;
 	headerHeight?: number;
@@ -29,7 +30,7 @@ interface HeaderFlatListProps<T> {
 	setRefreshing: (b: boolean) => void;
 	onRefresh?: () => void;
 	keyExtractor: (item: T, index: number) => string;
-	ListEmptyComponent?: ReactNode;
+	ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null;
 	ListFooterComponent?: ReactNode;
 	childrenAboveList?: ReactNode;
 	dataLoaded: boolean | undefined;
@@ -155,7 +156,13 @@ function HeaderFlatList<T>({
 							</View>
 						}
 						ListEmptyComponent={ListEmptyComponent}
-						ListFooterComponent={ListFooterComponent}
+						ListFooterComponent={
+							ListFooterComponent
+								? typeof ListFooterComponent === 'function'
+									? ListFooterComponent
+									: () => ListFooterComponent
+								: null
+						}
 						refreshControl={
 							<RefreshControl
 								refreshing={refreshing}

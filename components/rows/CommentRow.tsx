@@ -16,10 +16,10 @@ import { formatDistanceToNow } from 'date-fns';
 import ThemedText from '../general/ThemedText';
 
 interface CommentRowProps {
-	username: string;
+	username: string | null;
 	avatar: string;
 	text: string;
-	userId: number;
+	userId: string;
 	commentId: number;
 	likes: number;
 	responses: number;
@@ -144,10 +144,10 @@ const CommentRow: React.FC<CommentRowProps> = ({
 						{replies?.map((reply, index) => (
 							<CommentRow
 								key={index}
-								username={reply.user.name}
+								username={reply.user.username}
 								avatar={reply.avatar}
 								text={reply.text}
-								userId={reply.user._id}
+								userId={reply.user.id}
 								commentId={reply._id}
 								likes={reply.likes}
 								responses={0}
@@ -171,6 +171,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
 			<Row
 				highlightWords={highlightWords}
 				containerStyle={[
+					// @ts-ignore
 					style,
 					styles.container,
 					{
@@ -180,7 +181,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
 								: Dimensions.get('window').width,
 					},
 				]}
-				title={username}
+				title={username ?? 'no username'}
 				subtitle={text}
 				avatarUrl={avatar}
 				showAvatar={true}

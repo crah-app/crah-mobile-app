@@ -98,7 +98,6 @@ import { mmkv } from '@/hooks/mmkv';
 import CameraComponent from '@/components/giftedChat/CameraComponent';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
-import PlayAudioInstance from '@/components/giftedChat/PlayAudioInstance';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 
 const ChatScreen = () => {
@@ -546,13 +545,6 @@ const ChatScreen = () => {
 					progress={loadingSourceProgress}
 					visible={loadingSourceModalVisible}
 				/>
-
-				{/* to play audio */}
-				{/* <PlayAudioInstance
-					isPlayingAudio={isPlayingAudio}
-					setIsPlayingAudio={setIsPlayingAudio}
-					recordedAudio={recordedAudio}
-				/> */}
 
 				<RenderFetchedData
 					ActivityIndicatorStyle={{
