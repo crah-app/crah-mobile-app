@@ -115,12 +115,12 @@ const UserPostContainer: React.FC<UserPostContainerProps> = ({
 	return (
 		<View
 			style={[
-				defaultStyles.surface_container,
 				{
+					paddingTop: 12,
 					borderTopWidth: containerBorder,
 					borderTopColor: Colors[theme].gray,
 					backgroundColor: containerBackground,
-					width: Dimensions.get('window').width - 24,
+					width: Dimensions.get('window').width,
 				},
 			]}>
 			<View
@@ -147,8 +147,12 @@ const UserPostContainer: React.FC<UserPostContainerProps> = ({
 				))}
 			</View>
 
-			<View style={{}}>
-				<View style={{ bottom }}>
+			{/* posts */}
+			<View
+				style={{
+					width: Dimensions.get('window').width,
+				}}>
+				<View style={{ width: Dimensions.get('window').width }}>
 					{!postsLoaded ? (
 						// loading...
 						<CrahActivityIndicator color={Colors[theme].primary} size={24} />
@@ -358,7 +362,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 					<View
 						style={{
 							position: 'absolute',
-							width: Dimensions.get('window').width - 24,
+							width: Dimensions.get('window').width,
 							padding: 12,
 							alignItems: 'flex-end',
 							gap: 8,
@@ -387,7 +391,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 					<View
 						style={{
 							position: 'absolute',
-							width: Dimensions.get('window').width - 24,
+							width: Dimensions.get('window').width,
 							padding: 12,
 							alignItems: 'flex-end',
 							gap: 8,
@@ -538,7 +542,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 						borderTopWidth: containerBorder,
 						borderTopColor: Colors[theme].gray,
 						backgroundColor: containerBackground,
-						width: Dimensions.get('window').width - 24,
+						width: Dimensions.get('window').width,
 					},
 				]}>
 				{/* user fans (followers) and friends (user follows back) count */}
@@ -629,7 +633,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 					defaultStyles.surface_container,
 					{
 						backgroundColor: containerBackground,
-						width: Dimensions.get('window').width - 24,
+						width: Dimensions.get('window').width,
 					},
 				]}>
 				<View
@@ -802,7 +806,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'flex-start',
 		alignItems: 'center',
-		padding: 12,
+		// padding: 12,
 		gap: 12,
 		height: 'auto',
 		width: Dimensions.get('window').width,
@@ -817,7 +821,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 	},
 	header: {
-		width: Dimensions.get('window').width - 24,
+		width: Dimensions.get('window').width,
 		alignItems: 'flex-start',
 		justifyContent: 'flex-start',
 		padding: 0,
@@ -843,8 +847,8 @@ const styles = StyleSheet.create({
 		paddingBottom: 10,
 	},
 	GridItem: {
-		width: Dimensions.get('window').width / 3 - 12,
-		height: Dimensions.get('window').width / 3 - 12,
+		width: Dimensions.get('window').width / 3,
+		height: Dimensions.get('window').width / 3,
 		borderWidth: StyleSheet.hairlineWidth,
 	},
 });

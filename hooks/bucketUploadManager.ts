@@ -155,7 +155,8 @@ const XHRUpload = async (
 
 		xhr.upload.onprogress = (e) => {
 			if (e.lengthComputable) {
-				const percent = (e.loaded / e.total) * 100;
+				let percent = (e.loaded / e.total) * 100;
+
 				console.log(`Upload progress: ${percent.toFixed(2)}%`);
 				setLoadingSourceProgress(Number(percent.toFixed(2)));
 			}

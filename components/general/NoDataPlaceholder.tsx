@@ -44,7 +44,7 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 			</Text>
 			<Link
 				href={{
-					pathname: onSubTextClickPathname ?? '/',
+					pathname: '/(auth)/(tabs)/createPages/createVideo',
 				}}
 				asChild>
 				<TouchableOpacity>

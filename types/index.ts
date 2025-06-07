@@ -59,6 +59,9 @@ export type RawPost = {
 	Shares: number;
 
 	sourceRatio: upload_source_ratio;
+
+	// wether currentUser liked post or not
+	liked: boolean;
 };
 
 // reaction type based on reactions array

@@ -95,6 +95,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	const [likesCount, setLikesCount] = useState(post.Likes || 0);
 	const [commentsCount, setCommentsCount] = useState(post.comments.length || 0);
 	const [shareCount, setshareCount] = useState(post.Shares || 0);
+	const [userLikedPost, setUserLikedPost] = useState<boolean>(post.liked);
 
 	const [currentUserLiked, setCurrentUserLiked] = useState<boolean>();
 
@@ -114,6 +115,19 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 
 			setLikesCount(likesCount - 1);
 			return false;
+		});
+
+		fetch(`http://192.168.0.136:4000/api/posts/post/${postId}/like`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Cache-Control': 'no-cache',
+			},
+			body: JSON.stringify({
+				userLikedPost: userLikedPost,
+			}),
+		}).catch((err) => {
+			console.warn('Error posting current like status to user post: ', err);
 		});
 	};
 

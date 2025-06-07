@@ -54,12 +54,9 @@ import CreatePageHeader from '@/components/create/CreatePageHeader';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
-import { SegmentedControl } from '@/components/general/SegmentedControl';
-import crahTransparentLogo from '../../../../assets/images/vectors/crah_transparent.svg';
 import { VideoUIBtns } from '@/components/VideoUI';
 import { uploadSource } from '@/hooks/bucketUploadManager';
-import { useSession } from '@clerk/clerk-expo';
-import { useAuth, useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-expo';
 import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
 import { sleep } from '@/utils/globalFuncs';
 
@@ -74,7 +71,7 @@ interface videoDataInterface {
 
 const CreateVideo = () => {
 	const theme = useSystemTheme();
-	const { bottom } = useSafeAreaInsets();
+	// const { bottom } = useSafeAreaInsets();
 
 	const { getToken } = useAuth();
 	const { user } = useUser();
@@ -309,7 +306,7 @@ const CreateVideo = () => {
 						progress={uploadingProgress}
 					/>
 
-					<ThemedView theme={theme} flex={1} style={{ bottom: bottom * 3 }}>
+					<ThemedView theme={theme} flex={1} style={{}}>
 						<CreatePageHeader
 							title={'Create Video'}
 							handleUploadClickEvent={handleVideoUploadClickEvent}
@@ -406,13 +403,14 @@ const CreateVideoMainContent = ({
 			const currentTime = Number(
 				(videoPlayerRef.current.getCurrentTime() * 1000).toFixed(0),
 			);
-			const { uri } = await VideoThumbnails.getThumbnailAsync(
+			const { uri, width, height } = await VideoThumbnails.getThumbnailAsync(
 				uploadedSource[0].uri,
 				{
 					time: currentTime,
 				},
 			);
-			setCover(uri);
+
+			setCover([{ width, height, uri }]);
 		}
 	};
 
