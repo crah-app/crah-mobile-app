@@ -19,8 +19,11 @@ import UserPostGridItem from '@/components/UserPostGridItem';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
 	BestTrickType,
+	CrahUser,
 	dropDownMenuInputData,
 	GeneralPostTypesIonicons,
+	Rank,
+	RiderType,
 	UserGalleryTopics,
 } from '@/types';
 
@@ -193,7 +196,7 @@ const UserPostContainer: React.FC<UserPostContainerProps> = ({
 const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
-	const { bottom } = useSafeAreaInsets();
+	const { bottom, top } = useSafeAreaInsets();
 
 	const [activePostFilterIcon, setActivePostFilterIcon] =
 		useState<GeneralPostTypesIonicons>(GeneralPostTypesIonicons.all);
@@ -230,16 +233,19 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 	};
 
 	// States for user data
-	const [fans, setFans] = useState<number>(81000);
-	const [friends, setFriends] = useState<number>(287);
-	const [level, setLevel] = useState<number>(23);
-	const [rank, setRank] = useState<number>(257);
-	const [postsCount, setPostsCount] = useState<number | undefined>();
-	const [riderType, setRiderType] = useState<string>('Flat Rider');
-	const [bestTrick, setBestTrick] = useState<string>('Buttercup Flat');
-	const [userName, SetUserName] = useState<string>(
-		user?.username ?? 'no user name',
+	const [fans, setFans] = useState<number>(0);
+	const [friends, setFriends] = useState<number>(0);
+	const [level, setLevel] = useState<number>(0);
+	const [rank, setRank] = useState<Rank>(Rank.Wood);
+	const [rankPoints, setRankPoints] = useState<number>(0);
+	const [userAvatar, setUserAvatar] = useState<string>('');
+	const [postsCount, setPostsCount] = useState<number>(0);
+	const [riderType, setRiderType] = useState<RiderType>('Park Rider');
+	const [bestTrick, setBestTrick] = useState<string>('');
+	const [profileDescription, setProfileDescription] = useState<string | null>(
+		null,
 	);
+	const [userName, SetUserName] = useState<string>();
 
 	const [loadingUser, setLoadingUser] = useState<boolean>(true);
 	const [errLoadingUser, setErrLoadingUser] = useState<{
@@ -268,7 +274,26 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 			signal: controller.signal,
 		})
 			.then((res) => res.json())
-			.then((res: ClerkUser) => SetUserName(res?.username ?? 'no user name'))
+			.then((res: CrahUser[]) => {
+				const user: CrahUser = res[0];
+
+				// profile
+				SetUserName(user.Name);
+				setUserAvatar(user.avatar);
+				setProfileDescription(user.profileDescription);
+
+				// rider
+				setRiderType(user.riderType);
+
+				// ranks
+				setRank(user.rank);
+				setRankPoints(user.rankPoints);
+				setLevel(user.level);
+
+				// social
+				setFans(user.followerCount);
+				setFriends(user.friendCount);
+			})
 			.catch((err) => {
 				if (err.name !== 'AbortError') {
 					setErrLoadingUser({
@@ -418,7 +443,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 						}}>
 						<ThemedText
 							theme={theme}
-							value={userName}
+							value={userName ?? ''}
 							style={[styles.UserName]}
 						/>
 					</View>
@@ -442,7 +467,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 						/>
 						<ThemedText
 							theme={theme}
-							value={`#${rank}`}
+							value={`${rank}`}
 							style={styles.UserDataText}
 						/>
 
@@ -466,7 +491,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 						/>
 						<ThemedText
 							theme={theme}
-							value={level.toString()}
+							value={(level ?? '').toString()}
 							style={styles.UserDataText}
 						/>
 					</View>
@@ -482,7 +507,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 						{postsCount != undefined ? (
 							<ThemedText
 								theme={theme}
-								value={postsCount.toString()}
+								value={(postsCount ?? '').toString()}
 								style={[
 									styles.UserDataText,
 									{
@@ -537,7 +562,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 					/>
 					<ThemedText
 						theme={theme}
-						value={fans.toLocaleString()}
+						value={(fans ?? '').toString()}
 						style={styles.UserDataText}
 					/>
 
@@ -561,7 +586,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 					/>
 					<ThemedText
 						theme={theme}
-						value={friends.toString()}
+						value={(friends ?? '').toString()}
 						style={styles.UserDataText}
 					/>
 				</View>
@@ -570,9 +595,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 				<View style={{ marginBottom: 12 }}>
 					<ThemedText
 						theme={theme}
-						value={
-							'I am a 27 years old flat rider, living in Bjearnum, Sweden. Never stop fighting. Take what is yours.'
-						}
+						value={profileDescription ?? 'no profile description'}
 					/>
 				</View>
 
@@ -593,7 +616,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 						value="Rider Type"
 						style={[{ color: 'red' }]}
 					/>
-					<ThemedText theme={theme} value={riderType} />
+					<ThemedText theme={theme} value={riderType ?? ''} />
 				</View>
 			</View>
 		);
@@ -705,7 +728,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 	};
 
 	return (
-		<ThemedView theme={theme} flex={1}>
+		<ThemedView theme={theme} flex={1} style={{ top }}>
 			<ScrollView
 				contentContainerStyle={{}}
 				showsVerticalScrollIndicator={true}

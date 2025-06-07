@@ -5,6 +5,7 @@ import { IMessage, User } from 'react-native-gifted-chat';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 import ClerkUser from './clerk';
+import { DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_FORM_ACTIONS } from 'react';
 
 // Ionicons icon type
 export type ionicon = keyof typeof Ionicons.glyphMap;
@@ -63,10 +64,24 @@ export type RawPost = {
 // reaction type based on reactions array
 export type ReactionType = (typeof Reactions)[number];
 
+export type RiderType = 'Park Rider' | 'Street Rider' | 'Flat Rider' | null;
+
 // simple user interface
 export interface CrahUser extends ClerkUser {
-	level?: number;
-	rank?: number;
+	Name: string;
+	level: number;
+	rank: Rank;
+	rankPoints: number;
+	createdAt: Date | null;
+	avatar: string;
+	chatGreeting: string | null;
+	profileDescription: string | null;
+	riderType: RiderType;
+
+	// not officially in the db but comes with the api request of user
+	followerCount: number;
+	friendCount: number;
+	posts: number;
 }
 
 // when a user is selected in f.e a gifted chat

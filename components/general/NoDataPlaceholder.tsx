@@ -32,10 +32,12 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 
 	return (
 		<View style={[styles.placeholderContainer, containerStyle]}>
-			<GetSVG
-				props={{ width: 30, height: 30, fill: Colors[theme].textPrimary }}
-				name="arrow_to_down_right"
-			/>
+			<View style={arrowStyle}>
+				<GetSVG
+					props={{ width: 30, height: 30, fill: Colors[theme].textPrimary }}
+					name="arrow_to_down_right"
+				/>
+			</View>
 
 			<Text style={styles.placeholderText}>
 				{firstTextValue ?? "No one's around here"}{' '}

@@ -54,7 +54,7 @@ const LeaguesPage: React.FC<LeaguesProps> = ({ theme }) => {
 			<View
 				style={{
 					padding: 8,
-					top: Dimensions.get('window').height - 290,
+					top: Dimensions.get('window').height - 350,
 					zIndex: 2,
 					position: 'absolute',
 				}}>
