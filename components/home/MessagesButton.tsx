@@ -2,10 +2,10 @@ import Colors from '@/constants/Colors';
 import { Link } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import ScooterBar from '../../assets/images/vectors/bar.svg';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedText from '../general/ThemedText';
+import GetSVG from '../GetSVG';
 
 const MessagesButton = () => {
 	const theme = useSystemTheme();
@@ -20,17 +20,9 @@ const MessagesButton = () => {
 					pathname: '/(auth)/(tabs)/homePages/chats',
 				}}>
 				<TouchableOpacity>
-					<SvgXml
-						width="25"
-						height="25"
-						xml={ScooterBar}
-						fill={Colors[theme].textPrimary}
-						style={[
-							{
-								// @ts-ignore
-								color: Colors[theme].textPrimary,
-							},
-						]}
+					<GetSVG
+						props={{ fill: Colors[theme].textPrimary, width: 24, height: 24 }}
+						name={'bar'}
 					/>
 
 					<View

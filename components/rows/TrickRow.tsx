@@ -33,7 +33,7 @@ const TrickColumn: React.FC<TrickColumnProps> = ({
 			}}
 			avatarIsSVG={true}
 			showAvatar={true}
-			avatarUrl={Bars}
+			avatarUrl={'bar'}
 			onPress={onPress}
 		/>
 	);

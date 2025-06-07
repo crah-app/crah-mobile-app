@@ -9,6 +9,7 @@ import {
 	RefreshControl,
 	Dimensions,
 	ListRenderItem,
+	SafeAreaView,
 } from 'react-native';
 import ThemedView from '../general/ThemedView';
 import Colors from '@/constants/Colors';
@@ -16,6 +17,7 @@ import { ContentFilterTypes } from '@/types';
 import NoDataPlaceholder from '../general/NoDataPlaceholder';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
 import UserPost from '../home/UserPost';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SCROLL_THRESHOLD = 10;
 
@@ -114,8 +116,10 @@ function HeaderFlatList<T>({
 		}
 	}, [dataLoaded, errWhileLoading]);
 
+	const { top } = useSafeAreaInsets();
+
 	return (
-		<ThemedView theme={theme} flex={1}>
+		<ThemedView theme={theme} flex={1} style={{ top }}>
 			{/* 🔝 Fixed Header */}
 			<Animated.View
 				style={[

@@ -2,6 +2,7 @@ import React, { ReactNode, useState } from 'react';
 import { StyleSheet, View, Dimensions } from 'react-native';
 import ThemedView from '../general/ThemedView';
 import Colors from '@/constants/Colors';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Props = {
 	theme: 'light' | 'dark';

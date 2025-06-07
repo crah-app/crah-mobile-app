@@ -33,7 +33,6 @@ import {
 	ScrollView,
 } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
-import { SvgXml } from 'react-native-svg';
 import {
 	CommentPurpose,
 	userCommentType,

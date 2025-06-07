@@ -12,13 +12,14 @@ import {
 import React from 'react';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { SvgFromXml, SvgXml } from 'react-native-svg';
+import GetSVG from '../GetSVG';
+import { svg_name } from '@/types';
 
 interface RowProps {
 	title: string;
 	subtitle?: string;
 	showAvatar?: boolean;
-	avatarUrl?: string | undefined;
+	avatarUrl?: string | undefined | svg_name;
 	customLeftComponent?: React.ReactNode;
 	customRightComponent?: React.ReactNode;
 	leftContainerStyle?: ViewStyle | ViewStyle[];
@@ -106,12 +107,13 @@ const Row: React.FC<RowProps> = ({
 				{showAvatar && avatarUrl ? (
 					<View>
 						{avatarIsSVG ? (
-							<SvgXml
-								xml={avatarUrl}
-								fill={Colors[theme].textPrimary}
-								style={[styles.avatar]}
-								width={costumAvatarWidth ?? 46}
-								height={costumAvatarHeight ?? 42}
+							<GetSVG
+								props={{
+									width: 42,
+									height: 42,
+									fill: Colors[theme].textPrimary,
+								}}
+								name={avatarUrl as svg_name}
 							/>
 						) : (
 							<Image

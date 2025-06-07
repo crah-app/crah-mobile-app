@@ -2,7 +2,6 @@ import React from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import ThemedText from '../general/ThemedText';
 import Colors from '@/constants/Colors';
-import { SvgXml } from 'react-native-svg';
 
 import Scooter from '../../assets/images/vectors/scooter.svg';
 import Row from '../general/Row';
@@ -10,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { defaultStyles } from '@/constants/Styles';
 import { format } from 'date-fns';
 import { SpotInterface } from '@/types';
+import GetSVG from '../GetSVG';
 
 interface TrickPreviewProps {
 	theme: 'dark' | 'light';
@@ -61,12 +61,7 @@ const TrickPreviewCard: React.FC<TrickPreviewProps> = ({
 							alignItems: 'center',
 							height: '75%',
 						}}>
-						<SvgXml
-							xml={Scooter}
-							fill={Colors[theme].textPrimary}
-							height={70}
-							width={70}
-						/>
+						<GetSVG props={{ width: 250, height: 250 }} name="scooter" />
 					</View>
 
 					<View>

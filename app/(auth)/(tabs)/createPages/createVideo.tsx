@@ -55,7 +55,6 @@ import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 import { SegmentedControl } from '@/components/general/SegmentedControl';
-import { SvgXml } from 'react-native-svg';
 import crahTransparentLogo from '../../../../assets/images/vectors/crah_transparent.svg';
 import { VideoUIBtns } from '@/components/VideoUI';
 import { uploadSource } from '@/hooks/bucketUploadManager';
@@ -269,18 +268,7 @@ const CreateVideo = () => {
 			headerChildren={
 				<CostumHeader
 					theme={theme}
-					headerLeft={
-						<HeaderLeftLogo position="relative" />
-						// <View>
-						// 	<SvgXml
-						// 		xml={crahTransparentLogo}
-						// 		height={42}
-						// 		width={42}
-						// 		// @ts-ignore
-						// 		style={{ color: Colors[theme].textPrimary }}
-						// 	/>
-						// </View>
-					}
+					headerLeft={<HeaderLeftLogo position="relative" />}
 					headerRight={
 						<Link
 							style={{}}

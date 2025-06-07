@@ -3,11 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import BottomAuthSheet from '@/components/BottomAuthSheet';
 import Colors from '@/constants/Colors';
 import WelcomeTitle from '@/components/WelcomeTitle';
-import { SvgXml } from 'react-native-svg';
-
-import TitleImage from '../assets/images/vectors/crah_transparent.svg';
-import TitleImageDark from '../assets/images/vectors/crah_transparent_black.svg';
 import { useSystemTheme } from '@/utils/useSystemTheme';
+import GetSVG from '@/components/GetSVG';
 
 const Page = () => {
 	const theme = useSystemTheme();
@@ -15,9 +12,12 @@ const Page = () => {
 		<View style={styles.container}>
 			<WelcomeTitle />
 			{theme == `dark` ? (
-				<SvgXml width="250" height="250" xml={TitleImageDark} />
+				<GetSVG
+					props={{ width: 250, height: 250 }}
+					name="crah_transparent_black"
+				/>
 			) : (
-				<SvgXml width="250" height="250" xml={TitleImage} />
+				<GetSVG props={{ width: 250, height: 250 }} name="crah_transparent" />
 			)}
 
 			<BottomAuthSheet />

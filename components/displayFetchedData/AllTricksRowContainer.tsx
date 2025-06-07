@@ -68,7 +68,6 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 				}
 
 				console.log(res);
-
 				setAllTricks(res);
 			})
 			.catch((err) =>

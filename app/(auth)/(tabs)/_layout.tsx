@@ -1,12 +1,15 @@
 import React from 'react';
 import { Tabs, useSegments } from 'expo-router';
-import { StyleSheet, View, StatusBar } from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
-import { SvgXml } from 'react-native-svg';
-import Scooter from '../../../assets/images/vectors/scooter.svg';
 import CreatePostDropDownMenu from '@/components/CreatePostDropDownMenu';
+import GetSVGMemo from '@/components/GetSVG';
+import {
+	SafeAreaView,
+	useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 const Layout = () => {
 	const theme = useSystemTheme();
@@ -34,11 +37,6 @@ const Layout = () => {
 						color: Colors[theme].textPrimary,
 					},
 					headerShadowVisible: false,
-					tabBarItemStyle: [
-						{
-							paddingVertical: 15,
-						},
-					],
 				}}>
 				<Tabs.Screen
 					name="homePages"
@@ -79,7 +77,13 @@ const Layout = () => {
 					options={{
 						tabBarIcon: () => null,
 						headerShown: false,
-						tabBarButton: (props) => <CreatePostDropDownMenu />,
+						tabBarButton: (props) => (
+							<TouchableOpacity style={styles.plusButtonContainer}>
+								<View style={styles.plusButton}>
+									<Ionicons name="add" size={30} color="#FFF" />
+								</View>
+							</TouchableOpacity>
+						),
 					}}
 				/>
 
@@ -87,7 +91,14 @@ const Layout = () => {
 					name="statsPages"
 					options={{
 						tabBarIcon: ({ color }) => (
-							<SvgXml width="25" height="25" xml={Scooter} fill={color} />
+							<GetSVGMemo
+								props={{
+									fill: color,
+									width: 24,
+									height: 24,
+								}}
+								name={'scooter'}
+							/>
 						),
 						tabBarShowLabel: true,
 						tabBarLabel: 'Ranks',
@@ -147,9 +158,27 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 	},
 	tabBarStyle: {
-		height: 80, // tab bar is fully in the screen
+		height: 95,
 		borderTopWidth: StyleSheet.hairlineWidth * 2, // top border height
-		paddingHorizontal: 15, // gap between tab bar icon is narrow
+		paddingHorizontal: 8, // gap between tab bar icon is narrow
+		paddingTop: 15, // gap between tab bar icon and border
+	},
+	plusButtonContainer: {
+		bottom: 1,
+		alignItems: 'center',
+	},
+	plusButton: {
+		width: 50,
+		height: 50,
+		borderRadius: 30,
+		backgroundColor: Colors.default.primary,
+		justifyContent: 'center',
+		alignItems: 'center',
+		elevation: 5,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.1,
+		shadowRadius: 8,
 	},
 });
 

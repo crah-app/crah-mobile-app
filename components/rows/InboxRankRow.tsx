@@ -1,9 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Column from '@/components/general/Row';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import Colors from '@/constants/Colors';
-import { SvgXml } from 'react-native-svg';
 
 import IronBadge from '../../assets/images/vectors/bar.svg';
 import BronzeBadge from '../../assets/images/vectors/bar.svg';

@@ -22,7 +22,6 @@ import {
 } from '@/types';
 import { defaultStyles } from '@/constants/Styles';
 import { format } from 'date-fns';
-import { SvgXml } from 'react-native-svg';
 import TrickPreviewCard from './TrickPreviewCard';
 import { useUser } from '@clerk/clerk-expo';
 

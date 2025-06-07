@@ -22,7 +22,6 @@ import ThemedView from '@/components/general/ThemedView';
 import TitleImage from '../assets/images/vectors/flyinghenke.svg';
 import TitleImageDark from '../assets/images/vectors/flyinghenke_dark.svg';
 
-import { SvgXml } from 'react-native-svg';
 import {
 	CodeField,
 	Cursor,
@@ -32,6 +31,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import SecuredPasswordInput from '@/components/general/SecuredPasswordInput';
 import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
+import GetSVG from '@/components/GetSVG';
 
 const CELL_COUNT = 6;
 
@@ -188,9 +188,15 @@ const Page = () => {
 					{type !== 'google' ? (
 						<View style={{ justifyContent: 'center', alignItems: 'center' }}>
 							{theme == `light` ? (
-								<SvgXml width="250" height="250" xml={TitleImageDark} />
+								<GetSVG
+									props={{ width: 250, height: 250 }}
+									name="crah_transparent_black"
+								/>
 							) : (
-								<SvgXml width="250" height="250" xml={TitleImage} />
+								<GetSVG
+									props={{ width: 250, height: 250 }}
+									name="crah_transparent"
+								/>
 							)}
 						</View>
 					) : (
@@ -291,6 +297,7 @@ const Page = () => {
 											},
 										]}
 										value={symbol || (isFocused ? <Cursor /> : '')}
+										// @ts-ignore
 										onLayout={getCellOnLayoutHandler(index)}
 									/>
 								)}
@@ -393,6 +400,7 @@ const Page = () => {
 													: 'transparent',
 											},
 										]}
+										// @ts-ignore
 										onLayout={getCellOnLayoutHandler(index)}
 										value={symbol || (isFocused ? <Cursor /> : '')}
 									/>

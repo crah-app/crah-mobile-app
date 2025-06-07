@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
-import { SvgXml } from 'react-native-svg';
+import { SafeAreaView, StyleSheet, View, ViewStyle } from 'react-native';
 import GetSVG from '../GetSVG';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface HeaderLeftLogoProps {
 	style?: ViewStyle | ViewStyle[];
@@ -9,10 +9,7 @@ interface HeaderLeftLogoProps {
 }
 
 const HeaderLeftLogo: React.FC<HeaderLeftLogoProps> = ({ style, position }) => {
-
-	return (
-		<GetSVG name={'textlogo'} props={{}}/>
-	);
+	return <GetSVG name={'textlogo'} props={{ width: 130, height: 40 }} />;
 };
 
 const styles = StyleSheet.create({});

@@ -10,6 +10,7 @@ import {
 	Dimensions,
 } from 'react-native';
 import ThemedView from '../general/ThemedView';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SCROLL_THRESHOLD = 10;
 
@@ -66,8 +67,10 @@ const HeaderScrollView: React.FC<HeaderScrollViewProps> = ({
 		scrollOffset.current = currentOffset;
 	};
 
+	const { top } = useSafeAreaInsets();
+
 	return (
-		<ThemedView theme={theme} flex={1}>
+		<ThemedView theme={theme} flex={1} style={{ top }}>
 			<Animated.View
 				style={[
 					styles.header,

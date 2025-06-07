@@ -9,9 +9,9 @@ import React from 'react';
 import Colors from '@/constants/Colors';
 
 import arrow from '../../assets/images/vectors/arrow-to-down-right-svgrepo-com.svg';
-import { SvgXml } from 'react-native-svg';
 import { Link } from 'expo-router';
 import { useSystemTheme } from '@/utils/useSystemTheme';
+import GetSVG from '../GetSVG';
 
 interface NoDataPlaceholderProps {
 	arrowStyle?: ViewStyle | ViewStyle[];
@@ -32,19 +32,9 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 
 	return (
 		<View style={[styles.placeholderContainer, containerStyle]}>
-			<SvgXml
-				width="30"
-				height="30"
-				xml={arrow}
-				fill={Colors[theme].textPrimary}
-				style={[
-					styles.arrow,
-					arrowStyle,
-					{
-						// @ts-ignore
-						color: Colors[theme].textPrimary,
-					},
-				]}
+			<GetSVG
+				props={{ width: 30, height: 30, fill: Colors[theme].textPrimary }}
+				name="arrow_to_down_right"
 			/>
 
 			<Text style={styles.placeholderText}>

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Dimensions, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SvgXml } from 'react-native-svg';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { useAuth } from '@clerk/clerk-expo';
@@ -9,6 +8,7 @@ import { router } from 'expo-router';
 import Column from '@/components/general/Row';
 import Scooter from '../../assets/images/vectors/scooter.svg';
 import { ionicon } from '@/types';
+import GetSVG from '../GetSVG';
 
 interface SettingsColumnProps {
 	type: 'ordinary' | 'unordinary' | string;
@@ -43,15 +43,7 @@ const SettingsColumn: React.FC<SettingsColumnProps> = ({
 
 	const renderLeftIcon = () => {
 		if (svg && type != 'unordinary') {
-			return (
-				<SvgXml
-					width="25"
-					height="25"
-					xml={Scooter}
-					fill={Colors[theme].textPrimary}
-					style={{ marginRight: -2 }}
-				/>
-			);
+			return <GetSVG props={{ width: 24, height: 24 }} name="scooter" />;
 		}
 
 		if (hasIcon && icon && type != 'unordinary') {

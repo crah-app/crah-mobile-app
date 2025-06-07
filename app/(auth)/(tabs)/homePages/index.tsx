@@ -31,7 +31,6 @@ import CostumHeader from '@/components/header/CostumHeader';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 
 // dummy-data
-import { SvgXml } from 'react-native-svg';
 import MessagesButton from '@/components/home/MessagesButton';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 
@@ -42,6 +41,7 @@ import { useUser } from '@clerk/clerk-expo';
 import ThemedText from '@/components/general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
 import HeaderFlatList from '@/components/header/HeaderFlatList';
+import GetSVG from '@/components/GetSVG';
 
 const POST_CACHE_KEY = 'allPosts';
 
@@ -167,15 +167,13 @@ const Page = () => {
 									style={{
 										transform: [{ rotate: rotateInterpolate }],
 									}}>
-									<SvgXml
-										width="25"
-										height="25"
-										xml={ScooterWheel}
-										fill={Colors[theme].textPrimary}
-										style={{
-											// @ts-ignore
-											color: Colors[theme].textPrimary,
+									<GetSVG
+										props={{
+											fill: Colors[theme].textPrimary,
+											width: 24,
+											height: 24,
 										}}
+										name={'wheel'}
 									/>
 								</Animated.View>
 							</TouchableOpacity>

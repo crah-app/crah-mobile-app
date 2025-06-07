@@ -2,13 +2,10 @@ import React from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ThemedText from '../general/ThemedText';
-import { useSystemTheme } from '@/utils/useSystemTheme';
-import { CrahUser, Rank, RankColors, RankColorsDark } from '@/types';
-import { LinearGradient } from 'expo-linear-gradient';
-import { SvgXml } from 'react-native-svg';
 import { defaultStyles } from '@/constants/Styles';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import GetSVG from '../GetSVG';
 
 // import bg from '../../assets/images/output.svg';
 // import { Canvas, Path, Skia } from '@shopify/react-native-skia';
@@ -203,7 +200,10 @@ const YourRank: React.FC<YourRankProps> = ({ theme }) => {
 						width: Dimensions.get('window').width,
 					},
 				]}>
-				{/* <SvgXml width={600} height={200} xml={cleanSvg} /> */}
+				<GetSVG
+					props={{ width: 600, height: 200 }}
+					name="trianglify_red_background"
+				/>
 				<View
 					style={{
 						backgroundColor: 'rgba(0, 0, 0, 0.2)',
