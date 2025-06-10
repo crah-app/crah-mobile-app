@@ -25,40 +25,229 @@ const CreateProfile = () => {
 	const theme = useSystemTheme();
 	const { bottom } = useSafeAreaInsets();
 
-	type step = 0 | 1 | 2 | 3 | 4 | 5;
+	const totalSteps = 5;
 
-	const [stepsComplete, setStepsComplete] = useState<step>(0);
-	const [currentStep, setCurrentStep] = useState<step>(0);
+	const [stepsComplete, setStepsComplete] = useState<number>(0);
+	const [currentStep, setCurrentStep] = useState<number>(0);
+
+	const handleContinue = () => {
+		setStepsComplete((prev) => {
+			if (prev < 5) {
+				setCurrentStep(prev + 1);
+				return prev + 1;
+			}
+
+			return prev;
+		});
+	};
+
+	const handleGoBack = () => {
+		setStepsComplete((prev) => {
+			if (prev > 0) {
+				setCurrentStep(prev - 1);
+				return prev - 1;
+			}
+
+			return prev;
+		});
+	};
 
 	const ActionContainer = () => {
-		return (
-			<View
-				style={{
-					flex: 1,
-					top: 250,
-					justifyContent: 'flex-start',
-					alignItems: 'center',
-					// width: '100%',
-					// height: '100%',
-				}}>
-				<View
-					style={{ justifyContent: 'center', alignItems: 'center', gap: 12 }}>
-					<ThemedText
-						style={[defaultStyles.bigText, { fontWeight: 500 }]}
-						theme={theme}
-						value={'Nice, that you are here!'}
-					/>
+		switch (currentStep) {
+			case 0:
+				return (
+					<View
+						style={{
+							flex: 1,
+							top: 250,
+							justifyContent: 'flex-start',
+							alignItems: 'center',
+						}}>
+						<View
+							style={{
+								justifyContent: 'center',
+								alignItems: 'center',
+								gap: 12,
+							}}>
+							<ThemedText
+								style={[defaultStyles.bigText, { fontWeight: 500 }]}
+								theme={theme}
+								value={'Nice, that you are here!'}
+							/>
 
-					<ThemedText
-						style={[{ color: Colors[theme].lightGray, textAlign: 'center' }]}
-						theme={theme}
-						value={
-							'Blib Blab Blub. Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.'
-						}
-					/>
-				</View>
-			</View>
-		);
+							<ThemedText
+								style={[
+									{ color: Colors[theme].lightGray, textAlign: 'center' },
+								]}
+								theme={theme}
+								value={
+									'Blib Blab Blub. Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.'
+								}
+							/>
+						</View>
+					</View>
+				);
+
+			case 1:
+				return (
+					<View
+						style={{
+							flex: 1,
+							top: 250,
+							justifyContent: 'flex-start',
+							alignItems: 'center',
+						}}>
+						<View
+							style={{
+								justifyContent: 'center',
+								alignItems: 'center',
+								gap: 12,
+							}}>
+							<ThemedText
+								style={[defaultStyles.bigText, { fontWeight: 500 }]}
+								theme={theme}
+								value={'Page 2'}
+							/>
+
+							<ThemedText
+								style={[
+									{ color: Colors[theme].lightGray, textAlign: 'center' },
+								]}
+								theme={theme}
+								value={'This is the Next Page'}
+							/>
+						</View>
+					</View>
+				);
+
+			case 2:
+				return (
+					<View
+						style={{
+							flex: 1,
+							top: 250,
+							justifyContent: 'flex-start',
+							alignItems: 'center',
+						}}>
+						<View
+							style={{
+								justifyContent: 'center',
+								alignItems: 'center',
+								gap: 12,
+							}}>
+							<ThemedText
+								style={[defaultStyles.bigText, { fontWeight: 500 }]}
+								theme={theme}
+								value={'Crah is huge'}
+							/>
+
+							<ThemedText
+								style={[
+									{ color: Colors[theme].lightGray, textAlign: 'center' },
+								]}
+								theme={theme}
+								value={'This is the Next Page'}
+							/>
+						</View>
+					</View>
+				);
+
+			case 3:
+				return (
+					<View
+						style={{
+							flex: 1,
+							top: 250,
+							justifyContent: 'flex-start',
+							alignItems: 'center',
+						}}>
+						<View
+							style={{
+								justifyContent: 'center',
+								alignItems: 'center',
+								gap: 12,
+							}}>
+							<ThemedText
+								style={[defaultStyles.bigText, { fontWeight: 500 }]}
+								theme={theme}
+								value={'Page 3'}
+							/>
+
+							<ThemedText
+								style={[
+									{ color: Colors[theme].lightGray, textAlign: 'center' },
+								]}
+								theme={theme}
+								value={'This is the Next Page'}
+							/>
+						</View>
+					</View>
+				);
+
+			case 4:
+				return (
+					<View
+						style={{
+							flex: 1,
+							top: 250,
+							justifyContent: 'flex-start',
+							alignItems: 'center',
+						}}>
+						<View
+							style={{
+								justifyContent: 'center',
+								alignItems: 'center',
+								gap: 12,
+							}}>
+							<ThemedText
+								style={[defaultStyles.bigText, { fontWeight: 500 }]}
+								theme={theme}
+								value={'Page 4'}
+							/>
+
+							<ThemedText
+								style={[
+									{ color: Colors[theme].lightGray, textAlign: 'center' },
+								]}
+								theme={theme}
+								value={'This is the Next Page'}
+							/>
+						</View>
+					</View>
+				);
+
+			case 5:
+				return (
+					<View
+						style={{
+							flex: 1,
+							top: 250,
+							justifyContent: 'flex-start',
+							alignItems: 'center',
+						}}>
+						<View
+							style={{
+								justifyContent: 'center',
+								alignItems: 'center',
+								gap: 12,
+							}}>
+							<ThemedText
+								style={[defaultStyles.bigText, { fontWeight: 500 }]}
+								theme={theme}
+								value={'Page 5'}
+							/>
+
+							<ThemedText
+								style={[
+									{ color: Colors[theme].lightGray, textAlign: 'center' },
+								]}
+								theme={theme}
+								value={'This is the Next Page'}
+							/>
+						</View>
+					</View>
+				);
+		}
 	};
 
 	return (
@@ -86,13 +275,17 @@ const CreateProfile = () => {
 									alignItems: 'center',
 								},
 							]}>
-							<ProgressionBar theme={theme} progress={5} />
+							<ProgressionBar
+								theme={theme}
+								progress={stepsComplete}
+								totalProgress={5}
+							/>
 						</View>
 					}
 				/>
 			}
 			scrollChildren={
-				<View style={{ flex: 1 }}>
+				<View style={{ flex: 1, bottom: bottom * 3.5 }}>
 					<StatusBar barStyle={'default'} />
 
 					{/* main action text container */}
@@ -106,12 +299,11 @@ const CreateProfile = () => {
 					{/* bottom action container */}
 					<View
 						style={{
-							flex: 1,
-							justifyContent: 'flex-end',
 							alignItems: 'center',
-							bottom: bottom * 4,
+							gap: 10,
 						}}>
 						<TouchableOpacity
+							onPress={handleContinue}
 							style={[
 								{
 									width: 250,
@@ -126,6 +318,14 @@ const CreateProfile = () => {
 								theme={theme}
 								value={'Continue'}
 								style={[{ fontSize: 18, fontWeight: '700' }]}
+							/>
+						</TouchableOpacity>
+
+						<TouchableOpacity onPress={handleGoBack}>
+							<ThemedText
+								theme={theme}
+								value={'Go Back'}
+								style={[{ fontSize: 14 }]}
 							/>
 						</TouchableOpacity>
 					</View>
