@@ -25,6 +25,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 // import { dark } from '@clerk/themes';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Appearance } from 'react-native';
+import { mmkv } from '@/hooks/mmkv';
 
 Appearance.setColorScheme('dark');
 SplashScreen.preventAutoHideAsync();
@@ -41,6 +42,8 @@ const Root = () => {
 	const segments = useSegments();
 	const theme = useSystemTheme();
 	const router = useRouter();
+
+	const SignedInOnce = mmkv.getBoolean('userSignedInOnce');
 
 	useEffect(() => {
 		if (error) throw error;
@@ -59,6 +62,14 @@ const Root = () => {
 		const inAuthGroup = segments[0] === '(auth)';
 
 		if (isSignedIn && !inAuthGroup) {
+			// if this is the users first time signing in. He has to initialize a profile
+			// ALl values he defines he can change in his profile settings
+			if (!SignedInOnce) {
+				router.replace('/createProfile');
+				mmkv.set('userSignedInOnce', false);
+				return;
+			}
+
 			router.replace('/(auth)/(tabs)/homePages');
 		} else if (!isSignedIn) {
 			router.replace('/');
@@ -102,6 +113,12 @@ const Root = () => {
 			<Stack.Screen
 				name="modals"
 				options={{ headerShown: false, presentation: 'modal' }}
+			/>
+			<Stack.Screen
+				name="createProfile"
+				options={{
+					headerShown: false,
+				}}
 			/>
 		</Stack>
 	);
