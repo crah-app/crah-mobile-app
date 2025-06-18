@@ -1,21 +1,34 @@
+import BuildCharacterUI from '@/components/Character/BuildCharacterUI';
+import RenderCharacter from '@/components/Character/RenderCharacter';
+import ActionContainer from '@/components/createProfile/ActionContainer';
+import SearchBar from '@/components/general/SearchBar';
 import ThemedText from '@/components/general/ThemedText';
+import ThemedTextInput from '@/components/general/ThemedTextInput';
+import GetSVG from '@/components/GetSVG';
 import CostumHeader from '@/components/header/CostumHeader';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import ProgressionBar from '@/components/ProgressionBar';
+import Tag from '@/components/tag';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
+import { useCommonTricks } from '@/hooks/getCommonTricks';
+import { TextInputMaxCharacters, Trick } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import { FlashList } from '@shopify/flash-list';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
+	Alert,
 	Dimensions,
+	KeyboardAvoidingView,
 	StatusBar,
 	StyleSheet,
 	TouchableOpacity,
 	View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
 
 /*
 Initial Page
@@ -30,7 +43,38 @@ const CreateProfile = () => {
 	const [stepsComplete, setStepsComplete] = useState<number>(0);
 	const [currentStep, setCurrentStep] = useState<number>(0);
 
+	// page data
+	const [username, setUsername] = useState<string>('');
+	const [selectedBestTricks, setSelectedBestTricks] = useState<Trick[]>([]);
+
+	const [trickSearchQuery, setTrickSearchQuery] = useState<string>('');
+	const [showWarningToWriteName, setShowWarningToWriteName] =
+		useState<boolean>(false);
+
+	const { commonTricks, loading, error } = useCommonTricks();
+
+	const allowedToContinueHandler = () => {
+		switch (currentStep) {
+			case 1: // second page
+				if (username.length <= 0) {
+					setShowWarningToWriteName(true);
+					return false;
+				}
+				break;
+
+			case 2: // third page
+				if (selectedBestTricks.length <= 0) return true;
+				break;
+		}
+
+		return true;
+	};
+
 	const handleContinue = () => {
+		const result = allowedToContinueHandler();
+
+		if (!result) return false;
+
 		setStepsComplete((prev) => {
 			if (prev < 5) {
 				setCurrentStep(prev + 1);
@@ -50,204 +94,6 @@ const CreateProfile = () => {
 
 			return prev;
 		});
-	};
-
-	const ActionContainer = () => {
-		switch (currentStep) {
-			case 0:
-				return (
-					<View
-						style={{
-							flex: 1,
-							top: 250,
-							justifyContent: 'flex-start',
-							alignItems: 'center',
-						}}>
-						<View
-							style={{
-								justifyContent: 'center',
-								alignItems: 'center',
-								gap: 12,
-							}}>
-							<ThemedText
-								style={[defaultStyles.bigText, { fontWeight: 500 }]}
-								theme={theme}
-								value={'Nice, that you are here!'}
-							/>
-
-							<ThemedText
-								style={[
-									{ color: Colors[theme].lightGray, textAlign: 'center' },
-								]}
-								theme={theme}
-								value={
-									'Blib Blab Blub. Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.Blib Blab Blub.'
-								}
-							/>
-						</View>
-					</View>
-				);
-
-			case 1:
-				return (
-					<View
-						style={{
-							flex: 1,
-							top: 250,
-							justifyContent: 'flex-start',
-							alignItems: 'center',
-						}}>
-						<View
-							style={{
-								justifyContent: 'center',
-								alignItems: 'center',
-								gap: 12,
-							}}>
-							<ThemedText
-								style={[defaultStyles.bigText, { fontWeight: 500 }]}
-								theme={theme}
-								value={'Page 2'}
-							/>
-
-							<ThemedText
-								style={[
-									{ color: Colors[theme].lightGray, textAlign: 'center' },
-								]}
-								theme={theme}
-								value={'This is the Next Page'}
-							/>
-						</View>
-					</View>
-				);
-
-			case 2:
-				return (
-					<View
-						style={{
-							flex: 1,
-							top: 250,
-							justifyContent: 'flex-start',
-							alignItems: 'center',
-						}}>
-						<View
-							style={{
-								justifyContent: 'center',
-								alignItems: 'center',
-								gap: 12,
-							}}>
-							<ThemedText
-								style={[defaultStyles.bigText, { fontWeight: 500 }]}
-								theme={theme}
-								value={'Crah is huge'}
-							/>
-
-							<ThemedText
-								style={[
-									{ color: Colors[theme].lightGray, textAlign: 'center' },
-								]}
-								theme={theme}
-								value={'This is the Next Page'}
-							/>
-						</View>
-					</View>
-				);
-
-			case 3:
-				return (
-					<View
-						style={{
-							flex: 1,
-							top: 250,
-							justifyContent: 'flex-start',
-							alignItems: 'center',
-						}}>
-						<View
-							style={{
-								justifyContent: 'center',
-								alignItems: 'center',
-								gap: 12,
-							}}>
-							<ThemedText
-								style={[defaultStyles.bigText, { fontWeight: 500 }]}
-								theme={theme}
-								value={'Page 3'}
-							/>
-
-							<ThemedText
-								style={[
-									{ color: Colors[theme].lightGray, textAlign: 'center' },
-								]}
-								theme={theme}
-								value={'This is the Next Page'}
-							/>
-						</View>
-					</View>
-				);
-
-			case 4:
-				return (
-					<View
-						style={{
-							flex: 1,
-							top: 250,
-							justifyContent: 'flex-start',
-							alignItems: 'center',
-						}}>
-						<View
-							style={{
-								justifyContent: 'center',
-								alignItems: 'center',
-								gap: 12,
-							}}>
-							<ThemedText
-								style={[defaultStyles.bigText, { fontWeight: 500 }]}
-								theme={theme}
-								value={'Page 4'}
-							/>
-
-							<ThemedText
-								style={[
-									{ color: Colors[theme].lightGray, textAlign: 'center' },
-								]}
-								theme={theme}
-								value={'This is the Next Page'}
-							/>
-						</View>
-					</View>
-				);
-
-			case 5:
-				return (
-					<View
-						style={{
-							flex: 1,
-							top: 250,
-							justifyContent: 'flex-start',
-							alignItems: 'center',
-						}}>
-						<View
-							style={{
-								justifyContent: 'center',
-								alignItems: 'center',
-								gap: 12,
-							}}>
-							<ThemedText
-								style={[defaultStyles.bigText, { fontWeight: 500 }]}
-								theme={theme}
-								value={'Page 5'}
-							/>
-
-							<ThemedText
-								style={[
-									{ color: Colors[theme].lightGray, textAlign: 'center' },
-								]}
-								theme={theme}
-								value={'This is the Next Page'}
-							/>
-						</View>
-					</View>
-				);
-		}
 	};
 
 	return (
@@ -292,35 +138,57 @@ const CreateProfile = () => {
 					<View
 						style={{
 							flex: 1,
+							justifyContent: 'flex-start',
+							alignItems: 'flex-start',
+							top: bottom * 3.5 + 45,
 						}}>
-						<ActionContainer />
+						{currentStep < 5 && (
+							<ActionContainer
+								currentStep={currentStep}
+								commonTricks={commonTricks}
+								error={error}
+								loading={loading}
+								theme={theme}
+								username={username}
+								setUsername={setUsername}
+								showWarningToWriteName={showWarningToWriteName}
+								setShowWarningToWriteName={setShowWarningToWriteName}
+								trickSearchQuery={trickSearchQuery}
+								setTrickSearchQuery={setTrickSearchQuery}
+								bottom={bottom}
+							/>
+						)}
+
+						<BuildCharacterUI visible={currentStep === 5} />
 					</View>
 
 					{/* bottom action container */}
+
 					<View
 						style={{
 							alignItems: 'center',
 							gap: 10,
 						}}>
-						<TouchableOpacity
-							onPress={handleContinue}
-							style={[
-								{
-									width: 250,
-									padding: 8,
-									backgroundColor: Colors[theme].primary,
-									justifyContent: 'center',
-									alignItems: 'center',
-									borderRadius: 24,
-								},
-							]}>
-							<ThemedText
-								theme={theme}
-								value={'Continue'}
-								style={[{ fontSize: 18, fontWeight: '700' }]}
-							/>
-						</TouchableOpacity>
-
+						{currentStep < 5 && (
+							<TouchableOpacity
+								onPress={handleContinue}
+								style={[
+									{
+										width: 250,
+										padding: 8,
+										backgroundColor: Colors[theme].primary,
+										justifyContent: 'center',
+										alignItems: 'center',
+										borderRadius: 24,
+									},
+								]}>
+								<ThemedText
+									theme={theme}
+									value={'Continue'}
+									style={[{ fontSize: 18, fontWeight: '700' }]}
+								/>
+							</TouchableOpacity>
+						)}
 						<TouchableOpacity onPress={handleGoBack}>
 							<ThemedText
 								theme={theme}
@@ -336,6 +204,21 @@ const CreateProfile = () => {
 	);
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+	pageContainer: {
+		paddingHorizontal: 8,
+		flex: 1,
+		width: '100%',
+		justifyContent: 'flex-start',
+		alignItems: 'center',
+	},
+	smallText: {
+		textAlign: 'center',
+		fontSize: 17,
+	},
+	webview: {
+		flex: 1,
+	},
+});
 
 export default CreateProfile;

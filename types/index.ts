@@ -186,6 +186,8 @@ export enum fetchAdresses {
 	allUsers = 'http://192.168.0.136:4000/api/users/all',
 	allPosts = 'http://192.168.0.136:4000/api/posts/all',
 	allTricks = 'http://192.168.0.136:4000/api/tricks/all',
+	//
+	readyplayermeUser = 'https://api.readyplayer.me/v1/users',
 }
 
 export interface Trick {

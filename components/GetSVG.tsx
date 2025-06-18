@@ -12,12 +12,12 @@ import Svg, {
 	SvgProps,
 } from 'react-native-svg';
 
-// interface Props {
-// 	name: svg_name;
-// 	props: SvgProps;
-// }
+interface Props {
+	name: svg_name;
+	props: SvgProps;
+}
 
-const GetSVG = ({ name, props }) => {
+const GetSVG: React.FC<Props> = ({ name, props }) => {
 	switch (name) {
 		case 'textlogo':
 			return (

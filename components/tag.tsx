@@ -6,7 +6,7 @@ import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 
 interface TagProps {
-	tag: Tags;
+	tag: Tags | string;
 	theme: 'light' | 'dark';
 	handleTagPress?: () => void;
 	isSelectedOnClick?: boolean;
