@@ -25,6 +25,7 @@ import {
 	ScrollView,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
+import stringSimilarity from 'string-similarity';
 
 const ActionContainer = memo(
 	({
@@ -40,6 +41,7 @@ const ActionContainer = memo(
 		trickSearchQuery,
 		setTrickSearchQuery,
 		bottom,
+		usernameIsDuplicate,
 	}: {
 		currentStep: number;
 		commonTricks: Trick[];
@@ -53,6 +55,7 @@ const ActionContainer = memo(
 		trickSearchQuery: string;
 		setTrickSearchQuery: Dispatch<SetStateAction<string>>;
 		bottom: number;
+		usernameIsDuplicate: boolean;
 	}) => {
 		const handleNameInputPress = () => {
 			setShowWarningToWriteName(false);
@@ -92,7 +95,7 @@ compare yourself to others and become the best scooter rider in the world `}
 					<View style={styles.pageContainer}>
 						<KeyboardAvoidingView
 							style={[styles.pageContainer, { paddingHorizontal: 4 }]}>
-							<View style={{ gap: 8, width: '100%' }}>
+							<View style={{ gap: 20, width: '100%' }}>
 								<ThemedText
 									style={[
 										defaultStyles.bigText,
@@ -120,7 +123,7 @@ compare yourself to others and become the best scooter rider in the world `}
 									theme={theme}
 									value={username}
 									setValue={setUsername}
-									placeholder="Max Mustermann"
+									placeholder="john_smith"
 									style={{ fontSize: 20, width: '100%', textAlign: 'center' }}
 									containerStyle={{ width: '100%' }}
 									maxLength={30}
@@ -134,6 +137,17 @@ compare yourself to others and become the best scooter rider in the world `}
 										]}
 										theme={theme}
 										value="please write a name down"
+									/>
+								)}
+
+								{usernameIsDuplicate && (
+									<ThemedText
+										style={[
+											styles.smallText,
+											{ color: Colors[theme].primary, textAlign: 'center' },
+										]}
+										theme={theme}
+										value="username is already taken"
 									/>
 								)}
 							</View>
@@ -158,7 +172,7 @@ compare yourself to others and become the best scooter rider in the world `}
 								<SearchBar
 									query={trickSearchQuery}
 									setQuery={setTrickSearchQuery}
-									placeholder="e.g. Tailwhip Flat"
+									placeholder="e.g. Tailwhip"
 									flex={0}
 									containerStyle={{ height: 100, width: 100 }}
 								/>
@@ -175,10 +189,26 @@ compare yourself to others and become the best scooter rider in the world `}
 								<FlashList
 									numColumns={3}
 									contentContainerStyle={{
-										// gap: 8, // funktioniert nicht direkt → siehe unten
 										padding: 16,
 									}}
-									data={commonTricks}
+									data={
+										trickSearchQuery.length <= 0
+											? commonTricks
+											: commonTricks.filter((trick) => {
+													if (
+														stringSimilarity.compareTwoStrings(
+															trick.Name.toLowerCase(),
+															trickSearchQuery.toLowerCase(),
+														) > 0.19 ||
+														stringSimilarity.compareTwoStrings(
+															trick.SecondName?.toLowerCase() ?? '',
+															trickSearchQuery.toLowerCase(),
+														) > 0.19
+													) {
+														return trick;
+													}
+											  })
+									}
 									keyExtractor={(item) => item.Name}
 									renderItem={({ item }) => (
 										<View style={{ padding: 4 }}>
@@ -189,35 +219,6 @@ compare yourself to others and become the best scooter rider in the world `}
 								/>
 							)}
 						</View>
-
-						{/* <View
-							style={{
-								// flexWrap: 'wrap',
-								flex: 1,
-								// backgroundColor: 'green',
-								width: '100%',
-								height: 100,
-								gap: 12,
-								bottom: bottom * 6,
-							}}>
-							{commonTricks && !error && !loading && (
-								<FlashList
-									numColumns={3}
-									contentContainerStyle={{
-										// gap: 8, // funktioniert nicht direkt → siehe unten
-										padding: 16,
-									}}
-									data={commonTricks}
-									keyExtractor={(item) => item.Name}
-									renderItem={({ item }) => (
-										<View style={{ padding: 4 }}>
-											<Tag tag={item.Name} theme={theme} />
-										</View>
-									)}
-									estimatedItemSize={100}
-								/>
-							)}
-						</View> */}
 					</View>
 				);
 

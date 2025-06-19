@@ -68,6 +68,7 @@ const BuildCharacterUI: React.FC<{ visible: boolean }> = ({ visible }) => {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
+					mode: 'cors',
 					Authorization: 'Bearer 6852ff6a738d5335e2267dd7',
 				},
 			},

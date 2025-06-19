@@ -1,10 +1,9 @@
 import BuildCharacterUI from '@/components/Character/BuildCharacterUI';
-import RenderCharacter from '@/components/Character/RenderCharacter';
+
 import ActionContainer from '@/components/createProfile/ActionContainer';
-import SearchBar from '@/components/general/SearchBar';
+
 import ThemedText from '@/components/general/ThemedText';
-import ThemedTextInput from '@/components/general/ThemedTextInput';
-import GetSVG from '@/components/GetSVG';
+
 import CostumHeader from '@/components/header/CostumHeader';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
@@ -15,6 +14,7 @@ import { defaultStyles } from '@/constants/Styles';
 import { useCommonTricks } from '@/hooks/getCommonTricks';
 import { TextInputMaxCharacters, Trick } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
+import { useUser } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -28,7 +28,6 @@ import {
 	View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { WebView } from 'react-native-webview';
 
 /*
 Initial Page
@@ -37,6 +36,7 @@ Initial Page
 const CreateProfile = () => {
 	const theme = useSystemTheme();
 	const { bottom } = useSafeAreaInsets();
+	const { user } = useUser();
 
 	const totalSteps = 5;
 
@@ -47,19 +47,79 @@ const CreateProfile = () => {
 	const [username, setUsername] = useState<string>('');
 	const [selectedBestTricks, setSelectedBestTricks] = useState<Trick[]>([]);
 
+	const [usernameIsTaken, setUsernameIsTaken] = useState<boolean>(false);
+
 	const [trickSearchQuery, setTrickSearchQuery] = useState<string>('');
 	const [showWarningToWriteName, setShowWarningToWriteName] =
 		useState<boolean>(false);
 
 	const { commonTricks, loading, error } = useCommonTricks();
 
-	const allowedToContinueHandler = () => {
+	const updateUsername = async () => {
+		try {
+			await user?.update({
+				username,
+			});
+			console.log('username updated!');
+		} catch (err: any) {
+			if (
+				err?.errors &&
+				err?.errors[0]?.code === 'form_identifier_exists' &&
+				err?.errors[0]?.meta?.param_name === 'username'
+			) {
+				setUsernameIsTaken(true);
+				console.error('error updating username:', error);
+			}
+		}
+	};
+
+	const handleUsernameIsDuplicate = async (username: string) => {
+		const result = await fetch(
+			`http://192.168.0.136:4000/api/users/${username}/nameIsDuplicate`,
+			{
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' },
+			},
+		);
+
+		if (result.status !== 200) {
+			return true;
+		}
+
+		const parsed_json = result.json;
+		const isDuplicate = parsed_json.length > 0;
+
+		return isDuplicate;
+	};
+
+	const allowedToContinueHandler = async () => {
 		switch (currentStep) {
+			case 0:
+				setShowWarningToWriteName(false);
+				setUsernameIsTaken(false);
+
+				break;
 			case 1: // second page
 				if (username.length <= 0) {
 					setShowWarningToWriteName(true);
+					setUsernameIsTaken(false);
 					return false;
 				}
+
+				setShowWarningToWriteName(false);
+
+				// about username is duplicate
+				const isDuplicate = await handleUsernameIsDuplicate(username);
+
+				if (isDuplicate) {
+					setUsernameIsTaken(true);
+					return false;
+				} else {
+					if (user?.username !== username) {
+						await updateUsername();
+					}
+				}
+
 				break;
 
 			case 2: // third page
@@ -70,8 +130,8 @@ const CreateProfile = () => {
 		return true;
 	};
 
-	const handleContinue = () => {
-		const result = allowedToContinueHandler();
+	const handleContinue = async () => {
+		const result = await allowedToContinueHandler();
 
 		if (!result) return false;
 
@@ -156,6 +216,7 @@ const CreateProfile = () => {
 								trickSearchQuery={trickSearchQuery}
 								setTrickSearchQuery={setTrickSearchQuery}
 								bottom={bottom}
+								usernameIsDuplicate={usernameIsTaken}
 							/>
 						)}
 
@@ -171,7 +232,7 @@ const CreateProfile = () => {
 						}}>
 						{currentStep < 5 && (
 							<TouchableOpacity
-								onPress={handleContinue}
+								onPress={async () => await handleContinue()}
 								style={[
 									{
 										width: 250,
