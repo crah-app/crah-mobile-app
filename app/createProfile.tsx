@@ -12,12 +12,18 @@ import Tag from '@/components/tag';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { useCommonTricks } from '@/hooks/getCommonTricks';
-import { TextInputMaxCharacters, Trick } from '@/types';
+import { SelectedTrick, TextInputMaxCharacters, Trick } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { useUser } from '@clerk/clerk-expo';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import {
 	Alert,
 	Dimensions,
@@ -38,6 +44,8 @@ const CreateProfile = () => {
 	const { bottom } = useSafeAreaInsets();
 	const { user } = useUser();
 
+	const { getToken } = useAuth();
+
 	const totalSteps = 5;
 
 	const [stepsComplete, setStepsComplete] = useState<number>(0);
@@ -45,7 +53,9 @@ const CreateProfile = () => {
 
 	// page data
 	const [username, setUsername] = useState<string>('');
-	const [selectedBestTricks, setSelectedBestTricks] = useState<Trick[]>([]);
+	const [selectedBestTricks, setSelectedBestTricks] = useState<SelectedTrick[]>(
+		[],
+	);
 
 	const [usernameIsTaken, setUsernameIsTaken] = useState<boolean>(false);
 
@@ -92,6 +102,36 @@ const CreateProfile = () => {
 		return isDuplicate;
 	};
 
+	const handlePostBestTricks = async () => {
+		const usertoken = await getToken();
+
+		console.log(selectedBestTricks);
+
+		const response = await fetch(
+			`http://192.168.0.136:4000/api/tricks/${user?.id}/setTricks`,
+			{
+				method: 'POST',
+				mode: 'cors',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${usertoken}`,
+				},
+				body: JSON.stringify({ tricks: selectedBestTricks }),
+			},
+		);
+
+		const result = await response.json();
+
+		console.log(result);
+		if (!response.ok) {
+			const errorText = await response.text();
+			console.warn('Error posting tricks:', response.status, errorText);
+			return false;
+		}
+
+		return true;
+	};
+
 	const allowedToContinueHandler = async () => {
 		switch (currentStep) {
 			case 0:
@@ -123,8 +163,11 @@ const CreateProfile = () => {
 				break;
 
 			case 2: // third page
-				if (selectedBestTricks.length <= 0) return true;
-				break;
+				console.log(selectedBestTricks.length);
+				if (selectedBestTricks.length <= 0) return false;
+
+				const result = await handlePostBestTricks();
+				return result;
 		}
 
 		return true;
@@ -155,6 +198,23 @@ const CreateProfile = () => {
 			return prev;
 		});
 	};
+
+	const handleSelectTrick = useCallback(
+		(Trick: SelectedTrick) => {
+			setSelectedBestTricks((prev) => {
+				if (prev.length < 5) {
+					return [...prev, Trick];
+				}
+				return prev;
+			});
+		},
+		[selectedBestTricks],
+	);
+
+	useEffect(() => {
+		console.log(selectedBestTricks);
+		return () => {};
+	}, [selectedBestTricks]);
 
 	return (
 		<HeaderScrollView
@@ -217,6 +277,9 @@ const CreateProfile = () => {
 								setTrickSearchQuery={setTrickSearchQuery}
 								bottom={bottom}
 								usernameIsDuplicate={usernameIsTaken}
+								selectedTricks={selectedBestTricks}
+								handleSelectTrick={handleSelectTrick}
+								setSelectedBestTricks={setSelectedBestTricks}
 							/>
 						)}
 
@@ -227,8 +290,12 @@ const CreateProfile = () => {
 
 					<View
 						style={{
+							bottom: -bottom * 3.5,
+							paddingBottom: bottom * 3.5,
 							alignItems: 'center',
 							gap: 10,
+							backgroundColor: Colors[theme].background,
+							padding: 12,
 						}}>
 						{currentStep < 5 && (
 							<TouchableOpacity
@@ -250,13 +317,16 @@ const CreateProfile = () => {
 								/>
 							</TouchableOpacity>
 						)}
-						<TouchableOpacity onPress={handleGoBack}>
-							<ThemedText
-								theme={theme}
-								value={'Go Back'}
-								style={[{ fontSize: 14 }]}
-							/>
-						</TouchableOpacity>
+
+						{currentStep > 0 && (
+							<TouchableOpacity onPress={handleGoBack}>
+								<ThemedText
+									theme={theme}
+									value={'Go Back'}
+									style={[{ fontSize: 14 }]}
+								/>
+							</TouchableOpacity>
+						)}
 					</View>
 				</View>
 			}

@@ -12,7 +12,7 @@ import Tag from '@/components/tag';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { useCommonTricks } from '@/hooks/getCommonTricks';
-import { TextInputMaxCharacters, Trick } from '@/types';
+import { SelectedTrick, TextInputMaxCharacters, Trick } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
@@ -23,9 +23,29 @@ import {
 	StyleSheet,
 	FlatList,
 	ScrollView,
+	TouchableOpacity,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import stringSimilarity from 'string-similarity';
+
+interface ActionContainerProps {
+	currentStep: number;
+	commonTricks: Trick[];
+	error: Error | null;
+	loading: boolean;
+	theme: 'light' | 'dark';
+	username: string;
+	setUsername: Dispatch<SetStateAction<string>>;
+	showWarningToWriteName: boolean;
+	setShowWarningToWriteName: Dispatch<SetStateAction<boolean>>;
+	trickSearchQuery: string;
+	setTrickSearchQuery: Dispatch<SetStateAction<string>>;
+	bottom: number;
+	usernameIsDuplicate: boolean;
+	selectedTricks: SelectedTrick[];
+	handleSelectTrick: (trick: SelectedTrick) => void;
+	setSelectedBestTricks: Dispatch<SetStateAction<SelectedTrick[]>>;
+}
 
 const ActionContainer = memo(
 	({
@@ -42,23 +62,80 @@ const ActionContainer = memo(
 		setTrickSearchQuery,
 		bottom,
 		usernameIsDuplicate,
-	}: {
-		currentStep: number;
-		commonTricks: Trick[];
-		error: Error | null;
-		loading: boolean;
-		theme: 'light' | 'dark';
-		username: string;
-		setUsername: Dispatch<SetStateAction<string>>;
-		showWarningToWriteName: boolean;
-		setShowWarningToWriteName: Dispatch<SetStateAction<boolean>>;
-		trickSearchQuery: string;
-		setTrickSearchQuery: Dispatch<SetStateAction<string>>;
-		bottom: number;
-		usernameIsDuplicate: boolean;
-	}) => {
+		selectedTricks,
+		handleSelectTrick,
+		setSelectedBestTricks,
+	}: ActionContainerProps) => {
 		const handleNameInputPress = () => {
 			setShowWarningToWriteName(false);
+		};
+
+		useEffect(() => {
+			console.log('from memo', selectedTricks.length);
+			return () => {};
+		}, [selectedTricks]);
+
+		interface SelectedTrickBlockProps {
+			selected_trick: SelectedTrick;
+		}
+
+		const SelectedTrickBlock: React.FC<SelectedTrickBlockProps> = ({
+			selected_trick,
+		}) => {
+			return (
+				<View
+					style={[
+						{
+							marginVertical: 5,
+							flexDirection: 'row',
+							width: '100%',
+							justifyContent: 'space-between',
+						},
+					]}>
+					<Tag tag={selected_trick.Name} theme={theme} />
+
+					{/* spot container */}
+					<View
+						style={{
+							flexDirection: 'row',
+							alignItems: 'center',
+						}}>
+						{typeof selected_trick.Spot !== 'string' ? (
+							<ThemedText
+								theme={theme}
+								value="Select"
+								style={[{ fontSize: 17, color: Colors[theme].gray }]}
+							/>
+						) : (
+							<ThemedText
+								theme={theme}
+								value={`${selected_trick.Spot}`}
+								style={[{ fontSize: 17 }]}
+							/>
+						)}
+						<Ionicons
+							style={{ padding: 3 }}
+							size={16}
+							color={Colors[theme].textPrimary}
+							name="chevron-forward"
+						/>
+					</View>
+
+					<TouchableOpacity
+						onPress={() =>
+							setSelectedBestTricks((prev) =>
+								prev.filter((trick) => trick.Name !== selected_trick.Name),
+							)
+						}>
+						<Ionicons
+							style={{ padding: 3 }}
+							size={18}
+							color={Colors[theme].textPrimary}
+							name="close-outline"
+						/>
+					</TouchableOpacity>
+				</View>
+			);
 		};
 
 		switch (currentStep) {
@@ -158,6 +235,7 @@ compare yourself to others and become the best scooter rider in the world `}
 			case 2:
 				return (
 					<View style={styles.pageContainer}>
+						{/* header */}
 						<View style={{ gap: 18, width: '100%' }}>
 							<ThemedText
 								style={[
@@ -170,6 +248,7 @@ compare yourself to others and become the best scooter rider in the world `}
 
 							<View style={{ justifyContent: 'center', alignItems: 'center' }}>
 								<SearchBar
+									displayLeftSearchIcon
 									query={trickSearchQuery}
 									setQuery={setTrickSearchQuery}
 									placeholder="e.g. Tailwhip"
@@ -179,11 +258,72 @@ compare yourself to others and become the best scooter rider in the world `}
 							</View>
 						</View>
 
+						{/* selected trick container */}
+						{selectedTricks.length > 0 && (
+							<View style={{ width: '100%', paddingHorizontal: 6 }}>
+								<ThemedText
+									style={[
+										defaultStyles.bigText,
+										{
+											fontWeight: '700',
+											fontSize: 24,
+											textAlign: 'left',
+										},
+									]}
+									theme={theme}
+									value="Selected tricks"
+								/>
+
+								{/* selected trick list */}
+
+								<View
+									style={{
+										minHeight: 100,
+										borderBottomWidth: StyleSheet.hairlineWidth,
+										borderBottomColor: Colors[theme].gray,
+										width: '100%',
+										paddingVertical: 12,
+									}}>
+									{/* header block */}
+									{/* <View
+										style={[
+											{
+												marginVertical: 12,
+												flexDirection: 'row',
+												width: '75%',
+												justifyContent: 'space-between',
+											},
+										]}>
+										<ThemedText
+											theme={theme}
+											value="trick"
+											style={[{ fontSize: 17 }]}
+										/>
+										<ThemedText
+											theme={theme}
+											value="spot"
+											style={[{ fontSize: 17 }]}
+										/>
+									</View> */}
+
+									{/* trick block */}
+									{selectedTricks.map((selected_trick) => (
+										<SelectedTrickBlock
+											key={selected_trick.Name}
+											selected_trick={selected_trick}
+										/>
+									))}
+								</View>
+							</View>
+						)}
+
+						{/* trick list */}
 						<View
 							style={{
 								width: '100%',
 								height: 530,
 								gap: 12,
+								paddingTop: 15,
 							}}>
 							{commonTricks && !error && !loading && (
 								<FlashList
@@ -199,11 +339,11 @@ compare yourself to others and become the best scooter rider in the world `}
 														stringSimilarity.compareTwoStrings(
 															trick.Name.toLowerCase(),
 															trickSearchQuery.toLowerCase(),
-														) > 0.19 ||
+														) > 0.29 ||
 														stringSimilarity.compareTwoStrings(
 															trick.SecondName?.toLowerCase() ?? '',
 															trickSearchQuery.toLowerCase(),
-														) > 0.19
+														) > 0.29
 													) {
 														return trick;
 													}
@@ -212,7 +352,16 @@ compare yourself to others and become the best scooter rider in the world `}
 									keyExtractor={(item) => item.Name}
 									renderItem={({ item }) => (
 										<View style={{ padding: 4 }}>
-											<Tag tag={item.Name} theme={theme} />
+											<Tag
+												handleTagPress={() => {
+													console.log(selectedTricks.length, 'from overhere');
+													if (selectedTricks.length < 5) {
+														handleSelectTrick({ ...item, Spot: 'Park' });
+													}
+												}}
+												tag={item.Name}
+												theme={theme}
+											/>
 										</View>
 									)}
 									estimatedItemSize={100}

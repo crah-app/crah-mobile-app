@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 interface TagProps {
 	tag: Tags | string;
 	theme: 'light' | 'dark';
-	handleTagPress?: () => void;
+	handleTagPress?: (...params: any[]) => void;
 	isSelectedOnClick?: boolean;
 	DisplayRemoveBtn?: boolean;
 	ActionOnRemoveBtnClick?: () => void;

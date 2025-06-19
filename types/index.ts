@@ -202,6 +202,14 @@ export interface Trick {
 export type TrickType = 'Overhead' | 'Rewind' | 'Whip' | 'Balance' | 'Grab';
 
 /*
+	In case we are talking about a trick the user has selected 
+	we need to know on which spot he landed that trick
+*/
+export interface SelectedTrick extends Trick {
+	Spot: TrickSpot | null;
+}
+
+/*
 	costum messgae type for a message in a gifted chat
 */
 
