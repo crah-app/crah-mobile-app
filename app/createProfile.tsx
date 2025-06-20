@@ -12,10 +12,16 @@ import Tag from '@/components/tag';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { useCommonTricks } from '@/hooks/getCommonTricks';
-import { SelectedTrick, TextInputMaxCharacters, Trick } from '@/types';
+import {
+	SelectedTrick,
+	TextInputMaxCharacters,
+	Trick,
+	TrickSpot,
+} from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
 import React, {
 	useCallback,
@@ -57,11 +63,17 @@ const CreateProfile = () => {
 		[],
 	);
 
+	const [averageTrickPointsOfBestTricks, setAverageTrickPointsOfBestTricks] =
+		useState<number>(0);
+
 	const [usernameIsTaken, setUsernameIsTaken] = useState<boolean>(false);
 
 	const [trickSearchQuery, setTrickSearchQuery] = useState<string>('');
 	const [showWarningToWriteName, setShowWarningToWriteName] =
 		useState<boolean>(false);
+
+	const [trickSelectedForSpotSelection, setTrickSelectedForSpotSelection] =
+		useState<SelectedTrick | null>(null);
 
 	const { commonTricks, loading, error } = useCommonTricks();
 
@@ -128,6 +140,8 @@ const CreateProfile = () => {
 			console.warn('Error posting tricks:', response.status, errorText);
 			return false;
 		}
+
+		setAverageTrickPointsOfBestTricks(result.user_points);
 
 		return true;
 	};
@@ -211,10 +225,42 @@ const CreateProfile = () => {
 		[selectedBestTricks],
 	);
 
-	useEffect(() => {
-		console.log(selectedBestTricks);
-		return () => {};
-	}, [selectedBestTricks]);
+	const triggerTrickSpotSelection = useCallback(
+		(Trick: SelectedTrick) => {
+			// trigger bottom menu and set trick
+			setTrickSelectedForSpotSelection(Trick);
+			handlePresentModalPress();
+		},
+		[selectedBestTricks],
+	);
+
+	const handleSpotSelected = (trick: SelectedTrick | null, spot: TrickSpot) => {
+		console.log(trickSelectedForSpotSelection, trick);
+		if (!trickSelectedForSpotSelection || !trick) return;
+
+		setSelectedBestTricks((tricks) => {
+			return tricks.map((best_trick) => {
+				console.log(best_trick.Name, trickSelectedForSpotSelection);
+				if (best_trick.Name === trickSelectedForSpotSelection.Name) {
+					best_trick.Spot = spot;
+				}
+
+				return best_trick;
+			});
+		});
+		handleCloseModalPress();
+	};
+
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
+	const snapPoints = useMemo(() => ['25%'], []);
+
+	const handlePresentModalPress = useCallback(() => {
+		bottomSheetRef.current?.present();
+	}, []);
+
+	const handleCloseModalPress = useCallback(() => {
+		bottomSheetRef.current?.close();
+	}, []);
 
 	return (
 		<HeaderScrollView
@@ -252,6 +298,80 @@ const CreateProfile = () => {
 			}
 			scrollChildren={
 				<View style={{ flex: 1, bottom: bottom * 3.5 }}>
+					<BottomSheetModal
+						snapPoints={snapPoints}
+						handleIndicatorStyle={{ backgroundColor: 'gray' }}
+						backgroundStyle={{
+							backgroundColor: Colors[theme].container_surface,
+							flex: 1,
+						}}
+						containerStyle={{ flex: 1 }}
+						ref={bottomSheetRef}>
+						<BottomSheetView style={{ flex: 1 }}>
+							<View
+								style={{
+									flexDirection: 'column',
+									gap: 12,
+									paddingHorizontal: 18,
+									paddingVertical: 18,
+									flex: 1,
+								}}>
+								<ThemedText
+									value={'Select a spot'}
+									theme={theme}
+									style={[
+										defaultStyles.biggerText,
+										{ textAlign: 'center', fontSize: 28 },
+									]}
+								/>
+
+								<View
+									style={{
+										flexDirection: 'row',
+										gap: 40,
+										alignItems: 'center',
+										justifyContent: 'center',
+										marginTop: 24,
+										marginBottom: 24,
+									}}>
+									<TouchableOpacity
+										onPress={() =>
+											handleSpotSelected(trickSelectedForSpotSelection, 'Park')
+										}>
+										<ThemedText
+											value={'Park'}
+											theme={theme}
+											style={[defaultStyles.biggerText]}
+										/>
+									</TouchableOpacity>
+									<TouchableOpacity
+										onPress={() =>
+											handleSpotSelected(
+												trickSelectedForSpotSelection,
+												'Street',
+											)
+										}>
+										<ThemedText
+											value={'Street'}
+											theme={theme}
+											style={[defaultStyles.biggerText]}
+										/>
+									</TouchableOpacity>
+									<TouchableOpacity
+										onPress={() =>
+											handleSpotSelected(trickSelectedForSpotSelection, 'Flat')
+										}>
+										<ThemedText
+											value={'Flat'}
+											theme={theme}
+											style={[defaultStyles.biggerText]}
+										/>
+									</TouchableOpacity>
+								</View>
+							</View>
+						</BottomSheetView>
+					</BottomSheetModal>
+
 					<StatusBar barStyle={'default'} />
 
 					{/* main action text container */}
@@ -280,6 +400,8 @@ const CreateProfile = () => {
 								selectedTricks={selectedBestTricks}
 								handleSelectTrick={handleSelectTrick}
 								setSelectedBestTricks={setSelectedBestTricks}
+								triggerTrickSpotSelection={triggerTrickSpotSelection}
+								averageTrickPointsOfBestTricks={averageTrickPointsOfBestTricks}
 							/>
 						)}
 

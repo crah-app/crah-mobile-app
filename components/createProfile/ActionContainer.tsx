@@ -45,6 +45,8 @@ interface ActionContainerProps {
 	selectedTricks: SelectedTrick[];
 	handleSelectTrick: (trick: SelectedTrick) => void;
 	setSelectedBestTricks: Dispatch<SetStateAction<SelectedTrick[]>>;
+	triggerTrickSpotSelection: (trick: SelectedTrick) => void;
+	averageTrickPointsOfBestTricks: number;
 }
 
 const ActionContainer = memo(
@@ -65,6 +67,8 @@ const ActionContainer = memo(
 		selectedTricks,
 		handleSelectTrick,
 		setSelectedBestTricks,
+		triggerTrickSpotSelection,
+		averageTrickPointsOfBestTricks,
 	}: ActionContainerProps) => {
 		const handleNameInputPress = () => {
 			setShowWarningToWriteName(false);
@@ -113,12 +117,15 @@ const ActionContainer = memo(
 								style={[{ fontSize: 17 }]}
 							/>
 						)}
-						<Ionicons
-							style={{ padding: 3 }}
-							size={16}
-							color={Colors[theme].textPrimary}
-							name="chevron-forward"
-						/>
+						<TouchableOpacity
+							onPress={() => triggerTrickSpotSelection(selected_trick)}>
+							<Ionicons
+								style={{ padding: 3 }}
+								size={16}
+								color={Colors[theme].textPrimary}
+								name="chevron-forward"
+							/>
+						</TouchableOpacity>
 					</View>
 
 					<TouchableOpacity
@@ -275,7 +282,6 @@ compare yourself to others and become the best scooter rider in the world `}
 								/>
 
 								{/* selected trick list */}
-
 								<View
 									style={{
 										minHeight: 100,
@@ -284,28 +290,6 @@ compare yourself to others and become the best scooter rider in the world `}
 										width: '100%',
 										paddingVertical: 12,
 									}}>
-									{/* header block */}
-									{/* <View
-										style={[
-											{
-												marginVertical: 12,
-												flexDirection: 'row',
-												width: '75%',
-												justifyContent: 'space-between',
-											},
-										]}>
-										<ThemedText
-											theme={theme}
-											value="trick"
-											style={[{ fontSize: 17 }]}
-										/>
-										<ThemedText
-											theme={theme}
-											value="spot"
-											style={[{ fontSize: 17 }]}
-										/>
-									</View> */}
-
 									{/* trick block */}
 									{selectedTricks.map((selected_trick) => (
 										<SelectedTrickBlock
@@ -391,7 +375,7 @@ compare yourself to others and become the best scooter rider in the world `}
 									textAlign: 'center',
 								}}
 								theme={theme}
-								value="This is the Next Page"
+								value={`Your points are ${averageTrickPointsOfBestTricks}`}
 							/>
 						</View>
 					</View>
