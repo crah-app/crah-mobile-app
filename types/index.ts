@@ -489,13 +489,12 @@ export enum Tags {
 */
 
 export enum Rank {
-	Wood = 'wood',
-	Bronze = 'bronze',
-	Silver = 'silver',
-	Gold = 'gold',
-	Platinum = 'platinum',
-	Diamond = 'diamond',
-	Epic = 'epic',
+	Wood = 'Wood',
+	Bronze = 'Bronze',
+	Silver = 'Silver',
+	Gold = 'Gold',
+	Platinum = 'Platinum',
+	Diamond = 'Diamond',
 	Legendary = 'legendary',
 }
 
@@ -506,7 +505,6 @@ export const RankColors: Record<Rank, string[]> = {
 	[Rank.Gold]: ['#FFD700', '#FFEC8B'],
 	[Rank.Platinum]: ['#00CED1', '#E0FFFF'],
 	[Rank.Diamond]: ['#B9F2FF', '#E0FFFF'],
-	[Rank.Epic]: ['#9400D3', '#8A2BE2'],
 	[Rank.Legendary]: ['#FFD700', '#FF4500'],
 };
 
@@ -517,7 +515,6 @@ export const RankColorsDark: Record<Rank, string[]> = {
 	[Rank.Gold]: ['#B8860B', '#C9AE5D'],
 	[Rank.Platinum]: ['#009EA0', '#B0DCDC'],
 	[Rank.Diamond]: ['#7EC8E3', '#B0E0E6'],
-	[Rank.Epic]: ['#6A0DAD', '#5B2C9F'],
 	[Rank.Legendary]: ['#B8860B', '#CC3700'],
 };
 

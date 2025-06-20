@@ -9,14 +9,17 @@ import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import ProgressionBar from '@/components/ProgressionBar';
 import Tag from '@/components/tag';
+import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { useCommonTricks } from '@/hooks/getCommonTricks';
 import {
+	Rank,
 	SelectedTrick,
 	TextInputMaxCharacters,
 	Trick,
 	TrickSpot,
+	UserRank,
 } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { useAuth, useUser } from '@clerk/clerk-expo';
@@ -48,20 +51,22 @@ Initial Page
 const CreateProfile = () => {
 	const theme = useSystemTheme();
 	const { bottom } = useSafeAreaInsets();
+
 	const { user } = useUser();
-
 	const { getToken } = useAuth();
-
-	const totalSteps = 5;
 
 	const [stepsComplete, setStepsComplete] = useState<number>(0);
 	const [currentStep, setCurrentStep] = useState<number>(0);
+	const [loadingRequest, setLoadingRequest] = useState<boolean>(false);
 
 	// page data
 	const [username, setUsername] = useState<string>('');
 	const [selectedBestTricks, setSelectedBestTricks] = useState<SelectedTrick[]>(
 		[],
 	);
+	const [userRank, setUserRank] = useState<number>(0);
+	const [loadingModalVisible, setLoadingModalVisible] =
+		useState<boolean>(false);
 
 	const [averageTrickPointsOfBestTricks, setAverageTrickPointsOfBestTricks] =
 		useState<number>(0);
@@ -115,35 +120,49 @@ const CreateProfile = () => {
 	};
 
 	const handlePostBestTricks = async () => {
-		const usertoken = await getToken();
+		try {
+			setLoadingRequest(true);
+			setLoadingModalVisible(true);
+			let usertoken = await getToken();
 
-		console.log(selectedBestTricks);
+			console.log(selectedBestTricks);
 
-		const response = await fetch(
-			`http://192.168.0.136:4000/api/tricks/${user?.id}/setTricks`,
-			{
-				method: 'POST',
-				mode: 'cors',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${usertoken}`,
+			const response = await fetch(
+				`http://192.168.0.136:4000/api/tricks/${user?.id}/setTricks`,
+				{
+					method: 'POST',
+					mode: 'cors',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${usertoken}`,
+					},
+					body: JSON.stringify({ tricks: selectedBestTricks }),
 				},
-				body: JSON.stringify({ tricks: selectedBestTricks }),
-			},
-		);
+			);
 
-		const result = await response.json();
+			const result = await response.json();
 
-		console.log(result);
-		if (!response.ok) {
-			const errorText = await response.text();
-			console.warn('Error posting tricks:', response.status, errorText);
-			return false;
+			console.log(result);
+			if (!response.ok) {
+				const errorText = await response.text();
+				console.warn('Error posting tricks:', response.status, errorText);
+				setLoadingRequest(false);
+				setLoadingModalVisible(false);
+				return false;
+			}
+
+			setAverageTrickPointsOfBestTricks(result.user_points);
+			setUserRank(result.rank);
+
+			setLoadingRequest(false);
+			setLoadingModalVisible(false);
+
+			return true;
+		} catch (error) {
+			console.warn(error);
+			setLoadingRequest(false);
+			setLoadingModalVisible(false);
 		}
-
-		setAverageTrickPointsOfBestTricks(result.user_points);
-
-		return true;
 	};
 
 	const allowedToContinueHandler = async () => {
@@ -216,6 +235,10 @@ const CreateProfile = () => {
 	const handleSelectTrick = useCallback(
 		(Trick: SelectedTrick) => {
 			setSelectedBestTricks((prev) => {
+				const exists = prev.some((t) => t.Name === Trick.Name);
+
+				if (exists) return prev;
+
 				if (prev.length < 5) {
 					return [...prev, Trick];
 				}
@@ -298,6 +321,14 @@ const CreateProfile = () => {
 			}
 			scrollChildren={
 				<View style={{ flex: 1, bottom: bottom * 3.5 }}>
+					{loadingRequest && (
+						<TransparentLoadingScreen
+							visible={loadingModalVisible}
+							progress={0}
+							showProgress={false}
+						/>
+					)}
+
 					<BottomSheetModal
 						snapPoints={snapPoints}
 						handleIndicatorStyle={{ backgroundColor: 'gray' }}
@@ -402,6 +433,7 @@ const CreateProfile = () => {
 								setSelectedBestTricks={setSelectedBestTricks}
 								triggerTrickSpotSelection={triggerTrickSpotSelection}
 								averageTrickPointsOfBestTricks={averageTrickPointsOfBestTricks}
+								userRank={userRank}
 							/>
 						)}
 

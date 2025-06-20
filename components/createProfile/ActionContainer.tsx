@@ -12,7 +12,7 @@ import Tag from '@/components/tag';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { useCommonTricks } from '@/hooks/getCommonTricks';
-import { SelectedTrick, TextInputMaxCharacters, Trick } from '@/types';
+import { Rank, SelectedTrick, TextInputMaxCharacters, Trick } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
@@ -27,6 +27,7 @@ import {
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import stringSimilarity from 'string-similarity';
+import { evaluateTextBasedOnRankNumber } from '@/utils/globalFuncs';
 
 interface ActionContainerProps {
 	currentStep: number;
@@ -47,6 +48,7 @@ interface ActionContainerProps {
 	setSelectedBestTricks: Dispatch<SetStateAction<SelectedTrick[]>>;
 	triggerTrickSpotSelection: (trick: SelectedTrick) => void;
 	averageTrickPointsOfBestTricks: number;
+	userRank: number;
 }
 
 const ActionContainer = memo(
@@ -69,6 +71,7 @@ const ActionContainer = memo(
 		setSelectedBestTricks,
 		triggerTrickSpotSelection,
 		averageTrickPointsOfBestTricks,
+		userRank,
 	}: ActionContainerProps) => {
 		const handleNameInputPress = () => {
 			setShowWarningToWriteName(false);
@@ -96,7 +99,11 @@ const ActionContainer = memo(
 							justifyContent: 'space-between',
 						},
 					]}>
-					<Tag tag={selected_trick.Name} theme={theme} />
+					<Tag
+						tag={selected_trick.Name}
+						theme={theme}
+						style={{ borderColor: Colors[theme].primary }}
+					/>
 
 					{/* spot container */}
 					<View
@@ -337,11 +344,9 @@ compare yourself to others and become the best scooter rider in the world `}
 									renderItem={({ item }) => (
 										<View style={{ padding: 4 }}>
 											<Tag
+												style={{}}
 												handleTagPress={() => {
-													console.log(selectedTricks.length, 'from overhere');
-													if (selectedTricks.length < 5) {
-														handleSelectTrick({ ...item, Spot: 'Park' });
-													}
+													handleSelectTrick({ ...item, Spot: 'Park' });
 												}}
 												tag={item.Name}
 												theme={theme}
@@ -367,7 +372,7 @@ compare yourself to others and become the best scooter rider in the world `}
 							<ThemedText
 								style={[defaultStyles.bigText, { fontWeight: '500' }]}
 								theme={theme}
-								value={`Page ${currentStep}`}
+								value={evaluateTextBasedOnRankNumber(userRank)}
 							/>
 							<ThemedText
 								style={{
@@ -376,6 +381,16 @@ compare yourself to others and become the best scooter rider in the world `}
 								}}
 								theme={theme}
 								value={`Your points are ${averageTrickPointsOfBestTricks}`}
+							/>
+
+							<ThemedText
+								style={{
+									color: Colors[theme].lightGray,
+									textAlign: 'center',
+								}}
+								theme={theme}
+								// @ts-ignore
+								value={`Your are ${Object.values(Rank)[userRank]}`}
 							/>
 						</View>
 					</View>
@@ -403,12 +418,14 @@ compare yourself to others and become the best scooter rider in the world `}
 					</View>
 				);
 
+			// atm it renders a WebView in the root component
 			case 5:
-				return (
-					<View style={styles.pageContainer}>
-						{/* <BuildCharacterUI visible={currentStep === 5} /> */}
-					</View>
-				);
+				return <></>;
+			// return (
+			// 	<View style={styles.pageContainer}>
+			// 		{/* <BuildCharacterUI visible={currentStep === 5} /> */}
+			// 	</View>
+			// );
 
 			default:
 				return null;

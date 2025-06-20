@@ -1,4 +1,4 @@
-import { SearchCategories, upload_source_ratio } from '@/types';
+import { Rank, SearchCategories, upload_source_ratio } from '@/types';
 import { Dimensions } from 'react-native';
 
 export const filterPosts = (
@@ -111,4 +111,32 @@ export function calculateDimensions(sourceWidth: number, sourceHeight: number) {
 	}
 
 	return { width, height };
+}
+
+export function evaluateTextBasedOnRankNumber(rank: number): string {
+	switch (rank) {
+		case 0:
+			return 'Start your Journey here!';
+
+		case 1:
+			return 'Keep going!';
+
+		case 2:
+			return 'Never give up!';
+
+		case 3:
+			return 'You have a lot of potential!';
+
+		case 4:
+			return 'You are a beast!';
+
+		case 5:
+			return 'You are a pro!';
+
+		case 6:
+			return 'You are the Goat 🐐!';
+
+		default:
+			return 'Thank you for using Crah!';
+	}
 }

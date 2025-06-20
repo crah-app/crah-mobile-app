@@ -10,21 +10,15 @@ import { defaultStyles } from '@/constants/Styles';
 interface TransparentLoadingScreenProps {
 	visible: boolean;
 	progress: number;
+	showProgress?: boolean;
 }
 
 const TransparentLoadingScreen: React.FC<TransparentLoadingScreenProps> = ({
 	visible,
 	progress,
+	showProgress = true,
 }) => {
 	const theme = useSystemTheme();
-
-	useEffect(() => {
-		console.log('hello');
-	}, []);
-
-	useEffect(() => {
-		console.log(visible);
-	}, [visible]);
 
 	return (
 		<Modal
@@ -59,11 +53,16 @@ const TransparentLoadingScreen: React.FC<TransparentLoadingScreenProps> = ({
 						// backgroundColor: 'red',
 					}}>
 					<CrahActivityIndicator size={32} color={Colors[theme].primary} />
-					<ThemedText
-						style={[defaultStyles.biggerText, { color: Colors[theme].primary }]}
-						value={`${progress}%`}
-						theme={theme}
-					/>
+					{showProgress && (
+						<ThemedText
+							style={[
+								defaultStyles.biggerText,
+								{ color: Colors[theme].primary },
+							]}
+							value={`${progress}%`}
+							theme={theme}
+						/>
+					)}
 				</View>
 			</View>
 		</Modal>

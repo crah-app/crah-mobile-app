@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
 import ThemedText from './general/ThemedText';
 import { Tags } from '@/types';
 import Colors from '@/constants/Colors';
@@ -13,6 +13,7 @@ interface TagProps {
 	DisplayRemoveBtn?: boolean;
 	ActionOnRemoveBtnClick?: () => void;
 	touchOpacity?: number;
+	style?: ViewStyle | ViewStyle[];
 }
 
 const Tag: React.FC<TagProps> = ({
@@ -23,6 +24,7 @@ const Tag: React.FC<TagProps> = ({
 	DisplayRemoveBtn,
 	ActionOnRemoveBtnClick,
 	touchOpacity,
+	style,
 }) => {
 	return (
 		<TouchableOpacity
@@ -48,6 +50,7 @@ const Tag: React.FC<TagProps> = ({
 							? Colors[theme].textPrimary
 							: Colors[theme].textPrimary,
 				},
+				style,
 			]}>
 			<ThemedText
 				theme={theme}
