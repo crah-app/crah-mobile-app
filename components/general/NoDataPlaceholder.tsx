@@ -4,6 +4,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	ViewStyle,
+	Dimensions,
 } from 'react-native';
 import React from 'react';
 import Colors from '@/constants/Colors';
@@ -12,6 +13,8 @@ import arrow from '../../assets/images/vectors/arrow-to-down-right-svgrepo-com.s
 import { Link } from 'expo-router';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import GetSVG from '../GetSVG';
+import ThemedText from './ThemedText';
+import { defaultStyles } from '@/constants/Styles';
 
 interface NoDataPlaceholderProps {
 	arrowStyle?: ViewStyle | ViewStyle[];
@@ -19,6 +22,7 @@ interface NoDataPlaceholderProps {
 	firstTextValue?: string;
 	subTextValue?: string;
 	onSubTextClickPathname?: string;
+	retryFunction?: () => void;
 }
 
 const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
@@ -27,6 +31,7 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 	firstTextValue,
 	subTextValue,
 	onSubTextClickPathname,
+	retryFunction = () => {},
 }) => {
 	const theme = useSystemTheme();
 
@@ -39,21 +44,37 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 				/>
 			</View>
 
-			<Text style={styles.placeholderText}>
-				{firstTextValue ?? "No one's around here"}{' '}
-			</Text>
-			<Link
-				href={{
-					pathname: '/(auth)/(tabs)/createPages/createVideo',
-				}}
-				asChild>
-				<TouchableOpacity>
-					<Text
-						style={[styles.placeholderText, { color: Colors.default.primary }]}>
-						{subTextValue ?? 'Create A Post'}
-					</Text>
+			<View
+				style={{
+					justifyContent: 'center',
+					alignItems: 'center',
+				}}>
+				<Text style={styles.placeholderText}>
+					{firstTextValue ?? "No one's around here"}{' '}
+				</Text>
+			</View>
+
+			<View style={{ top: 20 }}>
+				<TouchableOpacity style={{}} onPress={() => retryFunction()}>
+					<ThemedText
+						value="Retry"
+						theme={theme}
+						style={[
+							defaultStyles.outlinedBtn,
+							{
+								padding: 10,
+								borderWidth: 2,
+								width: Dimensions.get('window').width - 128,
+								borderRadius: 10,
+								color: Colors[theme].primary,
+								fontSize: 20,
+								fontWeight: '500',
+								backgroundColor: 'rgba(255, 0,0, 0.05)',
+							},
+						]}
+					/>
 				</TouchableOpacity>
-			</Link>
+			</View>
 		</View>
 	);
 };
@@ -74,8 +95,8 @@ const styles = StyleSheet.create({
 		bottom: 0,
 	},
 	placeholderText: {
-		fontWeight: '700',
-		fontSize: 28,
+		fontWeight: '400',
+		fontSize: 20,
 		color: 'gray',
 	},
 });

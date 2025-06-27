@@ -137,8 +137,8 @@ function HeaderFlatList<T>({
 				errWhileLoading ? (
 					<NoDataPlaceholder
 						containerStyle={[styles.PlaceholderContentContainer]}
-						firstTextValue="Error loading posts"
-						subTextValue="Please try again later."
+						firstTextValue="Something went wrong, please try again."
+						subTextValue=""
 						arrowStyle={{ display: 'none' }}
 					/>
 				) : data && data.length > 0 ? (

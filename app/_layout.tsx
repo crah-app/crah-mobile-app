@@ -43,6 +43,8 @@ const Root = () => {
 	const theme = useSystemTheme();
 	const router = useRouter();
 
+	mmkv.set('userSignedInOnce', false);
+
 	const SignedInOnce = mmkv.getBoolean('userSignedInOnce');
 
 	useEffect(() => {
@@ -66,7 +68,6 @@ const Root = () => {
 			// ALl values he defines he can change in his profile settings
 			if (!SignedInOnce) {
 				router.replace('/createProfile');
-				mmkv.set('userSignedInOnce', false);
 				return;
 			}
 

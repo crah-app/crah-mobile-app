@@ -13,8 +13,10 @@ import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { useCommonTricks } from '@/hooks/getCommonTricks';
+import { mmkv } from '@/hooks/mmkv';
 import {
 	Rank,
+	RiderType,
 	SelectedTrick,
 	TextInputMaxCharacters,
 	Trick,
@@ -26,6 +28,7 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
+import { router } from 'expo-router';
 import React, {
 	useCallback,
 	useEffect,
@@ -55,6 +58,8 @@ const CreateProfile = () => {
 	const { user } = useUser();
 	const { getToken } = useAuth();
 
+	const max_steps = 4;
+
 	const [stepsComplete, setStepsComplete] = useState<number>(0);
 	const [currentStep, setCurrentStep] = useState<number>(0);
 	const [loadingRequest, setLoadingRequest] = useState<boolean>(false);
@@ -73,6 +78,10 @@ const CreateProfile = () => {
 
 	const [usernameIsTaken, setUsernameIsTaken] = useState<boolean>(false);
 
+	const [mustSelectRiderType, setMustSelectRiderType] =
+		useState<boolean>(false);
+	const [riderType, setRiderType] = useState<RiderType>(null);
+
 	const [trickSearchQuery, setTrickSearchQuery] = useState<string>('');
 	const [showWarningToWriteName, setShowWarningToWriteName] =
 		useState<boolean>(false);
@@ -80,7 +89,11 @@ const CreateProfile = () => {
 	const [trickSelectedForSpotSelection, setTrickSelectedForSpotSelection] =
 		useState<SelectedTrick | null>(null);
 
+	const [mustSelectOneTrick, setMustSelectOneTrick] = useState<boolean>(false);
+
 	const { commonTricks, loading, error } = useCommonTricks();
+
+	let usertoken: any;
 
 	const updateUsername = async () => {
 		try {
@@ -123,9 +136,8 @@ const CreateProfile = () => {
 		try {
 			setLoadingRequest(true);
 			setLoadingModalVisible(true);
-			let usertoken = await getToken();
 
-			console.log(selectedBestTricks);
+			usertoken = await getToken();
 
 			const response = await fetch(
 				`http://192.168.0.136:4000/api/tricks/${user?.id}/setTricks`,
@@ -142,37 +154,74 @@ const CreateProfile = () => {
 
 			const result = await response.json();
 
-			console.log(result);
 			if (!response.ok) {
-				const errorText = await response.text();
-				console.warn('Error posting tricks:', response.status, errorText);
-				setLoadingRequest(false);
-				setLoadingModalVisible(false);
+				console.warn(
+					'Error posting tricks:',
+					response.status,
+					result?.error || result,
+				);
 				return false;
 			}
 
 			setAverageTrickPointsOfBestTricks(result.user_points);
 			setUserRank(result.rank);
 
+			return true;
+		} catch (error) {
+			console.warn('handlePostBestTricks error:', error);
+			return false;
+		} finally {
 			setLoadingRequest(false);
 			setLoadingModalVisible(false);
+		}
+	};
+
+	const handlePostRiderType = async () => {
+		try {
+			setLoadingRequest(true);
+			setLoadingModalVisible(true);
+
+			usertoken = await getToken();
+
+			const response = await fetch(
+				`http://192.168.0.136:4000/api/users/${user?.id}/setRiderType`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${usertoken}`,
+					},
+					body: JSON.stringify({ riderType }),
+				},
+			);
+
+			const result = await response.json();
+
+			if (!response.ok) {
+				console.warn('Error:', result);
+				throw new Error(
+					result?.error || 'Something went wrong posting rider type',
+				);
+			}
 
 			return true;
 		} catch (error) {
-			console.warn(error);
+			console.warn('handlePostRiderType error:', error);
+			return false;
+		} finally {
 			setLoadingRequest(false);
 			setLoadingModalVisible(false);
 		}
 	};
 
 	const allowedToContinueHandler = async () => {
-		switch (currentStep) {
-			case 0:
-				setShowWarningToWriteName(false);
-				setUsernameIsTaken(false);
+		setShowWarningToWriteName(false);
+		setUsernameIsTaken(false);
+		setMustSelectOneTrick(false);
+		setMustSelectRiderType(false);
 
-				break;
-			case 1: // second page
+		switch (currentStep) {
+			case 1: // page 2: rider name
 				if (username.length <= 0) {
 					setShowWarningToWriteName(true);
 					setUsernameIsTaken(false);
@@ -195,9 +244,20 @@ const CreateProfile = () => {
 
 				break;
 
-			case 2: // third page
-				console.log(selectedBestTricks.length);
-				if (selectedBestTricks.length <= 0) return false;
+			case 2: // page 3: rider type
+				if (!riderType) {
+					setMustSelectRiderType(true);
+					return false;
+				}
+
+				await handlePostRiderType();
+				break;
+
+			case 3: // page 4: tricks
+				if (selectedBestTricks.length <= 0) {
+					setMustSelectOneTrick(true);
+					return false;
+				}
 
 				const result = await handlePostBestTricks();
 				return result;
@@ -212,10 +272,13 @@ const CreateProfile = () => {
 		if (!result) return false;
 
 		setStepsComplete((prev) => {
-			if (prev < 5) {
+			if (prev < max_steps) {
 				setCurrentStep(prev + 1);
 				return prev + 1;
 			}
+
+			mmkv.set('userSignedInOnce', false);
+			router.replace('/(auth)/(tabs)/homePages');
 
 			return prev;
 		});
@@ -242,6 +305,7 @@ const CreateProfile = () => {
 				if (prev.length < 5) {
 					return [...prev, Trick];
 				}
+
 				return prev;
 			});
 		},
@@ -313,7 +377,7 @@ const CreateProfile = () => {
 							<ProgressionBar
 								theme={theme}
 								progress={stepsComplete}
-								totalProgress={5}
+								totalProgress={4}
 							/>
 						</View>
 					}
@@ -434,10 +498,16 @@ const CreateProfile = () => {
 								triggerTrickSpotSelection={triggerTrickSpotSelection}
 								averageTrickPointsOfBestTricks={averageTrickPointsOfBestTricks}
 								userRank={userRank}
+								setMustSelectOneTrick={setMustSelectOneTrick}
+								mustSelectOneTrick={mustSelectOneTrick}
+								mustSelectRiderType={mustSelectRiderType}
+								setRiderType={setRiderType}
+								riderType={riderType}
+								setMustSelectRiderType={setMustSelectRiderType}
 							/>
 						)}
 
-						<BuildCharacterUI visible={currentStep === 5} />
+						<BuildCharacterUI visible={currentStep === 6} />
 					</View>
 
 					{/* bottom action container */}
@@ -451,7 +521,7 @@ const CreateProfile = () => {
 							backgroundColor: Colors[theme].background,
 							padding: 12,
 						}}>
-						{currentStep < 5 && (
+						{currentStep < 6 && (
 							<TouchableOpacity
 								onPress={async () => await handleContinue()}
 								style={[

@@ -8,21 +8,22 @@ type ColorSchemeUpdated = 'light' | 'dark';
  * @returns {ColorSchemeUpdated} 'light' oder 'dark'
  */
 export function useSystemTheme(): ColorSchemeUpdated {
-  const [theme, setTheme] = useState<ColorSchemeName>(
-    Appearance.getColorScheme(),
-  );
+	return 'dark';
+	// const [theme, setTheme] = useState<ColorSchemeName>(
+	//   Appearance.getColorScheme(),
+	// );
 
-  useEffect(() => {
-    // Event-Listener für Theme-Änderungen hinzufügen
-    const listener = Appearance.addChangeListener(({ colorScheme }) => {
-      setTheme(colorScheme);
-    });
+	// useEffect(() => {
+	//   // Event-Listener für Theme-Änderungen hinzufügen
+	//   const listener = Appearance.addChangeListener(({ colorScheme }) => {
+	//     setTheme(colorScheme);
+	//   });
 
-    // Cleanup-Funktion zum Entfernen des Event-Listeners
-    return () => {
-      listener.remove();
-    };
-  }, []);
+	//   // Cleanup-Funktion zum Entfernen des Event-Listeners
+	//   return () => {
+	//     listener.remove();
+	//   };
+	// }, []);
 
-  return theme!;
+	// return theme!;
 }

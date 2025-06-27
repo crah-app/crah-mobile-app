@@ -12,11 +12,23 @@ import Tag from '@/components/tag';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { useCommonTricks } from '@/hooks/getCommonTricks';
-import { Rank, SelectedTrick, TextInputMaxCharacters, Trick } from '@/types';
+import {
+	Rank,
+	RiderType,
+	SelectedTrick,
+	TextInputMaxCharacters,
+	Trick,
+} from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import React, { Dispatch, memo, SetStateAction, useEffect } from 'react';
+import React, {
+	Dispatch,
+	memo,
+	SetStateAction,
+	useEffect,
+	useRef,
+} from 'react';
 import {
 	KeyboardAvoidingView,
 	View,
@@ -28,6 +40,7 @@ import {
 import { BlurView } from 'expo-blur';
 import stringSimilarity from 'string-similarity';
 import { evaluateTextBasedOnRankNumber } from '@/utils/globalFuncs';
+import { TextInput } from 'react-native-gesture-handler';
 
 interface ActionContainerProps {
 	currentStep: number;
@@ -49,6 +62,12 @@ interface ActionContainerProps {
 	triggerTrickSpotSelection: (trick: SelectedTrick) => void;
 	averageTrickPointsOfBestTricks: number;
 	userRank: number;
+	setMustSelectOneTrick: Dispatch<SetStateAction<boolean>>;
+	mustSelectOneTrick: boolean;
+	mustSelectRiderType: boolean;
+	setRiderType: Dispatch<SetStateAction<RiderType>>;
+	riderType: RiderType;
+	setMustSelectRiderType: Dispatch<SetStateAction<boolean>>;
 }
 
 const ActionContainer = memo(
@@ -72,7 +91,28 @@ const ActionContainer = memo(
 		triggerTrickSpotSelection,
 		averageTrickPointsOfBestTricks,
 		userRank,
+		setMustSelectOneTrick,
+		mustSelectOneTrick,
+		setRiderType,
+		riderType,
+		setMustSelectRiderType,
 	}: ActionContainerProps) => {
+		const nameInputRef = useRef<TextInput>(null);
+
+		const RiderTypes: RiderType[] = [
+			'Park Rider',
+			'Street Rider',
+			'Flat Rider',
+		];
+
+		useEffect(() => {
+			console.log('object', currentStep);
+			if (currentStep === 1) {
+				nameInputRef.current?.focus();
+			}
+			return () => {};
+		}, [currentStep]);
+
 		const handleNameInputPress = () => {
 			setShowWarningToWriteName(false);
 		};
@@ -193,7 +233,7 @@ compare yourself to others and become the best scooter rider in the world `}
 										{ fontWeight: '700', textAlign: 'center', fontSize: 32 },
 									]}
 									theme={theme}
-									value="What is your name?"
+									value="Your Rider Name"
 								/>
 								<ThemedText
 									style={[
@@ -211,6 +251,8 @@ compare yourself to others and become the best scooter rider in the world `}
 
 							<View style={{ top: 45, gap: 4 }}>
 								<ThemedTextInput
+									allowSpace={false}
+									ref={nameInputRef}
 									theme={theme}
 									value={username}
 									setValue={setUsername}
@@ -249,6 +291,60 @@ compare yourself to others and become the best scooter rider in the world `}
 			case 2:
 				return (
 					<View style={styles.pageContainer}>
+						<View style={{ gap: 20, width: '100%' }}>
+							<ThemedText
+								style={[
+									defaultStyles.bigText,
+									{ fontWeight: '700', textAlign: 'center', fontSize: 32 },
+								]}
+								theme={theme}
+								value="Your Rider Type"
+							/>
+							<ThemedText
+								style={[
+									styles.smallText,
+									{
+										color: Colors[theme].gray,
+										fontWeight: '400',
+										textAlign: 'center',
+									},
+								]}
+								theme={theme}
+								value="What type of rider you call yourself?"
+							/>
+						</View>
+
+						<View style={{ gap: 4, flex: 1, justifyContent: 'center', bottom }}>
+							{RiderTypes.map((val) => (
+								<TouchableOpacity
+									key={val}
+									style={{ marginBottom: 24 }}
+									onPress={() => setRiderType(val)}>
+									<ThemedText
+										style={[
+											defaultStyles.bigText,
+											{
+												fontWeight: '700',
+												textAlign: 'center',
+												fontSize: 36,
+												color:
+													riderType === val
+														? Colors[theme].primary
+														: Colors[theme].textPrimary,
+											},
+										]}
+										theme={theme}
+										value={val as string}
+									/>
+								</TouchableOpacity>
+							))}
+						</View>
+					</View>
+				);
+
+			case 3:
+				return (
+					<View style={styles.pageContainer}>
 						{/* header */}
 						<View style={{ gap: 18, width: '100%' }}>
 							<ThemedText
@@ -259,7 +355,6 @@ compare yourself to others and become the best scooter rider in the world `}
 								theme={theme}
 								value="Select your 5 best Tricks!"
 							/>
-
 							<View style={{ justifyContent: 'center', alignItems: 'center' }}>
 								<SearchBar
 									displayLeftSearchIcon
@@ -270,6 +365,17 @@ compare yourself to others and become the best scooter rider in the world `}
 									containerStyle={{ height: 100, width: 100 }}
 								/>
 							</View>
+							joseg
+							{mustSelectOneTrick && (
+								<ThemedText
+									style={[
+										styles.smallText,
+										{ color: Colors[theme].primary, textAlign: 'center' },
+									]}
+									theme={theme}
+									value="Select atleast one trick"
+								/>
+							)}
 						</View>
 
 						{/* selected trick container */}
@@ -346,6 +452,7 @@ compare yourself to others and become the best scooter rider in the world `}
 											<Tag
 												style={{}}
 												handleTagPress={() => {
+													setMustSelectOneTrick(false);
 													handleSelectTrick({ ...item, Spot: 'Park' });
 												}}
 												tag={item.Name}
@@ -360,7 +467,7 @@ compare yourself to others and become the best scooter rider in the world `}
 					</View>
 				);
 
-			case 3:
+			case 4:
 				return (
 					<View style={styles.pageContainer}>
 						<View
@@ -395,31 +502,11 @@ compare yourself to others and become the best scooter rider in the world `}
 						</View>
 					</View>
 				);
-			case 4:
-				return (
-					<View style={styles.pageContainer}>
-						<View
-							style={{
-								justifyContent: 'center',
-								alignItems: 'center',
-								gap: 12,
-							}}>
-							<ThemedText
-								style={[defaultStyles.bigText, { fontWeight: '500' }]}
-								theme={theme}
-								value={`Page ${currentStep}`}
-							/>
-							<ThemedText
-								style={{ color: Colors[theme].lightGray, textAlign: 'center' }}
-								theme={theme}
-								value="This is the Next Page"
-							/>
-						</View>
-					</View>
-				);
+			case 5:
+				return <></>;
 
 			// atm it renders a WebView in the root component
-			case 5:
+			case 6:
 				return <></>;
 			// return (
 			// 	<View style={styles.pageContainer}>
