@@ -43,7 +43,12 @@ const SettingsColumn: React.FC<SettingsColumnProps> = ({
 
 	const renderLeftIcon = () => {
 		if (svg && type != 'unordinary') {
-			return <GetSVG props={{ width: 24, height: 24 }} name="scooter" />;
+			return (
+				<GetSVG
+					props={{ width: 24, height: 24, fill: Colors[theme].textPrimary }}
+					name="scooter"
+				/>
+			);
 		}
 
 		if (hasIcon && icon && type != 'unordinary') {
@@ -69,9 +74,7 @@ const SettingsColumn: React.FC<SettingsColumnProps> = ({
 			}}
 			containerStyle={{
 				backgroundColor:
-					type === 'ordinary'
-						? Colors[theme].textPrimaryReverse
-						: 'transparent',
+					type === 'ordinary' ? Colors[theme].background : 'transparent',
 			}}
 			titleStyle={{
 				fontSize: 16,
@@ -80,6 +83,7 @@ const SettingsColumn: React.FC<SettingsColumnProps> = ({
 				textAlign: type === 'unordinary' ? 'center' : 'left',
 				width: type === 'unordinary' ? '100%' : undefined,
 				fontWeight: 'normal',
+				marginTop: type === 'unordinary' ? 28 : 0,
 			}}
 		/>
 	);

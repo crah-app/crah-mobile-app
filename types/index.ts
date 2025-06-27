@@ -1,11 +1,9 @@
 import Reactions from '@/constants/Reactions';
-import UserPostDummyStructure from '@/JSON/posts.json';
 import { Ionicons } from '@expo/vector-icons';
 import { IMessage, User } from 'react-native-gifted-chat';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 import ClerkUser from './clerk';
-import { DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_FORM_ACTIONS } from 'react';
 
 // Ionicons icon type
 export type ionicon = keyof typeof Ionicons.glyphMap;

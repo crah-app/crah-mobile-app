@@ -5,6 +5,7 @@ import {
 	StyleSheet,
 	SafeAreaView,
 	ScrollView,
+	TouchableOpacity,
 } from 'react-native';
 import ThemedView from '@/components/general/ThemedView';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -13,29 +14,82 @@ import SettingsColumn from '@/components/rows/SettingsRow';
 import settingsData from '@/JSON/settings.json';
 import { router, Stack } from 'expo-router';
 import ThemedText from '@/components/general/ThemedText';
+import HeaderScrollView from '@/components/header/HeaderScrollView';
+import CostumHeader from '@/components/header/CostumHeader';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
+import { Ionicons } from '@expo/vector-icons';
 
 const Page = () => {
 	const theme = useSystemTheme();
 
 	return (
-		<ThemedView theme={theme} flex={1}>
-			<SafeAreaView style={{ flex: 1 }}>
-				<SectionList
-					sections={settingsData}
-					keyExtractor={(item, index) => item.text + index}
-					renderItem={({ item }) => <SettingsColumn {...item} />}
-					renderSectionHeader={({ section: { title } }) => (
-						<ThemedView style={styles.header} theme={theme}>
-							<ThemedText
-								theme={theme}
-								style={[styles.headerText]}
-								value={title}
-							/>
-						</ThemedView>
-					)}
+		<HeaderScrollView
+			headerChildren={
+				<CostumHeader
+					theme={theme}
+					headerLeft={
+						<View
+							style={{
+								justifyContent: 'center',
+								alignItems: 'center',
+								flexDirection: 'row',
+								gap: 6,
+							}}>
+							<TouchableOpacity onPress={router.back}>
+								<Ionicons
+									name="chevron-back"
+									size={24}
+									color={Colors[theme].textPrimary}
+								/>
+							</TouchableOpacity>
+							<HeaderLeftLogo />
+						</View>
+					}
+					headerRight={
+						<Ionicons
+							name="settings-outline"
+							size={28}
+							color={Colors[theme].textPrimary}
+						/>
+					}
 				/>
-			</SafeAreaView>
-		</ThemedView>
+			}
+			scrollChildren={
+				<ThemedView theme={theme} flex={1}>
+					<SafeAreaView style={{ flex: 1 }}>
+						<SectionList
+							sections={settingsData}
+							keyExtractor={(item, index) => item.text + index}
+							renderItem={({ item }) => <SettingsColumn {...item} />}
+							renderSectionHeader={({ section: { title } }) => (
+								<ThemedView
+									style={[
+										styles.header,
+										{
+											paddingHorizontal: 8,
+										},
+									]}
+									theme={theme}>
+									<ThemedText
+										theme={theme}
+										style={[
+											styles.headerText,
+											{
+												paddingVertical: 12,
+												borderBottomWidth: 3,
+												borderBottomColor: Colors.dark.surface,
+											},
+										]}
+										value={title}
+									/>
+								</ThemedView>
+							)}
+						/>
+					</SafeAreaView>
+				</ThemedView>
+			}
+			theme={theme}
+		/>
 	);
 };
 
