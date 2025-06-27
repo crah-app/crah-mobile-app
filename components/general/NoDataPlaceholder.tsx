@@ -50,7 +50,7 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 					alignItems: 'center',
 				}}>
 				<Text style={styles.placeholderText}>
-					{firstTextValue ?? "No one's around here"}{' '}
+					{firstTextValue ?? 'Something went wrong, please try again.'}{' '}
 				</Text>
 			</View>
 

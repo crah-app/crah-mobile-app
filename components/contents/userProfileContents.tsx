@@ -24,7 +24,9 @@ import {
 	GeneralPostTypesIonicons,
 	Rank,
 	RiderType,
+	Trick,
 	UserGalleryTopics,
+	UserTrick,
 } from '@/types';
 
 // dummy data
@@ -35,14 +37,7 @@ import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
 import ClerkUser from '@/types/clerk';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import tricks from '@/JSON/tricks.json';
 import { getCachedData } from '@/hooks/cache';
-
-interface trickInterface {
-	id: string;
-	name: string;
-	hardness: number;
-}
 
 interface UserProfileProps {
 	userId: string;
@@ -101,7 +96,6 @@ const UserPostContainer: React.FC<UserPostContainerProps> = ({
 			.then((res) => {
 				setPosts(res);
 				setPostsCount(res.length);
-				// await setCachedData(CACHE_KEY, res.commonTricks); // data gets cached
 			})
 			.catch((err) => setErrFetchingPosts(true))
 			.finally(() => setPostsLoaded(true));
@@ -123,6 +117,7 @@ const UserPostContainer: React.FC<UserPostContainerProps> = ({
 					width: Dimensions.get('window').width,
 				},
 			]}>
+			{/* {postsLoaded && posts && posts.length > 0 && ( */}
 			<View
 				style={[
 					styles.UserPostFilterContainer,
@@ -146,6 +141,7 @@ const UserPostContainer: React.FC<UserPostContainerProps> = ({
 					</TouchableOpacity>
 				))}
 			</View>
+			{/* )} */}
 
 			{/* posts */}
 			<View
@@ -159,8 +155,7 @@ const UserPostContainer: React.FC<UserPostContainerProps> = ({
 					) : errFetchingPosts ? (
 						// error while loading
 						<NoDataPlaceholder
-							firstTextValue="Something went wrong..."
-							subTextValue=""
+							retryFunction={async () => await fetchPosts()}
 							arrowStyle={{ display: 'none' }}
 							containerStyle={{ paddingTop: 40 }}
 						/>
@@ -185,8 +180,8 @@ const UserPostContainer: React.FC<UserPostContainerProps> = ({
 					) : (
 						// no posts
 						<NoDataPlaceholder
+							retryFunction={async () => await fetchPosts()}
 							firstTextValue="No posts here..."
-							subTextValue=""
 							arrowStyle={{ display: 'none' }}
 							containerStyle={{ paddingTop: 40 }}
 						/>
@@ -201,6 +196,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
 	const { bottom, top } = useSafeAreaInsets();
+
+	interface TrickResults {
+		[BestTrickType.PARK]: UserTrick[];
+		[BestTrickType.STREET]: UserTrick[];
+		[BestTrickType.FLAT]: UserTrick[];
+	}
 
 	const [activePostFilterIcon, setActivePostFilterIcon] =
 		useState<GeneralPostTypesIonicons>(GeneralPostTypesIonicons.all);
@@ -217,15 +218,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 	];
 
 	// best tricks states
-	const [bestParkTricks, setBestParkTricks] = useState<trickInterface[]>(
-		tricks[0].Park,
-	);
-	const [bestFlatTricks, setBestFlatTricks] = useState<trickInterface[]>(
-		tricks[0].Flat,
-	);
-	const [bestStreetTricks, setBestStreetTricks] = useState<trickInterface[]>(
-		tricks[0].Street,
-	);
+	const [bestTricksOverall, setBestTricksOverall] = useState<UserTrick[]>();
+
+	const [bestParkTricks, setBestParkTricks] = useState<UserTrick[]>();
+	const [bestFlatTricks, setBestFlatTricks] = useState<UserTrick[]>();
+	const [bestStreetTricks, setBestStreetTricks] = useState<UserTrick[]>();
 
 	const [currentSelectedBestTrickType, setCurrentSelectedBestTrickType] =
 		useState<BestTrickType>(BestTrickType.PARK);
@@ -244,7 +241,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 	const [rankPoints, setRankPoints] = useState<number>(0);
 	const [userAvatar, setUserAvatar] = useState<string>('');
 	const [postsCount, setPostsCount] = useState<number>(0);
-	const [riderType, setRiderType] = useState<RiderType>('Park Rider');
+	const [riderType, setRiderType] = useState<RiderType>(null);
 	const [bestTrick, setBestTrick] = useState<string>('');
 	const [profileDescription, setProfileDescription] = useState<string | null>(
 		null,
@@ -267,10 +264,18 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 	}, [errLoadingUser]);
 
 	useEffect(() => {
+		fetchData();
+
+		return () => {};
+	}, [userId]);
+
+	const fetchData = async () => {
 		if (!userId) {
 			setErrLoadingUser({ state: true, message: 'Error parsing the userId' });
 			return () => {};
 		}
+
+		setErrLoadingUser({ state: false, message: '' });
 
 		const controller = new AbortController();
 
@@ -278,8 +283,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 			signal: controller.signal,
 		})
 			.then((res) => res.json())
-			.then((res: CrahUser[]) => {
-				const user: CrahUser = res[0];
+			.then((res: any) => {
+				const user: CrahUser = res[0][0];
+				const tricks: TrickResults = res[1][0];
+				const best_tricks_overall: UserTrick[] = res[2];
+
+				console.log(user, tricks, best_tricks_overall);
 
 				// profile
 				SetUserName(user.Name);
@@ -297,6 +306,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 				// social
 				setFans(user.followerCount);
 				setFriends(user.friendCount);
+
+				// tricks
+				setBestTricksOverall(best_tricks_overall);
+				setBestParkTricks(tricks.Park);
+				setBestStreetTricks(tricks.Street);
+				setBestFlatTricks(tricks.Flat);
 			})
 			.catch((err) => {
 				if (err.name !== 'AbortError') {
@@ -307,10 +322,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 					console.warn(`Error loading user ${userId}`, err);
 				}
 			})
-			.finally(() => setLoadingUser(false));
-
-		return () => controller.abort();
-	}, [userId]);
+			.finally(() => {
+				setLoadingUser(false);
+				controller.abort();
+			});
+	};
 
 	const handleCompareYourself = () => {
 		router.push({
@@ -689,13 +705,16 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 					)}
 				</View>
 
-				{BestTricksToType[currentSelectedBestTrickType].length > 0 ? (
+				{bestTricksOverall &&
+				bestParkTricks &&
+				bestStreetTricks &&
+				bestFlatTricks ? (
 					<FlatList
 						showsVerticalScrollIndicator={false}
 						showsHorizontalScrollIndicator={false}
 						scrollEnabled={false}
 						data={BestTricksToType[currentSelectedBestTrickType]}
-						keyExtractor={(item) => item.id}
+						keyExtractor={(item) => item.TrickId.toString()}
 						renderItem={({ item, index }) => (
 							<LinearGradient
 								style={{
@@ -707,9 +726,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 									key={index}
 									theme={theme}
 									value={
-										item.name.length > 22
-											? item.name.substring(0, 20) + '...'
-											: item.name
+										item.Name.length > 22
+											? item.Name.substring(0, 20) + '...'
+											: item.Name
 									}
 								/>
 							</LinearGradient>
@@ -739,6 +758,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 				scrollEnabled={true}>
 				{errLoadingUser.state ? (
 					<NoDataPlaceholder
+						retryFunction={async () => await fetchData()}
 						containerStyle={{
 							flex: 1,
 							justifyContent: 'center',
@@ -746,8 +766,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 							height: windowHeight * 0.75,
 						}}
 						arrowStyle={{ display: 'none' }}
-						subTextValue="Something went wrong"
-						firstTextValue="Sorry :/"
 					/>
 				) : loadingUser ? (
 					<CrahActivityIndicator

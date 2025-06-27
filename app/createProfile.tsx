@@ -277,7 +277,7 @@ const CreateProfile = () => {
 				return prev + 1;
 			}
 
-			mmkv.set('userSignedInOnce', false);
+			mmkv.set('userSignedInOnce', true);
 			router.replace('/(auth)/(tabs)/homePages');
 
 			return prev;

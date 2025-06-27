@@ -199,6 +199,16 @@ export interface Trick {
 	SecondName: string;
 }
 
+export interface UserTrick {
+	TrickId: number;
+	UserId: string;
+	Name: string;
+	Points: number;
+	Difficulty: TrickDifficulty;
+	Spot: TrickSpot;
+	Date: Date | null;
+}
+
 export type TrickType = 'Overhead' | 'Rewind' | 'Whip' | 'Balance' | 'Grab';
 
 /*
@@ -418,31 +428,29 @@ export enum UserGalleryTopics {
 */
 
 export enum TrickDifficulty {
-	NOVICE = 'Novice',
 	BEGINNER = 'Beginner',
 	NORMAL = 'Normal',
 	INTERMEDIATE = 'Intermediate',
 	ADVANCED = 'Advanced',
 	HARD = 'Hard',
 	VERY_HARD = 'Very Hard',
-	MONSTER = 'Monster',
+	EXPERT = 'Expert',
 	IMPOSSIBLE = 'Impossible',
 	GOATED = 'Goated',
-	POTENTIAL_WORLDS_FIRST = "Potential World's First",
+	LEGENDARY = 'Legendary',
 }
 
 export const TrickDifficultyColorMap: Record<TrickDifficulty, string> = {
-	[TrickDifficulty.NOVICE]: '#d3f9d8', // light green
 	[TrickDifficulty.BEGINNER]: '#b2f2bb', // medium green
 	[TrickDifficulty.NORMAL]: '#8ce99a', // green
 	[TrickDifficulty.INTERMEDIATE]: '#ffe066', // yellow
 	[TrickDifficulty.ADVANCED]: '#fab005', // orange
 	[TrickDifficulty.HARD]: '#ff922b', // dark orange
 	[TrickDifficulty.VERY_HARD]: '#fa5252', // red
-	[TrickDifficulty.MONSTER]: '#e64980', // pink
+	[TrickDifficulty.EXPERT]: '#e64980', // pink
 	[TrickDifficulty.IMPOSSIBLE]: '#be4bdb', // purple
 	[TrickDifficulty.GOATED]: '#5f3dc4', // deep purple
-	[TrickDifficulty.POTENTIAL_WORLDS_FIRST]: '#ffffff', // black
+	[TrickDifficulty.LEGENDARY]: '#ffd700', // black or special
 };
 
 /* 
