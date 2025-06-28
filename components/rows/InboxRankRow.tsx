@@ -1,5 +1,4 @@
 import React from 'react';
-import Column from '@/components/general/Row';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import Colors from '@/constants/Colors';
 
@@ -10,8 +9,9 @@ import GoldBadge from '../../assets/images/vectors/bar.svg';
 import PlatinumBadge from '../../assets/images/vectors/bar.svg';
 import DiamondBadge from '../../assets/images/vectors/bar.svg';
 import { Rank } from '@/types';
+import Row from '@/components/general/Row';
 
-interface RankColumnProps {
+interface RankRowProps {
 	currentRank: Rank;
 	previousRank?: Rank;
 	onPress?: () => void;
@@ -26,7 +26,7 @@ const rankIcons: Record<string, string> = {
 	Diamond: DiamondBadge,
 };
 
-const RankColumn: React.FC<RankColumnProps> = ({
+const RankRow: React.FC<RankRowProps> = ({
 	currentRank,
 	previousRank,
 	onPress,
@@ -43,7 +43,7 @@ const RankColumn: React.FC<RankColumnProps> = ({
 		: 'Welcome to your first rank!';
 
 	return (
-		<Column
+		<Row
 			title={`Your new rank: ${currentRank}`}
 			subtitle={rankChange}
 			onPress={onPress}
@@ -59,4 +59,4 @@ const RankColumn: React.FC<RankColumnProps> = ({
 	);
 };
 
-export default RankColumn;
+export default RankRow;

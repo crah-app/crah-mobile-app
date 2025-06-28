@@ -677,3 +677,21 @@ export interface sourceMetadataInterface {
 	userId: string;
 	data: any;
 }
+
+export type InboxNotificationType =
+	| 'friend_request'
+	| 'new_follower'
+	| 'post_like'
+	| 'system_update'
+	| 'rank_up';
+
+export interface InboxNotification {
+	CreatedAt: string;
+	Id: number;
+	IsRead: number;
+	Message: string;
+	PostId: null | number;
+	SenderId: string;
+	Type: InboxNotificationType;
+	UserId: string;
+}

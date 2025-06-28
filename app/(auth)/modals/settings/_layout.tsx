@@ -1,18 +1,13 @@
-import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
-import { router, Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React from 'react';
-import {
-	FlatListComponent,
-	StyleSheet,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const Layout = () => {
 	const theme = useSystemTheme();
+	const router = useRouter();
 
 	return (
 		<Stack
@@ -25,16 +20,10 @@ const Layout = () => {
 				},
 				headerShadowVisible: false,
 			}}>
-			<Stack.Screen name="index" options={{ headerShown: false }} />
 			<Stack.Screen
-				name="settings"
+				name="editProfile"
 				options={{
-					headerShown: false,
-				}}
-			/>
-			<Stack.Screen
-				name="inbox"
-				options={{
+					presentation: 'modal',
 					headerShown: false,
 				}}
 			/>

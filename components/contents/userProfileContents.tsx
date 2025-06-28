@@ -242,7 +242,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 	const [userAvatar, setUserAvatar] = useState<string>('');
 	const [postsCount, setPostsCount] = useState<number>(0);
 	const [riderType, setRiderType] = useState<RiderType>(null);
-	const [bestTrick, setBestTrick] = useState<string>('');
+	const [bestTrick, setBestTrick] = useState<UserTrick | null>(null);
 	const [profileDescription, setProfileDescription] = useState<string | null>(
 		null,
 	);
@@ -287,6 +287,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 				const user: CrahUser = res[0][0];
 				const tricks: TrickResults = res[1][0];
 				const best_tricks_overall: UserTrick[] = res[2];
+				const best_trick: UserTrick = res[3][0];
 
 				console.log(user, tricks, best_tricks_overall);
 
@@ -312,6 +313,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 				setBestParkTricks(tricks.Park);
 				setBestStreetTricks(tricks.Street);
 				setBestFlatTricks(tricks.Flat);
+
+				setBestTrick(best_trick);
 			})
 			.catch((err) => {
 				if (err.name !== 'AbortError') {
@@ -626,7 +629,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 						value="Best Trick"
 						style={[{ color: 'red' }]}
 					/>
-					<ThemedText theme={theme} value={bestTrick} />
+					<ThemedText
+						theme={theme}
+						value={`${bestTrick?.Name} ${bestTrick?.Spot}`}
+					/>
 				</View>
 
 				{/* type of rider */}

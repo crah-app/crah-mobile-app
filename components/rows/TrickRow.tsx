@@ -7,7 +7,7 @@ import Row from '../general/Row';
 import Bars from '../../assets/images/vectors/bar.svg';
 import Colors from '@/constants/Colors';
 
-interface TrickColumnProps {
+interface TrickRowProps {
 	name: string;
 	points?: number;
 	difficulty?: TrickDifficulty;
@@ -15,7 +15,7 @@ interface TrickColumnProps {
 	onPress: () => void;
 }
 
-const TrickColumn: React.FC<TrickColumnProps> = ({
+const TrickRow: React.FC<TrickRowProps> = ({
 	name,
 	points,
 	difficulty,
@@ -45,4 +45,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default TrickColumn;
+export default TrickRow;

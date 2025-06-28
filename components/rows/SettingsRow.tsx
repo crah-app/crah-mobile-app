@@ -9,8 +9,9 @@ import Column from '@/components/general/Row';
 import Scooter from '../../assets/images/vectors/scooter.svg';
 import { ionicon } from '@/types';
 import GetSVG from '../GetSVG';
+import Row from '@/components/general/Row';
 
-interface SettingsColumnProps {
+interface SettingsRowProps {
 	type: 'ordinary' | 'unordinary' | string;
 	text: string;
 	icon?: ionicon | string;
@@ -18,7 +19,7 @@ interface SettingsColumnProps {
 	hasIcon?: boolean;
 }
 
-const SettingsColumn: React.FC<SettingsColumnProps> = ({
+const SettingsRow: React.FC<SettingsRowProps> = ({
 	type,
 	text,
 	icon,
@@ -39,6 +40,15 @@ const SettingsColumn: React.FC<SettingsColumnProps> = ({
 
 	const handleClick = async () => {
 		if (text === 'Sign Out') await handleSignOut();
+
+		switch (text) {
+			case 'Edit Profile':
+				router.push('/(auth)/modals/settings/editProfile');
+				break;
+
+			default:
+				break;
+		}
 	};
 
 	const renderLeftIcon = () => {
@@ -65,7 +75,7 @@ const SettingsColumn: React.FC<SettingsColumnProps> = ({
 	};
 
 	return (
-		<Column
+		<Row
 			title={text}
 			onPress={handleClick}
 			customLeftComponent={renderLeftIcon()}
@@ -73,6 +83,7 @@ const SettingsColumn: React.FC<SettingsColumnProps> = ({
 				marginRight: 0,
 			}}
 			containerStyle={{
+				marginLeft: 2,
 				backgroundColor:
 					type === 'ordinary' ? Colors[theme].background : 'transparent',
 			}}
@@ -89,4 +100,4 @@ const SettingsColumn: React.FC<SettingsColumnProps> = ({
 	);
 };
 
-export default SettingsColumn;
+export default SettingsRow;

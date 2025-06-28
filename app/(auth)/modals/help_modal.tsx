@@ -95,7 +95,10 @@ const HelpModal = () => {
 					theme={theme}
 					headerCenter={
 						<ThemedText
-							style={[defaultStyles.biggerText]}
+							style={[
+								defaultStyles.biggerText,
+								{ color: Colors[theme].primary },
+							]}
 							theme={theme}
 							value={'FAQ'}
 						/>

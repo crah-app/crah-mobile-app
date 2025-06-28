@@ -1,23 +1,17 @@
 import React from 'react';
-import {
-	View,
-	Text,
-	StyleSheet,
-	TouchableOpacity,
-	Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import Column from '@/components/general/Row';
+import Row from '@/components/general/Row';
 
-interface UpdateInformationColumnProps {
+interface UpdateInformationRowProps {
 	updateNumber: number;
 	title: string;
 	subtitle?: string;
 	onPress?: () => void;
 }
 
-const UpdateInformationColumn: React.FC<UpdateInformationColumnProps> = ({
+const UpdateInformationRow: React.FC<UpdateInformationRowProps> = ({
 	updateNumber,
 	title,
 	subtitle,
@@ -41,7 +35,7 @@ const UpdateInformationColumn: React.FC<UpdateInformationColumnProps> = ({
 	);
 
 	return (
-		<Column
+		<Row
 			title={title}
 			subtitle={subtitle}
 			customLeftComponent={numberComponent}
@@ -66,4 +60,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default UpdateInformationColumn;
+export default UpdateInformationRow;

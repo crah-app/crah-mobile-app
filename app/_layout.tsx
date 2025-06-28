@@ -43,8 +43,6 @@ const Root = () => {
 	const theme = useSystemTheme();
 	const router = useRouter();
 
-	mmkv.set('userSignedInOnce', false);
-
 	const SignedInOnce = mmkv.getBoolean('userSignedInOnce');
 
 	useEffect(() => {

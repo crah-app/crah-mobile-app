@@ -50,7 +50,7 @@ const HeaderScrollView: React.FC<HeaderScrollViewProps> = ({
 
 		if (direction === 'down' && isHeaderVisible) {
 			Animated.timing(headerTranslateY, {
-				toValue: -headerHeight,
+				toValue: -headerHeight * 1.75,
 				duration: 200,
 				useNativeDriver: true,
 			}).start();

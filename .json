@@ -1,0 +1,72 @@
+[
+	{
+		"CreatedAt": "2025-06-28T11:01:26.000Z",
+		"Id": 22,
+		"IsRead": 0,
+		"Message": "User ABC123 sent you a friend request",
+		"PostId": null,
+		"SenderId": "user_ABC123",
+		"Type": "friend_request",
+		"UserId": "user_2yBTXFqJg3AopGqlFQAApA07mVE"
+	},
+	{
+		"CreatedAt": "2025-06-28T11:01:26.000Z",
+		"Id": 23,
+		"IsRead": 0,
+		"Message": "User DEF456 is now following you",
+		"PostId": null,
+		"SenderId": "user_DEF456",
+		"Type": "new_follower",
+		"UserId": "user_2yBTXFqJg3AopGqlFQAApA07mVE"
+	},
+	{
+		"CreatedAt": "2025-06-28T11:01:26.000Z",
+		"Id": 24,
+		"IsRead": 0,
+		"Message": "User XYZ789 liked your post",
+		"PostId": 101,
+		"SenderId": "user_XYZ789",
+		"Type": "post_like",
+		"UserId": "user_2yBTXFqJg3AopGqlFQAApA07mVE"
+	},
+	{
+		"CreatedAt": "2025-06-28T11:01:26.000Z",
+		"Id": 25,
+		"IsRead": 0,
+		"Message": "We have updated our terms of service. Please review the changes.",
+		"PostId": null,
+		"SenderId": null,
+		"Type": "system_update",
+		"UserId": "user_2yBTXFqJg3AopGqlFQAApA07mVE"
+	},
+	{
+		"CreatedAt": "2025-06-28T11:01:26.000Z",
+		"Id": 26,
+		"IsRead": 0,
+		"Message": "Congratulations! You have reached Gold Rank.",
+		"PostId": null,
+		"SenderId": null,
+		"Type": "rank_up",
+		"UserId": "user_2yBTXFqJg3AopGqlFQAApA07mVE"
+	},
+	{
+		"CreatedAt": "2025-06-28T11:01:26.000Z",
+		"Id": 27,
+		"IsRead": 0,
+		"Message": "User GHI987 liked your post",
+		"PostId": 105,
+		"SenderId": "user_GHI987",
+		"Type": "post_like",
+		"UserId": "user_2yBTXFqJg3AopGqlFQAApA07mVE"
+	},
+	{
+		"CreatedAt": "2025-06-28T11:01:26.000Z",
+		"Id": 28,
+		"IsRead": 0,
+		"Message": "User JKL654 sent you a friend request",
+		"PostId": null,
+		"SenderId": "user_JKL654",
+		"Type": "friend_request",
+		"UserId": "user_2yBTXFqJg3AopGqlFQAApA07mVE"
+	}
+]

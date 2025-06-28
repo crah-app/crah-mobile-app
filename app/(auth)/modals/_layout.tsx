@@ -62,19 +62,6 @@ const Layout = () => {
 				name="help_modal"
 				options={{
 					headerShown: false,
-					title: 'Help',
-					headerStyle: {
-						backgroundColor: Colors[theme].background,
-					},
-					headerLeft: () => (
-						<TouchableOpacity onPress={router.back}>
-							<Ionicons
-								name="arrow-back"
-								size={24}
-								color={Colors[theme].textPrimary}
-							/>
-						</TouchableOpacity>
-					),
 				}}
 			/>
 			<Stack.Screen
@@ -111,6 +98,13 @@ const Layout = () => {
 			/>
 			<Stack.Screen
 				name="chats"
+				options={{
+					headerShown: false,
+				}}
+			/>
+
+			<Stack.Screen
+				name="settings"
 				options={{
 					headerShown: false,
 				}}

@@ -10,7 +10,6 @@ import {
 import ThemedView from '@/components/general/ThemedView';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import Colors from '@/constants/Colors';
-import SettingsColumn from '@/components/rows/SettingsRow';
 import settingsData from '@/JSON/settings.json';
 import { router, Stack } from 'expo-router';
 import ThemedText from '@/components/general/ThemedText';
@@ -18,6 +17,7 @@ import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
 import { Ionicons } from '@expo/vector-icons';
+import SettingsRow from '@/components/rows/SettingsRow';
 
 const Page = () => {
 	const theme = useSystemTheme();
@@ -38,7 +38,7 @@ const Page = () => {
 							<TouchableOpacity onPress={router.back}>
 								<Ionicons
 									name="chevron-back"
-									size={24}
+									size={28}
 									color={Colors[theme].textPrimary}
 								/>
 							</TouchableOpacity>
@@ -56,36 +56,34 @@ const Page = () => {
 			}
 			scrollChildren={
 				<ThemedView theme={theme} flex={1}>
-					<SafeAreaView style={{ flex: 1 }}>
-						<SectionList
-							sections={settingsData}
-							keyExtractor={(item, index) => item.text + index}
-							renderItem={({ item }) => <SettingsColumn {...item} />}
-							renderSectionHeader={({ section: { title } }) => (
-								<ThemedView
+					<SectionList
+						sections={settingsData}
+						keyExtractor={(item, index) => item.text + index}
+						renderItem={({ item }) => <SettingsRow {...item} />}
+						renderSectionHeader={({ section: { title } }) => (
+							<ThemedView
+								style={[
+									styles.header,
+									{
+										paddingHorizontal: 8,
+									},
+								]}
+								theme={theme}>
+								<ThemedText
+									theme={theme}
 									style={[
-										styles.header,
+										styles.headerText,
 										{
-											paddingHorizontal: 8,
+											paddingVertical: 12,
+											borderBottomWidth: 3,
+											borderBottomColor: Colors.dark.surface,
 										},
 									]}
-									theme={theme}>
-									<ThemedText
-										theme={theme}
-										style={[
-											styles.headerText,
-											{
-												paddingVertical: 12,
-												borderBottomWidth: 3,
-												borderBottomColor: Colors.dark.surface,
-											},
-										]}
-										value={title}
-									/>
-								</ThemedView>
-							)}
-						/>
-					</SafeAreaView>
+									value={title}
+								/>
+							</ThemedView>
+						)}
+					/>
 				</ThemedView>
 			}
 			theme={theme}

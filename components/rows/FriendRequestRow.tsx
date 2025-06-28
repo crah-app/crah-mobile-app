@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'react-native';
-import Column from '@/components/general/Row';
 
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedText from '../general/ThemedText';
+import Row from '@/components/general/Row';
 
-interface FriendRequestColumnProps {
+interface FriendRequestRowProps {
 	id: string | number;
 	name: string;
 	avatar: string;
@@ -15,7 +15,7 @@ interface FriendRequestColumnProps {
 	onDecline: (id: string | number) => void;
 }
 
-const FriendRequestColumn: React.FC<FriendRequestColumnProps> = ({
+const FriendRequestRow: React.FC<FriendRequestRowProps> = ({
 	id,
 	name,
 	avatar,
@@ -25,7 +25,7 @@ const FriendRequestColumn: React.FC<FriendRequestColumnProps> = ({
 	const theme = useSystemTheme();
 
 	return (
-		<Column
+		<Row
 			title={`${name}`}
 			subtitle="sent you a friend request"
 			customLeftComponent={
@@ -73,4 +73,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default FriendRequestColumn;
+export default FriendRequestRow;
