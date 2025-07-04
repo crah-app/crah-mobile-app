@@ -10,40 +10,38 @@ const Layout = () => {
 	const theme = useSystemTheme();
 
 	return (
-		<KeyboardProvider>
-			<Stack
-				screenOptions={{
-					headerStyle: {
-						backgroundColor: Colors[theme].surface,
-					},
-					headerTitleStyle: {
-						color: Colors[theme].textPrimary,
-					},
-					headerShadowVisible: false,
-					headerLeft: () => <HeaderLeftLogo />,
-					headerLargeTitle: false,
-					animation: 'none',
-				}}>
-				<Stack.Screen
-					name="createArticle"
-					options={{
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="createTextPost"
-					options={{
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="createVideo"
-					options={{
-						headerShown: false,
-					}}
-				/>
-			</Stack>
-		</KeyboardProvider>
+		<Stack
+			screenOptions={{
+				headerStyle: {
+					backgroundColor: Colors[theme].surface,
+				},
+				headerTitleStyle: {
+					color: Colors[theme].textPrimary,
+				},
+				headerShadowVisible: false,
+				headerLeft: () => <HeaderLeftLogo />,
+				headerLargeTitle: false,
+				animation: 'none',
+			}}>
+			<Stack.Screen
+				name="createArticle"
+				options={{
+					headerShown: false,
+				}}
+			/>
+			<Stack.Screen
+				name="createTextPost"
+				options={{
+					headerShown: false,
+				}}
+			/>
+			<Stack.Screen
+				name="createVideo"
+				options={{
+					headerShown: false,
+				}}
+			/>
+		</Stack>
 	);
 };
 

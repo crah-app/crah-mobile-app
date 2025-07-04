@@ -59,7 +59,7 @@ function HeaderFlashList<T>({
 	const scrollOffset = useRef(0);
 	const headerTranslateY = useRef(new Animated.Value(0)).current;
 	const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-	const sectionListRef = useRef<FlashList<T>>(null);
+	const flashListRef = useRef<FlashList<T>>(null);
 
 	const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
 		if (!scrollEffect) return;
@@ -112,7 +112,7 @@ function HeaderFlashList<T>({
 			setIsHeaderVisible(true);
 
 			// Optionale Rücksetzung der Scroll-Position
-			flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+			flashListRef.current?.scrollToOffset({ offset: 0, animated: false });
 		}
 	}, [dataLoaded, errWhileLoading]);
 
@@ -143,28 +143,16 @@ function HeaderFlashList<T>({
 					/>
 				) : data && data.length > 0 ? (
 					// @ts-ignore
-          <FlashList
-									numColumns={3}
-									contentContainerStyle={{
-										padding: 16,
-									}}
-									data={
-                  data
-									}
-									keyExtractor={(item) => item.Name}
-									renderItem={({ item }) => (
-										<View style={{ padding: 4 }}>
-											<Tag
-												style={{}}
-												handleTagPress={() => {}
-												tag={item.Name}
-												theme={theme}
-											/>
-										</View>
-									)}
-									estimatedItemSize={100}
-								/>
-
+					<FlashList
+						numColumns={3}
+						contentContainerStyle={{
+							padding: 16,
+						}}
+						data={data}
+						keyExtractor={(item: any) => item.id}
+						renderItem={({ item }) => <View style={{ padding: 4 }}></View>}
+						estimatedItemSize={100}
+					/>
 				) : (
 					<NoDataPlaceholder
 						containerStyle={[styles.PlaceholderContentContainer]}

@@ -84,7 +84,10 @@ const styles = StyleSheet.create({
 		height: '100%',
 	},
 	FilterButton: {
-		borderRadius: 10,
+		borderStartStartRadius: 10,
+		borderEndStartRadius: 10,
+		borderStartEndRadius: 10,
+		borderEndEndRadius: 10,
 		paddingVertical: 10,
 		paddingHorizontal: 15,
 		alignItems: 'center',
@@ -94,7 +97,9 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.2,
 		shadowRadius: 5,
 		elevation: 3,
-		width: 200,
+		width: 170,
+		borderBottomWidth: 5,
+		borderBottomColor: 'rgb(105, 0, 0)',
 	},
 	FilterButtonText: {
 		fontSize: 16,

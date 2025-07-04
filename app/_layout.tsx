@@ -26,6 +26,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Appearance } from 'react-native';
 import { mmkv } from '@/hooks/mmkv';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 Appearance.setColorScheme('dark');
 SplashScreen.preventAutoHideAsync();
@@ -57,7 +58,7 @@ const Root = () => {
 	}, [loaded]);
 
 	useEffect(() => {
-		if (!isLoaded) return;
+		if (!isLoaded || !loaded) return;
 
 		const inAuthGroup = segments[0] === '(auth)';
 
@@ -69,11 +70,12 @@ const Root = () => {
 				return;
 			}
 
-			router.replace('/(auth)/(tabs)/homePages');
+			// router.replace('/(auth)/(tabs)/homePages');
+			router.replace('/(auth)/modals/settings/editProfile');
 		} else if (!isSignedIn) {
 			router.replace('/');
 		}
-	}, [isSignedIn]);
+	}, [isSignedIn, loaded, isLoaded]);
 
 	if (!loaded || !isLoaded) {
 		return <Slot />;
@@ -168,18 +170,20 @@ const layout = () => {
 	//   }, []);
 
 	return (
-		<ThemeProvider value={MyTheme}>
-			<ClerkProvider
-				appearance={{}}
-				tokenCache={tokenCache!}
-				publishableKey={publishableKey!}>
-				<GestureHandlerRootView style={{ flex: 1 }}>
-					<BottomSheetModalProvider>
-						<Root />
-					</BottomSheetModalProvider>
-				</GestureHandlerRootView>
-			</ClerkProvider>
-		</ThemeProvider>
+		<KeyboardProvider>
+			<ThemeProvider value={MyTheme}>
+				<ClerkProvider
+					appearance={{}}
+					tokenCache={tokenCache!}
+					publishableKey={publishableKey!}>
+					<GestureHandlerRootView style={{ flex: 1 }}>
+						<BottomSheetModalProvider>
+							<Root />
+						</BottomSheetModalProvider>
+					</GestureHandlerRootView>
+				</ClerkProvider>
+			</ThemeProvider>
+		</KeyboardProvider>
 	);
 };
 

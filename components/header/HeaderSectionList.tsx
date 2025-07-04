@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, ReactNode, useEffect } from 'react';
 import {
 	Animated,
@@ -113,7 +112,7 @@ function HeaderSectionList<T>({
 			setIsHeaderVisible(true);
 
 			// Optionale Rücksetzung der Scroll-Position
-			flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+			// sectionListRef.current?.scrollToOffset({ offset: 0, animated: false });
 		}
 	}, [dataLoaded, errWhileLoading]);
 

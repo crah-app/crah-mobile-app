@@ -10,6 +10,7 @@ import {
 	TextStyle,
 	NativeSyntheticEvent,
 	TextInputKeyPressEventData,
+	Dimensions,
 } from 'react-native';
 import ThemedText from './ThemedText';
 
@@ -36,6 +37,7 @@ interface ThemedTextInputProps {
 	makeWordToBubble?: boolean;
 	containerStyle?: ViewStyle | ViewStyle[];
 	allowSpace?: boolean;
+	outerContainerStyle?: ViewStyle | ViewStyle[];
 }
 
 const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
@@ -58,6 +60,7 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 			makeWordToBubble,
 			containerStyle,
 			allowSpace = true,
+			outerContainerStyle,
 		},
 		ref,
 	) => {
@@ -112,15 +115,18 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 
 		return (
 			<View
-				style={{
-					backgroundColor: Colors[theme].container_surface,
-					borderRadius: 8,
-					padding: 8,
-					flexDirection: 'row',
-					flexWrap: 'wrap',
-					alignItems: 'center',
-					minHeight: 50,
-				}}>
+				style={[
+					{
+						backgroundColor: Colors[theme].container_surface,
+						borderRadius: 8,
+						padding: 8,
+						flexDirection: 'row',
+						flexWrap: 'wrap',
+						alignItems: 'center',
+						minHeight: 50,
+					},
+					outerContainerStyle,
+				]}>
 				{/* Alle Bubbles */}
 				{bubbles.map((bubble, index) => (
 					<View
@@ -228,4 +234,6 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 	},
 );
 
-export default ThemedTextInput;
+const ThemedMemoTextInput = React.memo(ThemedTextInput);
+
+export default ThemedMemoTextInput;

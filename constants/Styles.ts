@@ -46,6 +46,7 @@ export const defaultStyles = StyleSheet.create({
 	textInput: {
 		padding: 8,
 		borderRadius: 8,
+		fontSize: 18,
 	},
 	biggerText: {
 		fontSize: 22,
