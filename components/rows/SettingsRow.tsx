@@ -46,7 +46,28 @@ const SettingsRow: React.FC<SettingsRowProps> = ({
 				router.push('/(auth)/modals/settings/editProfile');
 				break;
 
-			default:
+			case 'Change Password':
+				router.push('/(auth)/modals/settings/changePassword');
+				break;
+
+			case 'Change Email':
+				router.push('/(auth)/modals/settings/changeEmail');
+				break;
+
+			case 'Change Language':
+				router.push('/(auth)/modals/settings/changeLanguage');
+				break;
+
+			case 'User Info':
+				router.push('/(auth)/modals/settings/userInfo');
+				break;
+
+			case 'Send Feedback':
+				router.push('/(auth)/modals/settings/sendFeedback');
+				break;
+
+			case 'Delete Account':
+				router.push('/(auth)/modals/settings/deleteAccount');
 				break;
 		}
 	};

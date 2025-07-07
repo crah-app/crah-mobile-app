@@ -695,3 +695,22 @@ export interface InboxNotification {
 	Type: InboxNotificationType;
 	UserId: string;
 }
+
+export type Language =
+	| 'English'
+	| 'German'
+	| 'Swedish'
+	| 'Russian'
+	| 'French'
+	| 'Polish'
+	| 'Spanish';
+
+export const LanguageISO: Record<Language, string> = {
+	English: 'GB',
+	German: 'DE',
+	Swedish: 'SE',
+	Russian: 'RU',
+	French: 'FR',
+	Polish: 'PL',
+	Spanish: 'ES',
+};

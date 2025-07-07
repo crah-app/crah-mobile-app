@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-const UserInfo = () => {
+const DeleteAccount = () => {
 	return <View></View>;
 };
 
 const styles = StyleSheet.create({});
 
-export default UserInfo;
+export default DeleteAccount;

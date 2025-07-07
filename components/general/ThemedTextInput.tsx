@@ -1,6 +1,12 @@
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
-import React, { useState, useRef, forwardRef } from 'react';
+import React, {
+	useState,
+	useRef,
+	forwardRef,
+	Dispatch,
+	SetStateAction,
+} from 'react';
 import {
 	View,
 	TextInput,
@@ -13,8 +19,12 @@ import {
 	Dimensions,
 } from 'react-native';
 import ThemedText from './ThemedText';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ThemedTextInputProps {
+	isSecret?: boolean;
+	setSecret?: Dispatch<SetStateAction<boolean>>;
+	secret?: boolean;
 	theme: 'light' | 'dark';
 	style?: TextStyle | TextStyle[];
 	placeholder?: string;
@@ -43,6 +53,9 @@ interface ThemedTextInputProps {
 const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 	(
 		{
+			isSecret = false,
+			setSecret = (b: boolean) => {},
+			secret = false,
 			theme,
 			style,
 			placeholder,
@@ -161,6 +174,7 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 							justifyContent: 'space-between',
 							height: multiline ? 10 * (lines || 1) : 'auto',
 							width: '100%',
+							flexDirection: isSecret ? 'row' : 'column',
 						}}>
 						<TextInput
 							autoCorrect={false}
@@ -189,6 +203,7 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 									color: Colors[theme].textPrimary,
 									textAlignVertical: 'top',
 									maxHeight: 200,
+									minWidth: '88%',
 								},
 								defaultStyles.textInput,
 								style,
@@ -199,6 +214,21 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 							onTouchCancel={disabled ? onPress : undefined}
 							onTouchEndCapture={disabled ? onPress : undefined}
 						/>
+
+						{isSecret && (
+							<TouchableOpacity onPress={() => setSecret(!secret)}>
+								<Ionicons
+									name={secret ? 'eye-off-outline' : 'eye-outline'}
+									size={22}
+									color={Colors[theme].textSecondary}
+									style={{
+										height: 'auto',
+										padding: 10,
+									}}
+								/>
+							</TouchableOpacity>
+						)}
+
 						<View />
 						{/* Zeichenlänge */}
 						{showLength && (

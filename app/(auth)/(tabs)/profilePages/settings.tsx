@@ -1,17 +1,10 @@
 import React from 'react';
-import {
-	View,
-	SectionList,
-	StyleSheet,
-	SafeAreaView,
-	ScrollView,
-	TouchableOpacity,
-} from 'react-native';
+import { View, SectionList, StyleSheet, TouchableOpacity } from 'react-native';
 import ThemedView from '@/components/general/ThemedView';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import Colors from '@/constants/Colors';
-import settingsData from '@/JSON/settings.json';
-import { router, Stack } from 'expo-router';
+import settingsData from '@/JSON/non_dummy_data/settings.json';
+import { router } from 'expo-router';
 import ThemedText from '@/components/general/ThemedText';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
 import CostumHeader from '@/components/header/CostumHeader';

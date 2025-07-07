@@ -8,6 +8,7 @@ import {
 	NativeSyntheticEvent,
 	NativeScrollEvent,
 	Dimensions,
+	SafeAreaView,
 } from 'react-native';
 import ThemedView from '../general/ThemedView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

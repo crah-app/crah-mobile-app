@@ -70,8 +70,8 @@ const Root = () => {
 				return;
 			}
 
-			// router.replace('/(auth)/(tabs)/homePages');
-			router.replace('/(auth)/modals/settings/editProfile');
+			router.replace('/(auth)/(tabs)/homePages');
+			// router.replace('/(auth)/modals/settings/changeEmail');
 		} else if (!isSignedIn) {
 			router.replace('/');
 		}

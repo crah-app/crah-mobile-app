@@ -58,6 +58,14 @@ const Layout = () => {
 					headerShown: false,
 				}}
 			/>
+
+			<Stack.Screen
+				name="changeLanguage"
+				options={{
+					presentation: 'modal',
+					headerShown: false,
+				}}
+			/>
 		</Stack>
 	);
 };

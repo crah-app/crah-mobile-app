@@ -4,23 +4,24 @@ import ThemedView from '@/components/general/ThemedView';
 import CostumHeader from '@/components/header/CostumHeader';
 import HeaderLeftBtnPlusLogo from '@/components/header/HeaderLeftBtnPlusLogo';
 import HeaderScrollView from '@/components/header/HeaderScrollView';
+import LanguageRow from '@/components/LanguageRow';
 import PostTypeButton from '@/components/PostTypeButton';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
+import { Language, LanguageISO } from '@/types';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import CountryFlag from 'react-native-country-flag';
 
-const ChangePassword = () => {
+const ChangeLanguage = () => {
 	const theme = useSystemTheme();
 
-	const [password, setPassword] = useState<string>('');
-	const [newPassword, setNewPassword] = useState<string>('');
+	const [language, setLanguage] = useState<Language>('English');
 
-	const [passwordSecretInput, setPasswordSecretInput] =
-		useState<boolean>(false);
-	const [newPasswordSecretInput, setNewPasswordSecretInput] =
-		useState<boolean>(false);
+	const handleLanguageClick = (lang: Language) => {
+		setLanguage(lang);
+	};
 
 	return (
 		<HeaderScrollView
@@ -38,7 +39,7 @@ const ChangePassword = () => {
 						<ThemedText
 							style={[defaultStyles.bigText, { fontWeight: '700' }]}
 							theme={theme}
-							value={'Change Password'}
+							value={'Change Language'}
 						/>
 					</View>
 
@@ -49,33 +50,19 @@ const ChangePassword = () => {
 							flexDirection: 'column',
 							gap: 18,
 						}}>
-						<ThemedTextInput
-							placeholder="old password"
-							isSecret
-							secret={passwordSecretInput}
-							setSecret={setPasswordSecretInput}
-							theme={theme}
-							value={password}
-							setValue={setPassword}
-						/>
-						<ThemedTextInput
-							placeholder="new password"
-							isSecret
-							secret={newPasswordSecretInput}
-							setSecret={setNewPasswordSecretInput}
-							theme={theme}
-							value={newPassword}
-							setValue={setNewPassword}
-						/>
+						{Object.keys(LanguageISO).map((key) => (
+							<LanguageRow
+								setSelected={setLanguage}
+								selected={language}
+								theme={theme}
+								Language={key as Language}
+								Flag={LanguageISO[key as Language]}
+							/>
+						))}
 						<PostTypeButton
 							style={{ width: '100%' }}
 							val={'Submit'}
 							click_action={() => {}}
-						/>
-						<ThemedText
-							theme={theme}
-							value={'Forgot Password'}
-							style={{ color: Colors['default'].primary }}
 						/>
 					</View>
 				</ThemedView>
@@ -86,4 +73,4 @@ const ChangePassword = () => {
 
 const styles = StyleSheet.create({});
 
-export default ChangePassword;
+export default ChangeLanguage;
