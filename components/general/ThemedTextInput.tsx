@@ -137,6 +137,8 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 						flexWrap: 'wrap',
 						alignItems: 'center',
 						minHeight: 50,
+						// borderBottomWidth: 1,
+						// borderBottomColor: 'rgb(15, 15, 15)',
 					},
 					outerContainerStyle,
 				]}>

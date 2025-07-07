@@ -586,7 +586,7 @@ export type TrickSpot = 'Flat' | 'Park' | 'Street';
 // spot row data interface
 export interface SpotInterface {
 	spot: TrickSpot;
-	landing_date: Date;
+	landing_date: Date | null;
 }
 
 /*

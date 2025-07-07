@@ -1,86 +1,114 @@
 import React, { useState } from 'react';
 import {
+	Alert,
 	Dimensions,
-	ScrollView,
 	StyleSheet,
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ThemedText from '../general/ThemedText';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import { router } from 'expo-router';
 import ThemedTextInput from '../general/ThemedTextInput';
-import {
-	BestTrickType,
-	SpotInterface,
-	TextInputMaxCharacters,
-	TrickListSpot,
-	TrickSpot,
-} from '@/types';
+import { SelectedTrick, SpotInterface, TextInputMaxCharacters } from '@/types';
 import { defaultStyles } from '@/constants/Styles';
 import { format } from 'date-fns';
 import TrickPreviewCard from './TrickPreviewCard';
-import { useUser } from '@clerk/clerk-expo';
+import { useAuth, useUser } from '@clerk/clerk-expo';
+import PostTypeButton from '../PostTypeButton';
+import TransparentLoadingScreen from '../TransparentLoadingScreen';
 
 interface TrickBuilderProps {}
 
 const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
-	const insets = useSafeAreaInsets();
 	const theme = useSystemTheme();
 	const { user } = useUser();
+	const { getToken } = useAuth();
 
-	// trick builder header
-	const TrickBuilderHeader = () => {
-		const onHelpPress = () => {
-			router.navigate({ pathname: '/modals/help_modal', params: {} });
-		};
+	const [trickCreated, setTrickCreated] = useState<boolean>(false);
+	const [addedSpot, setAddedSpot] = useState<boolean>(false);
 
-		const onConfirmPress = () => {
-			fetch('', {
-				headers: { 'Cache-Control': 'no-cache' },
-				body: JSON.stringify({}),
-			})
-				.then()
-				.catch((err) => console.log(err))
-				.finally(() => {});
-		};
+	const [loading, setLoading] = useState<boolean>(false);
+	const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-		return (
-			<View
-				style={{
-					justifyContent: 'space-between',
-					alignItems: 'center',
-					flexDirection: 'row',
-					marginBottom: 12,
-				}}>
-				<TouchableOpacity onPress={onHelpPress}>
-					<Ionicons name={'help'} size={24} color={Colors[theme].textPrimary} />
-				</TouchableOpacity>
+	const [tricks, setTricks] = useState<SelectedTrick[]>([]);
 
-				<TouchableOpacity onPress={onConfirmPress}>
-					<Ionicons
-						name={'checkmark'}
-						size={24}
-						color={Colors[theme].textPrimary}
-					/>
-				</TouchableOpacity>
-			</View>
-		);
+	const [value, setValue] = useState<string>('');
+	const [spots, setSpots] = useState<SpotInterface[]>([
+		// { spot: 'Flat', landing_date: new Date() },
+		// {
+		// 	spot: 'Street',
+		// 	landing_date: new Date(100000000000),
+		// },
+	]);
+
+	const createTrickObject = (): SelectedTrick[] => {
+		const createdTrick: SelectedTrick[] = [
+			{
+				Spot: 'Park', // placeholder. Park does not manipulate trick points
+				Name: value,
+				DefaultPoints: 0, // default points get calculated in the backend
+				Costum: false, // gets evaluated in the backend
+				Type: '', // gets evaluated in the backend
+				SecondName: '', // leave it blank
+			},
+		];
+
+		setTricks(createdTrick);
+		return createdTrick;
+	};
+
+	const handleCreateTrick = async () => {
+		try {
+			if (value.length <= 0) return;
+
+			setTrickCreated(false);
+			setLoading(true);
+			setModalVisible(true);
+			setAddedSpot(false);
+
+			const createdTrick = createTrickObject();
+
+			const token = await getToken();
+
+			const response = await fetch(
+				`http://192.168.0.136:4000/api/tricks/${user?.id}/setTricks`,
+				{
+					method: 'POST',
+					mode: 'cors',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({ tricks: createdTrick }),
+				},
+			);
+			const text = await response.text();
+			console.log('Raw response:', text);
+
+			// const result = await response.json();
+
+			if (!response.ok) {
+				setTrickCreated(false);
+				setLoading(false);
+				setModalVisible(false);
+				setAddedSpot(false);
+
+				Alert.alert('Error adding trick');
+			}
+		} catch (error) {
+			Alert.alert('Error adding trick');
+			console.warn(error);
+		} finally {
+			setTrickCreated(true);
+			setLoading(false);
+			setModalVisible(false);
+			setAddedSpot(false);
+		}
 	};
 
 	const TrickBuilderBody = () => {
-		const [value, setValue] = useState<string>('');
-		const [spots, setSpots] = useState<SpotInterface[]>([
-			{ spot: 'Flat', landing_date: new Date() },
-			{
-				spot: 'Street',
-				landing_date: new Date(100000000000),
-			},
-		]);
-
 		// spot row
 		const SpotRow: React.FC<{ spotData: SpotInterface; addSpot: boolean }> = ({
 			spotData,
@@ -91,11 +119,14 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 					style={{
 						flexDirection: 'row',
 						width: '100%',
+						height: 35,
 						borderBottomColor: Colors[theme].gray,
 						borderBottomWidth: !addSpot ? StyleSheet.hairlineWidth : 0,
-						paddingBottom: 8,
+						paddingLeft: 12,
+						paddingBottom: addSpot ? 0 : 8,
 					}}>
-					<View style={{ width: '50%', paddingLeft: 24 }}>
+					{/* left side */}
+					<View style={styles.innerRowContainer}>
 						{addSpot ? (
 							<TouchableOpacity>
 								<Ionicons
@@ -109,13 +140,8 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 						)}
 					</View>
 
-					<View
-						style={{
-							width: '50%',
-							paddingLeft: 24,
-							borderLeftColor: Colors[theme].gray,
-							borderLeftWidth: StyleSheet.hairlineWidth,
-						}}>
+					{/* right side */}
+					<View style={styles.innerRowContainer}>
 						{addSpot ? (
 							<ThemedText
 								style={{ color: Colors[theme].gray }}
@@ -125,7 +151,10 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 						) : (
 							<ThemedText
 								theme={theme}
-								value={format(spotData.landing_date, 'yyyy-MM-dd')}
+								value={format(
+									spotData.landing_date || new Date(),
+									'yyyy-MM-dd',
+								)}
 							/>
 						)}
 					</View>
@@ -133,90 +162,204 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 			);
 		};
 
-		return (
-			<View style={styles.container}>
-				{/* input field with button */}
-				<View style={{ gap: 12 }}>
-					<ThemedTextInput
-						makeWordToBubble
-						theme={theme}
-						value={value}
-						setValue={setValue}
-						lines={1}
-						maxLength={TextInputMaxCharacters.Simple}
-						placeholder="Your costum trick..."
-					/>
+		const TableHeader = ({ isDisabled }: { isDisabled: boolean }) => {
+			if (isDisabled) {
+				return <></>;
+			}
 
-					<TouchableOpacity>
+			return (
+				<View
+					style={{
+						flexDirection: 'row',
+						width: '100%',
+						paddingVertical: 8,
+						marginLeft: 12,
+					}}>
+					<View
+						style={{
+							flex: 1,
+							alignItems: 'flex-start',
+							justifyContent: 'center',
+						}}>
+						<ThemedText theme={theme} value={'Spot'} />
+					</View>
+
+					<View style={styles.innerRowContainer}>
+						<ThemedText theme={theme} value={'Landed on'} />
+					</View>
+				</View>
+			);
+		};
+
+		const Title = () => {
+			return (
+				<>
+					{!trickCreated && (
 						<ThemedText
+							style={[
+								defaultStyles.bigText,
+								{ fontWeight: 700, textAlign: 'center' },
+							]}
 							theme={theme}
-							value={'Create'}
-							style={[defaultStyles.primaryBtn]}
+							value={'You landed a new trick?'}
 						/>
-					</TouchableOpacity>
+					)}
+					{!addedSpot && trickCreated && (
+						<ThemedText
+							style={[
+								defaultStyles.bigText,
+								{ fontWeight: 700, textAlign: 'center' },
+							]}
+							theme={theme}
+							value={'Where did you land it?'}
+						/>
+					)}
+				</>
+			);
+		};
+
+		const InputField = () => {
+			return (
+				<>
+					{!trickCreated && (
+						<View
+							style={{
+								gap: 14,
+							}}>
+							<ThemedTextInput
+								containerStyle={{ width: '100%' }}
+								makeWordToBubble
+								theme={theme}
+								value={value}
+								setValue={setValue}
+								lines={1}
+								maxLength={TextInputMaxCharacters.Simple}
+								placeholder="Your landed trick"
+							/>
+
+							<PostTypeButton
+								val="Add it!"
+								click_action={async () => await handleCreateTrick()}
+								style={{ width: '100%' }}
+							/>
+						</View>
+					)}
+				</>
+			);
+		};
+
+		const AddSpotInputField = () => {
+			return (
+				<>
+					{!addedSpot && trickCreated && (
+						<View
+							style={{
+								gap: 14,
+							}}>
+							<ThemedTextInput
+								containerStyle={{ width: '100%' }}
+								makeWordToBubble
+								theme={theme}
+								value={value}
+								setValue={setValue}
+								lines={1}
+								maxLength={TextInputMaxCharacters.Simple}
+								placeholder="Park, Street, Flat"
+							/>
+
+							<PostTypeButton
+								val={spots.length > 1 ? 'Add Spots!' : 'Add Spot!'}
+								click_action={async () => await handleCreateTrick()}
+								style={{ width: '100%' }}
+							/>
+						</View>
+					)}
+				</>
+			);
+		};
+
+		const TrickDetails = () => {
+			return (
+				<View style={{ gap: 18 }}>
+					<View>
+						<View style={{ width: '100%' }}>
+							{/* table header */}
+							{!trickCreated ? (
+								<TableHeader isDisabled={false} />
+							) : (
+								<TableHeader isDisabled={true} />
+							)}
+						</View>
+
+						<View
+							style={{
+								backgroundColor: Colors[theme].container_surface,
+								padding: 8,
+								gap: 12,
+								borderRadius: 8,
+							}}>
+							{spots.map((spotData, index) => (
+								<SpotRow addSpot={false} spotData={spotData} key={index} />
+							))}
+							<SpotRow
+								addSpot
+								spotData={{ spot: 'Flat', landing_date: new Date() }}
+								key={4}
+							/>
+						</View>
+					</View>
+
+					{/* trick card */}
+					<TrickPreviewCard
+						theme={theme}
+						trickName={value}
+						userId={user?.id}
+						spots={spots}
+					/>
 				</View>
+			);
+		};
+
+		return (
+			<View
+				style={[
+					{
+						gap: 18,
+						paddingVertical: 24,
+						paddingHorizontal: 24,
+						width: Dimensions.get('window').width,
+						minHeight: 550,
+						justifyContent: 'center',
+					},
+				]}>
+				<Title />
+				<InputField />
+				<AddSpotInputField />
+
 				{/* trick spots */}
-				<View style={{ width: '100%' }}>
-					<View
-						style={{
-							flexDirection: 'row',
-							width: '100%',
-							justifyContent: 'space-around',
-							padding: 8,
-						}}>
-						<View style={{ width: '50%', paddingLeft: 24 }}>
-							<ThemedText theme={theme} value={'Spot'} />
-						</View>
-
-						<View style={{ width: '50%', paddingLeft: 24 }}>
-							<ThemedText theme={theme} value={'Landed on'} />
-						</View>
-					</View>
-
-					<View
-						style={{
-							backgroundColor: Colors[theme].container_surface,
-							padding: 8,
-							gap: 12,
-							borderRadius: 8,
-						}}>
-						{spots.map((spotData, index) => (
-							<SpotRow addSpot={false} spotData={spotData} key={index} />
-						))}
-						<SpotRow
-							addSpot
-							spotData={{ spot: 'Flat', landing_date: new Date() }}
-							key={4}
-						/>
-					</View>
-				</View>
-				{/* trick preview */}
-				<TrickPreviewCard
-					theme={theme}
-					trickName={'Crossfoot Buttercup Crossfoot'}
-					userId={user?.id}
-					spots={spots}
-				/>
+				{trickCreated && addedSpot ? <TrickDetails /> : <></>}
 			</View>
 		);
 	};
 
 	return (
-		<ScrollView
-			style={{
-				paddingHorizontal: 24,
-				gap: 12,
-				flexDirection: 'column',
-				width: Dimensions.get('window').width,
-			}}>
-			<TrickBuilderHeader />
+		<View>
+			<TransparentLoadingScreen
+				visible={modalVisible}
+				progress={0}
+				showProgress={false}
+			/>
 			<TrickBuilderBody />
-		</ScrollView>
+		</View>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: { flex: 1, gap: 12, width: '100%' },
+	innerRowContainer: {
+		flex: 1,
+		alignItems: 'flex-start',
+		justifyContent: 'center',
+	},
 });
 
 export default TrickBuilder;

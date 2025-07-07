@@ -31,17 +31,17 @@ const Page = () => {
 	const { pageType } = useLocalSearchParams();
 
 	const galleryComponents = {
+		[UserGalleryTopics.TRICK_BUILDER]: <TrickBuilder />,
+
 		[UserGalleryTopics.USER_RANK]: <YourRank theme={theme} />,
 
 		[UserGalleryTopics.LEAGUES]: <LeaguesPage theme={theme} />,
 
 		[UserGalleryTopics.TRICKS]: <Tricks />,
-
-		[UserGalleryTopics.TRICK_BUILDER]: <TrickBuilder />,
 	};
 
 	const [CurrentGalleryTopic, setCurrentGalleryTopic] =
-		useState<UserGalleryTopics>(UserGalleryTopics.USER_RANK);
+		useState<UserGalleryTopics>(UserGalleryTopics.TRICK_BUILDER);
 
 	const handleGalleryTopic = (newTopic: UserGalleryTopics) => {
 		setCurrentGalleryTopic(newTopic);

@@ -52,6 +52,10 @@ const TrickPreviewCard: React.FC<TrickPreviewProps> = ({
 					borderRadius: 8,
 					padding: 12,
 					flexDirection: 'row',
+					borderBottomWidth: 4,
+					borderRightWidth: 4,
+					borderBottomColor: 'rgb(45, 45, 45)',
+					borderRightColor: 'rgb(45, 45, 45)',
 				}}>
 				{/* left side */}
 				<View style={{ width: '50%' }}>
@@ -61,7 +65,14 @@ const TrickPreviewCard: React.FC<TrickPreviewProps> = ({
 							alignItems: 'center',
 							height: '75%',
 						}}>
-						<GetSVG props={{ width: 250, height: 250 }} name="scooter" />
+						<GetSVG
+							props={{
+								width: 110,
+								height: 110,
+								fill: Colors[theme].textPrimary,
+							}}
+							name="scooter"
+						/>
 					</View>
 
 					<View>
