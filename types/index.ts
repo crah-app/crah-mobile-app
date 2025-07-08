@@ -215,6 +215,7 @@ export type TrickType = 'Overhead' | 'Rewind' | 'Whip' | 'Balance' | 'Grab';
 */
 export interface SelectedTrick extends Trick {
 	Spot: TrickSpot | null;
+	Date?: Date | null;
 }
 
 /*
@@ -426,6 +427,7 @@ export enum UserGalleryTopics {
 */
 
 export enum TrickDifficulty {
+	UNKNOWN = 'Unknonwn',
 	BEGINNER = 'Beginner',
 	NORMAL = 'Normal',
 	INTERMEDIATE = 'Intermediate',
@@ -439,6 +441,7 @@ export enum TrickDifficulty {
 }
 
 export const TrickDifficultyColorMap: Record<TrickDifficulty, string> = {
+	[TrickDifficulty.UNKNOWN]: '#ffffff', // medium green
 	[TrickDifficulty.BEGINNER]: '#b2f2bb', // medium green
 	[TrickDifficulty.NORMAL]: '#8ce99a', // green
 	[TrickDifficulty.INTERMEDIATE]: '#ffe066', // yellow

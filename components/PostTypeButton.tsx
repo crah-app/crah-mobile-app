@@ -9,12 +9,18 @@ import {
 } from 'react-native';
 import ThemedText from './general/ThemedText';
 import { useSystemTheme } from '@/utils/useSystemTheme';
+import { defaultHeaderBtnSize } from '@/constants/Styles';
+import { ionicon } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
 
 interface PostTypeButtonProps {
 	val: string;
 	click_action: () => void | any;
 	style?: ViewStyle | ViewStyle[];
 	fontStyle?: TextStyle | TextStyle[];
+	isIcon?: boolean;
+	icon?: ionicon;
+	revert?: boolean;
 }
 
 const PostTypeButton: React.FC<PostTypeButtonProps> = ({
@@ -22,6 +28,9 @@ const PostTypeButton: React.FC<PostTypeButtonProps> = ({
 	click_action,
 	style,
 	fontStyle,
+	isIcon = false,
+	icon,
+	revert = false,
 }) => {
 	const theme = useSystemTheme();
 
@@ -29,16 +38,30 @@ const PostTypeButton: React.FC<PostTypeButtonProps> = ({
 		<TouchableOpacity
 			style={[
 				styles.FilterButton,
-				{ backgroundColor: Colors[theme].primary },
+				{
+					backgroundColor: revert ? 'rgb(105, 0, 0)' : Colors[theme].primary,
+					borderBottomColor: revert
+						? Colors[theme].bgPrimary
+						: 'rgb(105, 0, 0)',
+				},
 				style,
 			]}
 			onPress={click_action}>
-			<ThemedText
-				theme={theme}
-				value={val}
-				// @ts-ignore
-				style={[styles.FilterButtonText, fontStyle]}
-			/>
+			{isIcon && icon ? (
+				<Ionicons
+					size={defaultHeaderBtnSize - 6}
+					name={`${icon}`}
+					color={revert ? Colors[theme].primary : Colors[theme].textPrimary}
+					style={[fontStyle]}
+				/>
+			) : (
+				<ThemedText
+					theme={theme}
+					value={val}
+					// @ts-ignore
+					style={[styles.FilterButtonText, fontStyle]}
+				/>
+			)}
 		</TouchableOpacity>
 	);
 };
@@ -99,7 +122,6 @@ const styles = StyleSheet.create({
 		elevation: 3,
 		width: 170,
 		borderBottomWidth: 5,
-		borderBottomColor: 'rgb(105, 0, 0)',
 	},
 	FilterButtonText: {
 		fontSize: 16,

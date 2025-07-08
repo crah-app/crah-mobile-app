@@ -1,5 +1,11 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
+import {
+	StyleSheet,
+	TextStyle,
+	TouchableOpacity,
+	View,
+	ViewStyle,
+} from 'react-native';
 import ThemedText from './general/ThemedText';
 import { Tags } from '@/types';
 import Colors from '@/constants/Colors';
@@ -14,6 +20,7 @@ interface TagProps {
 	ActionOnRemoveBtnClick?: () => void;
 	touchOpacity?: number;
 	style?: ViewStyle | ViewStyle[];
+	textStyle?: TextStyle | TextStyle[];
 }
 
 const Tag: React.FC<TagProps> = ({
@@ -25,6 +32,7 @@ const Tag: React.FC<TagProps> = ({
 	ActionOnRemoveBtnClick,
 	touchOpacity,
 	style,
+	textStyle,
 }) => {
 	return (
 		<TouchableOpacity
@@ -56,6 +64,8 @@ const Tag: React.FC<TagProps> = ({
 				theme={theme}
 				value={tag}
 				style={[
+					// @ts-ignore
+					textStyle || {},
 					{
 						color:
 							tag === "World's First"
