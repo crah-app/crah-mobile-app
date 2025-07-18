@@ -53,8 +53,8 @@ export type RawPost = {
 	sourceWidth: number;
 	sourceHeight: number;
 
-	Likes: number;
-	Shares: number;
+	likes: number;
+	shares: number;
 
 	sourceRatio: upload_source_ratio;
 
@@ -148,17 +148,32 @@ export enum CommentType {
 
 export type CommentPurpose = 'comment' | 'reply';
 
-// JSOn structure of a comment
+// JSON structure of a comment
 export type userCommentType = {
-	user: CrahUser;
-	avatar: string;
-	text: string;
-	_id: number;
+	// default data
+	CreatedAt: Date;
+	Id: number;
+	Message: string;
+	PostId: number;
+	UpdatedAt: string;
+	UserAvatar: string;
+	UserName: string;
+	UserId: string;
 	likes: number;
-	createdAt: number | Date;
+
+	// special data
 	type: CommentType;
 	purpose: CommentPurpose;
 	replyTo?: number; // if comment is from purpose "reply"
+};
+
+export type database_comment = {
+	Id?: number; // do not parse since it is auto increment
+	PostId: number;
+	UserId: string;
+	Message: string;
+	CreatedAt: Date;
+	updatedAt: Date;
 };
 
 /*
@@ -471,6 +486,7 @@ export enum TextInputMaxCharacters {
 */
 
 export enum Tags {
+	Dream = 'Dream',
 	Banger = 'Banger', // Highly engaging and attention-grabbing
 	WorldsFirst = "World's First", // Unique and exclusive content
 	WorldsSecond = "World's Second", // Still unique but slightly less exclusive

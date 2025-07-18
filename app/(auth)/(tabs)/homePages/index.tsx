@@ -1,53 +1,37 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
 	View,
-	FlatList,
 	StyleSheet,
 	TouchableOpacity,
 	Animated,
 	Easing,
 	Dimensions,
-	RefreshControl,
 } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import ThemedView from '@/components/general/ThemedView';
 import Colors from '@/constants/Colors';
 import UserPost from '@/components/home/UserPost';
 import NoDataPlaceholder from '@/components/general/NoDataPlaceholder';
 
-import { useLocalSearchParams } from 'expo-router';
-
 import { filterPosts } from '@/utils/globalFuncs';
 import PostTypeFilterModal from '@/components/home/PostTypeFilterModal';
 import HomePageFilterButton from '@/components/home/HomePageFilterButton';
-import {
-	ContentFilterTypes,
-	fetchAdresses,
-	GeneralPostTypes,
-	RawPost,
-} from '@/types';
-import UserUploadsPost from '@/components/home/UserUploadsPost';
+import { ContentFilterTypes, RawPost } from '@/types';
 import CostumHeader from '@/components/header/CostumHeader';
-import HeaderScrollView from '@/components/header/HeaderScrollView';
 
 // dummy-data
 import MessagesButton from '@/components/home/MessagesButton';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
-
-import ScooterWheel from '../../../../assets/images/vectors/wheel.svg';
-import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
-import Row from '@/components/general/Row';
-import { useUser } from '@clerk/clerk-expo';
-import ThemedText from '@/components/general/ThemedText';
-import { defaultStyles } from '@/constants/Styles';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 import HeaderFlatList from '@/components/header/HeaderFlatList';
 import GetSVG from '@/components/GetSVG';
+import { mmkv } from '@/hooks/mmkv';
 
 const POST_CACHE_KEY = 'allPosts';
 
 const Page = () => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
+	const { getToken } = useAuth();
 
 	// content logic
 	const [filterIsVisible, setFilterIsVisbile] = useState(false);
@@ -102,35 +86,49 @@ const Page = () => {
 	};
 
 	const fetchPosts = async (category: ContentFilterTypes) => {
-		setErrLoadingUserPosts(false);
-		SetUserPostsLoaded(false);
+		try {
+			setErrLoadingUserPosts(false);
+			SetUserPostsLoaded(false);
 
-		let address = 'http://192.168.0.136:4000/api/posts/all';
+			const token = await getToken();
 
-		switch (category) {
-			case ContentFilterTypes.friends:
-				address =
-					'http://192.168.0.136:4000/api/posts/user/:userId/friends/all';
-				break;
+			let address = `http://192.168.0.136:4000/api/posts/all/currentUser/${user?.id}`;
 
-			case ContentFilterTypes.rank:
-				address = 'http://192.168.0.136:4000/api/posts/rank/:rank/all';
-				break;
+			switch (category) {
+				case ContentFilterTypes.friends:
+					address = `http://192.168.0.136:4000/api/posts/currentUser/${user?.id}/friends`;
+					break;
 
-			default:
-				address = 'http://192.168.0.136:4000/api/posts/all';
-				break;
-		}
+				case ContentFilterTypes.rank:
+					const currentRank = mmkv.getString('rank');
+					address = `http://192.168.0.136:4000/api/posts/rank/${currentRank}/all`;
+					break;
 
-		fetch(address, {
-			headers: { 'Cache-Control': 'no-cache' },
-		})
-			.then((res) => res.json())
-			.then((res) => {
-				setUserPosts(res);
+				default:
+					address = `http://192.168.0.136:4000/api/posts/all/currentUser/${user?.id}`;
+					break;
+			}
+
+			await fetch(address, {
+				method: 'GET',
+				headers: {
+					'Cache-Control': 'no-cache',
+					Authorization: `Bearer ${token}`,
+				},
 			})
-			.catch((err) => setErrLoadingUserPosts(err))
-			.finally(() => SetUserPostsLoaded(true));
+				.then((res) => res.json())
+				.then((res) => {
+					console.log(res);
+					setUserPosts(res);
+				})
+				.catch((err) => {
+					console.warn(err);
+					setErrLoadingUserPosts(err);
+				})
+				.finally(() => SetUserPostsLoaded(true));
+		} catch (error) {
+			console.warn('Error [fetchPosts]', error);
+		}
 	};
 
 	useEffect(() => {
@@ -147,6 +145,7 @@ const Page = () => {
 
 	return (
 		<HeaderFlatList
+			retryFunction={handleRefresh}
 			errWhileLoading={errLoadingUserPosts}
 			dataLoaded={UserPostsLoaded}
 			setRefreshing={setRefreshing}
@@ -232,6 +231,7 @@ const Page = () => {
 			}
 			ListEmptyComponent={
 				<NoDataPlaceholder
+					retryFunction={handleRefresh}
 					containerStyle={styles.PlaceholderContentContainer}
 					firstTextValue="No posts here yet..."
 					subTextValue="Start creating and sharing!"

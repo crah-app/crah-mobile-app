@@ -37,6 +37,7 @@ interface HeaderFlatListProps<T> {
 	childrenAboveList?: ReactNode;
 	dataLoaded: boolean | undefined;
 	errWhileLoading: boolean | undefined;
+	retryFunction?: () => void;
 }
 
 function HeaderFlatList<T>({
@@ -55,6 +56,7 @@ function HeaderFlatList<T>({
 	childrenAboveList,
 	dataLoaded,
 	errWhileLoading,
+	retryFunction = () => {},
 }: HeaderFlatListProps<T>) {
 	const scrollOffset = useRef(0);
 	const headerTranslateY = useRef(new Animated.Value(0)).current;
@@ -136,46 +138,49 @@ function HeaderFlatList<T>({
 			{dataLoaded ? (
 				errWhileLoading ? (
 					<NoDataPlaceholder
+						retryFunction={retryFunction}
 						containerStyle={[styles.PlaceholderContentContainer]}
 						firstTextValue="Something went wrong, please try again."
 						subTextValue=""
 						arrowStyle={{ display: 'none' }}
 					/>
-				) : data && data.length > 0 ? (
-					// @ts-ignore
-					<FlatList
-						ref={flatListRef} // Referenz auf die FlatList
-						data={data}
-						keyExtractor={(item: any) => item.id}
-						renderItem={renderItem}
-						scrollEnabled={true}
-						showsVerticalScrollIndicator={false}
-						showsHorizontalScrollIndicator={false}
-						contentContainerStyle={styles.flatListContent}
-						onScroll={handleScroll}
-						scrollEventThrottle={16}
-						ListHeaderComponent={
-							<View style={{ paddingTop: headerHeight }}>
-								{childrenAboveList}
-							</View>
-						}
-						ListEmptyComponent={ListEmptyComponent}
-						ListFooterComponent={
-							ListFooterComponent
-								? typeof ListFooterComponent === 'function'
-									? ListFooterComponent
-									: () => ListFooterComponent
-								: null
-						}
-						refreshControl={
-							<RefreshControl
-								refreshing={refreshing}
-								onRefresh={handleRefresh}
-								tintColor={Colors[theme].primary}
-								progressBackgroundColor={Colors[theme].surface}
-							/>
-						}
-					/>
+				) : data ? (
+					<View>
+						{/* @ts-ignore */}
+						<FlatList
+							ref={flatListRef} // Referenz auf die FlatList
+							data={data}
+							keyExtractor={(item: any) => item.id}
+							renderItem={renderItem}
+							scrollEnabled={true}
+							showsVerticalScrollIndicator={false}
+							showsHorizontalScrollIndicator={false}
+							contentContainerStyle={styles.flatListContent}
+							onScroll={handleScroll}
+							scrollEventThrottle={16}
+							ListHeaderComponent={
+								<View style={{ paddingTop: headerHeight }}>
+									{childrenAboveList}
+								</View>
+							}
+							ListEmptyComponent={ListEmptyComponent}
+							ListFooterComponent={
+								ListFooterComponent
+									? typeof ListFooterComponent === 'function'
+										? ListFooterComponent
+										: () => ListFooterComponent
+									: null
+							}
+							refreshControl={
+								<RefreshControl
+									refreshing={refreshing}
+									onRefresh={handleRefresh}
+									tintColor={Colors[theme].primary}
+									progressBackgroundColor={Colors[theme].surface}
+								/>
+							}
+						/>
+					</View>
 				) : (
 					<NoDataPlaceholder
 						containerStyle={[styles.PlaceholderContentContainer]}

@@ -44,7 +44,11 @@ import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import {
+	BottomSheetBackdrop,
+	BottomSheetModal,
+	BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import {
 	KeyboardAwareScrollView,
 	KeyboardToolbar,
@@ -59,6 +63,8 @@ import { uploadSource } from '@/hooks/bucketUploadManager';
 import { useUser, useAuth } from '@clerk/clerk-expo';
 import TransparentLoadingScreen from '@/components/TransparentLoadingScreen';
 import { sleep } from '@/utils/globalFuncs';
+import PostTypeButton from '@/components/PostTypeButton';
+import { useSharedValue } from 'react-native-reanimated';
 
 interface videoDataInterface {
 	video: imagePicker.ImagePickerAsset[]; // video
@@ -450,7 +456,7 @@ const CreateVideoMainContent = ({
 						</View>
 
 						<View style={[styles.Container2, styles.InputContainer]}>
-							<View style={{ gap: 12 }}>
+							<View style={{ gap: 24, marginBottom: 12 }}>
 								{uploadedSource ? (
 									<UploadedSourceContainer
 										removeSource={removeSource}
@@ -460,19 +466,12 @@ const CreateVideoMainContent = ({
 										sourceRatio={sourceRatio}
 									/>
 								) : (
-									<TouchableOpacity onPress={() => handleModal('Source')}>
-										<ThemedText
-											value="Upload video"
-											theme={theme}
-											style={[
-												defaultStyles.primaryBtn,
-												{
-													padding: 14,
-													color: Colors[theme].textPrimaryReverse,
-												},
-											]}
-										/>
-									</TouchableOpacity>
+									<PostTypeButton
+										fontStyle={{ color: Colors[theme].textPrimaryReverse }}
+										style={{ width: '100%' }}
+										val="Upload Video"
+										click_action={() => handleModal('Source')}
+									/>
 								)}
 
 								{cover ? (
@@ -485,30 +484,23 @@ const CreateVideoMainContent = ({
 								) : (
 									<View
 										style={{
-											flexDirection: 'row',
-											width: '100%',
-											justifyContent: 'space-between',
-											gap: 8,
+											flexDirection: 'column',
+											gap: 12,
 										}}>
-										<TouchableOpacity
-											style={{ flex: 1 }}
-											onPress={() => handleModal('Cover')}>
-											<ThemedText
-												value="Upload cover"
-												theme={theme}
-												style={[defaultStyles.outlinedBtn, { padding: 8 }]}
-											/>
-										</TouchableOpacity>
+										<PostTypeButton
+											fontStyle={{ color: Colors[theme].primary }}
+											style={[defaultStyles.outlinedBtn, { width: '100%' }]}
+											val="Upload Cover"
+											click_action={() => handleModal('Cover')}
+										/>
 
 										{uploadedSource && (
-											<TouchableOpacity
-												onPress={() => grabCoverFromCurrentFrame()}>
-												<ThemedText
-													value="Grab cover from current frame"
-													theme={theme}
-													style={[defaultStyles.outlinedBtn, { padding: 8 }]}
-												/>
-											</TouchableOpacity>
+											<PostTypeButton
+												fontStyle={{ color: Colors[theme].primary }}
+												style={[defaultStyles.outlinedBtn, { width: '100%' }]}
+												val="Grab cover from current frame"
+												click_action={() => grabCoverFromCurrentFrame()}
+											/>
 										)}
 									</View>
 								)}
@@ -547,6 +539,7 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 	setTags,
 }) => {
 	const theme = useSystemTheme();
+	const { bottom } = useSafeAreaInsets();
 
 	const [tagsLeft, setTagsLeft] = useState<Tags[]>(Object.values(Tags));
 
@@ -566,7 +559,7 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 	};
 
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const snapPoints = useMemo(() => ['50%'], []);
+	const snapPoints = useMemo(() => ['55%'], []);
 
 	const handlePresentModalPress = useCallback(() => {
 		bottomSheetRef.current?.present();
@@ -579,82 +572,38 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 		bottomSheetRef.current?.close();
 	}, []);
 
+	const renderBackdrop = useCallback((props: any) => {
+		const animatedIndex = useSharedValue(0);
+		const animatedPosition = useSharedValue(1);
+
+		return (
+			<BottomSheetBackdrop
+				animatedIndex={animatedIndex}
+				animatedPosition={animatedPosition}
+				disappearsOnIndex={-1}
+				appearsOnIndex={0}
+			/>
+		);
+	}, []);
+
 	return (
 		<View>
-			<View style={[styles.Container3, styles.InputContainer]}>
-				<ThemedTextInput
-					containerStyle={{ width: '100%' }}
-					placeholder={
-						'Enter description, insights, hashtags, your thoughts...'
-					}
-					theme={theme}
-					lines={30}
-					multiline={true}
-					maxLength={TextInputMaxCharacters.BigDescription}
-					showLength={true}
-					children={null}
-					value={description}
-					setValue={setDescription}
-					makeWordToBubble={false}
-				/>
-			</View>
-			<View style={[styles.Container4, styles.InputContainer]}>
-				<View
-					style={{
-						backgroundColor: Colors[theme].container_surface,
-						borderRadius: 8,
-						paddingRight: 8,
-						paddingBottom: 8,
-						flexDirection: 'column',
-						gap: 8,
-						padding: 12,
-					}}>
-					<TouchableOpacity onPress={handlePresentModalPress}>
-						<ThemedText
-							value={'Add tags'}
-							theme={theme}
-							style={{ color: 'gray' }}
-						/>
-					</TouchableOpacity>
-
-					<View
-						style={{
-							paddingBottom: 8,
-							gap: 12,
-							flexWrap: 'wrap',
-							width: '100%',
-							flexDirection: 'row',
-						}}>
-						{tags?.map((tag) => (
-							<Tag
-								key={tag}
-								touchOpacity={1}
-								DisplayRemoveBtn={true}
-								theme={theme}
-								tag={tag}
-								ActionOnRemoveBtnClick={() => RemoveTag(tag)}
-							/>
-						))}
-					</View>
-
-					{!tags && <View style={{ height: 12 }} />}
-				</View>
-			</View>
-
 			<BottomSheetModal
+				backdropComponent={renderBackdrop}
 				snapPoints={snapPoints}
 				handleIndicatorStyle={{ backgroundColor: 'gray' }}
 				backgroundStyle={{
-					backgroundColor: Colors[theme].background,
+					backgroundColor: Colors[theme].background2,
 				}}
 				ref={bottomSheetRef}>
-				<BottomSheetView style={{ flex: 1 }}>
+				<BottomSheetView>
 					<View
 						style={{
 							flexDirection: 'column',
 							gap: 12,
 							paddingHorizontal: 18,
 							paddingVertical: 18,
+							paddingBottom: 52,
 						}}>
 						<ThemedText
 							value={'Add a tag'}
@@ -695,6 +644,66 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 					</View>
 				</BottomSheetView>
 			</BottomSheetModal>
+
+			<View style={[styles.Container3, styles.InputContainer]}>
+				<ThemedTextInput
+					containerStyle={{ width: '100%' }}
+					placeholder={
+						'Enter description, insights, hashtags, your thoughts...'
+					}
+					theme={theme}
+					lines={30}
+					multiline={true}
+					maxLength={TextInputMaxCharacters.BigDescription}
+					showLength={true}
+					children={null}
+					value={description}
+					setValue={setDescription}
+					makeWordToBubble={false}
+				/>
+			</View>
+			<View style={[styles.Container4, styles.InputContainer]}>
+				<View
+					style={{
+						backgroundColor: Colors[theme].container_surface,
+						borderRadius: 8,
+						paddingRight: 8,
+						paddingBottom: 8,
+						flexDirection: 'column',
+						gap: 8,
+						padding: 12,
+					}}>
+					<TouchableOpacity onPress={handlePresentModalPress}>
+						<ThemedText
+							value={'Add tags'}
+							theme={theme}
+							style={{ color: 'gray', fontSize: 16 }}
+						/>
+					</TouchableOpacity>
+
+					<View
+						style={{
+							paddingBottom: 8,
+							gap: 12,
+							flexWrap: 'wrap',
+							width: '100%',
+							flexDirection: 'row',
+						}}>
+						{tags?.map((tag) => (
+							<Tag
+								key={tag}
+								touchOpacity={1}
+								DisplayRemoveBtn={true}
+								theme={theme}
+								tag={tag}
+								ActionOnRemoveBtnClick={() => RemoveTag(tag)}
+							/>
+						))}
+					</View>
+
+					{!tags && <View style={{ height: 12 }} />}
+				</View>
+			</View>
 		</View>
 	);
 };

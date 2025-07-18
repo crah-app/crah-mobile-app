@@ -1,30 +1,47 @@
-import React from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Tabs, useSegments } from 'expo-router';
 import { StyleSheet, View, StatusBar, TouchableOpacity } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { Ionicons } from '@expo/vector-icons';
-import CreatePostDropDownMenu from '@/components/CreatePostDropDownMenu';
 import GetSVGMemo from '@/components/GetSVG';
 import {
-	SafeAreaView,
-	useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+	BottomSheetBackdrop,
+	BottomSheetModal,
+	BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import { useSharedValue } from 'react-native-reanimated';
+import ThemedText from '@/components/general/ThemedText';
+import { defaultStyles } from '@/constants/Styles';
+import PostTypeButton from '@/components/PostTypeButton';
+import CreateModal from '../modals/createModal';
 
 const Layout = () => {
 	const theme = useSystemTheme();
 	const segments = useSegments();
 
+	const ref = useRef<BottomSheetModal>(null);
+
+	const handleCreateBtnPress = () => {
+		handlePresentModalPress();
+	};
+
+	const handlePresentModalPress = useCallback(() => {
+		ref.current?.present();
+	}, []);
+
 	return (
 		<View style={styles.container}>
 			<StatusBar barStyle={'default'} />
+			<CreateModal ref={ref} theme={theme} />
+
 			<Tabs
 				backBehavior="history"
 				screenOptions={{
 					tabBarStyle: [
 						styles.tabBarStyle,
 						{
-							borderTopColor: Colors[theme].surface, // top border color
+							borderTopColor: Colors[theme].primary, // top border color
 							backgroundColor: Colors[theme].background, // tab bar background color
 						},
 					],
@@ -78,9 +95,11 @@ const Layout = () => {
 						tabBarIcon: () => null,
 						headerShown: false,
 						tabBarButton: (props) => (
-							<TouchableOpacity style={styles.plusButtonContainer}>
+							<TouchableOpacity
+								style={styles.plusButtonContainer}
+								onPress={handleCreateBtnPress}>
 								<View style={styles.plusButton}>
-									<Ionicons name="add" size={30} color="#FFF" />
+									<Ionicons name="add" size={35} color="#FFF" />
 								</View>
 							</TouchableOpacity>
 						),
@@ -159,7 +178,8 @@ const styles = StyleSheet.create({
 	},
 	tabBarStyle: {
 		height: 95,
-		borderTopWidth: StyleSheet.hairlineWidth * 2, // top border height
+		borderTopWidth: StyleSheet.hairlineWidth * 5, // top border height
+		borderColor: Colors.default.primary,
 		paddingHorizontal: 8, // gap between tab bar icon is narrow
 		paddingTop: 15, // gap between tab bar icon and border
 	},

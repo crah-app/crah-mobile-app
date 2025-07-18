@@ -158,8 +158,8 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({
 					styles.container,
 					{
 						backgroundColor: Colors[theme].surface,
-						width: '80%',
-						height: '30%',
+						// width: '80%',
+						// height: '30%',
 					},
 				]}>
 				<View style={styles.header}>
@@ -233,6 +233,8 @@ const styles = StyleSheet.create({
 		zIndex: 101,
 	},
 	container: {
+		width: Dimensions.get('window').width * 0.7,
+		height: Dimensions.get('window').height * 0.3,
 		borderRadius: 12,
 		justifyContent: 'center',
 		alignItems: 'center',
