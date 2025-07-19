@@ -44,7 +44,7 @@ const PostTypeFilterModal: React.FC<PostTypeFilterModalProps> = ({
 						styles.popUpInnerWrapper,
 						{
 							width: (width / 10) * 8,
-							height: 300,
+							height: 330,
 							borderRadius: 20,
 							overflow: 'hidden',
 							backgroundColor: Colors[theme].surface,

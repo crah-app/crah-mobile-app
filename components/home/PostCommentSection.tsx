@@ -1,15 +1,29 @@
 import React, {
+	Dispatch,
 	forwardRef,
+	SetStateAction,
 	useCallback,
 	useEffect,
 	useMemo,
 	useState,
 } from 'react';
-import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import {
+	View,
+	StyleSheet,
+	TouchableOpacity,
+	Dimensions,
+	KeyboardAvoidingView,
+	Platform,
+	Keyboard,
+} from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedText from '../general/ThemedText';
-import { ScrollView } from 'react-native-gesture-handler';
+import {
+	FlatList,
+	PanGestureHandler,
+	ScrollView,
+} from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import {
 	userCommentType,
@@ -35,6 +49,7 @@ interface PostCommentSectionProps {
 	postId: number;
 	comments: userCommentType[];
 	username: string;
+	setCommentsCount: Dispatch<SetStateAction<number>>;
 }
 
 // on the home feed only the top 2 comments get parsed
@@ -50,7 +65,7 @@ const PostCommentSection = forwardRef<
 
 	const { comments: commentsAsProps, username } = props;
 
-	const snapPoints = useMemo(() => ['75%'], []);
+	const snapPoints = useMemo(() => ['70%'], []);
 
 	const [error, setError] = useState<boolean>(false);
 	const [commentsLoaded, setCommentsLoaded] = useState<boolean>(false);
@@ -68,7 +83,7 @@ const PostCommentSection = forwardRef<
 
 		try {
 			const response = await fetch(
-				`http://192.168.0.136:4000/api/posts/${props.postId}/comments`,
+				`http://192.168.0.136:4000/api/posts/${props.postId}/comments/${user?.id}`,
 			);
 
 			const text = await response.text();
@@ -88,39 +103,28 @@ const PostCommentSection = forwardRef<
 		}
 	};
 
-	const onSend = () => {
+	const onSend = async () => {
 		if (!text || !user) return;
 
-		// frontend data
-		const newComment: userCommentType = {
-			CreatedAt: new Date(),
-			Id: Math.floor(Math.random() * 1_000_000_000),
-			Message: text,
-			PostId: props.postId,
-			UpdatedAt: new Date().toISOString(),
-			UserName: user?.username || '',
-			UserAvatar: user?.imageUrl || '',
-			UserId: user?.id || '',
-			likes: 0,
-			purpose: 'comment',
-			type: CommentType.default,
-			// replyTo: undefined
-		};
+		Keyboard.dismiss();
 
-		setComments((prev) => [...prev, newComment]);
+		const messageText = text;
 
-		PostComment();
+		setText('');
+
+		await PostComment(messageText);
 	};
 
-	const PostComment = async () => {
+	const PostComment = async (Message: string) => {
 		if (!user) return;
 
 		const token = await getToken();
+		const message = text;
 
 		const comment: database_comment = {
 			PostId: props.postId,
 			UserId: user?.id,
-			Message: text,
+			Message: message,
 			CreatedAt: new Date(),
 			updatedAt: new Date(),
 		};
@@ -143,6 +147,30 @@ const PostCommentSection = forwardRef<
 			if (!response.ok) {
 				console.warn('Error [PostComment]', text);
 			}
+
+			const { insertedId: Id } = JSON.parse(text);
+
+			console.log('uisert d', Id);
+
+			// frontend data
+			const newComment: userCommentType = {
+				CreatedAt: new Date(),
+				Id,
+				Message,
+				PostId: props.postId,
+				UpdatedAt: new Date().toISOString(),
+				UserName: user?.username || '',
+				UserAvatar: user?.imageUrl || '',
+				UserId: user?.id || '',
+				likes: 0,
+				purpose: 'comment',
+				type: CommentType.default,
+				liked: false,
+				// replyTo: undefined
+			};
+
+			setComments((prev) => [newComment, ...prev]);
+			props.setCommentsCount((prev) => prev + 1);
 		} catch (error) {
 			console.warn('Error [PostComment]', error);
 		}
@@ -150,12 +178,8 @@ const PostCommentSection = forwardRef<
 
 	useEffect(() => {
 		setCommentsLoaded(false);
-
 		if (!comments) return;
-
 		setCommentsLoaded(true);
-
-		console.log(comments);
 	}, [comments]);
 
 	const renderBackdrop = useCallback((props: any) => {
@@ -172,9 +196,23 @@ const PostCommentSection = forwardRef<
 		);
 	}, []);
 
+	const bottomSheetRef = ref as React.RefObject<BottomSheetModal>;
+
+	useEffect(() => {
+		const keyboardDidHideListener = Keyboard.addListener(
+			'keyboardDidHide',
+			() => {
+				bottomSheetRef?.current?.snapToIndex(1);
+			},
+		);
+
+		return () => {
+			keyboardDidHideListener.remove();
+		};
+	}, []);
+
 	return (
 		<BottomSheetModal
-			containerStyle={{}}
 			backdropComponent={renderBackdrop}
 			handleIndicatorStyle={{ backgroundColor: 'gray' }}
 			backgroundStyle={{
@@ -192,111 +230,131 @@ const PostCommentSection = forwardRef<
 							justifyContent: 'space-between',
 							height: '100%',
 						}}>
-						<View
-							style={{
-								width: '100%',
-								justifyContent: 'center',
-								alignItems: 'center',
-								marginBottom: 20,
-							}}>
-							<ThemedText
-								theme={theme}
-								value={'Comments'}
-								style={[defaultStyles.biggerText]}
-							/>
-						</View>
-
-						<ScrollView
-							scrollEnabled={true}
-							keyboardDismissMode="on-drag"
-							contentInsetAdjustmentBehavior="always"
-							style={{ alignSelf: 'flex-start', flex: 1 }}>
-							{comments.length > 0 ? (
-								<BottomSheetFlatList
-									scrollEnabled={false}
-									data={comments}
-									renderItem={({ item: comment, index }) => {
-										const replies = comments.filter(
-											(val) => val.replyTo === comment.Id,
-										);
-
-										return (
-											<View>
-												{!comment.replyTo && (
-													<CommentRow
-														key={index}
-														style={{ backgroundColor: Colors[theme].surface }}
-														userId={comment.UserId}
-														avatar={comment.UserAvatar}
-														text={comment.Message}
-														responses={replies.length}
-														likes={comment.likes}
-														date={new Date(comment.CreatedAt)}
-														username={comment.UserName}
-														purpose={comment.purpose}
-														type={comment.type}
-														commentId={comment.Id}
-														replies={replies}
-													/>
-												)}
-											</View>
-										);
-									}}
-									keyExtractor={(item, index) => index.toString()}
+						<KeyboardAvoidingView
+							behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+							keyboardVerticalOffset={70}>
+							<View
+								style={{
+									width: '100%',
+									justifyContent: 'center',
+									alignItems: 'center',
+									marginBottom: 20,
+									height: 35,
+								}}>
+								<ThemedText
+									theme={theme}
+									value={'Comments'}
+									style={[defaultStyles.biggerText]}
 								/>
-							) : (
-								<View
-									style={{
-										flex: 1,
-										width: Dimensions.get('window').width,
-										height: 600,
-										alignItems: 'center',
-										justifyContent: 'center',
-									}}>
-									<ThemedText
-										style={{ color: 'gray' }}
-										theme={theme}
-										value={`Be the first comment under ${username}'s post!`}
+							</View>
+
+							<View
+								style={{
+									height:
+										Dimensions.get('window').height * 0.7 -
+										insets.bottom * 7.5 -
+										55,
+								}}>
+								{comments.length > 0 ? (
+									<FlatList
+										showsVerticalScrollIndicator={false}
+										// initialNumToRender={3}
+										// maxToRenderPerBatch={5}
+										// windowSize={1}
+										scrollEnabled={true}
+										data={comments}
+										extraData={comments}
+										renderItem={({ item: comment, index }) => {
+											const replies = comments.filter(
+												(val) => val.replyTo === comment.Id,
+											);
+
+											return (
+												<View>
+													{!comment.replyTo && (
+														<CommentRow
+															liked={comment.liked}
+															postId={props.postId}
+															key={index}
+															style={{
+																backgroundColor: Colors[theme].background2,
+															}}
+															userId={comment.UserId}
+															avatar={comment.UserAvatar}
+															text={comment.Message}
+															responses={replies.length}
+															likes={comment.likes}
+															date={new Date(comment.CreatedAt)}
+															username={comment.UserName}
+															purpose={comment.purpose}
+															type={comment.type}
+															commentId={comment.Id}
+															replies={replies}
+														/>
+													)}
+												</View>
+											);
+										}}
+										keyExtractor={(item, index) => item.Id.toString()}
 									/>
-								</View>
-							)}
-						</ScrollView>
+								) : (
+									<View
+										style={{
+											height:
+												Dimensions.get('window').height * 0.7 -
+												insets.bottom * 7.5 -
+												55,
+											width: Dimensions.get('window').width,
+											alignItems: 'center',
+											justifyContent: 'center',
+										}}>
+										<ThemedText
+											style={{ color: 'gray' }}
+											theme={theme}
+											value={`Be the first comment under ${username}'s post!`}
+										/>
+									</View>
+								)}
+							</View>
 
-						<View
-							style={{
-								width: '100%',
-								height: 'auto',
-								flexDirection: 'row',
-								justifyContent: 'space-between',
-								alignItems: 'center',
-								backgroundColor: Colors[theme].background2,
-								borderTopWidth: StyleSheet.hairlineWidth,
-								borderTopColor: Colors[theme].textPrimary,
-								paddingBottom: insets.bottom,
-							}}>
-							<BottomSheetTextInput
-								maxLength={TextInputMaxCharacters.SmallDescription}
-								onChangeText={setText}
-								value={text}
-								style={[
-									styles.composer,
-									{
-										color: Colors[theme].textPrimary,
-									},
-								]}
-								placeholderTextColor={'gray'}
-								placeholder={`A comment for ${username}`}
-							/>
-							<TouchableOpacity
-								onPress={onSend}
-								style={{ paddingHorizontal: 14 }}>
-								<Ionicons
-									name="send-outline"
-									size={defaultHeaderBtnSize - 6}
-									color={Colors[theme].textPrimary}
+							<View
+								style={{
+									flexDirection: 'row',
+									justifyContent: 'space-between',
+									alignItems: 'center',
+									backgroundColor: Colors[theme].background2,
+									borderTopWidth: StyleSheet.hairlineWidth,
+									borderTopColor: Colors[theme].textPrimary,
+									paddingBottom: insets.bottom,
+									width: '100%',
+								}}>
+								<BottomSheetTextInput
+									cursorColor={Colors.default.primary}
+									maxLength={TextInputMaxCharacters.SmallDescription}
+									onChangeText={setText}
+									value={text}
+									style={[
+										{
+											padding: 20,
+											fontSize: 16,
+											color: Colors[theme].textPrimary,
+											width: '85%',
+										},
+									]}
+									placeholderTextColor={Colors[theme].gray}
+									placeholder={`A comment for ${username}`}
 								/>
-							</TouchableOpacity>
-						</View>
+								<TouchableOpacity
+									onPress={onSend}
+									style={{ paddingHorizontal: 14, width: '15%' }}>
+									<Ionicons
+										name="send-outline"
+										size={defaultHeaderBtnSize - 6}
+										color={Colors[theme].textPrimary}
+									/>
+								</TouchableOpacity>
+							</View>
+						</KeyboardAvoidingView>
 					</View>
 				) : (
 					<CrahActivityIndicator size={'large'} color={'gray'} />
@@ -307,11 +365,6 @@ const PostCommentSection = forwardRef<
 	);
 });
 
-const styles = StyleSheet.create({
-	composer: {
-		padding: 20,
-		fontSize: 16,
-	},
-});
+const styles = StyleSheet.create({});
 
 export default PostCommentSection;

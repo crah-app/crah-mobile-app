@@ -1,30 +1,50 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { RawPost } from '@/types';
+import { router } from 'expo-router';
+import { useUser } from '@clerk/clerk-expo';
 
 const PostHeader: React.FC<{ post: RawPost; postTimeAgo: string }> = ({
 	post,
 	postTimeAgo,
 }) => {
 	const theme = useSystemTheme();
+	const { user } = useUser();
+
+	const onHeaderPress = () => {
+		router.push({
+			pathname: '/sharedPages/userProfile',
+			params: {
+				userId: post.UserId,
+				self: user?.id !== post.UserId ? 'false' : 'true',
+				linking: 'true',
+			},
+		});
+	};
 
 	return (
 		<View>
-			<View style={styles.header}>
-				<Image source={{ uri: post.UserAvatar }} style={styles.profileImage} />
+			<TouchableOpacity onPress={onHeaderPress}>
+				<View style={styles.header}>
+					<Image
+						source={{ uri: post.UserAvatar }}
+						style={styles.profileImage}
+					/>
 
-				<View style={{ flexDirection: 'column', gap: 2 }}>
-					<Text style={[styles.username, { color: Colors[theme].textPrimary }]}>
-						{post.UserName}
-					</Text>
+					<View style={{ flexDirection: 'column', gap: 2 }}>
+						<Text
+							style={[styles.username, { color: Colors[theme].textPrimary }]}>
+							{post.UserName}
+						</Text>
 
-					<Text style={[{ color: Colors[theme].gray, fontSize: 14 }]}>
-						{post.Title}
-					</Text>
+						<Text style={[{ color: Colors[theme].gray, fontSize: 14 }]}>
+							{post.Title}
+						</Text>
+					</View>
 				</View>
-			</View>
+			</TouchableOpacity>
 			<Text style={[styles.postTime, { color: 'gray' }]}>{postTimeAgo}</Text>
 		</View>
 	);

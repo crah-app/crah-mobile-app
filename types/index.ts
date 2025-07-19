@@ -165,6 +165,7 @@ export type userCommentType = {
 	type: CommentType;
 	purpose: CommentPurpose;
 	replyTo?: number; // if comment is from purpose "reply"
+	liked: boolean; // wether current user liked this comment
 };
 
 export type database_comment = {

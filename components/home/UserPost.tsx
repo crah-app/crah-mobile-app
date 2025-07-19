@@ -136,6 +136,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 
 	const handlePresentModalPress = useCallback(() => {
 		bottomSheetModalRef.current?.present();
+		bottomSheetModalRef?.current?.snapToIndex(1);
 	}, []);
 
 	const handlCloseModalPress = useCallback(() => {
@@ -178,6 +179,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				comments={userComments}
 				username={post.UserName}
 				postId={postId}
+				setCommentsCount={setCommentsCount}
 			/>
 		</View>
 	);

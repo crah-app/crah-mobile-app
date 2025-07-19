@@ -794,6 +794,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, self, linking }) => {
 									justifyContent: 'flex-start',
 									alignItems: 'flex-start',
 									width: '100%',
+									marginTop: 12,
+									marginLeft: 12,
 								}}>
 								<TouchableOpacity onPress={goBack}>
 									<Ionicons

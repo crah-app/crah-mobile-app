@@ -39,7 +39,6 @@ import React, {
 import {
 	Alert,
 	Dimensions,
-	KeyboardAvoidingView,
 	StatusBar,
 	StyleSheet,
 	TouchableOpacity,
