@@ -118,7 +118,7 @@ const Page = () => {
 			})
 				.then((res) => res.json())
 				.then((res) => {
-					console.log(res);
+					// console.log(res);
 					setUserPosts(res);
 				})
 				.catch((err) => {

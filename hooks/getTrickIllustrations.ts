@@ -1,4 +1,4 @@
-import briflip_default from '@/assets/illustrations/briflip.png';
+import briflip_default from '@/assets/illustrations/pngs/bri.png';
 import { Image, ImageSourcePropType } from 'react-native';
 
 const getTrickIllustration = (name: string) => {

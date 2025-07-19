@@ -3,10 +3,13 @@ import GetSVG from '@/components/GetSVG';
 import PostTypeButton from '@/components/PostTypeButton';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
-import { Rank, TrickSpot } from '@/types';
-import React, { Dispatch, SetStateAction } from 'react';
-import { View } from 'react-native';
+import { Rank, SpotInterface, TrickSpot } from '@/types';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { View, Image, ImageSourcePropType } from 'react-native';
 import Modal from 'react-native-modal';
+import B from '../../../../assets/illustrations/pngs/whip_umbrella.png';
+
+const bu = Image.resolveAssetSource(B as ImageSourcePropType);
 
 interface Props {
 	theme: 'light' | 'dark';
@@ -15,18 +18,44 @@ interface Props {
 	trickSpot?: TrickSpot; // pass this down only when user choosed one specific spot
 	visible: boolean;
 	setVisible: Dispatch<SetStateAction<boolean>>;
+	setTrickCreated: React.Dispatch<React.SetStateAction<boolean>>;
+	setAddedSpot: React.Dispatch<React.SetStateAction<boolean>>;
+	setValue: React.Dispatch<React.SetStateAction<string>>;
+	setSpots: React.Dispatch<React.SetStateAction<SpotInterface[]>>;
+	oldRank: number;
+	newRank: number;
+	setRankModalVisible: Dispatch<SetStateAction<boolean>>;
 }
 
 function TrickLandedModal({
 	theme,
-	additionalPoints = 65,
-	trickName = 'Buttercup',
-	trickSpot = 'Flat',
+	additionalPoints,
+	trickName,
+	trickSpot,
 	visible,
 	setVisible,
+	setTrickCreated,
+	setAddedSpot,
+	setValue,
+	setSpots,
+	oldRank,
+	newRank,
+	setRankModalVisible,
 }: Props) {
+	const [displayText, setDisplayText] = useState<string>(
+		`${trickName} ${trickSpot || ''}!`,
+	);
+
 	const handleConfirmPress = () => {
 		setVisible(false);
+		setTrickCreated(false);
+		setAddedSpot(false);
+		setValue('');
+		setSpots([]);
+
+		if (oldRank < newRank) {
+			setRankModalVisible(true);
+		}
 	};
 
 	const handleSharePress = () => {};
@@ -34,6 +63,24 @@ function TrickLandedModal({
 	const handleOnBackdropPress = () => {
 		setVisible(false);
 	};
+
+	function getResponsiveFontSize(
+		text: string,
+		minSize = 24,
+		maxSize = 42,
+		threshold = 15,
+	) {
+		if (text.length <= threshold) return maxSize;
+
+		// Linear skalieren:
+		const scale = Math.max(minSize, maxSize - (text.length - threshold));
+
+		return scale;
+	}
+
+	useEffect(() => {
+		setDisplayText(`${trickName} ${trickSpot || ''}!`);
+	}, [trickName, trickSpot]);
 
 	return (
 		<View>
@@ -46,13 +93,18 @@ function TrickLandedModal({
 				onBackdropPress={handleOnBackdropPress}>
 				{/* upper text */}
 				<View
-					style={{ flex: 1, flexDirection: 'column', alignItems: 'center' }}>
+					style={{
+						flex: 1,
+						flexDirection: 'column',
+						alignItems: 'center',
+						gap: 4,
+					}}>
 					<ThemedText
+						textShadow
 						theme={theme}
 						value={'Congratulations'}
 						style={[
-							defaultStyles.bigText,
-							{ color: Colors[theme].primary, fontWeight: '700' },
+							{ color: Colors[theme].primary, fontWeight: '700', fontSize: 42 },
 						]}
 					/>
 					<ThemedText
@@ -60,16 +112,7 @@ function TrickLandedModal({
 						value={`for landing`}
 						style={[
 							defaultStyles.bigText,
-							{ color: Colors[theme].primary, fontWeight: '700' },
-						]}
-					/>
-
-					<ThemedText
-						theme={theme}
-						value={`${trickName} ${trickSpot || ''}!`}
-						style={[
-							defaultStyles.bigText,
-							{ color: Colors[theme].primary, fontWeight: '700' },
+							{ color: Colors[theme].textPrimary, fontWeight: '700' },
 						]}
 					/>
 				</View>
@@ -79,18 +122,31 @@ function TrickLandedModal({
 					style={{
 						flex: 3,
 						flexDirection: 'column',
-						gap: 18,
+						gap: 42,
 						justifyContent: 'center',
 						alignItems: 'center',
 					}}>
 					{/* badge */}
-					<GetSVG
+					{/* <GetSVG
 						name={'scooter'}
 						props={{ fill: Colors[theme].textPrimary }}
-					/>
+					/> */}
 					<ThemedText
 						theme={theme}
-						value={`${additionalPoints}`}
+						value={displayText}
+						style={[
+							{
+								textAlign: 'center',
+								color: Colors[theme].textPrimary,
+								fontWeight: '700',
+								fontSize: getResponsiveFontSize(displayText),
+							},
+						]}
+					/>
+					<Image source={bu} style={{ width: 290, height: 300 }} />
+					<ThemedText
+						theme={theme}
+						value={`+${additionalPoints} Points`}
 						style={[
 							defaultStyles.bigText,
 							{ color: Colors[theme].primary, fontWeight: '600' },
@@ -119,7 +175,7 @@ function TrickLandedModal({
 					<PostTypeButton
 						fontStyle={{ fontSize: 20 }}
 						style={{}}
-						val={'Nice'}
+						val={'Got it!'}
 						click_action={handleConfirmPress}
 					/>
 					<PostTypeButton

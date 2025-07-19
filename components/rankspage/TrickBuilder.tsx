@@ -24,6 +24,7 @@ import {
 	SpotInterface,
 	TextInputMaxCharacters,
 	TrickDifficulty,
+	TrickListGeneralSpotCategory,
 	TrickSpot,
 	UserRank,
 } from '@/types';
@@ -97,14 +98,24 @@ interface AddSpotInputField {
 	setSpots: Dispatch<SetStateAction<SpotInterface[]>>;
 }
 
+enum GeneralSpot {
+	Flat = 'Flat',
+	Street = 'Street',
+	Park = 'Park',
+}
+
 interface TrickLandedServerResult {
-	user_points: number;
+	user_points: number | string;
 	user_total_points: number;
 	trick_total_points: number;
 	best_trick_difficulty: TrickDifficulty;
 	best_trick_name: string;
+	best_trick_spots: {
+		spot: GeneralSpot;
+		date?: Date;
+	}[];
 	old_rank: number; // old rank
-	rank: number; // new rank
+	new_rank: number; // new rank
 	unrecognized_word?: string;
 }
 
@@ -113,22 +124,44 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 	const { user } = useUser();
 	const { getToken } = useAuth();
 
+	// information states
 	const [trickCreated, setTrickCreated] = useState<boolean>(false);
 	const [addedSpot, setAddedSpot] = useState<boolean>(false);
 
-	const [loading, setLoading] = useState<boolean>(false);
-	const [modalVisible, setModalVisible] = useState<boolean>(false);
+	const [value, setValue] = useState<string>('');
+	const [spots, setSpots] = useState<SpotInterface[]>([]);
 
 	const [tricks, setTricks] = useState<SelectedTrick[]>([]);
 
-	const [value, setValue] = useState<string>('');
-	const [spots, setSpots] = useState<SpotInterface[]>([]);
+	// logic states
+	const [loading, setLoading] = useState<boolean>(false);
+	const [modalVisible, setModalVisible] = useState<boolean>(false);
 
 	const [trickLandedModalVisible, setTrickLandedModalVisible] =
 		useState<boolean>(false);
 	const [rankModalVisible, setRankModalVisible] = useState<boolean>(false);
 
-	const [serverResult, setServerResult] = useState<TrickLandedServerResult>();
+	const [serverResult, setServerResult] = useState<TrickLandedServerResult>({
+		best_trick_difficulty: TrickDifficulty.ADVANCED,
+		best_trick_name: '',
+		best_trick_spots: [{ spot: GeneralSpot.Park }],
+		new_rank: -1,
+		old_rank: -1,
+		trick_total_points: -1,
+		user_points: -1,
+		user_total_points: -1,
+	});
+
+	const [trickTotalPoints, setTrickTotalPoints] = useState<number>(0);
+	const [bestTrickName, setBestTrickName] = useState<string>('');
+	const [bestTrickSpots, setBestTrickSpots] = useState<
+		{ spot: GeneralSpot; date?: Date }[]
+	>([]);
+
+	const [rankSet, setRankSet] = useState<{
+		old_rank: number;
+		new_rank: number;
+	}>({ old_rank: -2, new_rank: -2 });
 
 	const createTrickObject = (): SelectedTrick[] => {
 		const spotList: SelectedTrick[] = spots.map((obj) => ({
@@ -160,18 +193,14 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 		return createdTrick;
 	};
 
-	const handleCreateTrick = useCallback(async () => {
+	const handleCreateTrick = async () => {
 		try {
-			console.log(value.length, spots, value);
 			if (value.length <= 0) return;
 
 			setLoading(true);
 			setModalVisible(true);
 
 			const createdTrick = createTrickObject();
-
-			console.log(createdTrick);
-
 			const token = await getToken();
 
 			const response = await fetch(
@@ -188,7 +217,6 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 			);
 
 			const text = await response.text();
-			console.log('Raw Text:', text);
 
 			if (!response.ok) {
 				setTrickCreated(false);
@@ -218,13 +246,23 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 			// first step finished: trick name
 			if (!trickCreated && !addedSpot) {
 				setTrickCreated(true);
+				setRankSet({ old_rank: result.old_rank, new_rank: result.new_rank });
+
+				setTrickTotalPoints(result.trick_total_points);
+				setBestTrickName(result.best_trick_name);
+				setBestTrickSpots(result.best_trick_spots);
 			}
 
 			// second step finished: spots
 			if (trickCreated && !addedSpot) {
 				setAddedSpot(true);
-				setServerResult(result);
+
+				setTrickTotalPoints(result.trick_total_points);
+				setBestTrickName(result.best_trick_name);
+				setBestTrickSpots(result.best_trick_spots);
+
 				setTrickLandedModalVisible(true);
+				setRankSet((prev) => ({ ...prev, new_rank: result.new_rank }));
 			}
 		} catch (error) {
 			if (error) Alert.alert('Error adding trick');
@@ -233,23 +271,36 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 			setLoading(false);
 			setModalVisible(false);
 		}
-	}, [value, getToken, user?.id]);
+	};
+
+	useEffect(() => {
+		console.log(serverResult);
+		return () => {};
+	}, [serverResult]);
 
 	return (
 		<View>
 			<TrickLandedModal
 				theme={theme}
-				additionalPoints={serverResult?.trick_total_points || 0}
-				trickName={serverResult?.best_trick_name || 'Unknown'}
+				additionalPoints={trickTotalPoints ?? -1}
+				trickName={bestTrickName}
+				trickSpot={bestTrickSpots[0]?.spot as TrickSpot}
 				visible={trickLandedModalVisible}
 				setVisible={setTrickLandedModalVisible}
+				setAddedSpot={setAddedSpot}
+				setTrickCreated={setTrickCreated}
+				setValue={setValue}
+				setSpots={setSpots}
+				oldRank={rankSet.old_rank}
+				newRank={rankSet.new_rank}
+				setRankModalVisible={setRankModalVisible}
 			/>
 
 			<NewRankModal
 				theme={theme}
-				oldRank={serverResult?.old_rank || 0}
-				newRank={serverResult?.rank || 0}
-				totalUserRankPoints={serverResult?.user_total_points || 0}
+				oldRank={rankSet.old_rank}
+				newRank={rankSet.new_rank}
+				totalUserRankPoints={serverResult?.user_total_points ?? 0}
 				visible={rankModalVisible}
 				setVisible={setRankModalVisible}
 			/>
@@ -265,7 +316,7 @@ const TrickBuilder: React.FC<TrickBuilderProps> = ({}) => {
 				addedSpot={addedSpot}
 				value={value}
 				setValue={setValue}
-				handleCreateTrick={handleCreateTrick}
+				handleCreateTrick={async () => handleCreateTrick()}
 				spots={spots}
 				user={user}
 				setSpots={setSpots}
@@ -300,20 +351,20 @@ const TrickBuilderBody = React.memo(
 				theme={theme}
 				value={value}
 				setValue={setValue}
-				handleCreateTrick={handleCreateTrick}
+				handleCreateTrick={async () => handleCreateTrick()}
 				trickCreated={trickCreated}
 			/>
 			<AddSpotInputField
 				theme={theme}
 				value={value}
 				setValue={setValue}
-				handleCreateTrick={handleCreateTrick}
+				handleCreateTrick={async () => handleCreateTrick()}
 				trickCreated={trickCreated}
 				spots={spots}
 				addedSpot={addedSpot}
 				setSpots={setSpots}
 			/>
-			{trickCreated && addedSpot ? (
+			{/* {trickCreated && addedSpot ? (
 				<TrickDetails
 					theme={theme}
 					trickCreated={trickCreated}
@@ -321,7 +372,7 @@ const TrickBuilderBody = React.memo(
 					value={value}
 					user={user}
 				/>
-			) : null}
+			) : null} */}
 		</View>
 	),
 );
@@ -458,7 +509,7 @@ const InputField = React.memo(
 				/>
 				<PostTypeButton
 					val="Add it!"
-					click_action={handleCreateTrick}
+					click_action={async () => handleCreateTrick()}
 					style={{ width: '100%' }}
 				/>
 			</View>

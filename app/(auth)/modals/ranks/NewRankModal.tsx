@@ -3,10 +3,14 @@ import GetSVG from '@/components/GetSVG';
 import PostTypeButton from '@/components/PostTypeButton';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
-import { Rank } from '@/types';
+import { Rank, UserGalleryTopics } from '@/types';
 import React, { Dispatch, SetStateAction } from 'react';
-import { View } from 'react-native';
+import { View, Image, ImageSourcePropType } from 'react-native';
 import Modal from 'react-native-modal';
+import B from '../../../../assets/illustrations/pngs/whip_umbrella.png';
+import { router } from 'expo-router';
+
+const bu = Image.resolveAssetSource(B as ImageSourcePropType);
 
 interface Props {
 	theme: 'light' | 'dark';
@@ -19,9 +23,9 @@ interface Props {
 
 function NewRankModal({
 	theme,
-	oldRank = 0,
-	newRank = 0,
-	totalUserRankPoints = 12_000,
+	oldRank = -1,
+	newRank = -1,
+	totalUserRankPoints = -1,
 	visible,
 	setVisible,
 }: Props) {
@@ -31,67 +35,155 @@ function NewRankModal({
 
 	const handleSharePress = () => {};
 
+	const handleRankBtnPress = () => {
+		router.push({
+			pathname: '/(auth)/(tabs)/statsPages',
+			params: { pageType: UserGalleryTopics.LEAGUES },
+		});
+
+		setTimeout(() => {
+			setVisible(false);
+		}, 300);
+	};
+
+	const handleOnBackdropPress = () => {
+		setVisible(false);
+	};
+
+	const oldRankName = Rank.getRankNameByIndex(oldRank);
+	const newRankName = Rank.getRankNameByIndex(newRank);
+
 	return (
 		<View>
 			{/* backdrop */}
-			<Modal hasBackdrop={true} useNativeDriver useNativeDriverForBackdrop>
+			<Modal
+				hasBackdrop={true}
+				useNativeDriver
+				useNativeDriverForBackdrop
+				isVisible={visible}
+				onBackdropPress={handleOnBackdropPress}>
 				{/* upper text */}
 				<View
-					style={{ flex: 1, flexDirection: 'column', alignItems: 'center' }}>
+					style={{
+						flex: 1,
+						flexDirection: 'column',
+						alignItems: 'center',
+						gap: 12,
+					}}>
 					<ThemedText
+						textShadow
 						theme={theme}
 						value={'Congratulations'}
 						style={[
-							defaultStyles.bigText,
-							{ color: Colors[theme].primary, fontWeight: '700' },
-						]}
-					/>
-					<ThemedText
-						theme={theme}
-						value={`You ranked up from ${oldRank} to...`}
-						style={[
-							defaultStyles.bigText,
-							{ color: Colors[theme].primary, fontWeight: '700' },
+							{ color: Colors[theme].primary, fontWeight: '700', fontSize: 42 },
 						]}
 					/>
 
-					<ThemedText
-						theme={theme}
-						value={`${newRank}`}
-						style={[
-							defaultStyles.bigText,
-							{ color: Colors[theme].primary, fontWeight: '700' },
-						]}
-					/>
+					<View style={{ flexDirection: 'row' }}>
+						<ThemedText
+							theme={theme}
+							value={`You ranked up from `}
+							style={[
+								defaultStyles.bigText,
+								{
+									color: Colors[theme].textPrimary,
+									fontWeight: '700',
+									fontSize: 23,
+								},
+							]}
+						/>
+						<ThemedText
+							theme={theme}
+							value={`${oldRankName}`}
+							style={[
+								defaultStyles.bigText,
+								{
+									color: Colors[theme].primary,
+									fontWeight: '700',
+									fontSize: 23,
+								},
+							]}
+						/>
+						<ThemedText
+							theme={theme}
+							value={` to...`}
+							style={[
+								defaultStyles.bigText,
+								{
+									color: Colors[theme].textPrimary,
+									fontWeight: '700',
+									fontSize: 23,
+								},
+							]}
+						/>
+					</View>
 				</View>
 
 				{/* rank badge and points */}
-				<View style={{ flex: 3, flexDirection: 'column', gap: 8 }}>
-					{/* badge */}
-					<GetSVG name={'scooter'} props={{}} />
+				<View
+					style={{
+						flex: 3,
+						flexDirection: 'column',
+						gap: 42,
+						justifyContent: 'center',
+						alignItems: 'center',
+					}}>
+					{/* rank */}
 					<ThemedText
 						theme={theme}
-						value={`${totalUserRankPoints}`}
+						value={`${newRankName}`}
 						style={[
-							defaultStyles.biggerText,
+							{ color: Colors[theme].primary, fontWeight: '700', fontSize: 36 },
+						]}
+					/>
+					{/* badge */}
+					<Image source={bu} style={{ width: 290, height: 300 }} />
+
+					{/* points */}
+					<ThemedText
+						theme={theme}
+						value={`+${totalUserRankPoints} Points`}
+						style={[
+							defaultStyles.bigText,
 							{ color: Colors[theme].primary, fontWeight: '600' },
 						]}
 					/>
 				</View>
 
 				{/* footer */}
-				<View style={{ flex: 1, flexDirection: 'row', gap: 8 }}>
+				<View
+					style={{
+						flex: 1,
+						flexDirection: 'row',
+						gap: 8,
+						alignItems: 'flex-end',
+						justifyContent: 'space-between',
+					}}>
 					<PostTypeButton
-						style={{}}
+						revert
+						style={{ width: 75 }}
+						fontStyle={{ fontSize: 26 }}
 						isIcon
 						icon={`share-outline`}
 						val={''}
 						click_action={handleSharePress}
 					/>
 					<PostTypeButton
+						fontStyle={{ fontSize: 20 }}
 						style={{}}
-						val={'Nice'}
+						val={'Got it!'}
 						click_action={handleConfirmPress}
+					/>
+					<PostTypeButton
+						revert
+						style={{
+							width: 75,
+						}}
+						fontStyle={{ fontSize: 26, marginLeft: 4 }}
+						isIcon
+						icon={'bar-chart-outline'}
+						val={''}
+						click_action={handleRankBtnPress}
 					/>
 				</View>
 			</Modal>

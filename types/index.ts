@@ -521,7 +521,30 @@ export enum Rank {
 	Gold = 'Gold',
 	Platinum = 'Platinum',
 	Diamond = 'Diamond',
-	Legendary = 'legendary',
+	Legendary = 'Legendary',
+}
+
+export namespace Rank {
+	export function getRankNameByIndex(index: number): Rank {
+		switch (index) {
+			case 0:
+				return Rank.Wood;
+			case 1:
+				return Rank.Bronze;
+			case 2:
+				return Rank.Silver;
+			case 3:
+				return Rank.Gold;
+			case 4:
+				return Rank.Platinum;
+			case 5:
+				return Rank.Diamond;
+			case 6:
+				return Rank.Legendary;
+			default:
+				return Rank.Wood; // fallback
+		}
+	}
 }
 
 export const RankColors: Record<Rank, string[]> = {
