@@ -25,6 +25,7 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import HeaderFlatList from '@/components/header/HeaderFlatList';
 import GetSVG from '@/components/GetSVG';
 import { mmkv } from '@/hooks/mmkv';
+import PostTypeButton from '@/components/PostTypeButton';
 
 const POST_CACHE_KEY = 'allPosts';
 
@@ -199,6 +200,16 @@ const Page = () => {
 							/>
 						))}
 					</View>
+
+					{/* <PostTypeButton
+						style={{
+							marginVertical: 18,
+							width: Dimensions.get('window').width - 24,
+							marginHorizontal: 12,
+						}}
+						val="Did you land a new trick?"
+						click_action={() => {}}
+					/> */}
 
 					{/* <Row
 						title={'Rank #1 Silver'}

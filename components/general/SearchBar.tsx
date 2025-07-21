@@ -21,6 +21,7 @@ interface SearchBarProps {
 	flex?: number;
 	containerStyle?: ViewStyle;
 	displayLeftSearchIcon?: boolean;
+	displayCloseRequestBtn?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -32,6 +33,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	flex,
 	containerStyle,
 	displayLeftSearchIcon = false,
+	displayCloseRequestBtn = true,
 }) => {
 	const theme = useSystemTheme();
 
@@ -52,6 +54,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 					marginBottom: 10,
 					paddingHorizontal: 12,
 					height: 42,
+					maxHeight: 42,
+					minHeight: 42,
 				},
 			]}>
 			{displayLeftSearchIcon && (
@@ -84,6 +88,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
 						size={18}
 						color={Colors[theme].gray}
 					/>
+				</TouchableOpacity>
+			)}
+
+			{displayCloseRequestBtn && !displayOptionsBtn && query.length > 0 && (
+				<TouchableOpacity
+					onPress={() => {
+						setQuery('');
+					}}>
+					<Ionicons name="close-outline" size={18} color={Colors[theme].gray} />
 				</TouchableOpacity>
 			)}
 		</ThemedView>

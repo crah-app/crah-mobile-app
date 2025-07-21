@@ -1,40 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+	Dispatch,
+	SetStateAction,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
 import {
 	Dimensions,
 	Falsy,
-	FlatList,
-	ScrollView,
 	StyleSheet,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ThemedText from '../general/ThemedText';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import TrickRow from '../rows/TrickRow';
 
 import {
-	commonTricksDataStructure,
-	dropDownMenuInputData,
-	fetchAdresses,
 	selectedTrickInterface,
 	Trick,
 	TrickDifficulty,
 	TrickListFilterOptions,
+	TrickListGeneralFilterParameterEnum,
 	TrickListGeneralSpotCategory,
 	TrickListOrderTypes,
 	TrickType,
+	TrickTypeUI,
 } from '@/types';
 
 import { getCachedData, setCachedData } from '@/hooks/cache';
 import Colors from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
-// import DropDownMenu from '../general/DropDownMenu';
 import SearchBar from '../general/SearchBar';
-import { getTrickTitle } from '@/utils/globalFuncs';
+import { useAuth, useUser } from '@clerk/clerk-expo';
+import { FlatList } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import OrderTricksByBottomSheetModal from './OrderTricksByBottomSheetModal';
+import FilterTricksByBottomSheetModal from './FilterTricksByBottomSheetModal';
+import filterTrickList, {
+	filterTrickListByParameters,
+	orderTrickList,
+} from '@/hooks/filterTrickList';
+import stringSimilarity from 'string-similarity';
 
 interface TricksProps {}
 
@@ -42,18 +53,37 @@ const CACHE_KEY = 'commonTricks';
 
 const Tricks: React.FC<TricksProps> = ({}) => {
 	const theme = useSystemTheme();
+	const { user } = useUser();
+	const { getToken } = useAuth();
 
 	const [commonTricks, setCommonTricks] = useState<Trick[] | undefined>();
+	const [modifiedTrickList, setModifiedTrickList] = useState<
+		Trick[] | undefined
+	>();
 
 	const [commonTricksLoaded, setCommonTricksLoaded] = useState(false);
 	const [errWhileLoadingCommonTricks, setErrWhileLoadingCommonTricks] =
 		useState<Falsy | Error>(false);
 
-	const fetchCommonTricks = async () => {
+	const [selectedCategory, setSelectedCategory] =
+		useState<TrickListGeneralFilterParameterEnum>(
+			TrickListGeneralFilterParameterEnum.ALL,
+		);
+	const [orderType, setOrderType] = useState<TrickListOrderTypes>(
+		TrickListOrderTypes.DEFAULT,
+	);
+	const [filterOption, setFilterOption] =
+		useState<TrickListFilterOptions>('ALL');
+
+	const fetchCommonTricks = async (
+		selectedCategory: TrickListGeneralFilterParameterEnum,
+	) => {
 		setCommonTricksLoaded(false);
 		setErrWhileLoadingCommonTricks(null);
 
-		const cached = await getCachedData<Trick[]>(CACHE_KEY);
+		const cached = await getCachedData<Trick[]>(
+			`commonTricks_category:${selectedCategory}_filter:${filterOption}_order:${orderType}`,
+		);
 
 		if (cached) {
 			setCommonTricks(cached);
@@ -62,14 +92,23 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 			return;
 		}
 
+		const token = await getToken();
+
 		console.log('fetch common tricks');
 
-		fetch(fetchAdresses.allTricks, {
-			headers: { 'Cache-Control': 'no-cache' },
-		})
+		fetch(
+			`http://192.168.0.136:4000/api/tricks/all/${user?.id}/${selectedCategory}`,
+			{
+				headers: {
+					'Cache-Control': 'no-cache',
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		)
 			.then((res) => res.json())
 			.then(async (res) => {
 				setCommonTricks(res);
+				setModifiedTrickList(res);
 				await setCachedData(CACHE_KEY, res);
 			})
 			.catch((err) => setErrWhileLoadingCommonTricks(err))
@@ -77,7 +116,7 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 	};
 
 	useEffect(() => {
-		fetchCommonTricks();
+		fetchCommonTricks(selectedCategory);
 	}, []);
 
 	useEffect(() => {
@@ -101,7 +140,22 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 					}}
 				/>
 			) : (
-				<TrickList commonTricks={commonTricks!} />
+				<TrickList
+					setTrickList={setCommonTricks}
+					theme={theme}
+					setSelectedCategory={setSelectedCategory}
+					selectedCategory={selectedCategory}
+					error={errWhileLoadingCommonTricks}
+					commonTricks={commonTricks!}
+					fetchCommonTricks={fetchCommonTricks}
+					orderType={orderType}
+					setOrderType={setOrderType}
+					filterOption={filterOption}
+					setFilterOption={setFilterOption}
+					trickList={commonTricks}
+					modifiedTrickList={modifiedTrickList}
+					setModifiedTrickList={setModifiedTrickList}
+				/>
 			)}
 		</View>
 	);
@@ -109,7 +163,39 @@ const Tricks: React.FC<TricksProps> = ({}) => {
 
 const TrickList: React.FC<{
 	commonTricks: Trick[] | undefined | [];
-}> = ({ commonTricks }) => {
+	error: Error | Falsy;
+	setSelectedCategory: Dispatch<
+		SetStateAction<TrickListGeneralFilterParameterEnum>
+	>;
+	selectedCategory: TrickListGeneralFilterParameterEnum;
+	fetchCommonTricks: (category: TrickListGeneralFilterParameterEnum) => void;
+	orderType: TrickListOrderTypes;
+	setOrderType: Dispatch<SetStateAction<TrickListOrderTypes>>;
+	filterOption: TrickListFilterOptions;
+	setFilterOption: Dispatch<SetStateAction<TrickListFilterOptions>>;
+	theme: 'light' | 'dark';
+	trickList: Trick[] | undefined;
+	setTrickList: Dispatch<SetStateAction<Trick[] | undefined>>;
+	setModifiedTrickList: Dispatch<SetStateAction<Trick[] | undefined>>;
+	modifiedTrickList: Trick[] | undefined;
+}> = ({
+	commonTricks,
+	error,
+	setSelectedCategory,
+	selectedCategory,
+	fetchCommonTricks,
+	orderType,
+	setOrderType,
+	setFilterOption,
+	filterOption,
+	theme,
+	trickList,
+	setTrickList,
+	setModifiedTrickList,
+	modifiedTrickList,
+}) => {
+	const { bottom } = useSafeAreaInsets();
+
 	const [searchQuery, setSearchQuery] = useState<string>('');
 
 	const handleTrickPress = (selectedTrickData: selectedTrickInterface) => {
@@ -126,157 +212,299 @@ const TrickList: React.FC<{
 	};
 
 	return (
-		<ScrollView
-			scrollEnabled={true}
-			showsVerticalScrollIndicator={false}
-			contentInsetAdjustmentBehavior="automatic"
-			contentContainerStyle={{
-				justifyContent: 'center',
-				alignItems: 'center',
-				width: Dimensions.get('window').width,
-			}}>
-			<TrickListHeader text={searchQuery} setText={setSearchQuery} />
-			<FlatList
-				scrollEnabled={false}
-				data={commonTricks}
-				keyExtractor={(item) => item.Name}
-				renderItem={({ item }: { item: Trick }) => (
-					<TrickRow
-						name={item.Name}
-						points={100}
-						difficulty={TrickDifficulty.POTENTIAL_WORLDS_FIRST}
-						landed={'landed'}
-						onPress={() =>
-							handleTrickPress({
-								Id: item.Name,
-								Name: item.Name,
-								DefaultPoints: item.DefaultPoints,
-								Difficulty: TrickDifficulty.NOVICE,
-								Type: item.Type as TrickType,
-							})
-						}
+		<View>
+			{!error ? (
+				<View>
+					<TrickListHeader
+						setTrickList={setTrickList}
+						filterOption={filterOption}
+						orderType={orderType}
+						setFilterOption={setFilterOption}
+						setOrderType={setOrderType}
+						fetchCommonTricks={fetchCommonTricks}
+						setSelectedCategory={setSelectedCategory}
+						selectedCategory={selectedCategory}
+						text={searchQuery}
+						setText={setSearchQuery}
+						trickList={trickList}
+						setModifiedTrickList={setModifiedTrickList}
+						modifiedTrickList={modifiedTrickList}
 					/>
-				)}
-				contentContainerStyle={{ height: 'auto', paddingBottom: 270 }}
-			/>
-		</ScrollView>
+					<FlatList
+						ListHeaderComponent={
+							<View
+								style={{
+									marginHorizontal: 12,
+									marginVertical: 2,
+									marginBottom: 8,
+									flexDirection: 'column',
+									gap: 12,
+								}}>
+								<View style={{ flexDirection: 'row', gap: 8 }}>
+									<ThemedText
+										style={{ color: Colors[theme].gray }}
+										theme={theme}
+										value={`Order: ${orderType}`}
+									/>
+									<ThemedText
+										style={{ color: Colors[theme].gray }}
+										theme={theme}
+										value={`Filter: ${TrickTypeUI[filterOption]}`}
+									/>
+								</View>
+								<ThemedText
+									style={{ color: Colors[theme].gray }}
+									theme={theme}
+									value={`${
+										(searchQuery.length <= 0
+											? modifiedTrickList
+											: modifiedTrickList?.filter((trick) => {
+													if (
+														stringSimilarity.compareTwoStrings(
+															trick.Name.toLowerCase(),
+															searchQuery.toLowerCase(),
+														) > 0.7 ||
+														stringSimilarity.compareTwoStrings(
+															trick.SecondName?.toLowerCase() ?? '',
+															searchQuery.toLowerCase(),
+														) > 0.7
+													) {
+														return trick;
+													}
+											  })
+										)?.length
+									} Tricks`}
+								/>
+							</View>
+						}
+						initialNumToRender={5}
+						maxToRenderPerBatch={5}
+						windowSize={10}
+						data={
+							searchQuery.length <= 0
+								? modifiedTrickList
+								: modifiedTrickList?.filter((trick) => {
+										if (
+											stringSimilarity.compareTwoStrings(
+												trick.Name.toLowerCase(),
+												searchQuery.toLowerCase(),
+											) > 0.5 ||
+											stringSimilarity.compareTwoStrings(
+												trick.SecondName?.toLowerCase() ?? '',
+												searchQuery.toLowerCase(),
+											) > 0.5
+										) {
+											return trick;
+										}
+								  })
+						}
+						keyExtractor={(item) => item.Name + Math.random()}
+						renderItem={({ item }: { item: Trick }) => (
+							<TrickRow
+								name={item.Name}
+								points={100}
+								difficulty={item.Difficulty || TrickDifficulty.BEGINNER}
+								landed={
+									typeof item.UserId === 'string' ? 'landed' : 'not landed'
+								}
+								onPress={() =>
+									handleTrickPress({
+										Id: item.Name,
+										Name: item.Name,
+										DefaultPoints: item.DefaultPoints,
+										Difficulty: item.Difficulty || TrickDifficulty.BEGINNER,
+										Type: item.Type as TrickType,
+									})
+								}
+							/>
+						)}
+						contentContainerStyle={{ paddingBottom: 95 + bottom + 150 }}
+					/>
+				</View>
+			) : (
+				<View></View>
+			)}
+		</View>
 	);
 };
 
 const TrickListHeader: React.FC<{
 	text: string;
 	setText: (text: string) => void;
-}> = ({ text, setText }) => {
+	setSelectedCategory: Dispatch<
+		SetStateAction<TrickListGeneralFilterParameterEnum>
+	>;
+	selectedCategory: TrickListGeneralFilterParameterEnum;
+	fetchCommonTricks: (category: TrickListGeneralFilterParameterEnum) => void;
+	orderType: TrickListOrderTypes;
+	setOrderType: Dispatch<SetStateAction<TrickListOrderTypes>>;
+	filterOption: TrickListFilterOptions;
+	trickList: Trick[] | undefined;
+	setTrickList: Dispatch<SetStateAction<Trick[] | undefined>>;
+	setFilterOption: Dispatch<SetStateAction<TrickListFilterOptions>>;
+	setModifiedTrickList: Dispatch<SetStateAction<Trick[] | undefined>>;
+	modifiedTrickList: Trick[] | undefined;
+}> = ({
+	text,
+	setText,
+	setSelectedCategory,
+	selectedCategory,
+	fetchCommonTricks,
+	orderType,
+	setOrderType,
+	setFilterOption,
+	filterOption,
+	trickList,
+	setTrickList,
+	modifiedTrickList,
+	setModifiedTrickList,
+}) => {
 	const theme = useSystemTheme();
 
-	const OrderOptions = [
-		{
-			key: 0,
-			text: TrickListOrderTypes.DIFFICULTY,
-		},
-		{
-			key: 1,
-			text: TrickListOrderTypes.LANDEDFIRST,
-		},
-		{
-			key: 2,
-			text: TrickListOrderTypes.LANDEDLAST,
-		},
-	];
+	const handleOrderBtnEvent = (order: TrickListOrderTypes) => {
+		setOrderType(order);
 
-	const [FilterOptions, setFilterOptions] = useState<dropDownMenuInputData[]>(
-		[],
-	);
+		const newList = orderTrickList(trickList, order);
+		const modifiedList = filterTrickList(newList, filterOption);
+		const filteredList = filterTrickListByParameters(
+			modifiedList,
+			selectedCategory,
+		);
 
-	const [selectedCategory, setSelectedCategory] =
-		useState<TrickListGeneralSpotCategory>(TrickListGeneralSpotCategory.ALL);
+		setModifiedTrickList(filteredList);
 
-	useEffect(() => {
-		const options = Object.values(TrickListFilterOptions).map((val, key) => ({
-			key,
-			text: val,
-		}));
-		setFilterOptions(options);
+		handleCloseOrderModalPress();
+	};
+
+	const handleFilterBtnEvent = (filter: TrickListFilterOptions) => {
+		setFilterOption(filter);
+
+		const newList = filterTrickList(trickList, filter);
+		const modifiedList = orderTrickList(newList, orderType);
+		const filteredList = filterTrickListByParameters(
+			modifiedList,
+			selectedCategory,
+		);
+
+		setModifiedTrickList(filteredList);
+
+		handleCloseFilterModalPress();
+	};
+
+	const handleOnSpotBtnPress = (
+		parameter: TrickListGeneralFilterParameterEnum,
+	) => {
+		setSelectedCategory(parameter);
+		const newList = filterTrickListByParameters(trickList, parameter);
+		const orderedList = orderTrickList(newList, orderType);
+		const modifiedList = filterTrickList(orderedList, filterOption);
+
+		setModifiedTrickList(modifiedList);
+	};
+
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
+	const bottomSheetFilterOptionsRef = useRef<BottomSheetModal>(null);
+
+	const handlePresentOrderModalPress = useCallback(() => {
+		bottomSheetRef.current?.present();
 	}, []);
 
-	const handleFilterBtnEvent = (key: number) => {};
+	const handleCloseOrderModalPress = useCallback(() => {
+		bottomSheetRef.current?.close();
+	}, []);
+
+	const handlePresentFilterModalPress = useCallback(() => {
+		bottomSheetFilterOptionsRef.current?.present();
+	}, []);
+
+	const handleCloseFilterModalPress = useCallback(() => {
+		bottomSheetFilterOptionsRef.current?.close();
+	}, []);
 
 	return (
-		<View
-			style={{
-				width: '100%',
-				flex: 1,
-				justifyContent: 'center',
-				alignItems: 'center',
-				flexDirection: 'column',
-				marginBottom: 10,
-			}}>
-			<SearchBar
-				placeholder={'Search for a trick'}
-				query={text}
-				setQuery={setText}
+		<View style={{ flex: 0 }}>
+			<OrderTricksByBottomSheetModal
+				handleOrderBtnEvent={handleOrderBtnEvent}
+				theme={theme}
+				ref={bottomSheetRef}
+			/>
+			<FilterTricksByBottomSheetModal
+				ref={bottomSheetFilterOptionsRef}
+				theme={theme}
+				handleFilterBtnEvent={handleFilterBtnEvent}
 			/>
 
 			<View
-				style={[
-					styles.HeaderBottomWrapper,
-					{ borderBottomColor: Colors[theme].textPrimary },
-				]}>
-				<View style={styles.headerContainerWrapper}>
-					{/* <DropDownMenu
-						items={OrderOptions}
-						onSelect={handleFilterBtnEvent}
-						triggerComponent={
-							<TouchableOpacity>
-								<View style={{ flexDirection: 'row' }}>
-									<ThemedText theme={theme} value={'Order'} />
-									<Ionicons
-										name="chevron-expand"
-										color={Colors[theme].textPrimary}
-										size={16}
-									/>
-								</View>
-							</TouchableOpacity>
-						}
-					/> */}
+				style={{
+					width: '100%',
+					height: 85,
+					justifyContent: 'center',
+					alignItems: 'center',
+					flexDirection: 'column',
+					marginBottom: 10,
+					gap: 12,
+				}}>
+				<SearchBar
+					displayLeftSearchIcon
+					placeholder={'Search for a trick'}
+					query={text}
+					setQuery={setText}
+				/>
 
-					{/* <DropDownMenu
-						items={FilterOptions}
-						onSelect={handleFilterBtnEvent}
-						triggerComponent={
-							<TouchableOpacity>
-								<View style={{ flexDirection: 'row' }}>
-									<ThemedText theme={theme} value={'Filter'} />
-									<Ionicons
-										name="chevron-expand"
-										color={Colors[theme].textPrimary}
-										size={16}
-									/>
-								</View>
-							</TouchableOpacity>
-						}
-					/> */}
-				</View>
-
-				<View style={styles.headerContainerWrapper}>
-					{Object.values(TrickListGeneralSpotCategory).map((val, key) => (
-						<TouchableOpacity
-							key={key}
-							onPress={() => setSelectedCategory(val)}>
-							<View style={{ flexDirection: 'row' }}>
-								<ThemedText
-									theme={theme}
-									value={val}
-									style={{
-										color:
-											selectedCategory === val
-												? Colors[theme].primary
-												: Colors[theme].textPrimary,
-									}}
+				<View
+					style={[
+						styles.HeaderBottomWrapper,
+						{ borderBottomColor: Colors[theme].textPrimary },
+					]}>
+					{/* buttons triggering modal */}
+					<View style={styles.headerContainerWrapper}>
+						<TouchableOpacity onPress={handlePresentOrderModalPress}>
+							<View style={styles.optionsButtonWrapper}>
+								<ThemedText theme={theme} value={'Order'} />
+								<Ionicons
+									name="chevron-expand"
+									color={Colors[theme].textPrimary}
+									size={16}
 								/>
 							</View>
 						</TouchableOpacity>
-					))}
+
+						<TouchableOpacity onPress={handlePresentFilterModalPress}>
+							<View style={styles.optionsButtonWrapper}>
+								<ThemedText theme={theme} value={'Filter'} />
+								<Ionicons
+									name="chevron-expand"
+									color={Colors[theme].textPrimary}
+									size={16}
+								/>
+							</View>
+						</TouchableOpacity>
+					</View>
+
+					{/* spot category buttons */}
+					<View style={styles.headerContainerWrapper}>
+						{Object.values(TrickListGeneralFilterParameterEnum).map(
+							(val, key) => (
+								<TouchableOpacity
+									key={key}
+									onPress={() => handleOnSpotBtnPress(val)}>
+									<View style={{ flexDirection: 'row' }}>
+										<ThemedText
+											theme={theme}
+											value={val}
+											style={{
+												color:
+													selectedCategory === val
+														? Colors[theme].primary
+														: Colors[theme].textPrimary,
+											}}
+										/>
+									</View>
+								</TouchableOpacity>
+							),
+						)}
+					</View>
+					{/*  */}
 				</View>
 			</View>
 		</View>
@@ -305,6 +533,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		gap: 8,
 	},
+	optionsButtonWrapper: { flexDirection: 'row', alignItems: 'center', gap: 2 },
 });
 
 export default Tricks;

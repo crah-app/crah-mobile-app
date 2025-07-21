@@ -353,7 +353,7 @@ const Page = () => {
 
 		let filteredChats = fetchedChats;
 
-		// Filter nach Typ
+		// filter by type
 		switch (messagesFilterSelected) {
 			case ChatFilterTypes.groups:
 				filteredChats = filteredChats.filter((chat) => chat.IsGroup);
@@ -363,7 +363,7 @@ const Page = () => {
 				break;
 		}
 
-		// Filter nach Suchanfrage
+		// filter by search request
 		if (searchQuery.trim().length > 0) {
 			filteredChats = filteredChats.filter((chat) => {
 				if (

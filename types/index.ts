@@ -205,12 +205,26 @@ export enum fetchAdresses {
 	readyplayermeUser = 'https://api.readyplayer.me/v1/users',
 }
 
+export type TrickGeneralSpot = 'Park' | 'Street' | 'Flat';
+
 export interface Trick {
 	Name: string;
 	DefaultPoints: number;
 	Costum: boolean;
 	Type: string;
 	SecondName: string;
+	Difficulty: TrickDifficulty;
+	GeneralSpots?: {
+		SpotId: number;
+		Spot: TrickGeneralSpot;
+		Points: number;
+		Date: null | Date;
+		Difficulty: TrickDifficulty;
+	}[];
+	GeneralType?: TrickGeneralSpot;
+	TrickType?: TrickType & 'All';
+	UserId?: string;
+	UserTrickId?: number;
 }
 
 export interface UserTrick {
@@ -223,7 +237,45 @@ export interface UserTrick {
 	Date: Date | null;
 }
 
-export type TrickType = 'Overhead' | 'Rewind' | 'Whip' | 'Balance' | 'Grab';
+export enum TrickTypeUI {
+	ALL = 'All',
+	OVERHEADS = 'Overhead',
+	REWINDS = 'Rewind',
+	WHIPS = 'Whip',
+	BALANCE = 'Balance',
+	GRABS = 'Grab',
+	ROTATIONS = 'Rotation',
+	TWISTS = 'Twist',
+	BODYFLIPS = 'BodyFlip',
+	STALLS = 'Stall',
+}
+
+/*
+	What kind of tricks should be displayed in a trick list
+ */
+export type TrickListFilterOptions = keyof typeof TrickTypeUI;
+
+export type TrickTypeUIText =
+	| 'Overheads'
+	| 'Rewinds'
+	| 'Whips'
+	| 'Balance'
+	| 'Grabs'
+	| 'Rotations'
+	| 'Twists'
+	| 'BodyFlips'
+	| 'Stalls';
+
+export type TrickType =
+	| 'Overhead'
+	| 'Rewind'
+	| 'Whip'
+	| 'Balance'
+	| 'Grab'
+	| 'Rotation'
+	| 'Twist'
+	| 'BodyFlip'
+	| 'Stall';
 
 /*
 	In case we are talking about a trick the user has selected 
@@ -618,6 +670,21 @@ export enum TrickListGeneralSpotCategory {
 	STREET = 'Street',
 }
 
+export enum TrickListGeneralFilterParameterEnum {
+	ALL = 'All',
+	FLAT = 'Flat',
+	STREET = 'Street',
+	PARK = 'Park',
+	COSTUM = 'Costum',
+}
+
+export type TrickListGeneralFilterParameter =
+	| 'All'
+	| 'Flat'
+	| 'Street'
+	| 'Park'
+	| 'Costum';
+
 export enum BestTrickType {
 	FLAT = 'Flat',
 	PARK = 'Park',
@@ -637,23 +704,10 @@ export interface SpotInterface {
 */
 
 export enum TrickListOrderTypes {
-	DIFFICULTY = 'difficulty', // hardest first
-	LANDEDFIRST = 'landed first', // tricks the user has landed first
-	LANDEDLAST = 'landed last', // tricks the user has not landed first
-}
-
-/*
-	What kind of tricks should be displayed in a trick list
- */
-
-export enum TrickListFilterOptions {
-	ALL = 'all',
-	SCOOTERFLIPS = 'scooter flips',
-	STALLS = 'stalls',
-	REWINDS = 'rewinds',
-	BODYFLIPS = 'body flips',
-	TWISTS = 'twists',
-	BALANCE = 'balance',
+	DEFAULT = 'Default', // normal order
+	DIFFICULTY = 'Difficulty', // hardest first
+	LANDED = 'Landed', // tricks current user landed
+	NOTLANDED = 'Not Landed', // tricks current user not landed
 }
 
 /*
