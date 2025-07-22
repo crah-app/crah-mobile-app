@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Share } from 'react-native';
+import { View, StyleSheet, Share, Dimensions } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { formatDistanceToNow } from 'date-fns';
@@ -133,14 +133,16 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	});
 
 	const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+	const reactionsModalBottomSheetRef = useRef<BottomSheetModal>(null);
 
 	const handlePresentModalPress = useCallback(() => {
 		bottomSheetModalRef.current?.present();
 		bottomSheetModalRef?.current?.snapToIndex(1);
 	}, []);
 
-	const handlCloseModalPress = useCallback(() => {
-		bottomSheetModalRef.current?.close();
+	const handlePresentReactionsModalPress = useCallback(() => {
+		reactionsModalBottomSheetRef.current?.present();
+		// reactionsModalBottomSheetRef?.current?.snapToIndex(1);
 	}, []);
 
 	// render post
@@ -148,7 +150,9 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 		<View
 			style={[
 				styles.postContainer,
-				{ backgroundColor: Colors[theme].background },
+				{
+					backgroundColor: Colors[theme].background,
+				},
 			]}>
 			{/* Header */}
 			<PostHeader post={post} postTimeAgo={postTimeAgo} />
@@ -161,7 +165,7 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				post={post}
 				shareCount={shareCount}
 				reactions={reactions}
-				setShowReactions={setShowReactions}
+				setShowReactions={handlePresentReactionsModalPress}
 				handleLike={handleLike}
 				handleShare={handleShare}
 				onCommentsBtnPress={handlePresentModalPress}
@@ -169,6 +173,8 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 			/>
 			{/* Reactions Modal */}
 			<UserPostReactionsModal
+				theme={theme}
+				ref={reactionsModalBottomSheetRef}
 				showReactions={showReactions}
 				setShowReactions={setShowReactions}
 				handleReaction={handleReaction}

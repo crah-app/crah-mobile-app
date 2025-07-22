@@ -20,8 +20,10 @@ interface SearchBarProps {
 	onOptionsPress?: () => void;
 	flex?: number;
 	containerStyle?: ViewStyle;
+	textInputStyle?: ViewStyle;
 	displayLeftSearchIcon?: boolean;
 	displayCloseRequestBtn?: boolean;
+	onFocus?: () => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -32,8 +34,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	onOptionsPress,
 	flex,
 	containerStyle,
+	textInputStyle,
 	displayLeftSearchIcon = false,
 	displayCloseRequestBtn = true,
+	onFocus,
 }) => {
 	const theme = useSystemTheme();
 
@@ -42,8 +46,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
 			theme={theme}
 			flex={flex ?? 1}
 			style={[
-				// @ts-ignore
-				containerStyle,
 				{
 					flexDirection: 'row',
 					backgroundColor: Colors[theme].container_surface,
@@ -57,6 +59,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 					maxHeight: 42,
 					minHeight: 42,
 				},
+				// @ts-ignore
+				containerStyle,
 			]}>
 			{displayLeftSearchIcon && (
 				<Ionicons name={'search'} size={22} color={Colors[theme].gray} />
@@ -71,6 +75,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 						cursor: Colors[theme].textPrimary,
 						fontSize: 18,
 					},
+					// @ts-ignore
+					textInputStyle,
 				]}
 				placeholderTextColor={'gray'}
 				placeholder={placeholder}
@@ -79,6 +85,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				clearButtonMode="always"
 				cursorColor={Colors[theme].primary}
 				maxLength={TextInputMaxCharacters.UserName}
+				onFocus={onFocus}
 			/>
 
 			{displayOptionsBtn && (
