@@ -1,14 +1,14 @@
-import { Rank, SearchCategories, upload_source_ratio } from '@/types';
+import { Rank, RawPost, SearchCategories, upload_source_ratio } from '@/types';
 import { Dimensions } from 'react-native';
 
 export const filterPosts = (
-	posts: any[],
+	posts: RawPost[],
 	type: SearchCategories | string,
 ): any[] => {
 	if (type === SearchCategories.allPosts) {
 		return posts;
 	}
-	return posts.filter((post) => post.type === type);
+	return posts.filter((post) => post.Type === type);
 };
 
 export function getTrickTitle(fetchedTrick?: {

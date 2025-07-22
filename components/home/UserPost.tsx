@@ -36,7 +36,9 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	const [showReactions, setShowReactions] = useState(false);
 	const [reactions, setReactions] = useState<ReactionType[]>([]);
 	const [likesCount, setLikesCount] = useState(post.likes || 0);
-	const [commentsCount, setCommentsCount] = useState(post.comments.length || 0);
+	const [commentsCount, setCommentsCount] = useState(
+		post.totalComments ?? post.comments.length ?? 0,
+	);
 	const [shareCount, setshareCount] = useState(post.shares || 0);
 	const [currentUserLiked, setCurrentUserLiked] = useState<boolean>(post.liked);
 

@@ -1,6 +1,6 @@
 import ClerkUser from '@/types/clerk';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	FlatList,
 	ScrollView,
@@ -12,11 +12,15 @@ import ThemedView from '../general/ThemedView';
 import Row from '../general/Row';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
 import Colors from '@/constants/Colors';
-import { fetchAdresses, selectedRiderInterface } from '@/types';
+import {
+	CrahUser,
+	fetchAdresses,
+	RankColors,
+	selectedRiderInterface,
+} from '@/types';
 import ThemedText from '../general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
 import { router } from 'expo-router';
-import UserProfile from '@/app/(auth)/sharedPages/userProfile';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useUser } from '@clerk/clerk-expo';
 import NoDataPlaceholder from '../general/NoDataPlaceholder';
@@ -46,7 +50,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	const { user } = useUser();
 
 	const [usersLoaded, setUsersLoaded] = useState<boolean>(false);
-	const [allUsers, setAllUsers] = useState<ClerkUser[]>();
+	const [allUsers, setAllUsers] = useState<CrahUser[]>();
 	const [noUsersFound, setNoUsersFound] = useState<boolean>(false);
 
 	// fetch all users
@@ -60,7 +64,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 			.then((res) => res.json())
 			.then((res) => {
 				if (excludeIds) {
-					res = res.filter((user: ClerkUser) => !excludeIds.includes(user.id));
+					res = res.filter((user: CrahUser) => !excludeIds.includes(user.id));
 				}
 				if (res.length === 0) {
 					console.warn('No users found');
@@ -70,7 +74,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 					return;
 				}
 				setAllUsers(res);
-				// console.log(res);
+				console.log(res);
 			})
 			.catch((err) =>
 				console.warn('An error loading all users occurred: ', err),
@@ -98,7 +102,11 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 
 		router.push({
 			pathname: '/(auth)/sharedPages/userProfile',
-			params: { userId: selectedUserData._id, self: 'false' },
+			params: {
+				userId: selectedUserData._id,
+				self: selectedUserData._id !== user?.id ? 'false' : 'true',
+				linking: 'true',
+			},
 		});
 	};
 
@@ -119,7 +127,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 					<CrahActivityIndicator color={Colors[theme].primary} size={24} />
 				</View>
 			) : (
-				<View style={{ flex: 0 }}>
+				<View style={{ flex: 0, gap: 12 }}>
 					{bottomSheet ? (
 						<BottomSheetScrollView
 							contentContainerStyle={{
@@ -156,19 +164,17 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 												containerStyle={[rowStyle]}
 												onPress={() =>
 													handleUserPress({
-														name: user.username ?? undefined,
-														_id: user.id,
-														avatar: user.imageUrl,
-														// @ts-ignore
-														rank: user.rank ?? 'Diamond',
-														// @ts-ignore
-														rankPosition: user.rankPosition ?? 3,
+														name: user.Name,
+														_id: user.Id,
+														avatar: user.avatar,
+														rank: user.rank,
+														rankPosition: user.rankPoints,
 													})
 												}
 												showAvatar={true}
-												avatarUrl={user.imageUrl}
-												title={user.username ?? 'no name user'}
-												subtitle={'Rank Gold #1'}
+												avatarUrl={user.avatar}
+												title={user.Name ?? 'no name user'}
+												subtitle={''}
 											/>
 										) : (
 											<CostumRow />
@@ -186,7 +192,10 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 								<ThemedText
 									theme={theme}
 									value={contentTitle ?? 'Riders'}
-									style={[defaultStyles.biggerText, { paddingHorizontal: 12 }]}
+									style={[
+										defaultStyles.biggerText,
+										{ paddingHorizontal: 12, marginBottom: 12 },
+									]}
 								/>
 							) : (
 								<View></View>
@@ -210,23 +219,23 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 												containerStyle={[rowStyle]}
 												onPress={() =>
 													handleUserPress({
-														name: FetchedUser.username ?? undefined,
-														_id: FetchedUser.id,
-														avatar: FetchedUser.imageUrl,
-														// @ts-ignore
-														rank: FetchedUser.rank ?? 'Diamond',
-														// @ts-ignore
-														rankPosition: FetchedUser.rankPosition ?? 3,
+														name: FetchedUser.Name,
+														_id: FetchedUser.Id,
+														avatar: FetchedUser.avatar,
+														rank: FetchedUser.rank,
+														rankPosition: FetchedUser.rankPoints,
 													})
 												}
 												showAvatar={true}
-												avatarUrl={FetchedUser.imageUrl}
+												avatarUrl={FetchedUser.avatar}
 												title={
-													(FetchedUser.username === user?.username
+													(FetchedUser.Name === user?.username
 														? 'You'
-														: FetchedUser.username) ?? 'no name user'
+														: FetchedUser.Name) ?? 'no name user'
 												}
-												subtitle={'Rank Silver #51' + ' ' + FetchedUser.id}
+												subtitle={`Rank ${FetchedUser.rank}`}
+												highlightWords={[FetchedUser.rank]}
+												highlightColor={RankColors[FetchedUser.rank][0]}
 											/>
 										) : (
 											<CostumRow user={FetchedUser} />

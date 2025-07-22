@@ -33,6 +33,7 @@ interface RowProps {
 	bottomContainer?: React.ReactNode;
 	textContainerStyle?: ViewStyle | ViewStyle[];
 	highlightWords?: Array<string>;
+	highlightColor?: string;
 	costumAvatarWidth?: number;
 	costumAvatarHeight?: number;
 	avatarStyle?: ImageStyle | ImageStyle[];
@@ -58,6 +59,7 @@ const Row: React.FC<RowProps> = ({
 	bottomContainer,
 	textContainerStyle,
 	highlightWords,
+	highlightColor = Colors.default.primary,
 	costumAvatarWidth,
 	costumAvatarHeight,
 	avatarStyle,
@@ -82,9 +84,7 @@ const Row: React.FC<RowProps> = ({
 
 		return parts.map((part, index) =>
 			words.some((word) => word.toLowerCase() === part.toLowerCase()) ? (
-				<Text
-					key={index}
-					style={{ color: Colors[theme].primary, fontWeight: 'bold' }}>
+				<Text key={index} style={{ color: highlightColor, fontWeight: 'bold' }}>
 					{part}
 				</Text>
 			) : (

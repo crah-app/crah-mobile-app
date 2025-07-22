@@ -92,7 +92,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				<TouchableOpacity onPress={onOptionsPress}>
 					<Ionicons
 						name="options-outline"
-						size={18}
+						size={20}
 						color={Colors[theme].gray}
 					/>
 				</TouchableOpacity>
@@ -103,7 +103,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 					onPress={() => {
 						setQuery('');
 					}}>
-					<Ionicons name="close-outline" size={18} color={Colors[theme].gray} />
+					<Ionicons name="close-outline" size={20} color={Colors[theme].gray} />
 				</TouchableOpacity>
 			)}
 		</ThemedView>

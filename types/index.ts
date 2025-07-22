@@ -46,6 +46,7 @@ export type RawPost = {
 	CreatedAt: string; // ISO-Date as string
 	UpdatedAt: string; // ISO-Date as string
 	comments: Array<RawComment | null>;
+	totalComments: number;
 
 	SourceKey: string; // SourceKey for cloud access
 	CoverSourceKey: string; // Cover SourceKey for cloud access
@@ -69,6 +70,7 @@ export type RiderType = 'Park Rider' | 'Street Rider' | 'Flat Rider' | null;
 
 // simple user interface
 export interface CrahUser extends ClerkUser {
+	Id: string;
 	Name: string;
 	level: number;
 	rank: Rank;
@@ -811,3 +813,5 @@ export const LanguageISO: Record<Language, string> = {
 	Polish: 'PL',
 	Spanish: 'ES',
 };
+
+export const PAGE_SIZE = 50;
