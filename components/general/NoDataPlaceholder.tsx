@@ -26,7 +26,7 @@ interface NoDataPlaceholderProps {
 }
 
 const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
-	arrowStyle,
+	arrowStyle = { display: 'none' },
 	containerStyle,
 	firstTextValue,
 	subTextValue,

@@ -565,7 +565,6 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 		bottomSheetRef.current?.present();
 
 		setTagsLeft((prev) => prev.filter((tag) => !tags?.includes(tag)));
-		console.log('tagsLeft: ', tagsLeft);
 	}, [scrollViewRef, tagsLeft, tags]);
 
 	const handlCloseModalPress = useCallback(() => {
@@ -589,6 +588,7 @@ const CreateVideoTextInputs: React.FC<CreateVideoTextInputsProps> = ({
 	return (
 		<View>
 			<BottomSheetModal
+				index={1}
 				backdropComponent={renderBackdrop}
 				snapPoints={snapPoints}
 				handleIndicatorStyle={{ backgroundColor: 'gray' }}

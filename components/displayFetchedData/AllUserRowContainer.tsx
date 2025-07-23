@@ -19,7 +19,7 @@ import {
 	selectedRiderInterface,
 } from '@/types';
 import ThemedText from '../general/ThemedText';
-import { defaultStyles } from '@/constants/Styles';
+import { defaultHeaderBtnSize, defaultStyles } from '@/constants/Styles';
 import { router } from 'expo-router';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useUser } from '@clerk/clerk-expo';
@@ -35,6 +35,13 @@ interface AllUserRowContainerProps {
 		user: selectedRiderInterface,
 	) => void | Promise<void>;
 	CostumRow?: React.ComponentType<any>;
+	users?: CrahUser[] | null;
+	listEmpyComponentStyle?: ViewStyle | ViewStyle[];
+	provideExternUserDataArray?: boolean;
+	limitOffsetScroll?: boolean;
+	loadMore?: () => void;
+	loadingMore?: boolean;
+	retryFunction?: () => void;
 }
 
 const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
@@ -45,6 +52,13 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	excludeIds,
 	costumHandleUserPress,
 	CostumRow,
+	users = [],
+	listEmpyComponentStyle,
+	provideExternUserDataArray = false,
+	limitOffsetScroll = false,
+	loadMore = () => {},
+	loadingMore = false,
+	retryFunction,
 }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
@@ -83,12 +97,13 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	};
 
 	useEffect(() => {
-		console.log(usersLoaded);
-	}, [usersLoaded]);
-
-	useEffect(() => {
-		fetchUsers();
-	}, []);
+		if (users) {
+			setAllUsers(users);
+			setUsersLoaded(true);
+			return;
+		}
+		!provideExternUserDataArray && fetchUsers();
+	}, [users]);
 
 	useEffect(() => {
 		if (!usersLoaded || !allUsers) return;
@@ -124,15 +139,15 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 						alignItems: 'center',
 						top: 100,
 					}}>
-					<CrahActivityIndicator color={Colors[theme].primary} size={24} />
+					<CrahActivityIndicator
+						color={Colors[theme].primary}
+						size={defaultHeaderBtnSize}
+					/>
 				</View>
 			) : (
 				<View style={{ flex: 0, gap: 12 }}>
 					{bottomSheet ? (
-						<BottomSheetScrollView
-							contentContainerStyle={{
-								flex: 1,
-							}}>
+						<View>
 							{contentTitle && allUsers.length > 0 && !noUsersFound ? (
 								<ThemedText
 									theme={theme}
@@ -150,6 +165,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 										arrowStyle={{ display: 'none' }}
 										subTextValue=""
 										firstTextValue="No users found"
+										retryFunction={retryFunction}
 									/>
 								)}
 								scrollEnabled={false}
@@ -177,17 +193,19 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 												subtitle={''}
 											/>
 										) : (
-											<CostumRow />
+											<CostumRow user={user} />
 										)}
 									</View>
 								)}
+								onEndReached={() => {
+									if (loadingMore || !limitOffsetScroll) return;
+									loadMore();
+								}}
+								onEndReachedThreshold={limitOffsetScroll ? 0.5 : 0}
 							/>
-						</BottomSheetScrollView>
+						</View>
 					) : (
-						<ScrollView
-							contentContainerStyle={{
-								flex: 0,
-							}}>
+						<View>
 							{contentTitle && allUsers.length > 0 && !noUsersFound ? (
 								<ThemedText
 									theme={theme}
@@ -202,7 +220,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 							)}
 
 							<FlatList
-								scrollEnabled={false}
+								scrollEnabled={true}
 								contentContainerStyle={{
 									flex: 0,
 									justifyContent: 'center',
@@ -244,14 +262,24 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 								)}
 								ListEmptyComponent={() => (
 									<NoDataPlaceholder
-										containerStyle={{ marginBottom: 100 }}
+										containerStyle={[
+											{ marginBottom: 100 },
+											// @ts-ignore
+											listEmpyComponentStyle,
+										]}
 										arrowStyle={{ display: 'none' }}
 										subTextValue=""
 										firstTextValue="No users found"
+										retryFunction={retryFunction}
 									/>
 								)}
+								onEndReached={() => {
+									if (loadingMore || !limitOffsetScroll) return;
+									loadMore();
+								}}
+								onEndReachedThreshold={limitOffsetScroll ? 0.5 : 0}
 							/>
-						</ScrollView>
+						</View>
 					)}
 				</View>
 			)}

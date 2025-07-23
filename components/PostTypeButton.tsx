@@ -21,6 +21,8 @@ interface PostTypeButtonProps {
 	isIcon?: boolean;
 	icon?: ionicon;
 	revert?: boolean;
+	splitBackground?: boolean;
+	splitBackgroundColors?: string[];
 }
 
 const PostTypeButton: React.FC<PostTypeButtonProps> = ({
@@ -31,22 +33,46 @@ const PostTypeButton: React.FC<PostTypeButtonProps> = ({
 	isIcon = false,
 	icon,
 	revert = false,
+	splitBackground = false,
+	splitBackgroundColors = [],
 }) => {
 	const theme = useSystemTheme();
 
 	return (
 		<TouchableOpacity
 			style={[
-				styles.FilterButton,
 				{
 					backgroundColor: revert ? 'rgb(105, 0, 0)' : Colors[theme].primary,
 					borderBottomColor: revert
 						? Colors[theme].bgPrimary
 						: 'rgb(105, 0, 0)',
 				},
+				styles.FilterButton,
 				style,
 			]}
 			onPress={click_action}>
+			{splitBackground && (
+				<View style={StyleSheet.absoluteFill}>
+					<View style={{ flex: 1, flexDirection: 'row' }}>
+						{splitBackgroundColors.map((backgroundColor, i) => (
+							<View
+								style={{
+									flex: 1,
+									backgroundColor,
+									borderTopLeftRadius: i === 0 ? 10 : 0,
+									borderTopRightRadius:
+										i === splitBackgroundColors.length - 1 ? 10 : 0,
+									borderBottomLeftRadius: i === 0 ? 7 : 0,
+									borderBottomRightRadius:
+										i === splitBackgroundColors.length - 1 ? 7 : 0,
+								}}
+								key={i}
+							/>
+						))}
+					</View>
+				</View>
+			)}
+
 			{isIcon && icon ? (
 				<Ionicons
 					size={defaultHeaderBtnSize - 6}
@@ -109,8 +135,8 @@ const styles = StyleSheet.create({
 	FilterButton: {
 		borderStartStartRadius: 10,
 		borderEndStartRadius: 10,
-		borderStartEndRadius: 10,
-		borderEndEndRadius: 10,
+		borderStartEndRadius: 7,
+		borderEndEndRadius: 7,
 		paddingVertical: 10,
 		paddingHorizontal: 15,
 		alignItems: 'center',

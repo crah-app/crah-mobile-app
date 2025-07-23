@@ -1,46 +1,21 @@
-{
-	"Content": null,
-	"CreatedAt": "2025-07-18T10:36:03.000Z",
-	"Description": "Dream Trick finally landed after like 10 Months of work and 2 years of dreaming",
-	"Id": 106,
-	"PopularityScore": 62,
-	"Reactions": "1F525",
-	"SourceKey": "user_2yBTXFqJg3AopGqlFQAApA07mVE/fea85721-5c95-485f-837d-5d57719b29a1/e904c7f6-1536-4b9e-9fbe-e4275ca2c16e.mp4",
-	"Title": "My first whip whip frontscoot flat!!",
-	"Type": "Video",
-	"UpdatedAt": "2025-07-18T10:36:03.000Z",
-	"UserAvatar": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18ydjhwd0VKTWZ6c04zbDExcDNpcWJwTTl2QXIiLCJyaWQiOiJ1c2VyXzJ5QlRYRnFKZzNBb3BHcWxGUUFBcEEwN21WRSIsImluaXRpYWxzIjoiSlMifQ",
-	"UserId": "user_2yBTXFqJg3AopGqlFQAApA07mVE",
-	"UserName": "josef",
-	"comments": [
-		{
-			"CreatedAt": "2025-07-19 11:50:50.000000",
-			"Id": 15,
-			"Message": "grat mean",
-			"UpdatedAt": "2025-07-19 11:50:50.000000",
-			"UserAvatar": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18ydjhwd0VKTWZ6c04zbDExcDNpcWJwTTl2QXIiLCJyaWQiOiJ1c2VyXzJ5QlRYRnFKZzNBb3BHcWxGUUFBcEEwN21WRSIsImluaXRpYWxzIjoiSlMifQ",
-			"UserId": "user_2yBTXFqJg3AopGqlFQAApA07mVE",
-			"UserName": "josef",
-			"liked": 1,
-			"likes": 1
-		},
-		{
-			"CreatedAt": "2025-07-19 11:52:58.000000",
-			"Id": 16,
-			"Message": "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWfdasfdfasfdfsdfasdfasdfsadfasdfsfasdfsdafsadfdasfasdfasdfasdfasdgdfgdfggsdfgfdsgsdf   f  WW",
-			"UpdatedAt": "2025-07-19 11:52:58.000000",
-			"UserAvatar": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18ydjhwd0VKTWZ6c04zbDExcDNpcWJwTTl2QXIiLCJyaWQiOiJ1c2VyXzJ5QlRYRnFKZzNBb3BHcWxGUUFBcEEwN21WRSIsImluaXRpYWxzIjoiSlMifQ",
-			"UserId": "user_2yBTXFqJg3AopGqlFQAApA07mVE",
-			"UserName": "josef",
-			"liked": 1,
-			"likes": 1
-		}
-	],
-	"liked": 1,
-	"likes": 1,
-	"shares": 0,
-	"sourceHeight": 720,
-	"sourceRatio": null,
-	"sourceWidth": 720,
-	"totalComments": 30
-}
+[
+	{
+		"Id": "user_2yBTXFqJg3AopGqlFQAApA07mVE",
+		"Name": "josef",
+		"TrickDate": null,
+		"TrickDifficulty": "Legendary",
+		"TrickId": 490,
+		"TrickName": "1440",
+		"TrickPoints": 44850,
+		"TrickSpot": "Flat",
+		"avatar": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18ydjhwd0VKTWZ6c04zbDExcDNpcWJwTTl2QXIiLCJyaWQiOiJ1c2VyXzJ5QlRYRnFKZzNBb3BHcWxGUUFBcEEwN21WRSIsImluaXRpYWxzIjoiSlMifQ",
+		"chatGreeting": null,
+		"createdAt": "2025-06-07T14:36:45.000Z",
+		"lastActiveAt": "2025-06-27T10:26:03.000Z",
+		"level": 0,
+		"profileDescription": null,
+		"rank": "Legendary",
+		"rankPoints": 15258,
+		"riderType": "Flat Rider"
+	}
+]

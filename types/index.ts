@@ -114,6 +114,29 @@ export interface CrahUser extends ClerkUser {
 	posts: number;
 }
 
+export interface CrahUserWithBestTrick extends CrahUser {
+	Id: string;
+	Name: string;
+	avatar: string;
+	chatGreeting: string | null;
+	createdAt: Date | null;
+	lastActiveAt: number | undefined;
+	level: number;
+	profileDescription: string | null;
+	rank: Rank;
+	rankPoints: number;
+	rankIndex: number;
+	rankGlobalndex: number;
+	riderType: 'Park Rider' | 'Street Rider' | 'Flat Rider' | null;
+
+	TrickId: string | null;
+	TrickName: string | null;
+	TrickPoints: number | null;
+	TrickDifficulty: TrickDifficulty | null;
+	TrickSpot: string | null;
+	TrickDate: string | null | Date;
+}
+
 // when a user is selected in f.e a gifted chat
 export interface selectedRiderInterface extends User {
 	rank: Rank;
@@ -645,7 +668,7 @@ export const RankColorsDark: Record<Rank, string[]> = {
 	[Rank.Gold]: ['#B8860B', '#C9AE5D'],
 	[Rank.Platinum]: ['#009EA0', '#B0DCDC'],
 	[Rank.Diamond]: ['#7EC8E3', '#B0E0E6'],
-	[Rank.Legendary]: ['#B8860B', '#CC3700'],
+	[Rank.Legendary]: ['#B8860B', '#FFD700'],
 };
 
 /* 

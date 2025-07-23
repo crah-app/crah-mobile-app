@@ -88,7 +88,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				onFocus={onFocus}
 			/>
 
-			{displayOptionsBtn && (
+			{displayOptionsBtn && query.length <= 0 && (
 				<TouchableOpacity onPress={onOptionsPress}>
 					<Ionicons
 						name="options-outline"
@@ -98,7 +98,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				</TouchableOpacity>
 			)}
 
-			{displayCloseRequestBtn && !displayOptionsBtn && query.length > 0 && (
+			{displayCloseRequestBtn && query.length > 0 && (
 				<TouchableOpacity
 					onPress={() => {
 						setQuery('');

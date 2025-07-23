@@ -5,10 +5,10 @@ import { useSystemTheme } from '@/utils/useSystemTheme';
 import UserImageCircle from '../general/UserImageCircle';
 import Colors from '@/constants/Colors';
 import Row from '../general/Row';
-import { CrahUser } from '@/types';
+import { CrahUser, CrahUserWithBestTrick } from '@/types';
 
 interface UserRankRowprops {
-	user: CrahUser;
+	user: CrahUserWithBestTrick;
 	isSticky?: boolean | null; // sticky to the screen
 }
 
@@ -29,11 +29,13 @@ const UserRankRow: React.FC<UserRankRowprops> = ({ user, isSticky = null }) => {
 				borderColor: isSticky ? Colors[theme].background : 'transparent',
 				padding: 8,
 			}}
-			title={user?.username ?? 'no name'}
+			title={user?.Name ?? 'no name'}
 			titleStyle={{ fontSize: 20, fontWeight: '400', marginLeft: 6 }}
-			avatarUrl={user?.imageUrl}
+			avatarUrl={user?.avatar}
 			showAvatar={false}
-			subtitle="Quint Whip Flat"
+			subtitle={`Best Trick is ${user?.TrickName || 'not found'} ${
+				user?.TrickSpot || ''
+			}`}
 			subtitleStyle={{
 				marginLeft: 6,
 				fontSize: 15,
@@ -47,11 +49,15 @@ const UserRankRow: React.FC<UserRankRowprops> = ({ user, isSticky = null }) => {
 						gap: 12,
 						marginLeft: 8,
 					}}>
-					<ThemedText theme={theme} value={'#1'} style={{ fontSize: 22 }} />
+					<ThemedText
+						theme={theme}
+						value={`#${user?.rankIndex}`}
+						style={{ fontSize: 22 }}
+					/>
 
 					<Image
 						source={{
-							uri: user?.imageUrl,
+							uri: user?.avatar,
 						}}
 						style={[styles.avatar]}
 						width={46}
@@ -68,7 +74,11 @@ const UserRankRow: React.FC<UserRankRowprops> = ({ user, isSticky = null }) => {
 						gap: 12,
 						marginRight: 8,
 					}}>
-					<ThemedText theme={theme} value={'1240'} style={{ fontSize: 20 }} />
+					<ThemedText
+						theme={theme}
+						value={user?.rankPoints?.toString()}
+						style={{ fontSize: 20 }}
+					/>
 				</View>
 			}
 		/>
