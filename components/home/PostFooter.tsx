@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
@@ -15,7 +15,7 @@ interface PostFooterProps {
 	commentsCount: number;
 	post: RawPost;
 	shareCount: number;
-	reactions: string[];
+	reactions: Record<string, { amount: number; name: string }>;
 	setShowReactions: (boolean: boolean) => void;
 	onCommentsBtnPress: () => void;
 	currentUserLiked: boolean | undefined;
@@ -99,33 +99,60 @@ const PostFooter: React.FC<PostFooterProps> = ({
 				</TouchableOpacity>
 			</View>
 
+			{/* reaction container */}
+			{Object.keys(reactions).length > 0 && (
+				<ScrollView
+					showsHorizontalScrollIndicator={false}
+					horizontal
+					style={{
+						maxWidth: '100%',
+						flexDirection: 'row',
+						overflowX: 'hidden',
+						// bottom: 28,
+					}}>
+					<View style={{ flexDirection: 'row', gap: 12 }}>
+						{Object.keys(reactions).map((reaction: string, index: number) => {
+							const codePointStr = reaction;
+							const codePointNum = parseInt(codePointStr, 16);
+
+							const emoji = String.fromCodePoint(codePointNum);
+
+							return (
+								<View
+									style={{
+										flexDirection: 'row',
+										gap: 6,
+										alignItems: 'center',
+									}}
+									key={index + 'Container'}>
+									<Text key={index} style={{ fontSize: 16 }}>
+										{emoji}
+									</Text>
+
+									<Text
+										key={index + 'Text'}
+										style={[
+											{
+												color: Colors[theme].textPrimary,
+												fontSize: 16,
+												fontWeight: 'bold',
+											},
+										]}>
+										{reactions[reaction].amount}
+									</Text>
+								</View>
+							);
+						})}
+					</View>
+				</ScrollView>
+			)}
+
 			{/* lower footer */}
-			<View
-				style={[
-					// styles.lower_footer,
-					{
-						// height: 200,
-						// height: 40,
-						// post.type == 'videoPortrait' ||
-						// post.type == 'videoLandscape' ||
-						// post.type == 'image'
-						// 	? reactions.length > 0
-						// 		? 145
-						// 		: 0
-						// 	: reactions.length > 0
-						// 	? 145
-						// 	: 0,
-					},
-				]}>
-				{/* Reactions in a vertical bubble */}
+			<View>
 				<View style={{ height: 'auto' }}>
-					{/* // reaction and counter container */}
 					<View
 						style={[
 							{
-								// padding: 10,
-								// borderRadius: 25,
-								// backgroundColor: 'rgba(100,100,100,0.3)',
 								flexDirection: 'column',
 								overflow: 'hidden',
 								justifyContent: 'flex-start',
@@ -134,52 +161,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
 								gap: 10,
 							},
 						]}>
-						{/* reaction container */}
-						{reactions.length > 0 && (
-							<ScrollView
-								showsHorizontalScrollIndicator={false}
-								horizontal
-								style={{
-									backgroundColor: 'rgba(100,100,100,0.3)',
-									borderRadius: 20,
-									paddingHorizontal: 12,
-									maxWidth: '100%',
-									flexDirection: 'row',
-									overflowX: 'hidden',
-								}}>
-								<View style={{ flexDirection: 'row', gap: 12 }}>
-									{reactions.map((reaction: string, index: number) => (
-										<View
-											style={{
-												flexDirection: 'row',
-												gap: 6,
-												// backgroundColor: 'rgba(100,100,100,0.3)',
-												paddingVertical: 10,
-												borderRadius: 20,
-												height: 40,
-											}}
-											key={index + 'Container'}>
-											<Text key={index} style={{}}>
-												{reaction}
-											</Text>
-
-											<Text
-												key={index + 'Text'}
-												style={[
-													{
-														color: Colors[theme].textPrimary,
-														fontSize: 14,
-														fontWeight: 'bold',
-													},
-												]}>
-												{2322}
-											</Text>
-										</View>
-									))}
-								</View>
-							</ScrollView>
-						)}
-
 						{/* description */}
 						<ThemedView
 							theme={theme}
@@ -207,7 +188,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 	},
 	lower_footer: {
-		marginTop: 4,
 		width: '100%',
 		alignItems: 'flex-start',
 		justifyContent: 'flex-start',
@@ -230,11 +210,6 @@ const styles = StyleSheet.create({
 	iconCount: {
 		fontSize: 13,
 		fontWeight: '600',
-	},
-	reactionCountContainer: {
-		fontWeight: 'bold',
-		borderRadius: '100%',
-		fontSize: 12,
 	},
 });
 

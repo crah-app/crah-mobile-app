@@ -3,14 +3,15 @@ import { View, StyleSheet, Share, Dimensions } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { formatDistanceToNow } from 'date-fns';
-import { userCommentType, ReactionType, RawPost } from '@/types';
+import { userCommentType, ReactionType, RawPost, ReactionName } from '@/types';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useUser } from '@clerk/clerk-expo';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 import PostCommentSection from './PostCommentSection';
 import PostHeader from './PostHeader';
 import PostFooter from './PostFooter';
 import UserPostReactionsModal from './PostReactionModal';
 import RenderPostContent from './RenderPostContent';
+import { emojiToCodePoint } from '@/utils/globalFuncs';
 
 interface UserPostComponentProps {
 	post: RawPost;
@@ -19,6 +20,7 @@ interface UserPostComponentProps {
 const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
+	const { getToken } = useAuth();
 
 	const [userComments, setUserComments] = useState<userCommentType[]>(() => {
 		// 1. remove all nulls
@@ -33,8 +35,9 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 		}));
 	});
 
-	const [showReactions, setShowReactions] = useState(false);
-	const [reactions, setReactions] = useState<ReactionType[]>([]);
+	const [reactions, setReactions] = useState<
+		Record<string, { amount: number; name: string }>
+	>({});
 	const [likesCount, setLikesCount] = useState(post.likes || 0);
 	const [commentsCount, setCommentsCount] = useState(
 		post.totalComments ?? post.comments.length ?? 0,
@@ -42,17 +45,70 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	const [shareCount, setshareCount] = useState(post.shares || 0);
 	const [currentUserLiked, setCurrentUserLiked] = useState<boolean>(post.liked);
 
-	useEffect(() => {
-		setCurrentUserLiked(post.liked);
-		setLikesCount(post.likes);
-	}, [post.liked, post.likes]);
+	// search reactions
+	const [query, setQuery] = useState<string>('');
 
-	const handleReaction = (reaction: ReactionType) => {
-		if (reaction) {
-			setReactions((prev: ReactionType[]) => [...prev, reaction]);
+	useEffect(() => {
+		setReactions(() => {
+			return (post?.Reactions?.split(',') ?? []).reduce((acc, curr) => {
+				if (acc[curr]) {
+					acc[curr].amount++;
+				} else {
+					acc[curr] = { amount: 1, name: curr };
+				}
+				return acc;
+			}, {} as Record<string, { amount: number; name: string }>);
+		});
+	}, [post?.Reactions]);
+
+	const handleReaction = async (reaction: string) => {
+		if (!reaction) return;
+		reaction = emojiToCodePoint(reaction);
+
+		handleCloseReactionsModalPress();
+
+		try {
+			setReactions((prev: Record<string, { amount: number; name: string }>) => {
+				const next = { ...prev };
+				next[reaction]
+					? delete next[reaction]
+					: // @ts-ignore
+					  (next[reaction] = { amount: 1, name: ReactionName[reaction] });
+
+				return next;
+			});
+
+			const token = await getToken();
+
+			const response = await fetch(
+				`http://192.168.0.136:4000/api/posts/reaction`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						postId: post.Id,
+						emojiId: reaction,
+					}),
+				},
+			);
+
+			const text = await response.text();
+
+			if (!response.ok) {
+				throw Error(text);
+			}
+		} catch (error) {
+			console.warn('Error [handleReaction] in Component [UserPost]', error);
 		}
-		setShowReactions(false);
 	};
+
+	useEffect(() => {
+		console.log('dfuioghjaasdfiuhjklnlasdfhjkbn', reactions);
+		return () => {};
+	}, [reactions]);
 
 	const handleLike = () => {
 		setCurrentUserLiked((prev) => {
@@ -143,8 +199,12 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	}, []);
 
 	const handlePresentReactionsModalPress = useCallback(() => {
+		setQuery('');
 		reactionsModalBottomSheetRef.current?.present();
-		// reactionsModalBottomSheetRef?.current?.snapToIndex(1);
+	}, []);
+
+	const handleCloseReactionsModalPress = useCallback(() => {
+		reactionsModalBottomSheetRef.current?.dismiss();
 	}, []);
 
 	// render post
@@ -177,9 +237,9 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 			<UserPostReactionsModal
 				theme={theme}
 				ref={reactionsModalBottomSheetRef}
-				showReactions={showReactions}
-				setShowReactions={setShowReactions}
 				handleReaction={handleReaction}
+				query={query}
+				setQuery={setQuery}
 			/>
 			{/* Post Comment Section */}
 			<PostCommentSection

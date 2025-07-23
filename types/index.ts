@@ -1,4 +1,3 @@
-import Reactions from '@/constants/Reactions';
 import { Ionicons } from '@expo/vector-icons';
 import { IMessage, User } from 'react-native-gifted-chat';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
@@ -59,8 +58,36 @@ export type RawPost = {
 
 	sourceRatio: upload_source_ratio;
 
+	Reactions: string;
+
 	// wether currentUser liked post or not
 	liked: boolean;
+};
+
+export const Reactions = [
+	'👍',
+	'❤️',
+	'😂',
+	'😮',
+	'😢',
+	'👏',
+	'🎶',
+	'😎',
+	'🔥',
+	'😁',
+];
+
+export const ReactionName = {
+	'👍': 'Thumbs Up',
+	'❤️': 'Heart',
+	'😂': 'Laugh',
+	'😮': 'Hyped Up',
+	'😢': 'Shittering',
+	'👏': 'Clap',
+	'🎶': 'Music',
+	'😎': 'Cool',
+	'🔥': 'Fire',
+	'😁': 'Smile',
 };
 
 // reaction type based on reactions array

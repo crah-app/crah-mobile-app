@@ -140,3 +140,9 @@ export function evaluateTextBasedOnRankNumber(rank: number): string {
 			return 'Thank you for using Crah!';
 	}
 }
+
+export function emojiToCodePoint(emoji: string): string {
+	const codePoint = emoji.codePointAt(0);
+	if (codePoint === undefined) return '';
+	return codePoint.toString(16).toUpperCase();
+}

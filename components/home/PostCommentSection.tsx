@@ -94,7 +94,7 @@ const PostCommentSection = forwardRef<
 
 			const result = JSON.parse(text);
 
-			console.log('object', result);
+			// console.log('object', result);
 
 			setComments(result);
 			setCommentsLoaded(true);

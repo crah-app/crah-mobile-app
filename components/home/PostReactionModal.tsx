@@ -1,4 +1,11 @@
-import React, { forwardRef, useCallback, useEffect, useState } from 'react';
+import React, {
+	Dispatch,
+	forwardRef,
+	SetStateAction,
+	useCallback,
+	useEffect,
+	useState,
+} from 'react';
 import {
 	View,
 	StyleSheet,
@@ -9,7 +16,7 @@ import {
 	Text,
 } from 'react-native';
 import { useSystemTheme } from '@/utils/useSystemTheme';
-import { ReactionType } from '@/types';
+import { ReactionName, ReactionType } from '@/types';
 import {
 	BottomSheetBackdrop,
 	BottomSheetModal,
@@ -21,20 +28,18 @@ import ThemedText from '../general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
 import SearchBar from '../general/SearchBar';
 import Reactions from '@/constants/Reactions';
+import { compareTwoStrings } from 'string-similarity';
 
 interface props {
-	showReactions: boolean;
-	setShowReactions: (boolean: boolean) => void;
 	handleReaction: (reaction: ReactionType) => void;
 	theme: 'light' | 'dark';
+	query: string;
+	setQuery: Dispatch<SetStateAction<string>>;
 }
 
 const UserPostReactionsModal = forwardRef<BottomSheetModal, props>(
-	({ setShowReactions, showReactions, handleReaction }, ref) => {
-		const theme = useSystemTheme();
+	({ handleReaction, theme, query, setQuery }, ref) => {
 		const [snapPoints, setSnapPoints] = useState<string[]>(['85%']);
-
-		const [query, setQuery] = useState<string>('');
 
 		const renderBackdrop = useCallback((props: any) => {
 			const animatedIndex = useSharedValue(0);
@@ -129,7 +134,16 @@ const UserPostReactionsModal = forwardRef<BottomSheetModal, props>(
 										alignItems: 'center',
 										justifyContent: 'center',
 									}}>
-									{Reactions.map((reaction) => (
+									{(query.length <= 0
+										? Reactions
+										: Reactions.filter(
+												(val) =>
+													compareTwoStrings(
+														ReactionName[val].toLocaleLowerCase(),
+														query.toLocaleLowerCase(),
+													) > 0.1,
+										  )
+									).map((reaction) => (
 										<TouchableOpacity
 											key={reaction}
 											onPress={() => handleReaction(reaction)}>
