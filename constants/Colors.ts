@@ -54,6 +54,9 @@ export default {
 		gray: 'gray',
 		highlightPrimary: 'rgb(105,15,15)',
 		bgPrimary: 'rgba(75, 0,0,1)',
+		background: '#121214',
+		textPrimary: 'rgb(255, 255, 255)',
+		background2: '#1a1a1d',
 	},
 };
 

@@ -3,6 +3,9 @@ import { IMessage, User } from 'react-native-gifted-chat';
 import { PhotoFile, VideoFile } from 'react-native-vision-camera';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 import ClerkUser from './clerk';
+import Colors from '@/constants/Colors';
+import { StyleProps } from 'react-native-reanimated';
+import { NotificationOwnProps } from 'react-native-notificated/lib/typescript/defaultConfig/types';
 
 // Ionicons icon type
 export type ionicon = keyof typeof Ionicons.glyphMap;
@@ -871,3 +874,12 @@ export enum ReportType {
 	post = 'Post',
 	user = 'User',
 }
+
+export const ToastNotificationParams = {
+	style: {
+		bgColor: Colors.default.background,
+		titleColor: Colors.default.primary,
+		descriptionColor: Colors.default.textPrimary,
+	},
+	hideCloseButton: true,
+};

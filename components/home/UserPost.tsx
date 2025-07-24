@@ -5,10 +5,10 @@ import { useSystemTheme } from '@/utils/useSystemTheme';
 import { formatDistanceToNow } from 'date-fns';
 import {
 	userCommentType,
-	ReactionType,
 	RawPost,
 	ReactionName,
 	ReportType,
+	ToastNotificationParams,
 } from '@/types';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useUser } from '@clerk/clerk-expo';
@@ -20,6 +20,8 @@ import RenderPostContent from './RenderPostContent';
 import { emojiToCodePoint } from '@/utils/globalFuncs';
 import PostOptionsModal from '@/app/(auth)/modals/postOptionsModal';
 import ReportBottomSheet from './ReportBottomSheet';
+import { defaultHeaderBtnSize } from '@/constants/Styles';
+import { useNotifications } from 'react-native-notificated';
 
 interface UserPostComponentProps {
 	post: RawPost;
@@ -61,6 +63,8 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	// options modal
 	const [optionsModalVisible, setOptionsModalVisible] =
 		useState<boolean>(false);
+
+	const { notify } = useNotifications();
 
 	useEffect(() => {
 		setReactions(() => {
@@ -257,10 +261,23 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 			handlCloseReportModalPress();
 
 			// toast message
+			notify('success', {
+				params: {
+					title: 'Report Send',
+					description: `You successfully reported this post`,
+				},
+			});
 		} catch (error) {
 			console.warn('Error [reportPost]', error);
 			handlCloseReportModalPress();
+
 			// toast message
+			notify('error', {
+				params: {
+					title: 'Report Fail',
+					description: 'Something went wrong',
+				},
+			});
 		}
 	};
 

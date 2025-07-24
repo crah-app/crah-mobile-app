@@ -22,11 +22,30 @@ import { tokenCache } from '@/cache';
 import { useFonts } from 'expo-font';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-// import { dark } from '@clerk/themes';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Appearance } from 'react-native';
 import { mmkv } from '@/hooks/mmkv';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { createNotifications } from 'react-native-notificated';
+
+const { NotificationsProvider, useNotifications, ...events } =
+	createNotifications({
+		defaultStylesSettings: {
+			darkMode: true,
+			globalConfig: {
+				borderType: 'accent',
+				bgColor: Colors.default.background2,
+				titleColor: Colors.default.primary,
+				descriptionColor: Colors.default.textPrimary,
+				accentColor: Colors.default.primary,
+				defaultIconType: 'no-icon',
+			},
+			successConfig: {},
+			errorConfig: {},
+			warningConfig: {},
+			infoConfig: {},
+		},
+	});
 
 Appearance.setColorScheme('dark');
 SplashScreen.preventAutoHideAsync();
@@ -171,18 +190,18 @@ const layout = () => {
 
 	return (
 		<KeyboardProvider>
-			<ThemeProvider value={MyTheme}>
-				<ClerkProvider
-					appearance={{}}
-					tokenCache={tokenCache!}
-					publishableKey={publishableKey!}>
-					<GestureHandlerRootView style={{ flex: 1 }}>
+			<GestureHandlerRootView style={{ flex: 1 }}>
+				<NotificationsProvider>
+					<ClerkProvider
+						appearance={{}}
+						tokenCache={tokenCache!}
+						publishableKey={publishableKey!}>
 						<BottomSheetModalProvider>
 							<Root />
 						</BottomSheetModalProvider>
-					</GestureHandlerRootView>
-				</ClerkProvider>
-			</ThemeProvider>
+					</ClerkProvider>
+				</NotificationsProvider>
+			</GestureHandlerRootView>
 		</KeyboardProvider>
 	);
 };
