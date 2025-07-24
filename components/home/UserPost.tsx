@@ -3,7 +3,13 @@ import { View, StyleSheet, Share, Dimensions } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { formatDistanceToNow } from 'date-fns';
-import { userCommentType, ReactionType, RawPost, ReactionName } from '@/types';
+import {
+	userCommentType,
+	ReactionType,
+	RawPost,
+	ReactionName,
+	ReportType,
+} from '@/types';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import PostCommentSection from './PostCommentSection';
@@ -12,6 +18,8 @@ import PostFooter from './PostFooter';
 import UserPostReactionsModal from './PostReactionModal';
 import RenderPostContent from './RenderPostContent';
 import { emojiToCodePoint } from '@/utils/globalFuncs';
+import PostOptionsModal from '@/app/(auth)/modals/postOptionsModal';
+import ReportBottomSheet from './ReportBottomSheet';
 
 interface UserPostComponentProps {
 	post: RawPost;
@@ -21,6 +29,8 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
 	const { getToken } = useAuth();
+
+	const [reportReason, setReportReason] = useState<string>('');
 
 	const [userComments, setUserComments] = useState<userCommentType[]>(() => {
 		// 1. remove all nulls
@@ -47,6 +57,10 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 
 	// search reactions
 	const [query, setQuery] = useState<string>('');
+
+	// options modal
+	const [optionsModalVisible, setOptionsModalVisible] =
+		useState<boolean>(false);
 
 	useEffect(() => {
 		setReactions(() => {
@@ -104,11 +118,6 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 			console.warn('Error [handleReaction] in Component [UserPost]', error);
 		}
 	};
-
-	useEffect(() => {
-		console.log('dfuioghjaasdfiuhjklnlasdfhjkbn', reactions);
-		return () => {};
-	}, [reactions]);
 
 	const handleLike = () => {
 		setCurrentUserLiked((prev) => {
@@ -207,6 +216,54 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 		reactionsModalBottomSheetRef.current?.dismiss();
 	}, []);
 
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+	const handlePresentReportModalPress = useCallback(() => {
+		bottomSheetRef.current?.present();
+	}, []);
+
+	const handlCloseReportModalPress = useCallback(() => {
+		bottomSheetRef.current?.close();
+	}, []);
+
+	const reportPost = async () => {
+		handlCloseReportModalPress();
+
+		try {
+			const token = await getToken();
+
+			const response = await fetch(
+				'http://192.168.0.136:4000/api/posts/report',
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						userId: user?.id,
+						postId,
+						reason: reportReason,
+					}),
+				},
+			);
+
+			const text = await response.text();
+
+			if (!response.ok) {
+				throw Error(text);
+			}
+
+			handlCloseReportModalPress();
+
+			// toast message
+		} catch (error) {
+			console.warn('Error [reportPost]', error);
+			handlCloseReportModalPress();
+			// toast message
+		}
+	};
+
 	// render post
 	return (
 		<View
@@ -217,7 +274,12 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				},
 			]}>
 			{/* Header */}
-			<PostHeader post={post} postTimeAgo={postTimeAgo} />
+			<PostHeader
+				optionsModalVisible={optionsModalVisible}
+				setOptionsModalVisible={setOptionsModalVisible}
+				post={post}
+				postTimeAgo={postTimeAgo}
+			/>
 			{/* Main content */}
 			<RenderPostContent post={post} theme={theme} />
 			{/* Footer */}
@@ -248,6 +310,25 @@ const UserPost: React.FC<UserPostComponentProps> = ({ post }) => {
 				username={post.UserName}
 				postId={postId}
 				setCommentsCount={setCommentsCount}
+			/>
+
+			{/* Post Options Modal */}
+			<PostOptionsModal
+				handlePresentReportModalPress={handlePresentReportModalPress}
+				handleShare={handleShare}
+				theme={theme}
+				isVisible={optionsModalVisible}
+				setVisibility={setOptionsModalVisible}
+			/>
+
+			{/* Report Post Modal */}
+			<ReportBottomSheet
+				ref={bottomSheetRef}
+				theme={theme}
+				reportType={ReportType.post}
+				reportFunction={reportPost}
+				value={reportReason}
+				setValue={setReportReason}
 			/>
 		</View>
 	);

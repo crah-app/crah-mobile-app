@@ -48,6 +48,7 @@ interface ThemedTextInputProps {
 	containerStyle?: ViewStyle | ViewStyle[];
 	allowSpace?: boolean;
 	outerContainerStyle?: ViewStyle | ViewStyle[];
+	textInputWrapperStyle?: ViewStyle | ViewStyle[];
 }
 
 const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
@@ -74,6 +75,7 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 			containerStyle,
 			allowSpace = true,
 			outerContainerStyle,
+			textInputWrapperStyle,
 		},
 		ref,
 	) => {
@@ -172,12 +174,15 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 						},
 					]}>
 					<View
-						style={{
-							justifyContent: 'space-between',
-							height: multiline ? 10 * (lines || 1) : 'auto',
-							width: '100%',
-							flexDirection: isSecret ? 'row' : 'column',
-						}}>
+						style={[
+							{
+								justifyContent: 'space-between',
+								height: multiline ? 10 * (lines || 1) : 'auto',
+								width: '100%',
+								flexDirection: isSecret ? 'row' : 'column',
+							},
+							textInputWrapperStyle,
+						]}>
 						<TextInput
 							autoCorrect={false}
 							ref={ref}

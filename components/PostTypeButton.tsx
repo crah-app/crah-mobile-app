@@ -10,8 +10,9 @@ import {
 import ThemedText from './general/ThemedText';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { defaultHeaderBtnSize } from '@/constants/Styles';
-import { ionicon } from '@/types';
+import { ionicon, svg_name } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
+import GetSVGMemo from './GetSVG';
 
 interface PostTypeButtonProps {
 	val: string;
@@ -19,7 +20,9 @@ interface PostTypeButtonProps {
 	style?: ViewStyle | ViewStyle[];
 	fontStyle?: TextStyle | TextStyle[];
 	isIcon?: boolean;
-	icon?: ionicon;
+	hasIcon?: boolean;
+	additionalIconIsSVG?: boolean;
+	icon?: ionicon | svg_name;
 	revert?: boolean;
 	splitBackground?: boolean;
 	splitBackgroundColors?: string[];
@@ -31,7 +34,9 @@ const PostTypeButton: React.FC<PostTypeButtonProps> = ({
 	style,
 	fontStyle,
 	isIcon = false,
+	hasIcon = false,
 	icon,
+	additionalIconIsSVG = false,
 	revert = false,
 	splitBackground = false,
 	splitBackgroundColors = [],
@@ -73,21 +78,70 @@ const PostTypeButton: React.FC<PostTypeButtonProps> = ({
 				</View>
 			)}
 
-			{isIcon && icon ? (
-				<Ionicons
-					size={defaultHeaderBtnSize - 6}
-					name={`${icon}`}
-					color={revert ? Colors[theme].primary : Colors[theme].textPrimary}
-					style={[fontStyle]}
-				/>
-			) : (
-				<ThemedText
-					theme={theme}
-					value={val}
-					// @ts-ignore
-					style={[styles.FilterButtonText, fontStyle]}
-				/>
-			)}
+			<View
+				style={{
+					marginLeft: hasIcon && icon ? defaultHeaderBtnSize - 24 : 0,
+				}}>
+				{isIcon && icon ? (
+					<View>
+						{!additionalIconIsSVG ? (
+							<Ionicons
+								size={defaultHeaderBtnSize - 10}
+								// @ts-ignore
+								name={icon}
+								color={
+									revert ? Colors[theme].primary : Colors[theme].textPrimary
+								}
+								style={[fontStyle]}
+							/>
+						) : (
+							// @ts-ignore
+							<GetSVGMemo name={icon} props={{ fill: 'white' }} />
+						)}
+					</View>
+				) : (
+					<View
+						style={{
+							gap: 8,
+							flexDirection: 'row',
+							alignItems: 'center',
+							justifyContent: 'center',
+						}}>
+						<ThemedText
+							theme={theme}
+							value={val}
+							// @ts-ignore
+							style={[styles.FilterButtonText, fontStyle]}
+						/>
+
+						{hasIcon && icon && (
+							<View>
+								{additionalIconIsSVG ? (
+									<GetSVGMemo
+										name={'bar'}
+										props={{
+											color: 'white',
+											fill: 'white',
+											width: defaultHeaderBtnSize - 10,
+											height: defaultHeaderBtnSize - 10,
+										}}
+									/>
+								) : (
+									<Ionicons
+										size={defaultHeaderBtnSize - 10}
+										// @ts-ignore
+										name={`${icon}`}
+										color={
+											revert ? Colors[theme].primary : Colors[theme].textPrimary
+										}
+										style={[fontStyle]}
+									/>
+								)}
+							</View>
+						)}
+					</View>
+				)}
+			</View>
 		</TouchableOpacity>
 	);
 };
@@ -135,8 +189,8 @@ const styles = StyleSheet.create({
 	FilterButton: {
 		borderStartStartRadius: 10,
 		borderEndStartRadius: 10,
-		borderStartEndRadius: 7,
-		borderEndEndRadius: 7,
+		borderStartEndRadius: 10,
+		borderEndEndRadius: 10,
 		paddingVertical: 10,
 		paddingHorizontal: 15,
 		alignItems: 'center',

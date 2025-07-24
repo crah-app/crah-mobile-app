@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import { RawPost } from '@/types';
 import { router } from 'expo-router';
 import { useUser } from '@clerk/clerk-expo';
+import { Ionicons } from '@expo/vector-icons';
+import { defaultHeaderBtnSize } from '@/constants/Styles';
 
-const PostHeader: React.FC<{ post: RawPost; postTimeAgo: string }> = ({
+interface Props {
+	post: RawPost;
+	postTimeAgo: string;
+	optionsModalVisible: boolean;
+	setOptionsModalVisible: Dispatch<SetStateAction<boolean>>;
+}
+
+const PostHeader: React.FC<Props> = ({
 	post,
 	postTimeAgo,
+	optionsModalVisible,
+	setOptionsModalVisible,
 }) => {
 	const theme = useSystemTheme();
 	const { user } = useUser();
@@ -24,28 +35,52 @@ const PostHeader: React.FC<{ post: RawPost; postTimeAgo: string }> = ({
 		});
 	};
 
+	const handlePostOptionsPress = () => {
+		setOptionsModalVisible((prev) => !prev);
+	};
+
 	return (
-		<View>
-			<TouchableOpacity onPress={onHeaderPress}>
-				<View style={styles.header}>
-					<Image
-						source={{ uri: post.UserAvatar }}
-						style={styles.profileImage}
-					/>
+		<View
+			style={{
+				flexDirection: 'row',
+				justifyContent: 'space-between',
+				alignItems: 'flex-start',
+			}}>
+			{/* left side */}
+			<View>
+				<TouchableOpacity onPress={onHeaderPress}>
+					<View style={styles.header}>
+						<Image
+							source={{ uri: post.UserAvatar }}
+							style={styles.profileImage}
+						/>
 
-					<View style={{ flexDirection: 'column', gap: 2 }}>
-						<Text
-							style={[styles.username, { color: Colors[theme].textPrimary }]}>
-							{post.UserName}
-						</Text>
+						<View style={{ flexDirection: 'column', gap: 2 }}>
+							<Text
+								style={[styles.username, { color: Colors[theme].textPrimary }]}>
+								{post.UserName}
+							</Text>
 
-						<Text style={[{ color: Colors[theme].gray, fontSize: 14 }]}>
-							{post.Title}
-						</Text>
+							<Text style={[{ color: Colors[theme].gray, fontSize: 14 }]}>
+								{post.Title}
+							</Text>
+						</View>
 					</View>
-				</View>
-			</TouchableOpacity>
-			<Text style={[styles.postTime, { color: 'gray' }]}>{postTimeAgo}</Text>
+				</TouchableOpacity>
+				<Text style={[styles.postTime, { color: 'gray' }]}>{postTimeAgo}</Text>
+			</View>
+			{/* right side */}
+			<View>
+				<TouchableOpacity
+					style={{ paddingVertical: 12 }}
+					onPress={handlePostOptionsPress}>
+					<Ionicons
+						name="ellipsis-vertical-outline"
+						size={defaultHeaderBtnSize - 12}
+						color={Colors[theme].textSecondary}
+					/>
+				</TouchableOpacity>
+			</View>
 		</View>
 	);
 };

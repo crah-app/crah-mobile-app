@@ -584,6 +584,7 @@ export enum TextInputMaxCharacters {
 	SmallDescription = 150,
 	BigDescription = 800,
 	Article = 10000,
+	Report = 600,
 }
 
 /* 
@@ -865,3 +866,8 @@ export const LanguageISO: Record<Language, string> = {
 };
 
 export const PAGE_SIZE = 50;
+
+export enum ReportType {
+	post = 'Post',
+	user = 'User',
+}

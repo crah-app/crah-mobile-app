@@ -109,6 +109,13 @@ const Layout = () => {
 					headerShown: false,
 				}}
 			/>
+
+			<Stack.Screen
+				name="postOptionsModal"
+				options={{
+					headerShown: false,
+				}}
+			/>
 		</Stack>
 	);
 };

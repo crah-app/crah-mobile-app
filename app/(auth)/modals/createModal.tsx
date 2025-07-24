@@ -112,7 +112,7 @@ const CreateModal = forwardRef<BottomSheetModal, Props>(({}, ref) => {
 						<ThemedText
 							theme={theme}
 							value={'self'}
-							style={{ color: Colors[theme].primary, fontSize: 20 }}
+							style={{ color: Colors[theme].gray, fontSize: 20 }}
 						/>
 
 						<PostTypeButton
@@ -131,7 +131,7 @@ const CreateModal = forwardRef<BottomSheetModal, Props>(({}, ref) => {
 						<ThemedText
 							theme={theme}
 							value={'community'}
-							style={{ color: Colors[theme].primary, fontSize: 20 }}
+							style={{ color: Colors[theme].gray, fontSize: 20 }}
 						/>
 
 						<PostTypeButton
