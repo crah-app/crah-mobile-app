@@ -118,26 +118,22 @@ export interface CrahUser extends ClerkUser {
 }
 
 export interface CrahUserWithBestTrick extends CrahUser {
-	Id: string;
-	Name: string;
-	avatar: string;
-	chatGreeting: string | null;
-	createdAt: Date | null;
-	lastActiveAt: number | undefined;
-	level: number;
-	profileDescription: string | null;
-	rank: Rank;
 	rankPoints: number;
 	rankIndex: number;
 	rankGlobalndex: number;
-	riderType: 'Park Rider' | 'Street Rider' | 'Flat Rider' | null;
-
 	TrickId: string | null;
 	TrickName: string | null;
 	TrickPoints: number | null;
 	TrickDifficulty: TrickDifficulty | null;
 	TrickSpot: string | null;
 	TrickDate: string | null | Date;
+}
+
+export interface CrahUserDetailedStats extends CrahUser {
+	rankGlobalIndex: number;
+	rankGlobalRelative: number;
+	rankRegionalIndex: number;
+	rankRegionalRelative: number;
 }
 
 // when a user is selected in f.e a gifted chat
@@ -882,4 +878,15 @@ export const ToastNotificationParams = {
 		descriptionColor: Colors.default.textPrimary,
 	},
 	hideCloseButton: true,
+};
+
+export type RankOvertimeInterval = 'Month' | 'Year';
+
+export type RankOvertimeEntry = {
+	Id: number;
+	UserId: string;
+	Rank: Rank;
+	RankPoints: number;
+	RankTotalPoints: number;
+	CreatedAt: string;
 };

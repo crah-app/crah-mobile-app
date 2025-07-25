@@ -10,12 +10,18 @@
 		"TrickSpot": "Flat",
 		"avatar": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18ydjhwd0VKTWZ6c04zbDExcDNpcWJwTTl2QXIiLCJyaWQiOiJ1c2VyXzJ5QlRYRnFKZzNBb3BHcWxGUUFBcEEwN21WRSIsImluaXRpYWxzIjoiSlMifQ",
 		"chatGreeting": null,
+		"country": "DE",
 		"createdAt": "2025-06-07T14:36:45.000Z",
 		"lastActiveAt": "2025-06-27T10:26:03.000Z",
 		"level": 0,
 		"profileDescription": null,
 		"rank": "Legendary",
+		"rankGlobalIndex": 1,
+		"rankGlobalRelative": "100.00",
 		"rankPoints": 15258,
+		"rankRegionalIndex": 1,
+		"rankRegionalRelative": "100.00",
+		"region": null,
 		"riderType": "Flat Rider"
 	}
 ]

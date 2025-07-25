@@ -24,7 +24,6 @@ import {
 	TrickDifficulty,
 	TrickListFilterOptions,
 	TrickListGeneralFilterParameterEnum,
-	TrickListGeneralSpotCategory,
 	TrickListOrderTypes,
 	TrickType,
 	TrickTypeUI,

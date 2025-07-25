@@ -80,20 +80,7 @@ const Layout = () => {
 				name="compareRiders"
 				options={{
 					presentation: 'modal',
-					headerShown: true,
-					title: '',
-					headerStyle: {
-						backgroundColor: Colors[theme].background,
-					},
-					headerLeft: () => (
-						<TouchableOpacity onPress={router.back}>
-							<Ionicons
-								name="arrow-back"
-								size={24}
-								color={Colors[theme].textPrimary}
-							/>
-						</TouchableOpacity>
-					),
+					headerShown: false,
 				}}
 			/>
 			<Stack.Screen
