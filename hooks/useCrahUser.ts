@@ -7,10 +7,6 @@ export default function useCrahUser(ClerkUser: ClerkUser | undefined | null) {
 	const [error, setError] = useState<Error | null>(null);
 
 	useEffect(() => {
-		return () => {};
-	}, []);
-
-	useEffect(() => {
 		if (!ClerkUser?.id) return;
 
 		const loadUser = async () => {

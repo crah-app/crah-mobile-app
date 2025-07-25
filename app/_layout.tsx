@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View } from 'react-native';
+import { StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import React, { Component, useEffect } from 'react';
 import {
 	Link,
@@ -90,7 +90,7 @@ const Root = () => {
 			}
 
 			router.replace('/(auth)/(tabs)/homePages');
-			// router.replace('/(auth)/modals/settings/changeEmail');
+			// router.replace('/(auth)/modals/compareRiders');
 		} else if (!isSignedIn) {
 			router.replace('/');
 		}
@@ -107,6 +107,8 @@ const Root = () => {
 					backgroundColor: Colors[theme].surface,
 				},
 			}}>
+			<StatusBar backgroundColor={Colors[theme].background} />
+
 			<Stack.Screen
 				name="index"
 				options={{
@@ -117,16 +119,7 @@ const Root = () => {
 				name="login"
 				options={{
 					presentation: 'modal',
-					title: '',
-					headerLeft: () => (
-						<TouchableOpacity onPress={router.back}>
-							<Ionicons
-								name="arrow-back"
-								size={24}
-								color={Colors[theme].textPrimary}
-							/>
-						</TouchableOpacity>
-					),
+					headerShown: false,
 				}}
 			/>
 			<Stack.Screen name="(auth)" options={{ headerShown: false }} />

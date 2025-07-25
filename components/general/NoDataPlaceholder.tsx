@@ -23,6 +23,7 @@ interface NoDataPlaceholderProps {
 	subTextValue?: string;
 	onSubTextClickPathname?: string;
 	retryFunction?: () => void;
+	displayRetryBtn?: boolean;
 }
 
 const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
@@ -32,6 +33,7 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 	subTextValue,
 	onSubTextClickPathname,
 	retryFunction = () => {},
+	displayRetryBtn = true,
 }) => {
 	const theme = useSystemTheme();
 
@@ -54,27 +56,29 @@ const NoDataPlaceholder: React.FC<NoDataPlaceholderProps> = ({
 				</Text>
 			</View>
 
-			<View style={{ top: 20 }}>
-				<TouchableOpacity style={{}} onPress={() => retryFunction()}>
-					<ThemedText
-						value="Retry"
-						theme={theme}
-						style={[
-							defaultStyles.outlinedBtn,
-							{
-								padding: 10,
-								borderWidth: 2,
-								width: Dimensions.get('window').width - 128,
-								borderRadius: 10,
-								color: Colors[theme].primary,
-								fontSize: 20,
-								fontWeight: '500',
-								backgroundColor: 'rgba(255, 0,0, 0.05)',
-							},
-						]}
-					/>
-				</TouchableOpacity>
-			</View>
+			{displayRetryBtn && (
+				<View style={{ top: 20 }}>
+					<TouchableOpacity style={{}} onPress={() => retryFunction()}>
+						<ThemedText
+							value="Retry"
+							theme={theme}
+							style={[
+								defaultStyles.outlinedBtn,
+								{
+									padding: 10,
+									borderWidth: 2,
+									width: Dimensions.get('window').width - 128,
+									borderRadius: 10,
+									color: Colors[theme].primary,
+									fontSize: 20,
+									fontWeight: '500',
+									backgroundColor: 'rgba(255, 0,0, 0.05)',
+								},
+							]}
+						/>
+					</TouchableOpacity>
+				</View>
+			)}
 		</View>
 	);
 };

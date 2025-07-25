@@ -55,6 +55,10 @@ export const defaultStyles = StyleSheet.create({
 	bigText: {
 		fontSize: 27,
 	},
+	veryBigText: {
+		fontSize: 34,
+		fontWeight: '700',
+	},
 	biggerOpacityText: {
 		fontSize: 22,
 		fontWeight: '700',

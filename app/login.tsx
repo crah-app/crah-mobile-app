@@ -1,81 +1,402 @@
 import {
 	View,
 	StyleSheet,
-	TextInput,
-	Alert,
 	TouchableOpacity,
 	KeyboardAvoidingView,
 	Platform,
-	ScrollView,
+	StatusBar,
+	Dimensions,
 } from 'react-native';
-import React, { useState } from 'react';
-import { Link, router, Stack } from 'expo-router';
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import { Link, router } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import ThemedText from '@/components/general/ThemedText';
-
-import { defaultStyles } from '@/constants/Styles';
+import { defaultHeaderBtnSize, defaultStyles } from '@/constants/Styles';
 import { useSignIn, useSignUp } from '@clerk/clerk-expo';
 import { useLocalSearchParams } from 'expo-router';
 import ThemedView from '@/components/general/ThemedView';
-
-import TitleImage from '../assets/images/vectors/flyinghenke.svg';
-import TitleImageDark from '../assets/images/vectors/flyinghenke_dark.svg';
-
 import {
 	CodeField,
 	Cursor,
+	RenderCellOptions,
 	useBlurOnFulfill,
 	useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
-import { Ionicons } from '@expo/vector-icons';
-import SecuredPasswordInput from '@/components/general/SecuredPasswordInput';
 import CrahActivityIndicator from '@/components/general/CrahActivityIndicator';
-import GetSVG from '@/components/GetSVG';
+import HeaderScrollView from '@/components/header/HeaderScrollView';
+import { Ionicons } from '@expo/vector-icons';
+import HeaderLeftLogo from '@/components/header/headerLeftLogo';
+import CostumHeader from '@/components/header/CostumHeader';
+import ThemedTextInput from '@/components/general/ThemedTextInput';
+import PostTypeButton from '@/components/PostTypeButton';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useNotifications } from 'react-native-notificated';
+import { TextInputMaxCharacters } from '@/types';
 
 const CELL_COUNT = 6;
 
+const AuthHeader = ({ theme, type, pendingVerification }: any) => (
+	<View
+		style={{
+			flex: 1,
+			justifyContent: 'center',
+			alignItems: 'center',
+		}}>
+		<ThemedText
+			theme={theme}
+			style={[defaultStyles.veryBigText]}
+			value={
+				type === 'login' && !pendingVerification
+					? 'Welcome Back!'
+					: type === 'register' && !pendingVerification
+					? 'Create New Account'
+					: pendingVerification
+					? 'Verify Your Email'
+					: 'Reset Password'
+			}
+		/>
+	</View>
+);
+
+interface AuthFormProps {
+	theme: 'light' | 'dark';
+	type: 'login' | 'register' | 'forgot';
+	emailAddress: string;
+	setEmailAddress: Dispatch<SetStateAction<string>>;
+	password: string;
+	setPassword: Dispatch<SetStateAction<string>>;
+	username: string;
+	setUsername: Dispatch<SetStateAction<string>>;
+	successfulCreation: boolean;
+}
+
+const AuthForm = ({
+	theme,
+	type,
+	emailAddress,
+	setEmailAddress,
+	password,
+	setPassword,
+	username,
+	setUsername,
+	successfulCreation,
+}: AuthFormProps) => {
+	const [secret, setSecret] = useState<boolean>(true);
+
+	return (
+		<View style={{ gap: 12 }}>
+			<ThemedTextInput
+				maxLength={TextInputMaxCharacters.Simple}
+				placeholder="Email"
+				theme={theme}
+				value={emailAddress}
+				setValue={setEmailAddress}
+			/>
+
+			{type !== 'forgot' && !successfulCreation && (
+				<ThemedTextInput
+					maxLength={TextInputMaxCharacters.UserName}
+					placeholder="Password"
+					theme={theme}
+					value={password}
+					setValue={setPassword}
+					isSecret
+					secret={secret}
+					setSecret={setSecret}
+				/>
+			)}
+			{type === 'register' && (
+				<ThemedTextInput
+					maxLength={TextInputMaxCharacters.UserName}
+					placeholder="Username"
+					theme={theme}
+					value={username}
+					setValue={setUsername}
+				/>
+			)}
+		</View>
+	);
+};
+
+interface VerificationCodeInputProps {
+	code: string;
+	setCode: Dispatch<SetStateAction<string>>;
+	props: any;
+	ref: any;
+	theme: 'light' | 'dark';
+	onVerifyPress: () => void;
+}
+
+const VerificationCodeInput = ({
+	code,
+	setCode,
+	props,
+	ref,
+	theme,
+	onVerifyPress,
+}: VerificationCodeInputProps) => (
+	<KeyboardAvoidingView
+		style={[
+			styles.container,
+			{
+				justifyContent: 'center',
+				alignItems: 'center',
+				width: '100%',
+				height: 180,
+			},
+		]}
+		behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+		keyboardVerticalOffset={10}>
+		<CodeField
+			ref={ref}
+			{...props}
+			value={code}
+			onChangeText={setCode}
+			cellCount={CELL_COUNT}
+			rootStyle={styles.codeFieldRoot}
+			keyboardType="number-pad"
+			textContentType="oneTimeCode"
+			renderCell={({ index, symbol, isFocused }: RenderCellOptions) => (
+				<ThemedText
+					theme={theme}
+					key={index}
+					style={[
+						{
+							borderColor: Colors[theme].borderColor,
+							backgroundColor: isFocused
+								? Colors[theme].surface
+								: 'transparent',
+							flex: 1,
+							width: 50,
+							height: 50,
+							justifyContent: 'center',
+							alignItems: 'center',
+							borderWidth: 1,
+							borderRadius: 10,
+							textAlign: 'center',
+							textAlignVertical: 'center',
+						},
+					]}
+					value={symbol || (isFocused ? <Cursor /> : '')}
+				/>
+			)}
+		/>
+		<TouchableOpacity
+			onPress={onVerifyPress}
+			style={[defaultStyles.btn, { flex: 1 }]}>
+			<ThemedText value="Verify" theme={theme} />
+		</TouchableOpacity>
+	</KeyboardAvoidingView>
+);
+
+interface ForgotPasswordFormProps {
+	theme: 'light' | 'dark';
+	resetCode: string;
+	setResetCode: Dispatch<SetStateAction<string>>;
+	newPassword: string;
+	setNewPassword: Dispatch<SetStateAction<string>>;
+	props: any;
+	ref: any;
+	onActualPasswordReset: () => void;
+}
+
+const ForgotPasswordForm = ({
+	theme,
+	resetCode,
+	setResetCode,
+	newPassword,
+	setNewPassword,
+	props,
+	ref,
+	onActualPasswordReset,
+}: ForgotPasswordFormProps) => {
+	const [secret, setSecret] = useState<boolean>(true);
+
+	return (
+		<View style={{ gap: 12 }}>
+			<CodeField
+				ref={ref}
+				{...props}
+				value={resetCode}
+				onChangeText={setResetCode}
+				cellCount={CELL_COUNT}
+				rootStyle={styles.codeFieldRoot}
+				keyboardType="number-pad"
+				textContentType="oneTimeCode"
+				renderCell={({ index, symbol, isFocused }: RenderCellOptions) => (
+					<ThemedText
+						theme={theme}
+						key={index}
+						style={[
+							{
+								fontSize: 22,
+								borderColor: Colors[theme].borderColor,
+								backgroundColor: isFocused
+									? Colors[theme].surface
+									: 'transparent',
+								flex: 1,
+								width: 50,
+								height: 55,
+								minWidth: 50,
+								justifyContent: 'center',
+								alignItems: 'center',
+								borderWidth: 1,
+								borderRadius: 10,
+								textAlign: 'center',
+								textAlignVertical: 'center',
+							},
+						]}
+						value={symbol || (isFocused ? <Cursor /> : '')}
+					/>
+				)}
+			/>
+			<ThemedTextInput
+				maxLength={TextInputMaxCharacters.UserName}
+				theme={theme}
+				secret={secret}
+				setSecret={setSecret}
+				isSecret
+				placeholder="New Password"
+				value={newPassword}
+				setValue={setNewPassword}
+				outerContainerStyle={{
+					marginTop: 0,
+				}}
+			/>
+
+			<PostTypeButton
+				click_action={onActualPasswordReset}
+				val={'Submit'}
+				style={{ width: '100%' }}
+			/>
+		</View>
+	);
+};
+
+interface AuthActionsProps {
+	theme: 'light' | 'dark';
+	type: 'login' | 'forgot' | 'register';
+	onSignInPress: () => void;
+	onSignUpPress: () => void;
+	onResetPasswordPress: () => void;
+	pendingVerification: boolean;
+	successfulCreation: boolean;
+}
+
+const AuthActions = ({
+	theme,
+	type,
+	onSignInPress,
+	onSignUpPress,
+	onResetPasswordPress,
+	pendingVerification,
+	successfulCreation,
+}: AuthActionsProps) => {
+	if (type === 'login' && !pendingVerification) {
+		return (
+			<View style={{ gap: 12 }}>
+				<Link
+					href={{ pathname: '/login', params: { type: 'forgot' } }}
+					asChild
+					style={{ marginTop: 12 }}>
+					<TouchableOpacity>
+						<ThemedText
+							style={{ color: Colors[theme].primary }}
+							theme={theme}
+							value={'I forgot my Password'}
+						/>
+					</TouchableOpacity>
+				</Link>
+
+				<PostTypeButton
+					val="Log In"
+					click_action={onSignInPress}
+					style={{ width: '100%', marginTop: 12 }}
+				/>
+			</View>
+		);
+	} else if (type === 'register' && !pendingVerification) {
+		return (
+			<PostTypeButton
+				click_action={onSignUpPress}
+				val="Create"
+				style={{ width: '100%', marginVertical: 24 }}
+			/>
+		);
+	} else if (type === 'forgot' && !successfulCreation) {
+		return (
+			<View>
+				<Link
+					href={{ pathname: '/login', params: { type: 'login' } }}
+					asChild
+					style={{ marginTop: 12 }}>
+					<TouchableOpacity>
+						<ThemedText
+							style={{ color: Colors[theme].primary }}
+							theme={theme}
+							value={'Go back to login'}
+						/>
+					</TouchableOpacity>
+				</Link>
+
+				<PostTypeButton
+					click_action={onResetPasswordPress}
+					val="Send Verification Code"
+					style={{ width: '100%', marginVertical: 24 }}
+				/>
+			</View>
+		);
+	} else {
+		return null;
+	}
+};
+
 const Page = () => {
 	const theme = useSystemTheme();
-	const { type } = useLocalSearchParams<{ type: string }>();
+	const { type } = useLocalSearchParams<{
+		type: 'login' | 'register' | 'forgot';
+	}>();
 	const { signIn, setActive, isLoaded } = useSignIn();
-	const {
-		signUp,
-		isLoaded: signUpLoaded,
-		setActive: signupSetActive,
-	} = useSignUp();
+	const { signUp, isLoaded: signUpLoaded } = useSignUp();
 
-	const [emailAddress, setEmailAddress] = useState('');
-	const [password, setPassword] = useState('');
-	const [newPassword, setNewPassword] = useState('');
-	const [successfulCreation, setSuccessfulCreation] = useState(false);
-	const [username, setUsername] = useState('');
-	const [loading, setLoading] = useState(false);
-	const [pendingVerification, setPendingVerification] = React.useState(false);
-	const [resetCode, setResetCode] = useState('');
-	const [code, setCode] = useState('');
+	const [emailAddress, setEmailAddress] = useState<string>('');
+	const [password, setPassword] = useState<string>('');
+	const [newPassword, setNewPassword] = useState<string>('');
+	const [username, setUsername] = useState<string>('');
+	const [loading, setLoading] = useState<boolean>(false);
+	const [pendingVerification, setPendingVerification] =
+		useState<boolean>(false);
+	const [successfulCreation, setSuccessfulCreation] = useState<boolean>(false);
+	const [resetCode, setResetCode] = useState<string>('');
+	const [code, setCode] = useState<string>('');
 	const [props, getCellOnLayoutHandler] = useClearByFocusCell({
 		value: code,
 		setValue: setCode,
 	});
 	const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
 
+	const { notify } = useNotifications();
+
 	const onSignUpPress = async () => {
 		if (!signUpLoaded) return;
 		setLoading(true);
-
 		try {
-			await signUp.create({
-				emailAddress,
-				password,
-				username,
-			});
-
+			await signUp.create({ emailAddress, password, username });
 			await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-
 			setPendingVerification(true);
-		} catch (err) {
-			console.error(JSON.stringify(err, null, 2));
+		} catch (error: any) {
+			console.warn('Error [onSignUpPress]', error);
+
+			const message =
+				error?.message || error?.errors?.[0]?.message || JSON.stringify(error);
+
+			notify('error', {
+				params: {
+					title: 'Error',
+					description: message,
+				},
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -84,65 +405,81 @@ const Page = () => {
 	const onVerifyPress = async () => {
 		if (!signUpLoaded || !isLoaded) return;
 		setLoading(true);
-
 		try {
 			const signUpAttempt = await signUp.attemptEmailAddressVerification({
 				code,
 			});
-
 			if (signUpAttempt.status === 'complete') {
 				await setActive({ session: signUpAttempt.createdSessionId });
 				router.replace('/(auth)/(tabs)/profilePages');
-			} else {
-				console.error(JSON.stringify(signUpAttempt, null, 2));
 			}
-		} catch (err) {
-			console.error(JSON.stringify(err, null, 2));
+		} catch (error: any) {
+			console.warn('Error [onVerifyPress]', error);
+
+			const message =
+				error?.message || error?.errors?.[0]?.message || JSON.stringify(error);
+
+			notify('error', {
+				params: {
+					title: 'Error',
+					description: message,
+				},
+			});
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const onSignInPress = React.useCallback(async () => {
+	const onSignInPress = async () => {
 		if (!isLoaded) return;
 		setLoading(true);
-
 		try {
 			const signInAttempt = await signIn.create({
 				identifier: emailAddress,
 				password,
 			});
-
 			if (signInAttempt.status === 'complete') {
 				await setActive({ session: signInAttempt.createdSessionId });
 				router.replace('/');
-			} else {
 			}
-		} catch (err) {
-			console.error(JSON.stringify(err, null, 2));
+		} catch (error: any) {
+			console.warn('Error [onSignInPress]', error);
+
+			const message =
+				error?.message || error?.errors?.[0]?.message || JSON.stringify(error);
+
+			notify('error', {
+				params: {
+					title: 'Error',
+					description: message,
+				},
+			});
 		} finally {
 			setLoading(false);
 		}
-	}, [isLoaded, emailAddress, password]);
+	};
 
 	const onResetPasswordPress = async () => {
 		if (!isLoaded) return;
 		setLoading(true);
-
 		try {
 			await signIn.create({
 				strategy: 'reset_password_email_code',
 				identifier: emailAddress,
 			});
 			setSuccessfulCreation(true);
+		} catch (error: any) {
+			console.warn('Error [onResetPasswordPress]', error);
 
-			// await signIn.prepareEmailAddressVerification({
-			//   strategy: 'email_code',
-			// });
+			const message =
+				error?.message || error?.errors?.[0]?.message || JSON.stringify(error);
 
-			// setPendingVerification(true);
-		} catch (err) {
-			console.error(JSON.stringify(err, null, 2));
+			notify('error', {
+				params: {
+					title: 'Error',
+					description: message,
+				},
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -151,349 +488,138 @@ const Page = () => {
 	const onActualPasswordReset = async () => {
 		if (!isLoaded) return;
 		setLoading(true);
-
 		try {
 			const result = await signIn.attemptFirstFactor({
 				strategy: 'reset_password_email_code',
 				code: resetCode,
 				password: newPassword,
 			});
-			console.log(result);
-			alert('Password reset successfully');
-
-			// Set the user session active, which will log in the user automatically
 			await setActive({ session: result.createdSessionId });
-		} catch (err: any) {
-			alert(err.errors[0].message);
+		} catch (error: any) {
+			console.warn('Error [onActualPasswordReset]', error);
+
+			const message =
+				error?.message || error?.errors?.[0]?.message || JSON.stringify(error);
+
+			notify('error', {
+				params: {
+					title: 'Error',
+					description: message,
+				},
+			});
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	return (
-		<ThemedView flex={1} theme={theme}>
-			{loading && (
-				<View style={defaultStyles.loadingOverlay}>
-					<CrahActivityIndicator
-						size="large"
-						color={theme == 'dark' ? '#fff' : '000'}
-					/>
-				</View>
-			)}
-			<ScrollView keyboardDismissMode="interactive">
-				<KeyboardAvoidingView
-					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-					keyboardVerticalOffset={70}
-					style={styles.container}>
-					{type !== 'google' ? (
-						<View style={{ justifyContent: 'center', alignItems: 'center' }}>
-							{theme == `light` ? (
-								<GetSVG
-									props={{ width: 250, height: 250 }}
-									name="crah_transparent_black"
+		<HeaderScrollView
+			theme={theme}
+			scrollEnabled={false}
+			headerChildren={
+				<CostumHeader
+					theme={theme}
+					headerLeft={
+						<View style={{ flexDirection: 'row', gap: 8 }}>
+							<TouchableOpacity onPress={router.back}>
+								<Ionicons
+									name="chevron-back"
+									size={defaultHeaderBtnSize}
+									color={Colors[theme].textPrimary}
 								/>
-							) : (
-								<GetSVG
-									props={{ width: 250, height: 250 }}
-									name="crah_transparent"
-								/>
-							)}
+							</TouchableOpacity>
+							<HeaderLeftLogo />
 						</View>
-					) : (
-						<View />
-					)}
+					}
+				/>
+			}
+			scrollChildren={
+				<ThemedView flex={1} theme={theme}>
+					<StatusBar backgroundColor={Colors[theme].background} />
 
-					<ThemedText
-						theme={theme}
-						style={[styles.title]}
-						value={
-							type === 'login' && pendingVerification === false
-								? 'Welcome back'
-								: type === 'register' && pendingVerification === false
-								? 'Create new account'
-								: pendingVerification === true
-								? 'Verify your Email'
-								: 'Reset Password'
-						}
-					/>
-
-					{!pendingVerification && !successfulCreation && (
-						<ThemedView theme={theme} style={{ marginBottom: 0 }}>
-							<TextInput
-								autoCapitalize="none"
-								placeholder="your email"
-								value={emailAddress}
-								onChangeText={setEmailAddress}
-								style={[
-									styles.inputField,
-									{
-										backgroundColor: Colors[theme].surface,
-										color: Colors[theme].textPrimary,
-										borderColor: Colors[theme].borderColor,
-									},
-								]}
+					{loading && (
+						<View style={defaultStyles.loadingOverlay}>
+							<CrahActivityIndicator
+								size="large"
+								color={theme == 'dark' ? '#fff' : '#000'}
 							/>
-
-							{type !== 'forgot' && !successfulCreation && (
-								<SecuredPasswordInput
+						</View>
+					)}
+					<KeyboardAwareScrollView
+						scrollEnabled={false}
+						contentContainerStyle={[styles.scrollContainer]}>
+						<AuthHeader
+							theme={theme}
+							type={type}
+							pendingVerification={pendingVerification}
+						/>
+						<View
+							style={{ flex: 2, width: Dimensions.get('window').width - 24 }}>
+							{!pendingVerification && !successfulCreation && (
+								<AuthForm
+									theme={theme}
+									type={type}
+									emailAddress={emailAddress}
+									setEmailAddress={setEmailAddress}
 									password={password}
 									setPassword={setPassword}
-									placeholder={'password'}
+									username={username}
+									setUsername={setUsername}
+									successfulCreation={successfulCreation}
 								/>
 							)}
-
-							{type === 'register' && (
-								<TextInput
-									placeholder="username"
-									value={username}
-									onChangeText={setUsername}
-									style={[
-										styles.inputField,
-										{
-											backgroundColor: Colors[theme].surface,
-											color: Colors[theme].textPrimary,
-											borderColor: Colors[theme].borderColor,
-										},
-									]}
-								/>
-							)}
-						</ThemedView>
-					)}
-
-					{type === 'forgot' && successfulCreation && (
-						<View>
-							<CodeField
-								ref={ref}
-								{...props}
-								value={resetCode}
-								onChangeText={setResetCode}
-								cellCount={CELL_COUNT}
-								rootStyle={styles.codeFieldRoot}
-								keyboardType="number-pad"
-								textContentType="oneTimeCode"
-								renderCell={({ index, symbol, isFocused }) => (
-									<ThemedText
-										theme={theme}
-										key={index}
-										style={[
-											styles.cellRoot,
-											{
-												borderColor: Colors[theme].borderColor,
-												textAlign: 'center',
-												textAlignVertical: 'center',
-												flex: 1,
-												justifyContent: 'center',
-												alignContent: 'center',
-												alignItems: 'center',
-												alignSelf: 'center',
-												padding: 12.5,
-												marginBottom: 20,
-											},
-											styles.cellText,
-											{
-												backgroundColor: isFocused
-													? Colors[theme].surface
-													: 'transparent',
-											},
-										]}
-										value={symbol || (isFocused ? <Cursor /> : '')}
-										// @ts-ignore
-										onLayout={getCellOnLayoutHandler(index)}
-									/>
-								)}
-							/>
-
-							<SecuredPasswordInput
-								password={newPassword}
-								setPassword={setNewPassword}
-								placeholder={'New Password'}
-								InputStyle={[
-									styles.inputField,
-									{
-										backgroundColor: Colors[theme].surface,
-										color: Colors[theme].textPrimary,
-										borderColor: Colors[theme].borderColor,
-									},
-								]}
-							/>
-						</View>
-					)}
-
-					{type === 'login' && pendingVerification === false ? (
-						<View>
-							<Link
-								href={{ pathname: '/login', params: { type: 'forgot' } }}
-								asChild
-								style={[defaultStyles.btn, styles.btnPrimary]}>
-								<TouchableOpacity>
-									<ThemedText
-										style={styles.btnPrimaryText}
-										theme={theme}
-										value={'I forgot my Password'}
-									/>
-								</TouchableOpacity>
-							</Link>
-							<TouchableOpacity
-								style={[defaultStyles.btn, styles.btnPrimary]}
-								onPress={onSignInPress}>
-								<ThemedText
-									style={styles.btnPrimaryText}
+							{pendingVerification && (
+								<VerificationCodeInput
+									code={code}
+									setCode={setCode}
+									props={props}
+									ref={ref}
 									theme={theme}
-									value={'Log In'}
+									onVerifyPress={onVerifyPress}
 								/>
-							</TouchableOpacity>
-						</View>
-					) : type === 'register' && pendingVerification === false ? (
-						<TouchableOpacity
-							style={[defaultStyles.btn, styles.btnPrimary]}
-							onPress={onSignUpPress}>
-							<ThemedText
-								style={styles.btnPrimaryText}
+							)}
+							{type === 'forgot' && successfulCreation && (
+								<ForgotPasswordForm
+									theme={theme}
+									resetCode={resetCode}
+									setResetCode={setResetCode}
+									newPassword={newPassword}
+									setNewPassword={setNewPassword}
+									props={props}
+									ref={ref}
+									onActualPasswordReset={onActualPasswordReset}
+								/>
+							)}
+							<AuthActions
 								theme={theme}
-								value={'Create'}
+								type={type}
+								onSignInPress={onSignInPress}
+								onSignUpPress={onSignUpPress}
+								onResetPasswordPress={onResetPasswordPress}
+								pendingVerification={pendingVerification}
+								successfulCreation={successfulCreation}
 							/>
-						</TouchableOpacity>
-					) : pendingVerification ? (
-						<KeyboardAvoidingView
-							style={[
-								styles.container,
-								{
-									justifyContent: 'center',
-									alignItems: 'center',
-									flex: 1,
-									width: '100%',
-									height: 180,
-								},
-							]}
-							behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-							keyboardVerticalOffset={10}>
-							<CodeField
-								ref={ref}
-								{...props}
-								value={code}
-								onChangeText={setCode}
-								cellCount={CELL_COUNT}
-								rootStyle={styles.codeFieldRoot}
-								keyboardType="number-pad"
-								textContentType="oneTimeCode"
-								renderCell={({ index, symbol, isFocused }) => (
-									<ThemedText
-										theme={theme}
-										key={index}
-										style={[
-											styles.cellRoot,
-											{
-												borderColor: Colors[theme].borderColor,
-												textAlign: 'center',
-												textAlignVertical: 'center',
-												flex: 1,
-												justifyContent: 'center',
-												alignContent: 'center',
-												alignItems: 'center',
-												alignSelf: 'center',
-												padding: 12.5,
-											},
-											styles.cellText,
-											{
-												backgroundColor: isFocused
-													? Colors[theme].surface
-													: 'transparent',
-											},
-										]}
-										// @ts-ignore
-										onLayout={getCellOnLayoutHandler(index)}
-										value={symbol || (isFocused ? <Cursor /> : '')}
-									/>
-								)}
-							/>
-
-							<TouchableOpacity
-								onPress={onVerifyPress}
-								style={[defaultStyles.btn, styles.btnPrimary, { flex: 1 }]}>
-								<ThemedText
-									value="Verify"
-									theme={theme}
-									style={{ marginTop: 0 }}
-								/>
-							</TouchableOpacity>
-						</KeyboardAvoidingView>
-					) : type === 'forgot' ? (
-						<View>
-							{!successfulCreation ? (
-								<View>
-									<Link
-										href={{ pathname: '/login', params: { type: 'login' } }}
-										asChild
-										style={[defaultStyles.btn, styles.btnPrimary]}>
-										<TouchableOpacity>
-											<ThemedText
-												style={styles.btnPrimaryText}
-												theme={theme}
-												value={'Go back to login'}
-											/>
-										</TouchableOpacity>
-									</Link>
-
-									<TouchableOpacity
-										onPress={onResetPasswordPress}
-										style={[defaultStyles.btn, styles.btnPrimary, { flex: 1 }]}>
-										<ThemedText
-											value="Send Email Code"
-											theme={theme}
-											style={{ marginTop: 0 }}
-										/>
-									</TouchableOpacity>
-								</View>
-							) : (
-								<View>
-									<TouchableOpacity
-										onPress={onActualPasswordReset}
-										style={[defaultStyles.btn, styles.btnPrimary, { flex: 1 }]}>
-										<ThemedText
-											value="Set new Password"
-											theme={theme}
-											style={{ marginTop: 0 }}
-										/>
-									</TouchableOpacity>
-								</View>
-							)}
 						</View>
-					) : (
-						<Cursor />
-					)}
-				</KeyboardAvoidingView>
-			</ScrollView>
-		</ThemedView>
+					</KeyboardAwareScrollView>
+				</ThemedView>
+			}
+		/>
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		padding: 20,
-	},
-	logo: {
-		width: 60,
-		height: 60,
-		alignSelf: 'center',
-		marginVertical: 80,
-	},
-	title: {
-		fontSize: 35,
-		marginBottom: 20,
-		fontWeight: 'bold',
-		alignSelf: 'center',
+		padding: 12,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 	inputField: {
 		marginVertical: 4,
 		height: 50,
 		borderWidth: 1,
-		borderColor: Colors['default'].borderColor,
 		borderRadius: 12,
 		padding: 10,
-	},
-	btnPrimary: {
-		// marginVertical: 4,
 	},
 	btnPrimaryText: {
 		fontSize: 16,
@@ -501,26 +627,11 @@ const styles = StyleSheet.create({
 	codeFieldRoot: {
 		gap: 6,
 	},
-	cellRoot: {
+	scrollContainer: {
 		flex: 1,
-		width: 50,
-		height: 50,
-		justifyContent: 'center',
+		width: Dimensions.get('window').width,
 		alignItems: 'center',
-		borderWidth: 1,
-		borderRadius: 10,
-		textAlign: 'center',
-		textAlignVertical: 'center',
-	},
-	cellText: {
-		fontSize: 16,
-		textAlign: 'center',
-		textAlignVertical: 'center',
-	},
-	focusCell: {
-		paddingBottom: 4,
-		textAlign: 'center',
-		textAlignVertical: 'center',
+		justifyContent: 'center',
 	},
 });
 

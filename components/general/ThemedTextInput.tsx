@@ -184,6 +184,7 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 							textInputWrapperStyle,
 						]}>
 						<TextInput
+							secureTextEntry={isSecret}
 							autoCorrect={false}
 							ref={ref}
 							placeholderTextColor={'gray'}
@@ -220,6 +221,7 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 							onTouchEnd={disabled ? onPress : undefined}
 							onTouchCancel={disabled ? onPress : undefined}
 							onTouchEndCapture={disabled ? onPress : undefined}
+							cursorColor={Colors[theme].primary}
 						/>
 
 						{isSecret && (
@@ -252,7 +254,7 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 									style={{
 										position: 'absolute',
 										right: 8,
-										bottom: 8,
+										color: Colors[theme].gray,
 									}}
 								/>
 							</View>
@@ -271,6 +273,6 @@ const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 	},
 );
 
-const ThemedMemoTextInput = React.memo(ThemedTextInput);
+const ThemedMemoTextInput = ThemedTextInput;
 
 export default ThemedMemoTextInput;

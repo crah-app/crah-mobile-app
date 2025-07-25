@@ -11,14 +11,14 @@ const Page = () => {
 	return (
 		<View style={styles.container}>
 			<WelcomeTitle />
-			{theme == `dark` ? (
+			{/* {theme == `dark` ? (
 				<GetSVG
 					props={{ width: 250, height: 250 }}
 					name="crah_transparent_black"
 				/>
 			) : (
 				<GetSVG props={{ width: 250, height: 250 }} name="crah_transparent" />
-			)}
+			)} */}
 
 			<BottomAuthSheet />
 		</View>
@@ -28,9 +28,7 @@ const Page = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: Colors.default.primary,
+		backgroundColor: Colors.default.background2,
 	},
 });
 

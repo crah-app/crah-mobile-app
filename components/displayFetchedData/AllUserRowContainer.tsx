@@ -2,6 +2,7 @@ import ClerkUser from '@/types/clerk';
 import { useSystemTheme } from '@/utils/useSystemTheme';
 import React, { useEffect, useState } from 'react';
 import {
+	Dimensions,
 	FlatList,
 	ScrollView,
 	StyleSheet,
@@ -16,6 +17,7 @@ import {
 	CrahUser,
 	fetchAdresses,
 	RankColors,
+	RankColorsDark,
 	selectedRiderInterface,
 } from '@/types';
 import ThemedText from '../general/ThemedText';
@@ -42,6 +44,8 @@ interface AllUserRowContainerProps {
 	loadMore?: () => void;
 	loadingMore?: boolean;
 	retryFunction?: () => void;
+	displayRetryBtn?: boolean;
+	user: CrahUser | ClerkUser | null;
 }
 
 const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
@@ -59,9 +63,10 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	loadMore = () => {},
 	loadingMore = false,
 	retryFunction,
+	displayRetryBtn = true,
+	user,
 }) => {
 	const theme = useSystemTheme();
-	const { user } = useUser();
 
 	const [usersLoaded, setUsersLoaded] = useState<boolean>(false);
 	const [allUsers, setAllUsers] = useState<CrahUser[]>();
@@ -97,13 +102,15 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 	};
 
 	useEffect(() => {
-		if (users) {
+		if (users && Array.isArray(users) && users.length > 0) {
 			setAllUsers(users);
 			setUsersLoaded(true);
 			return;
 		}
-		!provideExternUserDataArray && fetchUsers();
-	}, [users]);
+		if (!provideExternUserDataArray) {
+			fetchUsers();
+		}
+	}, []);
 
 	useEffect(() => {
 		if (!usersLoaded || !allUsers) return;
@@ -161,11 +168,14 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 							<FlatList
 								ListEmptyComponent={() => (
 									<NoDataPlaceholder
-										containerStyle={{ marginBottom: 100 }}
+										containerStyle={{
+											height: Dimensions.get('window').height * 0.4,
+										}}
 										arrowStyle={{ display: 'none' }}
 										subTextValue=""
 										firstTextValue="No users found"
 										retryFunction={retryFunction}
+										displayRetryBtn={displayRetryBtn}
 									/>
 								)}
 								scrollEnabled={false}
@@ -190,7 +200,8 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 												showAvatar={true}
 												avatarUrl={user.avatar}
 												title={user.Name ?? 'no name user'}
-												subtitle={''}
+												subtitle={`${user?.rank}`}
+												subtitleStyle={{ color: RankColors[user?.rank][0] }}
 											/>
 										) : (
 											<CostumRow user={user} />

@@ -8,15 +8,11 @@ import Colors from '@/constants/Colors';
 const WelcomeTitle = () => {
 	const theme = useSystemTheme();
 	return (
-		<ThemedView theme={theme} flex={0} style={styles.wrapper}>
+		<ThemedView theme={theme} flex={2} style={styles.wrapper}>
+			<ThemedText theme={theme} value="Crah" style={styles.title} />
 			<ThemedText
-				theme={theme == 'dark' ? 'light' : 'dark'}
-				value="Crah"
-				style={styles.title}
-			/>
-			<ThemedText
-				theme={theme == 'dark' ? 'light' : 'dark'}
-				value="The Official Social Network for the Flat Scootering Community"
+				theme={theme}
+				value="Your Place to be a Scooter Rider."
 				style={styles.subtitle}
 			/>
 		</ThemedView>
@@ -25,12 +21,10 @@ const WelcomeTitle = () => {
 
 const styles = StyleSheet.create({
 	wrapper: {
-		marginTop: 70,
+		top: 100,
 		justifyContent: 'flex-start',
 		alignItems: 'center',
-		backgroundColor: Colors['default'].primary,
-		position: 'absolute',
-		top: 10,
+		backgroundColor: Colors.default.background2,
 	},
 	title: {
 		fontSize: 90,

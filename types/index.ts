@@ -118,6 +118,7 @@ export interface CrahUser extends ClerkUser {
 }
 
 export interface CrahUserWithBestTrick extends CrahUser {
+	rank: Rank;
 	rankPoints: number;
 	rankIndex: number;
 	rankGlobalndex: number;
@@ -130,6 +131,7 @@ export interface CrahUserWithBestTrick extends CrahUser {
 }
 
 export interface CrahUserDetailedStats extends CrahUser {
+	rank: Rank;
 	rankGlobalIndex: number;
 	rankGlobalRelative: number;
 	rankRegionalIndex: number;
