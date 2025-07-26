@@ -36,6 +36,7 @@ import {
 	FlatList,
 	ScrollView,
 	TouchableOpacity,
+	Dimensions,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import stringSimilarity from 'string-similarity';
@@ -195,15 +196,12 @@ const ActionContainer = memo(
 		switch (currentStep) {
 			case 0:
 				return (
-					<View style={styles.pageContainer}>
+					<View style={[styles.pageContainer, { top: 30 }]}>
 						<GetSVG name="flying_henke" props={{ width: 350, height: 350 }} />
 
 						<View style={{ gap: 8 }}>
 							<ThemedText
-								style={[
-									defaultStyles.bigText,
-									{ fontWeight: '700', textAlign: 'center', fontSize: 32 },
-								]}
+								style={[defaultStyles.veryBigText, { textAlign: 'center' }]}
 								theme={theme}
 								value="Crah is your place in the Scootering Community"
 							/>
@@ -362,7 +360,10 @@ compare yourself to others and become the best scooter rider in the world `}
 									setQuery={setTrickSearchQuery}
 									placeholder="e.g. Tailwhip"
 									flex={0}
-									containerStyle={{ height: 100, width: 100 }}
+									containerStyle={{
+										height: 100,
+										width: Dimensions.get('window').width - 24,
+									}}
 								/>
 							</View>
 							joseg

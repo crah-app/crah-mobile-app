@@ -1,27 +1,81 @@
 [
-	{
-		"Id": "user_2yBTXFqJg3AopGqlFQAApA07mVE",
-		"Name": "josef",
-		"TrickDate": null,
-		"TrickDifficulty": "Legendary",
-		"TrickId": 490,
-		"TrickName": "1440",
-		"TrickPoints": 44850,
-		"TrickSpot": "Flat",
-		"avatar": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18ydjhwd0VKTWZ6c04zbDExcDNpcWJwTTl2QXIiLCJyaWQiOiJ1c2VyXzJ5QlRYRnFKZzNBb3BHcWxGUUFBcEEwN21WRSIsImluaXRpYWxzIjoiSlMifQ",
-		"chatGreeting": null,
-		"country": "DE",
-		"createdAt": "2025-06-07T14:36:45.000Z",
-		"lastActiveAt": "2025-06-27T10:26:03.000Z",
-		"level": 0,
-		"profileDescription": null,
-		"rank": "Legendary",
-		"rankGlobalIndex": 1,
-		"rankGlobalRelative": "100.00",
-		"rankPoints": 15258,
-		"rankRegionalIndex": 1,
-		"rankRegionalRelative": "100.00",
-		"region": null,
-		"riderType": "Flat Rider"
-	}
+	[
+		{
+			"Id": "user_30PX4OCSTvtJgqOd7yf4t2H70fb",
+			"Name": "kallekorpela",
+			"avatar": "https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18zMFBYNFBZOXoweDN0elpWdGJjWWt4Z21makYifQ",
+			"chatGreeting": null,
+			"country": "DE",
+			"createdAt": "2025-07-26T11:39:50.000Z",
+			"followerCount": 0,
+			"friendCount": 0,
+			"lastActiveAt": "2025-07-26T11:39:50.000Z",
+			"level": 0,
+			"posts": 0,
+			"profileDescription": null,
+			"rank": "Silver",
+			"rankPoints": 326,
+			"region": "Berlin",
+			"riderType": "Street Rider"
+		}
+	],
+	[{ "Park": [] }],
+	[
+		{
+			"Date": null,
+			"Difficulty": "Goated",
+			"Name": "Frontflip",
+			"Points": 900,
+			"Spot": "Park",
+			"TrickId": 531,
+			"UserId": "user_30PX4OCSTvtJgqOd7yf4t2H70fb"
+		},
+		{
+			"Date": null,
+			"Difficulty": "Very Hard",
+			"Name": "360 Bri",
+			"Points": 430,
+			"Spot": "Park",
+			"TrickId": 528,
+			"UserId": "user_30PX4OCSTvtJgqOd7yf4t2H70fb"
+		},
+		{
+			"Date": null,
+			"Difficulty": "Normal",
+			"Name": "Back Scooter Flip",
+			"Points": 100,
+			"Spot": "Park",
+			"TrickId": 529,
+			"UserId": "user_30PX4OCSTvtJgqOd7yf4t2H70fb"
+		},
+		{
+			"Date": null,
+			"Difficulty": "Normal",
+			"Name": "Decuple Heelwhip",
+			"Points": 100,
+			"Spot": "Park",
+			"TrickId": 530,
+			"UserId": "user_30PX4OCSTvtJgqOd7yf4t2H70fb"
+		},
+		{
+			"Date": null,
+			"Difficulty": "Normal",
+			"Name": "Octuple Heelwhip",
+			"Points": 100,
+			"Spot": "Park",
+			"TrickId": 532,
+			"UserId": "user_30PX4OCSTvtJgqOd7yf4t2H70fb"
+		}
+	],
+	[
+		{
+			"Date": null,
+			"Difficulty": "Goated",
+			"Name": "Frontflip",
+			"Points": 900,
+			"Spot": "Park",
+			"TrickId": 531,
+			"UserId": "user_30PX4OCSTvtJgqOd7yf4t2H70fb"
+		}
+	]
 ]

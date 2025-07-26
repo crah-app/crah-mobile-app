@@ -3,6 +3,7 @@ import BuildCharacterUI from '@/components/Character/BuildCharacterUI';
 import ActionContainer from '@/components/createProfile/ActionContainer';
 
 import ThemedText from '@/components/general/ThemedText';
+import ThemedView from '@/components/general/ThemedView';
 
 import CostumHeader from '@/components/header/CostumHeader';
 import HeaderLeftLogo from '@/components/header/headerLeftLogo';
@@ -350,6 +351,7 @@ const CreateProfile = () => {
 
 	return (
 		<HeaderScrollView
+			scrollEnabled={false}
 			headerChildren={
 				<CostumHeader
 					theme={theme}
@@ -363,27 +365,113 @@ const CreateProfile = () => {
 							/>
 						</TouchableOpacity>
 					}
-					headerBottom={
-						<View
-							style={[
-								{
-									paddingTop: 38,
-									width: 300,
-									gap: 8,
-									alignItems: 'center',
-								},
-							]}>
-							<ProgressionBar
-								theme={theme}
-								progress={stepsComplete}
-								totalProgress={4}
-							/>
-						</View>
-					}
 				/>
 			}
 			scrollChildren={
-				<View style={{ flex: 1, bottom: bottom * 3.5 }}>
+				<View style={{ flex: 1 }}>
+					<StatusBar barStyle={'default'} />
+
+					{/* progress bar */}
+					<View
+						style={[
+							{
+								flex: 1,
+								justifyContent: 'center',
+								alignItems: 'center',
+								width: Dimensions.get('window').width,
+								// backgroundColor: 'yellow',
+							},
+						]}>
+						<ProgressionBar
+							theme={theme}
+							progress={stepsComplete}
+							totalProgress={4}
+						/>
+					</View>
+
+					{/* main action text container */}
+					<View
+						style={{
+							flex: 12,
+							justifyContent: 'flex-start',
+							alignItems: 'flex-start',
+							// backgroundColor: 'blue',
+						}}>
+						{currentStep < 5 && (
+							<ActionContainer
+								currentStep={currentStep}
+								commonTricks={commonTricks}
+								error={error}
+								loading={loading}
+								theme={theme}
+								username={username}
+								setUsername={setUsername}
+								showWarningToWriteName={showWarningToWriteName}
+								setShowWarningToWriteName={setShowWarningToWriteName}
+								trickSearchQuery={trickSearchQuery}
+								setTrickSearchQuery={setTrickSearchQuery}
+								bottom={bottom}
+								usernameIsDuplicate={usernameIsTaken}
+								selectedTricks={selectedBestTricks}
+								handleSelectTrick={handleSelectTrick}
+								setSelectedBestTricks={setSelectedBestTricks}
+								triggerTrickSpotSelection={triggerTrickSpotSelection}
+								averageTrickPointsOfBestTricks={averageTrickPointsOfBestTricks}
+								userRank={userRank}
+								setMustSelectOneTrick={setMustSelectOneTrick}
+								mustSelectOneTrick={mustSelectOneTrick}
+								mustSelectRiderType={mustSelectRiderType}
+								setRiderType={setRiderType}
+								riderType={riderType}
+								setMustSelectRiderType={setMustSelectRiderType}
+							/>
+						)}
+
+						<BuildCharacterUI visible={currentStep === 6} />
+					</View>
+
+					{/* bottom action container */}
+					<View
+						style={{
+							alignItems: 'center',
+							gap: 10,
+							backgroundColor: Colors[theme].background,
+							padding: 12,
+							flex: 1,
+						}}>
+						{currentStep < 6 && (
+							<TouchableOpacity
+								onPress={async () => await handleContinue()}
+								style={[
+									{
+										width: 250,
+										padding: 8,
+										backgroundColor: Colors[theme].primary,
+										justifyContent: 'center',
+										alignItems: 'center',
+										borderRadius: 24,
+									},
+								]}>
+								<ThemedText
+									theme={theme}
+									value={'Continue'}
+									style={[{ fontSize: 18, fontWeight: '700' }]}
+								/>
+							</TouchableOpacity>
+						)}
+
+						{currentStep > 0 && (
+							<TouchableOpacity onPress={handleGoBack}>
+								<ThemedText
+									theme={theme}
+									value={'Go Back'}
+									style={[{ fontSize: 14 }]}
+								/>
+							</TouchableOpacity>
+						)}
+					</View>
+
+					{/* loading screen */}
 					{loadingRequest && (
 						<TransparentLoadingScreen
 							visible={loadingModalVisible}
@@ -393,15 +481,14 @@ const CreateProfile = () => {
 					)}
 
 					<BottomSheetModal
+						index={1}
 						snapPoints={snapPoints}
 						handleIndicatorStyle={{ backgroundColor: 'gray' }}
 						backgroundStyle={{
-							backgroundColor: Colors[theme].container_surface,
-							flex: 1,
+							backgroundColor: Colors[theme].background2,
 						}}
-						containerStyle={{ flex: 1 }}
 						ref={bottomSheetRef}>
-						<BottomSheetView style={{ flex: 1 }}>
+						<BottomSheetView>
 							<View
 								style={{
 									flexDirection: 'column',
@@ -465,92 +552,6 @@ const CreateProfile = () => {
 							</View>
 						</BottomSheetView>
 					</BottomSheetModal>
-
-					<StatusBar barStyle={'default'} />
-
-					{/* main action text container */}
-					<View
-						style={{
-							flex: 1,
-							justifyContent: 'flex-start',
-							alignItems: 'flex-start',
-							top: bottom * 3.5 + 45,
-						}}>
-						{currentStep < 5 && (
-							<ActionContainer
-								currentStep={currentStep}
-								commonTricks={commonTricks}
-								error={error}
-								loading={loading}
-								theme={theme}
-								username={username}
-								setUsername={setUsername}
-								showWarningToWriteName={showWarningToWriteName}
-								setShowWarningToWriteName={setShowWarningToWriteName}
-								trickSearchQuery={trickSearchQuery}
-								setTrickSearchQuery={setTrickSearchQuery}
-								bottom={bottom}
-								usernameIsDuplicate={usernameIsTaken}
-								selectedTricks={selectedBestTricks}
-								handleSelectTrick={handleSelectTrick}
-								setSelectedBestTricks={setSelectedBestTricks}
-								triggerTrickSpotSelection={triggerTrickSpotSelection}
-								averageTrickPointsOfBestTricks={averageTrickPointsOfBestTricks}
-								userRank={userRank}
-								setMustSelectOneTrick={setMustSelectOneTrick}
-								mustSelectOneTrick={mustSelectOneTrick}
-								mustSelectRiderType={mustSelectRiderType}
-								setRiderType={setRiderType}
-								riderType={riderType}
-								setMustSelectRiderType={setMustSelectRiderType}
-							/>
-						)}
-
-						<BuildCharacterUI visible={currentStep === 6} />
-					</View>
-
-					{/* bottom action container */}
-
-					<View
-						style={{
-							bottom: -bottom * 3.5,
-							paddingBottom: bottom * 3.5,
-							alignItems: 'center',
-							gap: 10,
-							backgroundColor: Colors[theme].background,
-							padding: 12,
-						}}>
-						{currentStep < 6 && (
-							<TouchableOpacity
-								onPress={async () => await handleContinue()}
-								style={[
-									{
-										width: 250,
-										padding: 8,
-										backgroundColor: Colors[theme].primary,
-										justifyContent: 'center',
-										alignItems: 'center',
-										borderRadius: 24,
-									},
-								]}>
-								<ThemedText
-									theme={theme}
-									value={'Continue'}
-									style={[{ fontSize: 18, fontWeight: '700' }]}
-								/>
-							</TouchableOpacity>
-						)}
-
-						{currentStep > 0 && (
-							<TouchableOpacity onPress={handleGoBack}>
-								<ThemedText
-									theme={theme}
-									value={'Go Back'}
-									style={[{ fontSize: 14 }]}
-								/>
-							</TouchableOpacity>
-						)}
-					</View>
 				</View>
 			}
 			theme={theme}

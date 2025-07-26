@@ -71,6 +71,9 @@ const Page = () => {
 	const [errLoadingUserPosts, setErrLoadingUserPosts] = useState<boolean>();
 	const [refreshing, setRefreshing] = useState(false);
 
+	const [limit, setLimit] = useState<number>(20);
+	const [offset, setOffset] = useState<number>(0);
+
 	const handleRefresh = async () => {
 		setRefreshing(true);
 		await fetchPosts(ContentFilterSelected);
@@ -93,7 +96,7 @@ const Page = () => {
 
 			const token = await getToken();
 
-			let address = `http://192.168.0.136:4000/api/posts/all/currentUser/${user?.id}`;
+			let address = `http://192.168.0.136:4000/api/posts/all/currentUser/${user?.id}?limit=${limit}&offset=${offset}`;
 
 			switch (category) {
 				case ContentFilterTypes.friends:
@@ -106,20 +109,19 @@ const Page = () => {
 					break;
 
 				default:
-					address = `http://192.168.0.136:4000/api/posts/all/currentUser/${user?.id}`;
+					address = `http://192.168.0.136:4000/api/posts/all/currentUser/${user?.id}?limit=${limit}&offset=${offset}`;
 					break;
 			}
 
 			await fetch(address, {
 				method: 'GET',
 				headers: {
-					'Cache-Control': 'no-cache',
 					Authorization: `Bearer ${token}`,
 				},
 			})
 				.then((res) => res.json())
 				.then((res) => {
-					// console.log(res);
+					console.log(res, user?.id);
 					setUserPosts(res);
 				})
 				.catch((err) => {
@@ -245,9 +247,6 @@ const Page = () => {
 					retryFunction={handleRefresh}
 					containerStyle={styles.PlaceholderContentContainer}
 					firstTextValue="No posts here yet..."
-					subTextValue="Start creating and sharing!"
-					onSubTextClickPathname="/(auth)/(tabs)/createPages/createVideo"
-					arrowStyle={{ display: 'none' }}
 				/>
 			}
 		/>

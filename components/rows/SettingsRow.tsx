@@ -10,6 +10,7 @@ import Scooter from '../../assets/images/vectors/scooter.svg';
 import { ionicon } from '@/types';
 import GetSVG from '../GetSVG';
 import Row from '@/components/general/Row';
+import { mmkv } from '@/hooks/mmkv';
 
 interface SettingsRowProps {
 	type: 'ordinary' | 'unordinary' | string;
@@ -31,6 +32,7 @@ const SettingsRow: React.FC<SettingsRowProps> = ({
 
 	const handleSignOut = async () => {
 		try {
+			mmkv.set('userSignedInOnce', false);
 			await signOut();
 			router.replace('/login');
 		} catch (err) {

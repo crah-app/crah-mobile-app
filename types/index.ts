@@ -138,8 +138,50 @@ export interface CrahUserDetailedStats extends CrahUser {
 	rankRegionalRelative: number;
 }
 
+export type UserTrickProfileData = [
+	[
+		{
+			Id: string;
+			Name: string;
+			avatar: string;
+			chatGreeting: string | null;
+			country: string;
+			createdAt: string;
+			followerCount: number;
+			friendCount: number;
+			lastActiveAt: string;
+			level: number;
+			posts: number;
+			profileDescription: string | null;
+			rank:
+				| 'Wood'
+				| 'Bronze'
+				| 'Silver'
+				| 'Gold'
+				| 'Platinum'
+				| 'Diamond'
+				| 'Legendary';
+			rankPoints: number;
+			region: string | null;
+			riderType: 'Flat Rider' | 'Park Rider' | 'Street Rider' | null;
+		},
+	],
+	[
+		{
+			Flat: Trick[];
+			Park: Trick[];
+			Street: Trick[];
+		},
+	],
+	Trick[], // best tricks
+	Trick[], // Best trick
+];
+
 // when a user is selected in f.e a gifted chat
-export interface selectedRiderInterface extends User {
+export interface selectedRiderInterface {
+	_id: string;
+	name: string;
+	avatar: string;
 	rank: Rank;
 	rankPosition: number;
 }
@@ -263,6 +305,7 @@ export type TrickGeneralSpot = 'Park' | 'Street' | 'Flat';
 export interface Trick {
 	Name: string;
 	DefaultPoints: number;
+	Points: number;
 	Costum: boolean;
 	Type: string;
 	SecondName: string;

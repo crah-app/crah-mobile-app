@@ -83,7 +83,7 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 			.then((res) => res.json())
 			.then((res) => {
 				if (excludeIds) {
-					res = res.filter((user: CrahUser) => !excludeIds.includes(user.id));
+					res = res.filter((user: CrahUser) => !excludeIds.includes(user.Id));
 				}
 				if (res.length === 0) {
 					console.warn('No users found');
@@ -93,7 +93,6 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 					return;
 				}
 				setAllUsers(res);
-				console.log(res);
 			})
 			.catch((err) =>
 				console.warn('An error loading all users occurred: ', err),

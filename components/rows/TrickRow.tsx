@@ -24,14 +24,43 @@ const TrickRow: React.FC<TrickRowProps> = ({
 }) => {
 	const theme = useSystemTheme();
 
+	const displaySubTitle = (
+		landed: 'landed' | 'not landed' | undefined,
+		difficulty: TrickDifficulty | undefined,
+		points: number | undefined,
+	): string => {
+		if (difficulty && points && landed) {
+			return `${landed}   Difficulty  ${difficulty}   Points  ${points}`;
+		}
+
+		if (difficulty && points) {
+			return `Difficulty  ${difficulty}  Points  ${points}`;
+		}
+
+		if (difficulty) {
+			return `Difficulty: ${difficulty}`;
+		}
+
+		if (points) {
+			return `Points: ${points}`;
+		}
+
+		if (landed) {
+			return landed;
+		}
+
+		return '';
+	};
+
 	return (
 		<Row
 			title={name}
-			subtitle={landed}
+			highlightWords={[points?.toString() ?? '', difficulty ?? '']}
+			subtitle={displaySubTitle(landed, difficulty, points)}
+			avatarIsSVG={true}
 			subtitleStyle={{
 				color: landed == 'landed' ? Colors['default'].primary : 'grey',
 			}}
-			avatarIsSVG={true}
 			showAvatar={true}
 			avatarUrl={'bar'}
 			onPress={onPress}

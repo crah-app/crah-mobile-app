@@ -85,6 +85,7 @@ const Root = () => {
 			// if this is the users first time signing in. He has to initialize a profile
 			// ALl values he defines he can change in his profile settings
 			if (!SignedInOnce) {
+				console.log('first time signing in. Navigate to create profile page');
 				router.replace('/createProfile');
 				return;
 			}
@@ -92,7 +93,7 @@ const Root = () => {
 			router.replace('/(auth)/(tabs)/homePages');
 			// router.replace('/(auth)/modals/compareRiders');
 		} else if (!isSignedIn) {
-			router.replace('/');
+			// router.replace('/');
 		}
 	}, [isSignedIn, loaded, isLoaded]);
 
@@ -129,6 +130,12 @@ const Root = () => {
 			/>
 			<Stack.Screen
 				name="createProfile"
+				options={{
+					headerShown: false,
+				}}
+			/>
+			<Stack.Screen
+				name="+not-found"
 				options={{
 					headerShown: false,
 				}}

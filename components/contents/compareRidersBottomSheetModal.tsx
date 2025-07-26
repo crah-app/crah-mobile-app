@@ -1,4 +1,10 @@
-import React, { forwardRef, useCallback, useMemo, useState } from 'react';
+import React, {
+	forwardRef,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
 import { View } from 'react-native';
 import ThemedText from '../general/ThemedText';
 import { defaultStyles } from '@/constants/Styles';
@@ -8,8 +14,14 @@ import {
 	BottomSheetModal,
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { useUser } from '@clerk/clerk-expo';
-import { CrahUser, CrahUserDetailedStats } from '@/types';
+import { ClerkLoading, useUser } from '@clerk/clerk-expo';
+import {
+	CrahUser,
+	CrahUserDetailedStats,
+	Rank,
+	RankColors,
+	selectedRiderInterface,
+} from '@/types';
 import useCrahUser from '@/hooks/useCrahUser';
 import SearchBar from '../general/SearchBar';
 import { useSharedValue } from 'react-native-reanimated';
@@ -17,15 +29,15 @@ import NoDataPlaceholder from '../general/NoDataPlaceholder';
 import CrahActivityIndicator from '../general/CrahActivityIndicator';
 import AllUserRowContainer from '../displayFetchedData/AllUserRowContainer';
 import Row from '../general/Row';
-import ClerkUser from '@/types/clerk';
 
 interface BottomSheetModalProps {
 	theme: 'light' | 'dark';
 	displaySelfInSuggestions: boolean;
 	allUsers?: CrahUserDetailedStats[] | null;
-	rider: CrahUserDetailedStats | null;
-	handleUserPress: (userId: string | undefined) => void;
-	selected_riderId: string | undefined;
+	rider1: selectedRiderInterface | null;
+	rider2: selectedRiderInterface | null;
+	handleUserPress: (userId: selectedRiderInterface) => void;
+	selected_riderInput: number | undefined;
 	user: CrahUser | null;
 }
 
@@ -38,9 +50,11 @@ const BottomSheetModalComponent = forwardRef<
 			theme,
 			displaySelfInSuggestions,
 			allUsers,
-			rider,
-			selected_riderId,
+			rider1,
+			rider2,
+			selected_riderInput,
 			user,
+			handleUserPress,
 		},
 		ref,
 	) => {
@@ -54,6 +68,10 @@ const BottomSheetModalComponent = forwardRef<
 			[],
 		);
 		const [errorWhileLoading, setErrorWhileLoading] = useState<boolean>(false);
+
+		const [displaySelf, setDisplaySelf] = useState<boolean>(
+			displaySelfInSuggestions,
+		);
 
 		const renderBackdrop = useCallback((props: any) => {
 			const animatedIndex = useSharedValue(0);
@@ -69,9 +87,11 @@ const BottomSheetModalComponent = forwardRef<
 			);
 		}, []);
 
-		const handleRiderRowPress = (userId: string | undefined) => {
-			if (!userId) return;
-		};
+		useEffect(() => {
+			console.log('fgsdaijasdfjfasdasdasdf', displaySelfInSuggestions);
+			setDisplaySelf(displaySelfInSuggestions);
+			return () => {};
+		}, [displaySelfInSuggestions]);
 
 		return (
 			<BottomSheetModal
@@ -126,13 +146,24 @@ const BottomSheetModalComponent = forwardRef<
 							<View>
 								{/* display current-user as You */}
 								<Row
-									onPress={() => handleRiderRowPress(user?.id)}
+									onPress={() =>
+										handleUserPress({
+											name: user?.Name ?? '',
+											_id: user?.Id || '',
+											avatar: user?.avatar ?? '',
+											rank: user?.rank || Rank.Wood,
+											rankPosition: user?.rankPoints || -1,
+										})
+									}
 									showAvatar={true}
-									avatarUrl={user?.imageUrl}
+									avatarUrl={user?.avatar}
 									title={'You'}
 									subtitle={`${user?.rank}`}
+									subtitleStyle={{
+										color: user ? RankColors[user.rank][0] : Colors[theme].gray,
+									}}
 									containerStyle={{
-										backgroundColor: Colors[theme].surface,
+										backgroundColor: Colors[theme].background2,
 										paddingHorizontal: -12,
 									}}
 								/>
@@ -176,9 +207,10 @@ const BottomSheetModalComponent = forwardRef<
 									flex: 1,
 								}}>
 								<AllUserRowContainer
+									costumHandleUserPress={handleUserPress}
 									user={user}
 									displayRetryBtn={false}
-									excludeIds={[]}
+									excludeIds={[rider1?._id ?? '-1', rider2?._id ?? '-1']}
 									contentTitle=""
 									bottomSheet={true}
 									rowStyle={{

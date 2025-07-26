@@ -1,7 +1,7 @@
 import { View, StyleSheet } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Colors from '@/constants/Colors';
-import { useOAuth, useSignIn, useSignUp } from '@clerk/clerk-expo';
+import { useOAuth, useSignIn, useSignUp, useUser } from '@clerk/clerk-expo';
 import { AuthStrategy } from '@/types';
 import { useWarmUpBrowser } from '@/hooks/useWarmUpBrowser';
 import PostTypeButton from './PostTypeButton';
@@ -12,6 +12,7 @@ const BottomAuthSheet = () => {
 
 	const { signUp, setActive } = useSignUp();
 	const { signIn } = useSignIn();
+	const { user, isSignedIn } = useUser();
 
 	const { startOAuthFlow: googleAuth } = useOAuth({
 		strategy: AuthStrategy.Google,
@@ -49,8 +50,10 @@ const BottomAuthSheet = () => {
 		if (userNeedsToBeCreated) {
 			const res = await signUp.create({
 				transfer: true,
-				// username: `UserX`, // does not work for some reason. Btw. In the clerk config you have to disable the requirement for a username to set OAuth to work
+				username: 'userXYZ', // does not work for some reason. Btw. In the clerk config you have to disable the requirement for a username to set OAuth to work
 			});
+
+			console.log('create user');
 
 			if (res.status === 'complete') {
 				setActive({
@@ -64,7 +67,7 @@ const BottomAuthSheet = () => {
 				const { createdSessionId, setActive } = await selectedAuth();
 
 				if (createdSessionId) {
-					setActive!({ session: createdSessionId });
+					await setActive!({ session: createdSessionId });
 					console.log('OAuth success standard');
 				}
 			} catch (err) {
@@ -72,6 +75,24 @@ const BottomAuthSheet = () => {
 			}
 		}
 	};
+
+	useEffect(() => {
+		// Wird ausgelöst, sobald der User eingeloggt ist
+		const trySetUsername = async () => {
+			if (user && !user.username) {
+				try {
+					const randomUsername =
+						'user_' + Math.random().toString(36).substring(2, 10);
+					await user.update({ username: randomUsername });
+					console.log('✅ Username gesetzt:', randomUsername);
+				} catch (err) {
+					console.warn('❌ Konnte Username nicht setzen', err);
+				}
+			}
+		};
+
+		trySetUsername();
+	}, [user?.id]); // triggert nur, wenn sich der User ändert
 
 	const handleCreateAccountClick = () => {
 		router.push({
