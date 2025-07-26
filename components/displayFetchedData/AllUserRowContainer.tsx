@@ -93,7 +93,6 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 					return;
 				}
 				setAllUsers(res);
-				// console.log(res);
 			})
 			.catch((err) =>
 				console.warn('An error loading all users occurred: ', err),
@@ -131,11 +130,6 @@ const AllUserRowContainer: React.FC<AllUserRowContainerProps> = ({
 			},
 		});
 	};
-
-	useEffect(() => {
-		console.log(excludeIds);
-		return () => {};
-	}, [excludeIds]);
 
 	return (
 		<ThemedView
