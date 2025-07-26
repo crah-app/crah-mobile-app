@@ -139,7 +139,10 @@ export interface CrahUserDetailedStats extends CrahUser {
 }
 
 // when a user is selected in f.e a gifted chat
-export interface selectedRiderInterface extends User {
+export interface selectedRiderInterface {
+	_id: string;
+	name: string;
+	avatar: string;
 	rank: Rank;
 	rankPosition: number;
 }

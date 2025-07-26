@@ -146,3 +146,33 @@ export function emojiToCodePoint(emoji: string): string {
 	if (codePoint === undefined) return '';
 	return codePoint.toString(16).toUpperCase();
 }
+
+export function formatErrorMessage(error: unknown): string {
+	if (!error) return 'Unknown error occurred.';
+
+	if (typeof error === 'string') return error;
+
+	if (error instanceof Error) {
+		// Netzwerkfehler spezifisch behandeln
+		if (error.message.includes('Network request failed')) {
+			return 'Cannot reach the server. Please check your internet connection.';
+		}
+		return error.message;
+	}
+
+	// Falls z. B. ein Axios-ähnliches error.response.status vorhanden ist
+	if ((error as any)?.response?.status) {
+		return `Request failed with status ${(error as any).response.status}`;
+	}
+
+	// Fallback
+	if (
+		typeof error === 'object' &&
+		'toString' in error &&
+		typeof error.toString === 'function'
+	) {
+		return error.toString();
+	}
+
+	return 'Something went wrong.';
+}
