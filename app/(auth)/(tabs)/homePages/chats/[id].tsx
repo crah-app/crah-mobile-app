@@ -568,7 +568,7 @@ const ChatScreen = () => {
 									// @ts-ignore
 									_id: user.id,
 									// @ts-ignore
-									name: user?.username,
+									name: user?.username || user?.fullName,
 									avatar: user?.imageUrl,
 								}}
 								onInputTextChanged={(text) => typingHandler(text)}

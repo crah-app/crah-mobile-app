@@ -113,6 +113,7 @@ const AuthForm = ({
 					theme={theme}
 					value={username}
 					setValue={setUsername}
+					allowSpace={false}
 				/>
 			)}
 		</View>
@@ -140,10 +141,11 @@ const VerificationCodeInput = ({
 		style={[
 			styles.container,
 			{
-				justifyContent: 'center',
-				alignItems: 'center',
-				width: '100%',
-				height: 180,
+				justifyContent: 'flex-start',
+				// alignItems: 'center',
+				// width: '100%',
+				// height: 180,
+				gap: 12,
 			},
 		]}
 		behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -163,13 +165,15 @@ const VerificationCodeInput = ({
 					key={index}
 					style={[
 						{
+							fontSize: 22,
 							borderColor: Colors[theme].borderColor,
 							backgroundColor: isFocused
-								? Colors[theme].surface
+								? Colors[theme].background2
 								: 'transparent',
 							flex: 1,
 							width: 50,
-							height: 50,
+							height: 55,
+							minWidth: 50,
 							justifyContent: 'center',
 							alignItems: 'center',
 							borderWidth: 1,
@@ -182,11 +186,12 @@ const VerificationCodeInput = ({
 				/>
 			)}
 		/>
-		<TouchableOpacity
-			onPress={onVerifyPress}
-			style={[defaultStyles.btn, { flex: 1 }]}>
-			<ThemedText value="Verify" theme={theme} />
-		</TouchableOpacity>
+
+		<PostTypeButton
+			click_action={onVerifyPress}
+			val={'Verify'}
+			style={{ width: '100%' }}
+		/>
 	</KeyboardAvoidingView>
 );
 
@@ -233,7 +238,7 @@ const ForgotPasswordForm = ({
 								fontSize: 22,
 								borderColor: Colors[theme].borderColor,
 								backgroundColor: isFocused
-									? Colors[theme].surface
+									? Colors[theme].background2
 									: 'transparent',
 								flex: 1,
 								width: 50,
@@ -411,7 +416,7 @@ const Page = () => {
 			});
 			if (signUpAttempt.status === 'complete') {
 				await setActive({ session: signUpAttempt.createdSessionId });
-				router.replace('/(auth)/(tabs)/profilePages');
+				router.replace('/createProfile');
 			}
 		} catch (error: any) {
 			console.warn('Error [onVerifyPress]', error);

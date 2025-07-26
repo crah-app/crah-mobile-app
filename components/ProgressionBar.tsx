@@ -1,6 +1,6 @@
 import Colors from '@/constants/Colors';
 import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
 	Easing,
 	useAnimatedStyle,
@@ -40,7 +40,7 @@ const ProgressionBar: React.FC<Props> = ({
 	return (
 		<View
 			style={{
-				width: '100%',
+				width: Dimensions.get('window').width - 48,
 				height: 14,
 				borderRadius: 12,
 				backgroundColor: Colors[theme].container_surface,
